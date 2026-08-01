@@ -216,6 +216,8 @@ async function handleCommand(rawInput, term, worker, finishCallback) {
 function triggerFileUpload(term, callback) {
   const input = document.createElement('input');
   input.type = 'file';
+
+  // 1. User selects a file
   input.onchange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -228,8 +230,16 @@ function triggerFileUpload(term, callback) {
     }
     callback();
   };
+
+  // 2. User cancels/closes the file dialog window
+  input.oncancel = () => {
+    term.writeln('Upload canceled.');
+    callback();
+  };
+
   input.click();
 }
+
 
 // Helper: Download file from OPFS
 async function triggerFileDownload(filename, term) {
