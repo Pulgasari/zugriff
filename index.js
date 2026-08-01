@@ -1,3 +1,5 @@
+// index.js
+
 import { preact, html } from './lib.js';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
