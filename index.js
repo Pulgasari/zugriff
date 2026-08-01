@@ -7,13 +7,12 @@ const { useEffect, useRef, signal } = preact;
 // Signal for active terminal commands
 const loadedCommands = signal(new Set(['help', 'init', 'clear']));
 
-function TerminalApp() {
+function TerminalView() {
   const terminalRef = useRef(null);
 
   useEffect(() => {
     if (!terminalRef.current) return;
 
-    // Instantiate xterm.js
     const term = new Terminal({
       cursorBlink: true,
       theme: {
@@ -33,7 +32,6 @@ function TerminalApp() {
     const handleResize = () => fitAddon.fit();
     window.addEventListener('resize', handleResize);
 
-    // Terminal session state
     let currentLine = '';
     const prompt = 'zugriff> ';
 
@@ -45,7 +43,6 @@ function TerminalApp() {
     term.writeln('Client-side WASM micro-terminal. Type "help" to list available commands.');
     term.write(`\x1b[32m${prompt}\x1b[0m`);
 
-    // Key input handler
     term.onData((data) => {
       const charCode = data.charCodeAt(0);
 
@@ -73,6 +70,27 @@ function TerminalApp() {
 
   return html`
     <div class="terminal-container" ref=${terminalRef}></div>
+  `;
+}
+
+// Application Layout Shell
+function App() {
+  const activeCount = loadedCommands.value.size;
+
+  return html`
+    <header id="app-head">
+      <h1>zugriff</h1>
+      <span style=${{ fontSize: '0.8rem', color: '#8b949e' }}>v0.1.0</span>
+    </header>
+    
+    <main id="app-main">
+      <${TerminalView} />
+    </main>
+    
+    <footer id="app-foot">
+      <span>Engine: Client WASM</span>
+      <span>Loaded Tools: ${activeCount}</span>
+    </footer>
   `;
 }
 
@@ -112,5 +130,5 @@ function handleCommand(rawInput, term) {
   }
 }
 
-// Mount application
-preact.render(html`<${TerminalApp} />`, document.getElementById('app'));
+// Mount Root
+preact.render(html`<${App} />`, document.getElementById('app'));
