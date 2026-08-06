@@ -39,6 +39,13 @@ function TerminalView() {
     // Handle incoming messages from the execution worker
     worker.onmessage = (e) => {
       const { type, text } = e.data;
+      /*
+      switch (type) {
+        case 'STDOUT' : term.writeln(`\x1b[36m${text}\x1b[0m`); break;
+        case 'STDERR' : term.writeln(`\x1b[31m${text}\x1b[0m`); break;
+        case 'EXIT'   : writePrompt();
+      }
+      */
       if (type === 'STDOUT') {
         term.writeln(`\x1b[36m${text}\x1b[0m`);
       } else if (type === 'STDERR') {
