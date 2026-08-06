@@ -6,6 +6,14 @@
   <title>zugriff</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.css" />
   <link rel="stylesheet" href="./index.css">
+  <script src="https://pulgasari.github.io/aufbau/importmap.js"></script>
+  <script type="importmap">
+    {"imports": {
+      "@xterm/xterm"     : "https://esm.sh/@xterm/xterm@5.5.0",
+      "@xterm/addon-fit" : "https://esm.sh/@xterm/addon-fit@0.10.0"
+    }}
+  </script>
+  <!--
   <script type="importmap">
   {
     "imports": {
@@ -17,7 +25,8 @@
       "@xterm/addon-fit": "https://esm.sh/@xterm/addon-fit@0.10.0"
     }
   }
-  </script>
+</script>
+-->
 </head>
 <body>
   <div id="app"></div>
