@@ -4,7 +4,7 @@
 
 // ::: app
 import * as app    from './../shared/js/app.js';
-import * as config from './config.js';
+import * as config from './app.config.js';
 import { vfs }     from './../shared/js/vfs.js';
 
 // ::: vendors
