@@ -65,7 +65,10 @@ const map = { imports: {
   "preact/hooks"     : "https://esm.sh/preact@10.20.1/hooks",
   "@preact/signals"  : "https://esm.sh/@preact/signals@1.2.2?external=preact",
     
-  "hljs" : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm"
+  "hljs" : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
+
+  "@xterm/addon-fit" : "https://esm.sh/@xterm/addon-fit@0.10.0",
+  "@xterm/xterm"     : "https://esm.sh/@xterm/xterm@5.5.0",
 }};
 
 const mapURL = document.currentScript?.src;
