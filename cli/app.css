@@ -12,6 +12,12 @@ html, body {
   flex-direction : column;
   height         : 100dvh;
   min-height     : 0;
+
+  /* layout.css is not linked here, so the order is spelled out */
+  #app-head     { order: 0; }
+  #app-settings { order: 1; flex: 0 0 auto; overflow-y: auto; max-height: 50dvh; }
+  #app-main     { order: 2; }
+  #app-foot     { order: 3; }
 }
 
 #app-head {
