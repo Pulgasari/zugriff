@@ -134,6 +134,11 @@ apply inside a worker, so `@bunker/cache` is imported by its full url there.
 | `zugriff-<slug>-v2` | the app's own files + the shared css/js | stale-while-revalidate, conditional on `ETag`/`Last-Modified` — an unchanged file costs a 304 |
 | `zugriff-vendor-v2` | third party modules pinned to a version in the url (`esm.sh/preact@10.20.1`, `unpkg.com/@ffmpeg/core@0.12.6/…`) | cached for a year, never refetched — and shared by every app, so preact is stored once, not thirty times |
 
+anything else on a foreign origin — iconify, google fonts — is **not** touched.
+revalidating it would mean adding `If-None-Match`/`If-Modified-Since`, which
+turns a simple request into a preflighted one, and `api.iconify.design` does
+not allow those headers: the icons would load once and then start failing.
+
 the revalidation is handed to `event.waitUntil` via bunker's `keepAlive`, so a
 refresh started on the last request of a session is not lost when the worker is
 killed. the launcher's scope is `/zugriff/`, which sits above every app — it

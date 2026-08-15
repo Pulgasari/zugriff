@@ -8,9 +8,10 @@ import { html, signal, computed } from '@aufbau/kits/preact-htm';
 import { boot } from './shared/js/app.js';
 import { registry, categories } from './apps/registry.js';
 import Icon from './shared/js/components/Icon.js';
+import Nav  from './shared/js/components/Nav.js';
 
 const config = {
-  app    : { slug: 'zugriff', name: 'zugriff', theme: 'dracula', lang: 'en' },
+  app    : { slug: 'zugriff', name: 'zugriff apps', theme: 'dracula', lang: 'en' },
   aufbau : { elements: { mode: 'auto' } },
 };
 
@@ -77,15 +78,8 @@ function AppList () {
 function Launcher () {
   return html`
     <div id="app-head">
-      <div id="app-logo"><strong>zugriff</strong></div>
-      <nav class="actions">
-        <a class="ghost-btn" href="./cli/" title="the zugriff terminal">
-          <${Icon} name="mdi:console" /> cli
-        </a>
-        <a class="ghost-btn active" href="./" title="all apps">
-          <${Icon} name="mdi:apps" /> apps
-        </a>
-      </nav>
+      <div id="app-logo"><strong>zugriff</strong> apps</div>
+      <${Nav} here='apps' base='./' />
     </div>
 
     <${AppList} />

@@ -11,6 +11,7 @@ import { FitAddon } from '@xterm/addon-fit';
 import * as config from './app.config.js';
 
 // ::: local: shared
+import Nav     from './../shared/js/components/Nav.js';
 import { vfs } from './../shared/js/vfs.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
@@ -118,8 +119,11 @@ function App() {
 
   return html`
     <header id="app-head">
-      <h1>zugriff</h1>
-      <span class="version">v0.2.0</span>
+      <div id="app-logo">
+        <h1>zugriff</h1>
+        <span class="version">v0.2.0</span>
+      </div>
+      <${Nav} here='cli' base='./../' />
     </header>
     
     <main id="app-main">
