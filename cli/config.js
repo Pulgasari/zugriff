@@ -1,5 +1,9 @@
 // cli/config.js
 
+export const app = {
+  name : 'zugriff',
+};
+
 export const aufbau = {
   elements: {
     load: 'auto',
