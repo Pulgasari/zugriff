@@ -3,7 +3,7 @@
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
-import { vfs } from './vfs.js';
+import { vfs } from './../shared/js/vfs.js';
 
 aufbau.init();
 const { useEffect, useRef, signal } = preact;
