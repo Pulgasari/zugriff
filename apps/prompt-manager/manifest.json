@@ -1,0 +1,34 @@
+{
+  "id": "prompt_manager",
+  "name": "Prompt Manager",
+  "short_name": "Prompt Manager",
+  "description": "Keep, tag and search your prompts \u2014 stored on this device.",
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "categories": [
+    "utilities"
+  ],
+  "background_color": "#282a36",
+  "theme_color": "#282a36",
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

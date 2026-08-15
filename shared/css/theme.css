@@ -1,0 +1,64 @@
+/* shared/css/theme.css
+   themes are selected via <html data-theme='...'>, the boot helper sets it
+   from the app config. every theme only has to provide the base tokens —
+   everything derived is computed further down. */
+
+:root {
+  --accent : red;
+
+  &[data-theme="dark"] {
+    --bg : #151515;
+    --fg : white;
+  }
+  &[data-theme="light"] {
+    --bg : white;
+    --fg : black;
+  }
+  &[data-theme="oled"] {
+    --bg : black;
+    --fg : white;
+  }
+  &[data-theme="dracula"] {
+    --accent   : #ff79c6;
+    --accent-2 : #f1fa8c;
+    --accent-3 : #50fa7b;
+    --success  : #50fa7b;
+    --bg       : #282a36;
+    --fg       : #f8f8f2;
+    --zebra    : color-mix(in oklch, var(--bg), black 5%);
+    --active   : var(--accent);
+  }
+}
+
+/* ── derived tokens ─────────────────────────────────────────────────────── */
+
+:root {
+  --accent-5  : hsl(from var(--accent) h s l / 0.05);
+  --accent-10 : hsl(from var(--accent) h s l / 0.10);
+  --accent-25 : hsl(from var(--accent) h s l / 0.25);
+  --accent-50 : hsl(from var(--accent) h s l / 0.50);
+  --accent-75 : hsl(from var(--accent) h s l / 0.75);
+
+  --fg-25 : hsl(from var(--fg) h s l / 0.25);
+  --fg-50 : hsl(from var(--fg) h s l / 0.50);
+  --fg-75 : hsl(from var(--fg) h s l / 0.75);
+
+  --bg-darker-10  : hsl(from var(--bg) h s calc(l - 10%));
+  --bg-lighter-10 : hsl(from var(--bg) h s calc(l + 10%));
+
+  --shadow : 0 0 5px color-mix(in srgb, var(--bg) 90%, black);
+
+  --button-primary-bg   : var(--accent);
+  --button-secondary-bg : color-mix(in srgb, var(--fg) 50%, var(--bg));
+}
+
+/* data type colors — used by the inspector patterns */
+:root {
+  --c-string : #98c379;
+  --c-number : #d19a66;
+  --c-bool   : #56b6c2;
+  --c-null   : #e06c75;
+}
+
+html { background : black; }
+body { background : var(--bg); color : var(--fg); }

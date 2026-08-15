@@ -1,4 +1,8 @@
 /*
-real app specific css lands here
-common css goes into: './../../shared/css/'
+app specific css only.
+everything shared lives in ./../../shared/css/ and is linked from index.html:
+  index.css   — reset, theme, typo, layout, components (always)
+  panes.css   — code input/output panes    (opt-in)
+  inspector.css — data tree                (opt-in)
+  hljs.css    — syntax highlighting theme  (opt-in)
 */

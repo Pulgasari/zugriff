@@ -1,0 +1,13 @@
+/* json-formatter — app specific css.
+   shared rules live in ./../../shared/css/ */
+
+.indent-picker {
+  display     : flex;
+  align-items : center;
+  gap         : 0.35rem;
+}
+
+.indent-label {
+  font-size : 0.75rem;
+  opacity   : 0.55;
+}

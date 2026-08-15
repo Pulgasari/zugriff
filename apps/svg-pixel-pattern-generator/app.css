@@ -1,0 +1,171 @@
+/* svg-pixel-pattern-generator — app specific css.
+   shared rules live in ./../../shared/css/ */
+
+.preview {
+  height : 300px;
+  width  : 100%;
+  background: red;
+}
+
+/* ── toolbar ── */
+.toolbar {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; flex-shrink: 0;
+  padding: .5rem .65rem; border-radius: .6rem;
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
+}
+
+.divider {
+  width: 1px; height: 1.4rem; flex-shrink: 0;
+  background: color-mix(in srgb, var(--fg) 15%, transparent);
+}
+
+.tool-group { display: flex; gap: .2rem; }
+
+.tool-btn {
+  background: transparent; border: none; color: var(--fg); cursor: pointer;
+  padding: .3rem; border-radius: .35rem; display: flex; align-items: center;
+  opacity: .5; transition: opacity .12s, background .12s;
+}
+
+.tool-btn:hover  { opacity: 1; background: color-mix(in srgb, var(--fg) 8%, transparent); }
+
+.tool-btn.active { opacity: 1; background: var(--accent); color: var(--bg); }
+
+/* size field */
+.size-field { display: flex; align-items: center; gap: .2rem; }
+
+.size-label { font-size: .72rem; opacity: .5; min-width: .8rem; }
+
+.sz-btn {
+  background: transparent; border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  color: var(--fg); cursor: pointer; padding: .15rem .25rem;
+  border-radius: .3rem; display: flex; align-items: center;
+  opacity: .5; transition: opacity .12s;
+}
+
+.sz-btn:hover { opacity: 1; }
+
+.sz-input {
+  width: 2.8rem; text-align: center; padding: .2rem .25rem;
+  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  border-radius: .3rem; background: color-mix(in srgb, var(--fg) 5%, transparent);
+  color: var(--fg); font-size: .8rem; font-variant-numeric: tabular-nums;
+}
+
+.sz-input:focus { outline: none; border-color: var(--accent); }
+
+/* ── palette ── */
+.palette {
+  display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; flex-shrink: 0;
+}
+
+.pal-swatch {
+  width: 1.6rem; height: 1.6rem; border-radius: .3rem; cursor: pointer;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 15%, transparent);
+  transition: transform .1s, box-shadow .1s;
+  position: relative;
+}
+
+.pal-swatch:hover  { transform: scale(1.15); }
+
+.pal-swatch.active {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+  transform: scale(1.15);
+}
+
+.pal-add {
+  width: 1.6rem; height: 1.6rem; border-radius: .3rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed color-mix(in srgb, var(--fg) 25%, transparent);
+  opacity: .5; position: relative; transition: opacity .12s;
+}
+
+.pal-add:hover { opacity: 1; }
+
+/* ── canvas ── */
+.canvas-wrap {
+  flex: 1; overflow: auto;
+  display: flex; align-items: flex-start; justify-content: flex-start;
+  padding: .5rem;
+  background: color-mix(in srgb, var(--fg) 3%, transparent);
+  border-radius: .6rem;
+  border: 1px solid color-mix(in srgb, var(--fg) 8%, transparent);
+  /* checkerboard */
+  background-image:
+    linear-gradient(45deg, #8882 25%, transparent 25%),
+    linear-gradient(-45deg, #8882 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #8882 75%),
+    linear-gradient(-45deg, transparent 75%, #8882 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  width: 100%;
+}
+
+.pixel-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);  /* war: repeat(var(--cols), var(--sz)) */
+  gap: 1px;
+  cursor: crosshair;
+  width: 100%;  /* füllt den wrap */
+}
+
+.pixel-cell {
+  aspect-ratio: 1;  /* immer quadratisch */
+  /* width/height: var(--sz) weg */
+  outline: 1px solid color-mix(in srgb, var(--fg) 8%, transparent);
+  transition: outline-color .1s;
+}
+
+/*
+.pixel-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--sz));
+  gap: 1px;
+  cursor: crosshair;
+  flex-shrink: 0;
+}
+
+.pixel-cell {
+  width: var(--sz);
+  height: var(--sz);
+  outline: 1px solid color-mix(in srgb, var(--fg) 8%, transparent);
+  transition: outline-color .1s;
+}
+
+*/
+.pixel-cell:hover {
+  outline: 1.5px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  z-index: 1; position: relative;
+}
+
+.mirror-toggle { position: relative; }
+
+.mirror-backdrop {
+  position: fixed; inset: 0; z-index: 10;
+}
+
+.mirror-popup {
+  position: absolute; bottom: calc(100% + .4rem); left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex; flex-direction: column; gap: .15rem;
+  padding: .3rem;
+  background: var(--bg);
+  border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
+  border-radius: .5rem;
+  box-shadow: 0 4px 16px #0003;
+  min-width: 9rem;
+}
+
+.mirror-opt {
+  display: flex; align-items: center; gap: .45rem;
+  padding: .3rem .5rem; border-radius: .35rem; border: none;
+  background: transparent; color: var(--fg); cursor: pointer;
+  font-size: .82rem; opacity: .6; transition: opacity .1s, background .1s;
+  white-space: nowrap;
+}
+
+.mirror-opt:hover  { opacity: 1; background: color-mix(in srgb, var(--fg) 8%, transparent); }
+
+.mirror-opt.active { opacity: 1; color: var(--accent); }

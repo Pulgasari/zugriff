@@ -1,0 +1,19 @@
+/* shared/css/reset.css */
+
+*, *::before, *::after {
+  box-sizing : border-box;
+  margin     : 0;
+  padding    : 0;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow: auto;
+}
+
+a {
+  color: var(--accent);
+}

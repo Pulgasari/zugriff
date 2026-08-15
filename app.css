@@ -1,0 +1,59 @@
+/* app.css — launcher only */
+
+#app-body {
+  max-width : 640px;
+}
+
+.launcher-search { width: 100%; }
+
+.launcher-categories {
+  display   : flex;
+  flex-wrap : wrap;
+  gap       : 0.35rem;
+  width     : 100%;
+}
+
+#apps {
+  font-size   : 1rem;
+  line-height : 1.3;
+  list-style  : none;
+  width       : 100%;
+
+  li {
+    border-radius : 0.25rem;
+    &:nth-child(2n+1) { background: var(--zebra); }
+
+    a {
+      border-radius   : 0.25rem;
+      display         : flex;
+      gap             : 0.75rem;
+      padding         : 0.75rem;
+      align-items     : center;
+      justify-content : space-between;
+      color           : var(--fg);
+      text-decoration : none;
+
+      &:hover { background: var(--accent-10); }
+    }
+
+    .title {
+      display        : flex;
+      flex-direction : column;
+      gap            : 0.2rem;
+      flex           : 1 1 auto;
+      min-width      : 0;
+    }
+    .name { font-size: 1.1rem; }
+    .desc { font-size: 0.8rem; opacity: 0.5; }
+
+    .logo {
+      color       : var(--fg);
+      opacity     : 0.25;
+      flex        : none;
+      --icon-size : 1.5rem;
+    }
+    a:hover .logo { opacity: 1; color: var(--accent); }
+  }
+}
+
+.launcher-empty { opacity: 0.4; font-style: italic; }
