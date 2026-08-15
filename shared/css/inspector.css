@@ -1,0 +1,101 @@
+/* shared/css/inspector.css
+   the data tree used by the inspector pattern — this was duplicated byte for
+   byte across csv-/json-/toml-/yaml-inspector. */
+
+.tree-col {
+  display        : flex;
+  flex-direction : column;
+  gap            : 0.6rem;
+  min-height     : 0;
+  overflow       : hidden;
+}
+
+.tree-empty {
+  flex            : 1;
+  display         : flex;
+  flex-direction  : column;
+  align-items     : center;
+  justify-content : center;
+  gap             : 0.6rem;
+  opacity         : 0.25;
+  font-size       : 0.9rem;
+}
+
+.tree {
+  flex        : 1;
+  overflow    : auto;
+  font-family : var(--font-code);
+  font-size   : 0.8rem;
+  line-height : 1.65;
+  padding     : 0.4rem 0;
+}
+
+.node { user-select: none; }
+
+.node-row {
+  display       : flex;
+  align-items   : center;
+  gap           : 0.3rem;
+  padding       : 0.1rem 0.4rem;
+  border-radius : 0.3rem;
+  cursor        : pointer;
+  transition    : background 0.1s;
+  position      : relative;
+}
+.node-row:hover         { background: color-mix(in srgb, var(--fg) 7%, transparent); }
+.node-row.leaf          { cursor: default; }
+.node-row.closing       { cursor: default; }
+.node-row.closing:hover { background: transparent; }
+
+.node-children {
+  padding-left : 1.4rem;
+  border-left  : 1px solid color-mix(in srgb, var(--fg) 8%, transparent);
+  margin-left  : 0.7rem;
+}
+
+.toggle-icon { opacity: 0.4; flex-shrink: 0; }
+.leaf-indent { width: 1rem; flex-shrink: 0; }
+.type-icon   { opacity: 0.4; flex-shrink: 0; font-size: 0.75rem; }
+
+.node-key {
+  color       : color-mix(in srgb, var(--accent) 80%, var(--fg));
+  font-weight : 500;
+}
+.colon { opacity: 0.4; margin-right: 0.2rem; }
+
+.prim-val {
+  overflow      : hidden;
+  text-overflow : ellipsis;
+  white-space   : nowrap;
+  max-width     : 40ch;
+  flex-shrink   : 1;
+}
+
+.preview { opacity: 0.35; font-size: 0.75rem; }
+.bracket { opacity: 0.5; }
+
+/* row actions stay hidden until the row is hovered */
+.node-actions {
+  display     : flex;
+  gap         : 0.1rem;
+  margin-left : auto;
+  flex-shrink : 0;
+  opacity     : 0;
+  transition  : opacity 0.1s;
+}
+.node-row:hover .node-actions { opacity: 1; }
+
+.highlighted {
+  background    : var(--accent-10);
+  border-radius : 0.3rem;
+}
+
+.filtered-hint {
+  font-size  : 0.72rem;
+  opacity    : 0.35;
+  padding    : 0.1rem 0.4rem;
+  font-style : italic;
+}
+
+/* the inspector apps run wider than the default column */
+#app-body { max-width: 1200px; }

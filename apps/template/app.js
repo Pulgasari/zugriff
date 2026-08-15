@@ -1,18 +1,27 @@
-// app.js
+// apps/template/app.js
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
-// ::: app
-import * as app    from './../shared/js/app.js';
-import * as config from './app.config.js';
-import { vfs }     from './../shared/js/vfs.js';
-
 // ::: vendors
-import aufbau, { html, dom, preact } from '@aufbau/kits/preact-htm';
+import { html } from '@aufbau/kits/preact-htm';
 
-// :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
+// ::: shared
+import { boot } from './../../shared/js/app.js';
+import { Icon } from './../../shared/js/components/index.js';
 
-aufbau.init();
-app.adoptStyleSheets(app.css);
+// ::: local
+import * as config from './app.config.js';
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
+
+function App () {
+  return html`
+    <div id="app-body">
+      <${Icon} name=${config.app.icon} size="48" />
+      <p>${config.app.description}</p>
+    </div>`;
+}
+
+// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+
+boot({ config, App });

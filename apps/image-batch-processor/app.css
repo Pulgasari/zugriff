@@ -1,0 +1,58 @@
+/* image-batch-processor — app specific css.
+   shared rules live in ./../../shared/css/ */
+
+/* file list */
+.file-list { display: flex; flex-direction: column; gap: .4rem; }
+
+.file-item { display: flex; align-items: center; gap: .6rem; padding: .5rem .65rem;
+  border-radius: .45rem; background: color-mix(in srgb, var(--fg) 6%, transparent); font-size: .85rem; }
+
+.file-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .8; }
+
+.file-item.done  { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+.file-item.error { background: color-mix(in srgb, #f44 8%, transparent); }
+
+/* task adder */
+.task-adder  { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+
+.adder-label { font-size: .75rem; opacity: .5; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+
+.adder-chips { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center; }
+
+/* tasks */
+.tasks {
+  display     : flex; 
+  flex-flow   : column nowrap; 
+  gap         : 1rem;
+  align-items : stretch;
+  align-self  : stretch;
+}
+
+.task main {
+  display     : flex;
+  align-items : center; 
+  gap         : 0.5rem; 
+  flex-wrap   : wrap;
+  padding     : 0.5rem;
+  justify-content: center;
+}
+
+.task-label { opacity: .5; font-size: .78rem; }
+
+.task-hint  { opacity: .4; font-size: .75rem; }
+
+.task-val   { min-width: 2.5rem; text-align: right; font-variant-numeric: tabular-nums; opacity: .7; font-size: .8rem; }
+
+.task-input {
+  padding: .25rem .4rem; border-radius: .35rem; font-size: .82rem;
+  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  color: var(--fg); width: 5rem;
+}
+
+.task-input.sm   { width: 3.5rem; }
+
+.task-input.grow { flex: 1; width: auto; }
+
+.task-input:focus { outline: none; border-color: var(--accent); }

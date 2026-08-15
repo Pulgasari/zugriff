@@ -1,0 +1,71 @@
+/* shared/css/hljs.css
+ * Dracula Theme v1.2.5 for highlight.js
+ * https://github.com/dracula/highlightjs — MIT
+ * @author Denis Ciccale <dciccale@gmail.com>
+ * @author Zeno Rocha <hi@zenorocha.com>
+ */
+
+:root {
+  --zombie-bg     : #282a36;
+  --zombie-fg     : #f8f8f2;
+  --zombie-blue   : #8be9fd;
+  --zombie-green  : #50fa7b;
+  --zombie-red    : #ff79c6;
+  --zombie-purple : #bd93f9;
+  --zombie-yellow : #f1fa8c;
+}
+
+.hljs {
+  background : none;
+  display    : block;
+  overflow-x : auto;
+  padding    : 0.5em;
+  min-height : 100%;
+}
+
+.hljs-built_in,
+.hljs-selector-tag,
+.hljs-section,
+.hljs-link { color: var(--zombie-blue); }
+
+.hljs-keyword { color: var(--zombie-red); }
+
+.hljs,
+.hljs-subst { color: var(--zombie-fg); }
+
+.hljs-title,
+.hljs-attr,
+.hljs-meta-keyword {
+  font-style : italic;
+  color      : var(--zombie-green);
+}
+
+.hljs-string,
+.hljs-meta,
+.hljs-name,
+.hljs-type,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition,
+.hljs-variable,
+.hljs-template-tag,
+.hljs-template-variable { color: var(--zombie-yellow); }
+
+.hljs-comment,
+.hljs-quote,
+.hljs-deletion { color: #6272a4; }
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-title,
+.hljs-section,
+.hljs-doctag,
+.hljs-type,
+.hljs-name,
+.hljs-strong { font-weight: bold; }
+
+.hljs-literal,
+.hljs-number { color: var(--zombie-purple); }
+
+.hljs-emphasis { font-style: italic; }

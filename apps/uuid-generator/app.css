@@ -1,0 +1,29 @@
+/* uuid-generator — app specific css.
+   shared rules live in ./../../shared/css/ */
+
+.controls { display: flex; flex-direction: column; gap: .65rem; }
+
+.version-picker { display: flex; gap: .4rem; }
+
+.count-row { display: flex; align-items: center; gap: .65rem; font-size: .85rem; }
+
+.count-row label { opacity: .55; min-width: 3rem; }
+
+.count-val { min-width: 2rem; text-align: right; opacity: .6; font-variant-numeric: tabular-nums; }
+
+.uuid-list { display: flex; flex-direction: column; gap: .3rem; }
+
+.uuid-row {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .65rem; border-radius: .4rem;
+  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  cursor: pointer; transition: background .12s;
+}
+
+.uuid-row:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+.uuid { font-size: .82rem; flex: 1; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+
+.copy-icon { opacity: .35; flex-shrink: 0; transition: opacity .12s; }
+
+.uuid-row:hover .copy-icon { opacity: .8; }
