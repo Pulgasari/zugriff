@@ -54,7 +54,9 @@ const isSameOrigin = url => url.startsWith(self.location.origin + '/');
 // the app's own files hang off the scope, the shared ones off this module —
 // the launcher sits at /zugriff/ and the apps two levels deeper, so resolving
 // both against the same base would break one of them
-const OWN = ['./', './app.js', './app.css', './app.config.js', './manifest.json'];
+// entry points only — everything they import is picked up by the fetch
+// handler on the first load anyway
+const OWN = ['./', './app.js', './app.css', './manifest.json'];
 
 const SHARED = ['./../css/index.css', './importmap.js', './app.js'];
 
@@ -66,8 +68,7 @@ const precacheUrls = () => [
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(APP_CACHE);
-    // one missing file must not fail the whole install — not every app has an
-    // app.config.js, and the launcher has no app.svg
+    // one missing file must not fail the whole install
     await Promise.all(precacheUrls().map(url =>
       cache.add(new Request(url, { cache: 'reload' }))
            .catch(error => console.warn('[sw] precache skipped', url, error))
