@@ -8,7 +8,7 @@ import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 
 // ::: local: app
-import * as config from './config.js';
+import * as config from './app.config.js';
 
 // ::: local: shared
 import { vfs } from './../shared/js/vfs.js';
