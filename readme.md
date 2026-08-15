@@ -21,11 +21,11 @@ the core we use gonna be `@aufbau/kits/preact-htm` containing all the aufbau-pac
 
 ### @bunker
 
-for caching and storage stuff we gonna use [@bunker](https://code.pulgasari.dev/bunker/).
+for caching and storage stuff we gonna use [@bunker](https://github.com/pulgasari/bunker/).
 
 ### @domina
 
-for dom manipulation stuff we gonna use [@domina](https://code.pulgasari.dev/domina/).
+for dom manipulation stuff we gonna use [@domina](https://github.com/pulgasari/domina/).
 
 ### utils
 
