@@ -48,7 +48,7 @@ export function defineSettings (namespace, schema, { onSet } = {}) {
 // picking an accent in one app picks it everywhere.
 
 export const theme = defineSettings('zugriff:theme', {
-  preset : { type: 'enum',  values: [...themeNames, 'custom'], default: DEFAULT_THEME },
+  preset : { type: 'enum', look: 'combobox', values: [...themeNames, 'custom'], default: DEFAULT_THEME },
   bg     : { type: 'color', default: themes[DEFAULT_THEME].bg },
   fg     : { type: 'color', default: themes[DEFAULT_THEME].fg },
   accent : { type: 'color', default: themes[DEFAULT_THEME].accent },

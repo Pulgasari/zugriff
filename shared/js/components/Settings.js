@@ -7,7 +7,14 @@
 
 import { html, signal } from '@aufbau/kits/preact-htm';
 import Icon from './Icon.js';
+import Picker from './Picker.js';
 import Toggle from './Toggle.js';
+
+// a handful of options reads best side by side, a long list wants a dropdown.
+// a schema entry can always say `look` for itself.
+const LOOK_THRESHOLD = 4;
+
+const lookFor = entry => entry.look ?? (entry.values.length > LOOK_THRESHOLD ? 'combobox' : 'segments');
 
 /** one panel per document, so the header button can toggle it from anywhere */
 export const settingsOpen = signal(false);
@@ -24,13 +31,7 @@ function Field ({ group, name }) {
 
     : entry.type === 'enum' ? html`
         <div class="setting-options">
-          ${entry.values.map(option => html`
-            <button
-              key=${option}
-              class=${'chip' + (value === option ? ' active' : '')}
-              onClick=${() => set(option)}>
-              ${option}
-            </button>`)}
+          <${Picker} look=${lookFor(entry)} options=${entry.values} value=${value} onChange=${set} />
         </div>`
 
     : entry.type === 'color' ? html`

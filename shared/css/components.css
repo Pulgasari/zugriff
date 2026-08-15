@@ -133,26 +133,87 @@ button:hover:not(:disabled),
   .upload-list { display: none; }
 }
 
-/* ── picker (<aufbau-picker look='segments'>) ───────────────────────────── */
+/* ── picker (<aufbau-picker>) ───────────────────────────────────────────── */
 
 .picker {
   --radius : 0.25rem;
 
+  display : inline-flex;
+  color   : var(--fg);
+}
+
+/* segments: one row of buttons, joined into a single control */
+
+.picker .picker-group {
   display : flex;
   gap     : 1px;
+}
 
-  button, label {
-    background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
-    color         : var(--fg);
-    border-radius : 0;
-  }
-  button.active, label:has(:checked), [aria-checked="true"] {
-    background : var(--accent);
-    color      : var(--bg);
-  }
+.picker[look="segments"] .picker-option {
+  background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
+  color         : var(--fg);
+  border        : none;
+  border-radius : 0;
+  padding       : 0.25rem 0.5rem;
+  cursor        : pointer;
+}
+.picker[look="segments"] .picker-option[aria-checked="true"] {
+  background : var(--accent);
+  color      : var(--bg);
+}
+.picker[look="segments"] .picker-option:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.picker[look="segments"] .picker-option:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+.picker[look="segments"] .picker-mark { display: none; }
 
-  button:first-child, label:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-  button:last-child,  label:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+/* combobox: a field that opens a list in the top layer. the list is a popover,
+   so it gets no colours from the page — it has to bring its own. */
+
+.picker .picker-field {
+  background    : color-mix(in srgb, var(--fg) 5%, transparent);
+  border        : 1px solid var(--fg-25);
+  border-radius : var(--radius);
+  padding       : 0.25rem 0.5rem;
+  min-width     : 10rem;
+}
+.picker.is-open .picker-field,
+.picker .picker-field:focus-within { border-color: var(--accent); }
+
+.picker .picker-input {
+  background : transparent;
+  border     : none;
+  outline    : none;
+  color      : var(--fg);
+  font       : inherit;
+  cursor     : inherit;
+}
+
+.picker .picker-caret { opacity: 0.5; }
+
+.picker .picker-list {
+  background    : var(--bg);
+  color         : var(--fg);
+  border        : 1px solid var(--fg-25);
+  border-radius : var(--radius);
+  box-shadow    : 0 8px 32px color-mix(in srgb, #000 45%, transparent);
+  padding       : 0.25rem;
+  margin        : 0;
+}
+
+.picker .picker-list .picker-option {
+  display       : flex;
+  align-items   : center;
+  gap           : 0.4rem;
+  padding       : 0.3rem 0.5rem;
+  border-radius : var(--radius);
+  cursor        : pointer;
+}
+.picker .picker-list .picker-option:hover,
+.picker .picker-list .picker-option.is-active {
+  background : var(--accent-10);
+}
+.picker .picker-list .picker-option[aria-selected="true"] {
+  background : var(--accent);
+  color      : var(--bg);
 }
 
 /* ── toggle (<aufbau-toggle look='switch'>) ─────────────────────────────── */

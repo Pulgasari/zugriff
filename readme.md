@@ -96,8 +96,10 @@ export const launcher = defineSettings('zugriff:launcher', {
 });
 ```
 
-three types so far — `boolean`, `enum`, `color`. keys are shown verbatim in the
-ui, no label mapping. every setting is a persisted signal, so it survives a
+three types so far — `boolean`, `enum`, `color`. an enum with more than four
+options renders as a `<aufbau-picker look='combobox'>`, fewer as segments; an
+entry can override that with its own `look`. keys are shown verbatim in the ui,
+no label mapping. every setting is a persisted signal, so it survives a
 reload and syncs across tabs.
 
 the panel lives between the header and the app's body; `Shell` puts the button
