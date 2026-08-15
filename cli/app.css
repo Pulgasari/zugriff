@@ -59,3 +59,25 @@ html, body {
   font-size : 0.8rem;
   color     : var(--fg-50);
 }
+
+#app-logo {
+  display     : flex;
+  align-items : baseline;
+  gap         : 0.5rem;
+}
+
+#app-head .actions {
+  display : flex;
+  gap     : 0.25rem;
+}
+
+#app-head .ghost-btn {
+  margin-left     : 0;
+  text-decoration : none;
+  font-size       : 0.85rem;
+}
+
+#app-head .ghost-btn.active {
+  opacity : 1;
+  color   : var(--accent);
+}

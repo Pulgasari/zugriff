@@ -46,7 +46,8 @@ const IMMUTABLE_TTL = 365 * 24 * 60 * 60 * 1000;
 // esm.sh/preact@10.20.1, unpkg.com/@ffmpeg/core@0.12.6/…, jsdelivr /npm/x@1.2.3/
 const VERSIONED = /(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\/.*@\d+\.\d+\.\d+/;
 
-const isVendor = url => VERSIONED.test(url);
+const isVendor    = url => VERSIONED.test(url);
+const isSameOrigin = url => url.startsWith(self.location.origin + '/');
 
 // ── install ────────────────────────────────────────────────────────────────
 
@@ -111,7 +112,14 @@ self.addEventListener('fetch', event => {
   if (isNested(url)) return;
 
   const versioned = isVendor(url);
-  const store     = versioned ? vendor : app;
+
+  // anything else on a foreign origin is left to the browser. revalidating it
+  // would mean adding If-None-Match / If-Modified-Since, and that turns a
+  // simple request into a preflighted one — api.iconify.design does not allow
+  // those headers, so the icons would start failing on the second load
+  if (!versioned && !isSameOrigin(url)) return;
+
+  const store = versioned ? vendor : app;
 
   // keepAlive hands the background revalidation to the event, so the worker is
   // not killed mid-refresh — without it a revalidation started on the last
