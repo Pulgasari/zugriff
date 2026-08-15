@@ -20,5 +20,5 @@ export { default as Toggle      } from './Toggle.js';
 
 export { Prompt, openPrompt } from './Prompt.js';
 export { copy }               from './CopyIcon.js';
-export { icons, resolveIcon } from './Icon.js';
+export { icons, resolveIcon } from './../data/icons.js';
 export { toEntry }            from './Dropzone.js';

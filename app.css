@@ -57,3 +57,19 @@
 }
 
 .launcher-empty { opacity: 0.4; font-style: italic; }
+
+#app-head .actions {
+  display : flex;
+  gap     : 0.25rem;
+}
+
+#app-head .ghost-btn {
+  margin-left     : 0;
+  text-decoration : none;
+  font-size       : 0.9rem;
+}
+
+#app-head .ghost-btn.active {
+  opacity : 1;
+  color   : var(--accent);
+}

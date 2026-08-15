@@ -1,78 +1,129 @@
 // shared/js/sw-core.js
 //
-// the shared service worker body. every app ships a three-liner sw.js that
-// pulls this in, which is what the old sw.js.php generated per request:
+// the shared service worker body. every app ships a one-line sw.js that pulls
+// this in — this is what sw.js.php used to generate per request.
 //
-//   importScripts('./../../shared/js/sw-core.js');
+//   import './../../shared/js/sw-core.js';
 //
-// it is a classic worker script on purpose — importScripts() works everywhere,
-// module workers still do not.
+// it is a MODULE service worker, because import maps do not apply inside a
+// worker: @bunker is imported by its full url here, not by bare specifier.
+// everything bunker pulls in is relative to that url, so one entry is enough.
 
-/* global self, caches, fetch */
+import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
-// the app slug is the last path segment of the registration scope, so the
-// cache name stays unique per app without anything being templated in
+/* global self, caches */
+
+// ── identity ───────────────────────────────────────────────────────────────
+
+// the app slug is the last path segment of the registration scope, so nothing
+// has to be templated into this file
 const SCOPE   = self.registration.scope;
 const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
-const VERSION = 'v1';
-const CACHE   = `${SLUG}-${VERSION}`;
+const VERSION = 'v2';
 
-// relative to the scope, so this works under /zugriff/apps/<slug>/ as well as
-// under any other base path
-const PRECACHE = [
-  './',
-  './index.html',
-  './app.js',
-  './app.css',
-  './app.config.js',
-  './manifest.json',
-  './../../shared/css/index.css',
-  './../../shared/js/importmap.js',
-  './../../shared/js/app.js',
+const APP_CACHE    = `zugriff-${SLUG}-${VERSION}`;
+const VENDOR_CACHE = `zugriff-vendor-${VERSION}`;
+
+// ── caches ─────────────────────────────────────────────────────────────────
+
+// the app's own files: small, and they change whenever the repo is pushed, so
+// every load revalidates — conditionally, so an unchanged file costs a 304
+const app = createCache({
+  name    : APP_CACHE,
+  onError : ({ operation, key, error }) => console.warn(`[sw] ${operation} failed for ${key}`, error),
+});
+
+// third party modules pinned to a version in the url. those bytes can never
+// change, so once they are here they are never fetched again — and the cache is
+// shared by every app instead of each one keeping its own copy of preact
+const vendor = createCache({
+  name    : VENDOR_CACHE,
+  onError : ({ operation, key, error }) => console.warn(`[sw] vendor ${operation} failed for ${key}`, error),
+});
+
+const IMMUTABLE_TTL = 365 * 24 * 60 * 60 * 1000;
+
+// esm.sh/preact@10.20.1, unpkg.com/@ffmpeg/core@0.12.6/…, jsdelivr /npm/x@1.2.3/
+const VERSIONED = /(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\/.*@\d+\.\d+\.\d+/;
+
+const isVendor = url => VERSIONED.test(url);
+
+// ── install ────────────────────────────────────────────────────────────────
+
+// the app's own files hang off the scope, the shared ones off this module —
+// the launcher sits at /zugriff/ and the apps two levels deeper, so resolving
+// both against the same base would break one of them
+const OWN = ['./', './app.js', './app.css', './app.config.js', './manifest.json'];
+
+const SHARED = ['./../css/index.css', './importmap.js', './app.js'];
+
+const precacheUrls = () => [
+  ...OWN.map(path    => new URL(path, SCOPE).href),
+  ...SHARED.map(path => new URL(path, import.meta.url).href),
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE).then(cache =>
-      // one missing file must not fail the whole install
-      Promise.all(PRECACHE.map(path =>
-        cache.add(new Request(new URL(path, SCOPE), { cache: 'reload' }))
-             .catch(error => console.warn('[sw] precache skipped', path, error))
-      ))
-    )
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(APP_CACHE);
+    // one missing file must not fail the whole install — not every app has an
+    // app.config.js, and the launcher has no app.svg
+    await Promise.all(precacheUrls().map(url =>
+      cache.add(new Request(url, { cache: 'reload' }))
+           .catch(error => console.warn('[sw] precache skipped', url, error))
+    ));
+  })());
   self.skipWaiting();
 });
 
+// ── activate ───────────────────────────────────────────────────────────────
+
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key.startsWith(`${SLUG}-`) && key !== CACHE)
-                      .map(key => caches.delete(key)))
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys.filter(key => key.startsWith('zugriff-') && key !== APP_CACHE && key !== VENDOR_CACHE)
+          // another app's cache is none of our business — only drop our own
+          // older versions, and the vendor cache when its version moved on
+          .filter(key => key.startsWith(`zugriff-${SLUG}-`) || key.startsWith('zugriff-vendor-'))
+          .map(key => caches.delete(key))
+    );
+    await self.clients.claim();
+  })());
 });
 
-// stale-while-revalidate: answer from the cache at once, refresh in the
-// background. only status 200 is stored, which also filters out the opaque
-// responses of cross-origin requests.
+// ── fetch ──────────────────────────────────────────────────────────────────
+
+// the launcher's scope is /zugriff/, which sits above every app — it must not
+// answer (or cache) their files, those belong to the app's own worker
+const NESTED = new URL('./apps/', SCOPE).href;
+const isNested = url => url.startsWith(NESTED) && !SCOPE.startsWith(NESTED);
+
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  const { request } = event;
 
+  if (request.method !== 'GET') return;
+
+  const url = request.url;
+
+  // extension and devtools schemes are not ours to answer
+  if (!url.startsWith('http')) return;
+
+  if (isNested(url)) return;
+
+  const versioned = isVendor(url);
+  const store     = versioned ? vendor : app;
+
+  // keepAlive hands the background revalidation to the event, so the worker is
+  // not killed mid-refresh — without it a revalidation started on the last
+  // request of a session is simply lost
   event.respondWith(
-    caches.open(CACHE).then(cache =>
-      cache.match(event.request).then(cached => {
-        const fresh = fetch(event.request).then(response => {
-          if (response && response.status === 200) cache.put(event.request, response.clone());
-          return response;
-        }).catch(error => {
-          if (cached) return cached;
-          throw error;
-        });
-
-        return cached || fresh;
-      })
-    )
+    store.staleWhileRevalidate(request, {
+      ttl       : versioned ? IMMUTABLE_TTL : 0,
+      keepAlive : pending => event.waitUntil(pending),
+    }).catch(async error => {
+      // offline and never cached: let the failure be the real network failure
+      console.warn('[sw] miss', url, error);
+      return fetch(request);
+    })
   );
 });

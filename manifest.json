@@ -1,0 +1,18 @@
+{
+  "id"               : "zugriff",
+  "name"             : "zugriff",
+  "short_name"       : "zugriff",
+  "description"      : "client-side mini-PWAs — converters, inspectors, generators.",
+  "lang"             : "en",
+  "dir"              : "ltr",
+  "scope"            : "./",
+  "start_url"        : "./",
+  "display"          : "standalone",
+  "orientation"      : "portrait",
+  "categories"       : ["utilities", "developer"],
+  "background_color" : "#282a36",
+  "theme_color"      : "#282a36",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
