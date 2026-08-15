@@ -3,17 +3,24 @@
 // renders the app list from apps/registry.js. this replaces index.php, which
 // used to scan the directory and build the same list server-side.
 
-import { html, signal, computed } from '@aufbau/kits/preact-htm';
+import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 import { boot } from './shared/js/app.js';
 import { registry, categories } from './apps/registry.js';
 import Icon from './shared/js/components/Icon.js';
 import Nav  from './shared/js/components/Nav.js';
+import Settings, { SettingsButton } from './shared/js/components/Settings.js';
+import { launcher, themeGroup } from './shared/js/lib/settings.js';
 
 const config = {
   app    : { slug: 'zugriff', name: 'zugriff apps', theme: 'dracula', lang: 'en' },
   aufbau : { elements: { mode: 'auto' } },
 };
+
+const groups = [
+  { title: 'launcher', settings: launcher },
+  themeGroup,
+];
 
 const query    = signal('');
 const category = signal('');
@@ -28,26 +35,41 @@ const visible = computed(() => {
   );
 });
 
+function Filter () {
+  const ref     = useRef(null);
+  const sticky  = launcher.value('filter-sticky');
+  const position = launcher.value('filter-position');
+
+  useEffect(() => {
+    if (launcher.value('filter-autofocus')) ref.current?.focus();
+  }, []);
+
+  return html`
+    <div class=${['search-row launcher-search', sticky && 'sticky', position].filter(Boolean).join(' ')}>
+      <${Icon} name="mdi:magnify" className="search-icon" />
+      <input
+        ref=${ref}
+        class="search-input"
+        type="search"
+        placeholder="Filter apps…"
+        value=${query.value}
+        onInput=${event => query.value = event.target.value}
+      />
+      ${query.value && html`
+        <button class="act-btn" onClick=${() => query.value = ''}>
+          <${Icon} name="mdi:close" />
+        </button>`}
+    </div>`;
+}
+
 function AppList () {
   const list = visible.value;
+  const top  = launcher.value('filter-position') === 'top';
 
   return html`
     <div id="app-body">
 
-      <div class="search-row launcher-search">
-        <${Icon} name="mdi:magnify" className="search-icon" />
-        <input
-          class="search-input"
-          type="search"
-          placeholder="Filter apps…"
-          value=${query.value}
-          onInput=${event => query.value = event.target.value}
-        />
-        ${query.value && html`
-          <button class="act-btn" onClick=${() => query.value = ''}>
-            <${Icon} name="mdi:close" />
-          </button>`}
-      </div>
+      ${top && html`<${Filter} />`}
 
       <div class="launcher-categories">
         <button class=${'chip' + (category.value === '' ? ' active' : '')}
@@ -72,6 +94,8 @@ function AppList () {
 
       ${!list.length && html`<p class="launcher-empty">nothing matches “${query.value}”.</p>`}
 
+      ${!top && html`<${Filter} />`}
+
     </div>`;
 }
 
@@ -79,8 +103,13 @@ function Launcher () {
   return html`
     <div id="app-head">
       <div id="app-logo"><strong>zugriff</strong> apps</div>
-      <${Nav} here='apps' base='./' />
+      <div class="actions">
+        <${Nav} here='apps' base='./' />
+        <${SettingsButton} />
+      </div>
     </div>
+
+    <${Settings} groups=${groups} />
 
     <${AppList} />
   `;

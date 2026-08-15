@@ -12,6 +12,8 @@ import * as config from './app.config.js';
 
 // ::: local: shared
 import Nav     from './../shared/js/components/Nav.js';
+import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
+import { themeGroup } from './../shared/js/lib/settings.js';
 import { vfs } from './../shared/js/vfs.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
@@ -123,8 +125,13 @@ function App() {
         <h1>zugriff</h1>
         <span class="version">v0.2.0</span>
       </div>
-      <${Nav} here='cli' base='./../' />
+      <div class="actions">
+        <${Nav} here='cli' base='./../' />
+        <${SettingsButton} />
+      </div>
     </header>
+
+    <${Settings} groups=${[themeGroup]} />
     
     <main id="app-main">
       <${TerminalView} />

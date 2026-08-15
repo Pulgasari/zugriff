@@ -73,3 +73,20 @@
   opacity : 1;
   color   : var(--accent);
 }
+
+/* ── filter ─────────────────────────────────────────────────────────────── */
+
+.launcher-search {
+  width : 100%;
+}
+
+.launcher-search.sticky {
+  position        : sticky;
+  z-index         : 3;
+  background      : color-mix(in oklch, var(--bg) 88%, black);
+  backdrop-filter : blur(6px);
+  box-shadow      : var(--shadow);
+}
+
+.launcher-search.sticky.bottom { bottom : 0.75rem; }
+.launcher-search.sticky.top    { top    : 0.75rem; }

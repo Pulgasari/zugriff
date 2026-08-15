@@ -15,11 +15,13 @@ export { default as GhostButton } from './GhostButton.js';
 export { default as Icon        } from './Icon.js';
 export { default as Nav         } from './Nav.js';
 export { default as Picker      } from './Picker.js';
+export { default as Settings    } from './Settings.js';
 export { default as Shell       } from './Shell.js';
 export { default as Slider      } from './Slider.js';
 export { default as Toggle      } from './Toggle.js';
 
 export { Prompt, openPrompt } from './Prompt.js';
+export { SettingsButton, settingsOpen, toggleSettings } from './Settings.js';
 export { copy }               from './CopyIcon.js';
 export { icons, resolveIcon } from './../data/icons.js';
 export { toEntry }            from './Dropzone.js';
