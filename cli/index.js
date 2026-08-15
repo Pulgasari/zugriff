@@ -1,9 +1,19 @@
 // index.js
 
+// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+
+// ::: vendors
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
+
+// ::: local: app
+import * as config from './config.js';
+
+// ::: local: shared
 import { vfs } from './../shared/js/vfs.js';
+
+// :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
 
 aufbau.init();
 const { useEffect, useRef, signal } = preact;
@@ -17,16 +27,7 @@ function TerminalView() {
   useEffect(() => {
     if (!terminalRef.current) return;
 
-    const term = new Terminal({
-      cursorBlink: true,
-      theme: {
-        background: '#0f1419',
-        foreground: '#e6edf3',
-        cursor: '#3fb950'
-      },
-      fontSize: 14,
-      fontFamily: 'Menlo, Monaco, "Courier New", monospace'
-    });
+    const term = new Terminal (config.terminal);
 
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
