@@ -1,48 +1,61 @@
+/* cli — app specific css.
+   the colours come from ./../shared/css/theme.css, this file only lays out
+   the terminal chrome. */
+
 html, body {
-  background-color: #0f1419;
-  color: #e6edf3;
-  font-family: monospace;
+  height   : 100%;
+  overflow : hidden;
+}
+
+#app {
+  display        : flex;
+  flex-direction : column;
+  height         : 100dvh;
+  min-height     : 0;
 }
 
 #app-head {
-  padding: 8px 16px;
-  background-color: #161b22;
-  border-bottom: 1px solid #30363d;
-  display: flex;
+  padding       : 8px 16px;
+  background    : color-mix(in oklch, var(--bg) 90%, black);
+  border-bottom : 1px solid var(--fg-25);
+  display       : flex;
+  align-items   : center;
   justify-content: space-between;
-  align-items: center;
+  flex          : 0 0 auto;
 }
 
 #app-head h1 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #58a6ff;
-  letter-spacing: 0.05em;
+  font-size      : 0.95rem;
+  font-weight    : 600;
+  color          : var(--accent);
+  letter-spacing : 0.05em;
 }
 
 #app-main {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  padding: 8px;
+  flex     : 1 1 auto;
+  position : relative;
+  overflow : hidden;
+  padding  : 8px;
+  min-height: 0;
 }
 
 #app-foot {
-  padding: 6px 16px;
-  background-color: #161b22;
-  border-top: 1px solid #30363d;
-  font-size: 0.75rem;
-  color: #8b949e;
-  display: flex;
+  padding     : 6px 16px;
+  background  : color-mix(in oklch, var(--bg) 90%, black);
+  border-top  : 1px solid var(--fg-25);
+  font-size   : 0.75rem;
+  color       : var(--fg-50);
+  display     : flex;
+  align-items : center;
   justify-content: space-between;
-  align-items: center;
+  flex        : 0 0 auto;
 }
 
-.terminal-container {
-  width: 100%;
-  height: 100%;
-}
+.terminal-container { width: 100%; height: 100%; }
 
-.xterm {
-  height: 100%;
+.xterm { height: 100%; }
+
+.version {
+  font-size : 0.8rem;
+  color     : var(--fg-50);
 }

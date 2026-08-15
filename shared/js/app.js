@@ -36,7 +36,9 @@ export function registerServiceWorker (url = './sw.js') {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol === 'file:') return;
 
-  const register = () => navigator.serviceWorker.register(url).catch(
+  // a module worker, because sw-core.js imports @bunker by url — import maps
+  // do not reach inside a service worker
+  const register = () => navigator.serviceWorker.register(url, { type: 'module' }).catch(
     error => console.warn('[zugriff] service worker registration failed:', error)
   );
 

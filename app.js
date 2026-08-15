@@ -3,12 +3,16 @@
 // renders the app list from apps/registry.js. this replaces index.php, which
 // used to scan the directory and build the same list server-side.
 
-import aufbau, { html, render, signal, computed } from '@aufbau/kits/preact-htm';
+import { html, signal, computed } from '@aufbau/kits/preact-htm';
 
+import { boot } from './shared/js/app.js';
 import { registry, categories } from './apps/registry.js';
 import Icon from './shared/js/components/Icon.js';
 
-await aufbau.init({ elements: { mode: 'auto' } });
+const config = {
+  app    : { slug: 'zugriff', name: 'zugriff', theme: 'dracula', lang: 'en' },
+  aufbau : { elements: { mode: 'auto' } },
+};
 
 const query    = signal('');
 const category = signal('');
@@ -74,15 +78,19 @@ function Launcher () {
   return html`
     <div id="app-head">
       <div id="app-logo"><strong>zugriff</strong></div>
-      <div class="actions">
+      <nav class="actions">
         <a class="ghost-btn" href="./cli/" title="the zugriff terminal">
           <${Icon} name="mdi:console" /> cli
         </a>
-      </div>
+        <a class="ghost-btn active" href="./" title="all apps">
+          <${Icon} name="mdi:apps" /> apps
+        </a>
+      </nav>
     </div>
 
     <${AppList} />
   `;
 }
 
-render(html`<${Launcher} />`, document.getElementById('app'));
+// the launcher draws its own header, so it skips the app shell
+boot({ config, App: Launcher, shell: false });

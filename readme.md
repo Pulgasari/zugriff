@@ -22,6 +22,7 @@ on its own. what they share is the shell, the components and the css.
 ```
 zugriff/
   index.html  app.js  app.css   the launcher, rendered from apps/registry.js
+  manifest.json  sw.js          the launcher is an installable pwa too
   icon.svg
   apps/
     registry.js                 single source of truth for every app's metadata
@@ -41,7 +42,8 @@ zugriff/
       vfs.js                    OPFS wrapper (used by the cli)
       components/               index.js (light) · code.js (panes) · media.js (audio)
       patterns/                 whole apps from a handful of options
-      lib/                      data-converters, signals, ffmpeg
+      data/                     icons — short names for the iconify ids
+      lib/                      data-converters, signals, ffmpeg, theme
   cli/                          the wasm micro terminal
 ```
 
@@ -119,8 +121,24 @@ html-minifier-terser, culori, pdf-lib, pdfjs, highlight.js, ffmpeg, upng-js.
 nothing is vendored into this repo; the ffmpeg core wasm alone is 32 mb and is
 fetched on first use, then kept by the service worker.
 
-## service worker
+## caching
 
-each app ships a three-line `sw.js` that pulls in `shared/js/sw-core.js`. the
-cache name is derived from the registration scope, so every app gets its own
-cache without anything being generated. strategy is stale-while-revalidate.
+each app — and the launcher — ships a one-line `sw.js` that pulls in
+`shared/js/sw-core.js`. it is a **module** service worker: import maps do not
+apply inside a worker, so `@bunker/cache` is imported by its full url there.
+
+`shared/js/sw-core.js` splits the traffic in two:
+
+| cache | holds | policy |
+|---|---|---|
+| `zugriff-<slug>-v2` | the app's own files + the shared css/js | stale-while-revalidate, conditional on `ETag`/`Last-Modified` — an unchanged file costs a 304 |
+| `zugriff-vendor-v2` | third party modules pinned to a version in the url (`esm.sh/preact@10.20.1`, `unpkg.com/@ffmpeg/core@0.12.6/…`) | cached for a year, never refetched — and shared by every app, so preact is stored once, not thirty times |
+
+the revalidation is handed to `event.waitUntil` via bunker's `keepAlive`, so a
+refresh started on the last request of a session is not lost when the worker is
+killed. the launcher's scope is `/zugriff/`, which sits above every app — it
+deliberately ignores anything under `apps/` so each app's own worker owns its
+files.
+
+the cache name comes from the registration scope, so nothing is generated per
+app. bump `VERSION` in `sw-core.js` to invalidate everything.

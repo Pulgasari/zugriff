@@ -15,7 +15,7 @@ import { vfs } from './../shared/js/vfs.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
 
-aufbau.init();
+aufbau.init(config.aufbau);
 const { useEffect, useRef, signal } = preact;
 
 // Signal tracking loaded WASM tools
@@ -119,7 +119,7 @@ function App() {
   return html`
     <header id="app-head">
       <h1>zugriff</h1>
-      <span style=${{ fontSize: '0.8rem', color: '#8b949e' }}>v0.2.0</span>
+      <span class="version">v0.2.0</span>
     </header>
     
     <main id="app-main">

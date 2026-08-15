@@ -1,2 +1,2 @@
 // apps/password-generator/sw.js — the shared worker body does the actual work
-importScripts('./../../shared/js/sw-core.js');
+import './../../shared/js/sw-core.js';
