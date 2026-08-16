@@ -6,7 +6,7 @@
 //   <${Settings} groups=${[{ title: 'theme', settings: theme }]} />
 
 import { html, signal } from '@aufbau/kits/preact-htm';
-import Icon from './Icon.js';
+import Icon   from './Icon.js';
 import Picker from './Picker.js';
 import Toggle from './Toggle.js';
 
