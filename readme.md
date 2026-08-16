@@ -36,6 +36,7 @@ zugriff/
       inspector.css             opt-in: the data tree
       hljs.css                  opt-in: syntax highlighting theme
     js/
+      theme-boot.js             puts the saved theme on :root before the first paint
       importmap.js              injects the import map, classic script in <head>
       app.js                    boot(): document setup, runtime, sw, mount
       sw-core.js                the shared service worker body

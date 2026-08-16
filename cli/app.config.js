@@ -15,8 +15,10 @@ export const aufbau = {
 };
 
 // xterm needs concrete colours, so the app theme is read back out of css here
-// instead of being written down a second time — switch data-theme and the
-// terminal follows
+// instead of being written down a second time. this runs at module evaluation,
+// before settings.js gets a chance to write anything — theme-boot.js is what
+// puts the user's palette on :root in time, so the terminal follows the
+// settings panel and not just data-theme
 const colors = themeColors();
 
 export const terminal = {
