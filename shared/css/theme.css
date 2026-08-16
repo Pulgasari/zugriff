@@ -52,12 +52,22 @@
   --button-secondary-bg : color-mix(in srgb, var(--fg) 50%, var(--bg));
 }
 
-/* data type colors — used by the inspector patterns */
+/* data type colors — used by the inspector patterns. these cannot derive from
+   a preset: four types have to stay four distinguishable hues no matter what
+   --accent is. what they can do is follow the direction of the theme, which is
+   what data-scheme carries (set from --bg by theme-boot.js and lib/settings.js) */
 :root {
   --c-string : #98c379;
   --c-number : #d19a66;
   --c-bool   : #56b6c2;
   --c-null   : #e06c75;
+
+  &[data-scheme="light"] {
+    --c-string : #295415;
+    --c-number : #6d4100;
+    --c-bool   : #075460;
+    --c-null   : #8e1a25;
+  }
 }
 
 html { background : black; }

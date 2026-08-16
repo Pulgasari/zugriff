@@ -15,6 +15,7 @@
 import { effect } from '@aufbau/kits/preact-htm';
 import { stored } from './signals.js';
 import { themes, themeNames, DEFAULT_THEME, COLOR_KEYS } from './../data/themes.js';
+import { schemeFor } from './theme.js';
 
 export const TYPES = ['boolean', 'enum', 'color'];
 
@@ -71,11 +72,14 @@ export const theme = defineSettings('zugriff:theme', {
 let applying = false;
 
 // the three base tokens go onto :root — everything else in theme.css derives
-// from them, so one write repaints the whole palette
+// from them, so one write repaints the whole palette. data-scheme carries what
+// the three colours cannot say: which way round the theme is, for the palettes
+// that do not derive from it
 effect(() => {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   for (const key of COLOR_KEYS) root.style.setProperty(`--${key}`, theme.signals[key].value);
+  root.dataset.scheme = schemeFor(theme.signals.bg.value);
 });
 
 // ── launcher ───────────────────────────────────────────────────────────────

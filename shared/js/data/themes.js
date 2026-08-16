@@ -9,6 +9,7 @@
 // preset that misses those is unreadable in half the apps.
 
 export const themes = {
+  amethyst  : { bg: '#160f1f', fg: '#ece0f5', accent: '#a855f7' },
   beton     : { bg: '#3a3a3a', fg: '#dcdcdc', accent: '#9ad1d4' },
   desert    : { bg: '#e3cfa4', fg: '#3b2c17', accent: '#8a3a0f' },
   dracula   : { bg: '#282a36', fg: '#f8f8f2', accent: '#ff79c6' },
@@ -21,6 +22,7 @@ export const themes = {
   oled      : { bg: '#000000', fg: '#e9e9e9', accent: '#00e5ff' },
   papier    : { bg: '#efe9dd', fg: '#2b2622', accent: '#8f5d3a' },
   parrot    : { bg: '#10241a', fg: '#f3f7e8', accent: '#ff4d2d' },
+  petrol    : { bg: '#08191a', fg: '#d5eceb', accent: '#0fb9ad' },
   rubin     : { bg: '#1a0a0f', fg: '#f2dfe3', accent: '#f2295b' },
   smaragd   : { bg: '#07160f', fg: '#dff3e6', accent: '#50c878' },
   snowflake : { bg: '#e9f1f7', fg: '#16262f', accent: '#00697a' },

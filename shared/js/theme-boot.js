@@ -41,6 +41,15 @@ try {
     if (key === 'bg') background = value;
   }
 
+  // which way round the theme is — hljs.css and theme.css branch on this for
+  // the colours that cannot derive from --bg/--fg/--accent. same maths as
+  // schemeFor() in lib/theme.js, repeated because this cannot import
+  if (background) {
+    const channel = v => v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    const [r, g, b] = [1, 3, 5].map(i => channel(parseInt(background.slice(i, i + 2), 16) / 255));
+    root.dataset.scheme = 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.18 ? 'light' : 'dark';
+  }
+
   // the browser chrome is themed by a meta tag, which no signal ever touches
   if (background) {
     const meta = document.querySelector('meta[name="theme-color"]');

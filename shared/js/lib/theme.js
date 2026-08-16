@@ -27,3 +27,21 @@ export function themeColors () {
 }
 
 export const fontFamily = () => cssVar('--font', '"JetBrains Mono", monospace');
+
+// ── light or dark ──────────────────────────────────────────────────────────
+// a preset is three colours and says nothing about which way round it is, but
+// the palettes that do not derive from it — the syntax colours in hljs.css,
+// the data types in theme.css — need to know. so the background decides, and
+// the answer rides on <html data-scheme>, which those stylesheets branch on.
+//
+// theme-boot.js repeats this, because a classic script cannot import.
+
+/** wcag relative luminance of a #rrggbb literal */
+export function luminance (hex) {
+  const channel = value => value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  const [r, g, b] = [1, 3, 5].map(i => channel(parseInt(hex.slice(i, i + 2), 16) / 255));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** the cutoff sits where black text starts beating white text on that background */
+export const schemeFor = bg => /^#[0-9a-f]{6}$/i.test(bg) && luminance(bg) > 0.18 ? 'light' : 'dark';

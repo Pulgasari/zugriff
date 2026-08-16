@@ -3,16 +3,35 @@
  * https://github.com/dracula/highlightjs — MIT
  * @author Denis Ciccale <dciccale@gmail.com>
  * @author Zeno Rocha <hi@zenorocha.com>
+ *
+ * local changes: the body text follows --fg instead of the dracula literal,
+ * the comment colour got a token of its own, and there is a light variant —
+ * the pane background is derived from --bg, so on a light preset the original
+ * palette lands at roughly 1.2:1 and is simply gone.
  */
 
 :root {
-  --zombie-bg     : #282a36;
-  --zombie-fg     : #f8f8f2;
-  --zombie-blue   : #8be9fd;
-  --zombie-green  : #50fa7b;
-  --zombie-red    : #ff79c6;
-  --zombie-purple : #bd93f9;
-  --zombie-yellow : #f1fa8c;
+  --zombie-bg      : #282a36;
+  --zombie-fg      : var(--fg);
+  --zombie-blue    : #8be9fd;
+  --zombie-green   : #50fa7b;
+  --zombie-red     : #ff79c6;
+  --zombie-purple  : #bd93f9;
+  --zombie-yellow  : #f1fa8c;
+  --zombie-comment : #6272a4;
+}
+
+/* same hues, pushed down until they clear 4.5:1 against the darkest light pane
+   in the preset list (desert, #d4c199) — a mid-tone background is the hard case,
+   not white. the comment stays deliberately dim, like the dracula original.
+   data-scheme is set from --bg by theme-boot.js and lib/settings.js */
+:root[data-scheme="light"] {
+  --zombie-blue    : #075460;
+  --zombie-green   : #0c5528;
+  --zombie-red     : #8c2061;
+  --zombie-purple  : #5432a8;
+  --zombie-yellow  : #554a00;
+  --zombie-comment : #556080;
 }
 
 .hljs {
@@ -53,7 +72,7 @@
 
 .hljs-comment,
 .hljs-quote,
-.hljs-deletion { color: #6272a4; }
+.hljs-deletion { color: var(--zombie-comment); }
 
 .hljs-keyword,
 .hljs-selector-tag,
