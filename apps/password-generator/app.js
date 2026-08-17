@@ -203,7 +203,7 @@ function PassphraseSettings() {
               onClick=${() => separator.value = s}>
               ${s === ' ' ? '·space·' : s}
             </button>`)}
-          <input class="sep-input" type="text" maxlength=3 value=${separator.value}
+          <input class="field sep-input" type="text" maxlength=3 value=${separator.value}
             onInput=${e => separator.value = e.target.value}
             placeholder="custom" />
         </div>

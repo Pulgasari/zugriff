@@ -5,9 +5,8 @@
 
 .version-picker { display: flex; gap: .4rem; }
 
-.count-row { display: flex; align-items: center; gap: .65rem; font-size: .85rem; }
-
-.count-row label { opacity: .55; min-width: 3rem; }
+/* narrower label than the shared .count-row default */
+.count-row label { min-width: 3rem; }
 
 .count-val { min-width: 2rem; text-align: right; opacity: .6; font-variant-numeric: tabular-nums; }
 
@@ -23,7 +22,5 @@
 .uuid-row:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
 .uuid { font-size: .82rem; flex: 1; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
-
-.copy-icon { opacity: .35; flex-shrink: 0; transition: opacity .12s; }
 
 .uuid-row:hover .copy-icon { opacity: .8; }

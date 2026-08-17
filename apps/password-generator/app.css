@@ -26,26 +26,18 @@
 
 .settings-group { display: flex; flex-direction: column; gap: .65rem; }
 
-.setting-row {
-  display: flex; align-items: center; gap: .65rem; font-size: .85rem;
-}
-
-.setting-row label { min-width: 5.5rem; opacity: .7; flex-shrink: 0; }
+/* wider labels than the shared .setting-row / .count-row default */
+.setting-row label,
+.count-row label { min-width: 5.5rem; }
 
 .val { font-variant-numeric: tabular-nums; opacity: 1; margin-left: .25rem; }
-
-/* ── toggles ── */
 
 /* ── chips ── */
 .chip-group { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; }
 
 .sep-input {
   width: 4.5rem; padding: .2rem .4rem; border-radius: .35rem; font-size: .8rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
-  background: color-mix(in srgb, var(--fg) 5%, transparent); color: var(--fg);
 }
-
-.sep-input:focus { outline: none; border-color: var(--accent); }
 
 /* ── entropy ── */
 .entropy { display: flex; flex-direction: column; gap: .35rem; }
@@ -58,22 +50,6 @@
 .entropy-fill { height: 100%; border-radius: 3px; transition: width .3s, background .3s; }
 
 .entropy-label { font-size: .75rem; font-weight: 600; font-variant-numeric: tabular-nums; }
-
-/* ── count row ── */
-.count-row {
-  display: flex; align-items: center; gap: .65rem; font-size: .85rem;
-}
-
-.count-row label { min-width: 5.5rem; opacity: .7; flex-shrink: 0; }
-
-/*
-.btn {
-  display: flex; align-items: center; gap: .4rem;
-  padding: .45rem .9rem; border-radius: .5rem; border: none;
-  cursor: pointer; font-size: .875rem; font-weight: 500; transition: opacity .15s;
-}
-
-*/
 
 /* ── password list ── */
 .pw-list { display: flex; flex-direction: column; gap: .3rem; }
@@ -92,7 +68,5 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-
-.copy-icon { opacity: .3; flex-shrink: 0; transition: opacity .12s; }
 
 .pw-row:hover .copy-icon { opacity: .8; }

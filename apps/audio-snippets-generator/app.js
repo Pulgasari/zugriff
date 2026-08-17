@@ -245,12 +245,12 @@ function SnippetPane({ snippet, index, total }) {
         </button>
         <div class="time-row">
           <label>Start</label>
-          <input type="number" class="time-input" step="0.1" min="0" max=${(end-.1).toFixed(1)}
+          <input type="number" class="field time-input" step="0.1" min="0" max=${(end-.1).toFixed(1)}
             value=${start.toFixed(1)}
             onInput=${e => update(id, { start: clamp(+e.target.value, 0, end-.1) })} />
           <${Icon} name="mdi:arrow-right" />
           <label>End</label>
-          <input type="number" class="time-input" step="0.1" min=${(start+.1).toFixed(1)} max=${duration.toFixed(1)}
+          <input type="number" class="field time-input" step="0.1" min=${(start+.1).toFixed(1)} max=${duration.toFixed(1)}
             value=${end.toFixed(1)}
             onInput=${e => update(id, { end: clamp(+e.target.value, start+.1, duration) })} />
           <span class="total-dur">/ ${fmtT(duration)}</span>

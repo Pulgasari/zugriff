@@ -156,7 +156,7 @@ function TagManager({ show, onClose }) {
         ${tags.value.length === 0 && html`<span class="empty-hint">No tags yet</span>`}
       </div>
       <div class="tag-manager-add">
-        <input class="tag-name-input" type="text" placeholder="Tag name"
+        <input class="field tag-name-input" type="text" placeholder="Tag name"
           value=${name} onInput=${e => setName(e.target.value)}
           onKeyDown=${e => e.key === 'Enter' && add()} />
         <input type="color" class="tag-color-input" value=${color}

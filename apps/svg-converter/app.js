@@ -187,7 +187,7 @@ function App() {
               <div class="size-row">
                 <div class="size-field">
                   <span class="size-unit">W</span>
-                  <input type="number" class="size-input" placeholder=${natW.value}
+                  <input type="number" class="field size-input" placeholder=${natW.value}
                     value=${outW.value || ''} min=1
                     onInput=${e => setW(+e.target.value || 0)} />
                   <span class="size-unit">px</span>
@@ -199,7 +199,7 @@ function App() {
                 </button>
                 <div class="size-field">
                   <span class="size-unit">H</span>
-                  <input type="number" class="size-input" placeholder=${natH.value}
+                  <input type="number" class="field size-input" placeholder=${natH.value}
                     value=${outH.value || ''} min=1
                     onInput=${e => setH(+e.target.value || 0)} />
                   <span class="size-unit">px</span>

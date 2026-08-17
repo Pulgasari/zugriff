@@ -10,65 +10,18 @@
 
 .dropzone u { color: var(--accent); text-underline-offset: 2px; }
 
-/* format picker */
-.format-picker {
-  display: flex;
-  gap: .5rem;
-}
-
+/* uppercase pill on top of the shared .fmt-btn base */
 .fmt-btn {
   padding: .3rem .75rem;
-  border-radius: 2rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
-  background: transparent;
-  color: var(--fg);
-  cursor: pointer;
   font-size: .85rem;
   text-transform: uppercase;
   letter-spacing: .04em;
-  transition: background .15s, border-color .15s, color .15s;
 }
 
-.fmt-btn:hover  { border-color: var(--accent); color: var(--accent); }
-
-.fmt-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
-
-/* file list */
-.file-list { display: flex; flex-direction: column; gap: .5rem; }
-
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: .65rem;
-  padding: .6rem .75rem;
-  border-radius: .5rem;
-  background: color-mix(in srgb, var(--fg) 6%, transparent);
-  font-size: .875rem;
-}
-
-.file-item .name  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .85; }
-
-.file-item .label { font-size: .78rem; opacity: .5; white-space: nowrap; }
-
-.file-item.done   { background: color-mix(in srgb, var(--accent) 10%, transparent); }
-
-.file-item.done .label { opacity: .7; color: var(--accent); }
-
-.file-item.error  { background: color-mix(in srgb, #f44 8%, transparent); }
-
+/* audio files flag decode errors with a red icon */
 .file-item.error iconify-icon { color: #f66; }
 
-.icon-btn:hover        { opacity: 1; }
-
-.icon-btn.remove:hover { color: #f66; }
-
-a.icon-btn             { text-decoration: none; }
-
-a.icon-btn:hover       { color: var(--accent); opacity: 1; }
-
-/* spin animation */
-@keyframes spin { to { transform: rotate(360deg); } }
-
+/* per-file progress */
 .progress-bar {
   flex: 1;
   height: 3px;

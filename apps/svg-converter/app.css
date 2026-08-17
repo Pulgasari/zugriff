@@ -67,12 +67,8 @@
 
 .size-input {
   width: 5rem; padding: .3rem .4rem; border-radius: .35rem; font-size: .82rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
-  background: color-mix(in srgb, var(--fg) 5%, transparent); color: var(--fg);
   font-variant-numeric: tabular-nums; text-align: right;
 }
-
-.size-input:focus { outline: none; border-color: var(--accent); }
 
 .size-hint { font-size: .75rem; opacity: .4; font-variant-numeric: tabular-nums; }
 
@@ -87,25 +83,5 @@
 
 .lock-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); }
 
-/* quality */
-.quality-row { display: flex; align-items: center; gap: .65rem; }
-
-.quality-val { min-width: 2.5rem; text-align: right; font-size: .82rem; opacity: .6; font-variant-numeric: tabular-nums; }
-
-/* export */
-.export-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
-
-/*
-.btn {
-  display: flex; align-items: center; gap: .35rem;
-  padding: .45rem .9rem; border-radius: .5rem; border: none;
-  cursor: pointer; font-size: .875rem; font-weight: 500; transition: opacity .15s;
-}
-
-*/
-
-/* error */
-.err-row {
-  display: flex; align-items: center; gap: .5rem;
-  color: #f66; font-size: .875rem;
-}
+/* quality — .quality-row / .quality-val base is shared */
+.quality-val { font-size: .82rem; }

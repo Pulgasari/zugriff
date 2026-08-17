@@ -45,7 +45,7 @@ function App() {
       
       <div class="input-row">
         <input
-          class="url-input"
+          class="field url-input"
           type="url"
           placeholder="https://example.com/file.js"
           spellcheck="false"
