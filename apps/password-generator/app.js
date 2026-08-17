@@ -5,7 +5,7 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Icon, Toggle } from './../../shared/js/components/index.js';
+import { Icon, Picker, Slider, Toggle } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -169,12 +169,8 @@ function EntropyBar() {
 function RandomSettings() {
   return html`
     <div class="settings-group">
-      <div class="setting-row">
-        <label>Length <span class="val">${length.value}</span></label>
-        <input type="range" min=4 max=128 value=${length.value}
-          onInput=${e => length.value = +e.target.value}
-          style="flex:1;accent-color:var(--accent)" />
-      </div>
+      <${Slider} label="Length" min=4 max=128
+        value=${length.value} onChange=${v => length.value = v} />
       <div class="toggles">
         <${Toggle} value=${useUpper.value} onChange=${v => useUpper.value = v}   label="A–Z uppercase" />
         <${Toggle} value=${useLower.value} onChange=${v => useLower.value = v}   label="a–z lowercase" />
@@ -189,12 +185,8 @@ function PassphraseSettings() {
   let SEPS = ['-', '.', '_', ' ', '/'];
   return html`
     <div class="settings-group">
-      <div class="setting-row">
-        <label>Words <span class="val">${wordCount.value}</span></label>
-        <input type="range" min=2 max=10 value=${wordCount.value}
-          onInput=${e => wordCount.value = +e.target.value}
-          style="flex:1;accent-color:var(--accent)" />
-      </div>
+      <${Slider} label="Words" min=2 max=10
+        value=${wordCount.value} onChange=${v => wordCount.value = v} />
       <div class="setting-row">
         <label>Separator</label>
         <div class="chip-group">
@@ -203,7 +195,7 @@ function PassphraseSettings() {
               onClick=${() => separator.value = s}>
               ${s === ' ' ? '·space·' : s}
             </button>`)}
-          <input class="sep-input" type="text" maxlength=3 value=${separator.value}
+          <input class="field sep-input" type="text" maxlength=3 value=${separator.value}
             onInput=${e => separator.value = e.target.value}
             placeholder="custom" />
         </div>
@@ -214,12 +206,8 @@ function PassphraseSettings() {
 function PINSettings() {
   return html`
     <div class="settings-group">
-      <div class="setting-row">
-        <label>Length <span class="val">${pinLength.value}</span></label>
-        <input type="range" min=4 max=12 value=${pinLength.value}
-          onInput=${e => pinLength.value = +e.target.value}
-          style="flex:1;accent-color:var(--accent)" />
-      </div>
+      <${Slider} label="Length" min=4 max=12
+        value=${pinLength.value} onChange=${v => pinLength.value = v} />
     </div>`;
 }
 
@@ -246,13 +234,8 @@ function App() {
   return html`
     <div id="app-body">
       
-      <div class="mode-picker">
-        ${MODES.map(({ id, icon, label }) => html`
-          <button class=${'mode-btn' + (m === id ? ' active' : '')}
-            onClick=${() => { mode.value = id; generate(); }}>
-            <${Icon} name=${icon} /> ${label}
-          </button>`)}
-      </div>
+      <${Picker} options=${MODES.map(({ id, icon, label }) => ({ value: id, label, icon }))}
+        value=${m} onChange=${id => { mode.value = id; generate(); }} />
       
       <div class="panel">
         ${m === 'random'     && html`<${RandomSettings} />`}
@@ -261,12 +244,8 @@ function App() {
         
         <${EntropyBar} />
         
-        <div class="count-row">
-          <label>Generate <span class="val">${count.value}</span></label>
-          <input type="range" min=1 max=20 value=${count.value}
-            onInput=${e => count.value = +e.target.value}
-            style="flex:1;accent-color:var(--accent)" />
-        </div>
+        <${Slider} label="Generate" min=1 max=20
+          value=${count.value} onChange=${v => count.value = v} />
 
         <div class="actions">
           <button class="btn primary" onClick=${generate}>

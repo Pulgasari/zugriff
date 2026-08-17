@@ -229,7 +229,7 @@ function SizeInput({ label, sig, min=1, max=64, onChange }) {
       <button class="sz-btn" onClick=${() => { let v = Math.max(min, sig.value-1); sig.value=v; onChange?.(v); }}>
         <${Icon} name="mdi:minus" />
       </button>
-      <input type="number" class="sz-input" min=${min} max=${max} value=${sig.value}
+      <input type="number" class="field sz-input" min=${min} max=${max} value=${sig.value}
         onInput=${e => { let v = Math.max(min, Math.min(max, +e.target.value)); sig.value=v; onChange?.(v); }} />
       <button class="sz-btn" onClick=${() => { let v = Math.min(max, sig.value+1); sig.value=v; onChange?.(v); }}>
         <${Icon} name="mdi:plus" />

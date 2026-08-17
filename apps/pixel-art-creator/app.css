@@ -1,30 +1,6 @@
 /* pixel-art-creator — app specific css.
-   shared rules live in ./../../shared/css/ */
-
-/* ── toolbar ── */
-.toolbar {
-  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; flex-shrink: 0;
-  padding: .5rem .65rem; border-radius: .6rem;
-  background: color-mix(in srgb, var(--fg) 5%, transparent);
-  border: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
-}
-
-.divider {
-  width: 1px; height: 1.4rem; flex-shrink: 0;
-  background: color-mix(in srgb, var(--fg) 15%, transparent);
-}
-
-.tool-group { display: flex; gap: .2rem; align-items: center; }
-
-.tool-btn {
-  background: transparent; border: none; color: var(--fg); cursor: pointer;
-  padding: .3rem; border-radius: .35rem; display: flex; align-items: center;
-  opacity: .5; transition: opacity .12s, background .12s;
-}
-
-.tool-btn:hover  { opacity: 1; background: color-mix(in srgb, var(--fg) 8%, transparent); }
-
-.tool-btn.active { opacity: 1; background: var(--accent); color: var(--bg); }
+   shared rules live in ./../../shared/css/
+   (pixel.css — toolbar + palette chrome — is opt-in, linked from index.html) */
 
 .preset-btn {
   background: transparent; cursor: pointer;
@@ -38,41 +14,30 @@
 
 .preset-btn.active { opacity: 1; background: var(--accent); color: var(--bg); border-color: transparent; }
 
-/* ── palette ── */
-.palette { display: flex; align-items: center; gap: .35rem; flex-wrap: wrap; flex-shrink: 0; }
-
+/* ── palette swatch (morphs to a circle when active) ── */
 .pal-swatch {
   --size: 1.5rem;
-  
-  width  : var(--size); 
-  height : var(--size); 
+
+  width  : var(--size);
+  height : var(--size);
   border-radius: .25rem; cursor: pointer;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 15%, transparent);
   transition: transform .1s, box-shadow .1s; position: relative;
-  
-  &:hover  { border-radius: 50%; } 
+
+  &:hover  { border-radius: 50%; }
   &.active { border-radius: 50%; --size: 2.5rem; }
 }
-
-.pal-add {
-  width: 1.6rem; height: 1.6rem; border-radius: .3rem; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px dashed color-mix(in srgb, var(--fg) 25%, transparent);
-  opacity: .5; position: relative; transition: opacity .12s;
-}
-
-.pal-add:hover { opacity: 1; }
 
 /* ── canvas ── */
 .canvas-wrap {
   flex            : 0 1 0;
   flex            : 0 1 auto;
-  min-height      : 200px; 
+  min-height      : 200px;
   overflow        : auto;
-  display         : flex; 
-  align-items     : flex-start; 
+  display         : flex;
+  align-items     : flex-start;
   justify-content : flex-start;
-  padding         : 0.5rem; 
+  padding         : 0.5rem;
   border-radius   : 0.25rem;
   border          : 1px solid color-mix(in srgb, var(--fg) 5%, transparent);
   border          : 1px solid var(--pxl-active);
@@ -83,7 +48,7 @@
 .pixel-grid {
   display     : grid;
   grid-template-columns: repeat(var(--cols), 1fr);
-  cursor      : crosshair; 
+  cursor      : crosshair;
   flex-shrink : 0;
   width       : calc(100% * var(--pxl-scale));
   /*
@@ -95,7 +60,7 @@
 .pixel-cell {
   aspect-ratio: 1;
   /*
-  width  : var(--sz); 
+  width  : var(--sz);
   height : var(--sz);
   */
 }

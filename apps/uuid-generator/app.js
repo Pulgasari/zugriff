@@ -5,7 +5,7 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { CopyIcon, Icon } from './../../shared/js/components/index.js';
+import { CopyIcon, Icon, Picker, Slider } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -63,18 +63,10 @@ function App() {
     <div id="app-body">
       
       <div class="controls">
-        <div class="version-picker">
-          ${VERSIONS.map(v => html`
-            <button class=${'chip' + (version.value === v ? ' active' : '')}
-              onClick=${() => { version.value = v; generate(); }}>${v}</button>`)}
-        </div>
-        <div class="count-row">
-          <label>Count</label>
-          <input type="range" min=1 max=100 value=${count.value}
-            onInput=${e => count.value = +e.target.value}
-            style="flex:1;accent-color:var(--accent)" />
-          <span class="count-val">${count.value}</span>
-        </div>
+        <${Picker} options=${VERSIONS} value=${version.value}
+          onChange=${v => { version.value = v; generate(); }} />
+        <${Slider} label="Count" min=1 max=100
+          value=${count.value} onChange=${v => count.value = v} />
         <div class="actions">
           <button class="btn primary" onClick=${generate}>
             <${Icon} name="mdi:refresh" /> Generate

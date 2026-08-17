@@ -6,7 +6,7 @@ import { BunkerDB } from '@bunker/db';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Icon } from './../../shared/js/components/index.js';
+import { Icon, Picker } from './../../shared/js/components/index.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -156,7 +156,7 @@ function TagManager({ show, onClose }) {
         ${tags.value.length === 0 && html`<span class="empty-hint">No tags yet</span>`}
       </div>
       <div class="tag-manager-add">
-        <input class="tag-name-input" type="text" placeholder="Tag name"
+        <input class="field tag-name-input" type="text" placeholder="Tag name"
           value=${name} onInput=${e => setName(e.target.value)}
           onKeyDown=${e => e.key === 'Enter' && add()} />
         <input type="color" class="tag-color-input" value=${color}
@@ -223,9 +223,8 @@ function Sidebar() {
 
       <div class="sort-row">
         <span class="section-label">Sort</span>
-        ${SORTS.map(s => html`
-          <button class=${'sort-btn' + (sortBy.value === s.id ? ' active' : '')}
-            onClick=${() => sortBy.value = s.id}>${s.label}</button>`)}
+        <${Picker} options=${SORTS.map(s => ({ value: s.id, label: s.label }))}
+          value=${sortBy.value} onChange=${id => sortBy.value = id} />
       </div>
 
       <div class="prompt-list zebra">

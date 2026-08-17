@@ -246,7 +246,7 @@ function      CropTaskPane (props) {
   let { id, params: p } = props.task;
   let field = (label, key) => html`
     <label class="task-label">${label}</label>
-    <input type="number" class="task-input sm" value=${p[key]}
+    <input type="number" class="field task-input sm" value=${p[key]}
       onInput=${e => updateTask(id, { [key]: +e.target.value })} />`;
   return html`
     <${TaskPane} ...${props}>
@@ -292,10 +292,10 @@ function    ResizeTaskPane (props) {
   return html`
     <${TaskPane} ...${props}>
       <label class="task-label">W</label>
-      <input type="number" class="task-input" placeholder="px" value=${p.w}
+      <input type="number" class="field task-input" placeholder="px" value=${p.w}
         onInput=${e => updateTask(id, { w: e.target.value })} />
       <label class="task-label">H</label>
-      <input type="number" class="task-input" placeholder="px" value=${p.h}
+      <input type="number" class="field task-input" placeholder="px" value=${p.h}
         onInput=${e => updateTask(id, { h: e.target.value })} />
       <span class="task-hint">(leave one empty to keep ratio)</span>
     </${TaskPane}>`;
@@ -307,7 +307,7 @@ function    RotateTaskPane (props) {
       ${[90, 180, 270].map(d => html`
         <button class=${'chip' + (p.deg === d ? ' active' : '')}
           onClick=${() => updateTask(id, { deg: d })}>${d}°</button>`)}
-      <input type="number" class="task-input sm" value=${p.deg} min=0 max=359
+      <input type="number" class="field task-input sm" value=${p.deg} min=0 max=359
         onInput=${e => updateTask(id, { deg: +e.target.value })} />
     </${TaskPane}>`;
 }
@@ -316,10 +316,10 @@ function WatermarkTaskPane (props) {
   let POSITIONS = [['tl','top-left'],['tr','top-right'],['bl','bottom-left'],['br','bottom-right']];
   return html`
     <${TaskPane} ...${props}>
-      <input class="task-input grow" type="text" value=${p.text} placeholder="Text"
+      <input class="field task-input grow" type="text" value=${p.text} placeholder="Text"
         onInput=${e => updateTask(id, { text: e.target.value })} />
       <label class="task-label">Size</label>
-      <input type="number" class="task-input sm" value=${p.size} min=8 max=200
+      <input type="number" class="field task-input sm" value=${p.size} min=8 max=200
         onInput=${e => updateTask(id, { size: +e.target.value })} />
       <label class="task-label">Opacity</label>
       <input type="range" min=0 max=1 step=0.05 value=${p.opacity}

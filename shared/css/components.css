@@ -453,3 +453,86 @@ button:hover:not(:disabled),
 @media (max-width: 560px) {
   .setting-key { flex-basis: 100%; }
 }
+
+/* ── button modifiers ───────────────────────────────────────────────────── */
+/* base `button, .btn` is defined at the top of this file — these are the
+   modifiers the apps kept redefining locally. */
+
+.btn.sm        { padding: 0.25rem 0.60rem; font-size: 0.78rem; }
+.btn.full      { width: 100%; justify-content: center; }
+.btn.icon-only { padding: 0.50rem 0.65rem; }
+.btn.danger    { background: color-mix(in srgb, #f44 12%, transparent); color: #f66; }
+
+/* icon-btn variants — base `.icon-btn, .act-btn` is defined above */
+.icon-btn.remove:hover { color: #f66; opacity: 1; }
+.icon-btn:disabled     { opacity: 0.15; cursor: not-allowed; }
+a.icon-btn             { text-decoration: none; }
+a.icon-btn:hover       { color: var(--accent); opacity: 1; }
+
+/* ── text field ─────────────────────────────────────────────────────────── */
+/* the border/background/focus every text input shared. size, padding and
+   border-radius stay on the app's own input class. */
+
+.field {
+  border     : 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
+  background : color-mix(in srgb, var(--fg) 5%, transparent);
+  color      : var(--fg);
+}
+.field:focus { outline: none; border-color: var(--accent); }
+
+/* ── button rows ────────────────────────────────────────────────────────── */
+/* single-select pickers are <${Picker} look='segments'> now; this is just the
+   flex row a few apps put their export buttons in. */
+
+.export-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* ── file list / file bar ───────────────────────────────────────────────── */
+
+.file-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.file-item,
+.file-bar {
+  display       : flex;
+  align-items   : center;
+  gap           : 0.6rem;
+  padding       : 0.6rem 0.75rem;
+  border-radius : 0.5rem;
+  background    : color-mix(in srgb, var(--fg) 6%, transparent);
+  font-size     : 0.875rem;
+}
+
+.file-item .name,
+.file-bar .fname {
+  flex          : 1;
+  overflow      : hidden;
+  text-overflow : ellipsis;
+  white-space   : nowrap;
+  opacity       : 0.85;
+}
+.file-item .label { font-size: 0.78rem; opacity: 0.5; white-space: nowrap; }
+
+.file-item.done        { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.file-item.done .label { opacity: 0.7; color: var(--accent); }
+.file-item.error       { background: color-mix(in srgb, #f44 8%, transparent); }
+
+/* ── labelled setting rows ──────────────────────────────────────────────── */
+
+.setting-row {
+  display     : flex;
+  align-items : center;
+  gap         : 0.65rem;
+  font-size   : 0.85rem;
+}
+.setting-row label { opacity: 0.6; flex-shrink: 0; }
+
+.copy-icon { opacity: 0.35; flex-shrink: 0; transition: opacity 0.12s; }
+
+/* ── inline error row (lighter sibling of .err-block) ───────────────────── */
+
+.err-row {
+  display     : flex;
+  align-items : center;
+  gap         : 0.5rem;
+  color       : #f66;
+  font-size   : 0.85rem;
+}

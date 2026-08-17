@@ -6,7 +6,7 @@ import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb,
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Icon } from './../../shared/js/components/index.js';
+import { Icon, Picker } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -104,7 +104,7 @@ function Slider({ label, value, min, max, step = 1, gradient, onChange }) {
         <input type="range" min=${min} max=${max} step=${step}
           value=${value} onInput=${e => onChange(+e.target.value)} />
       </div>
-      <input type="number" class="num-input" min=${min} max=${max} step=${step}
+      <input type="number" class="field num-input" min=${min} max=${max} step=${step}
         style=${{ width }}
         value=${disp} onInput=${e => onChange(clamp(+e.target.value, min, max))} />
     </div>`;
@@ -148,7 +148,7 @@ function RGBTab() {
         onChange=${v => set('b', v)} />
       <div class="hex-row">
         <span class="slider-label">Hex</span>
-        <input class="hex-input" type="text" maxlength="7" value=${hex}
+        <input class="field hex-input" type="text" maxlength="7" value=${hex}
           onInput=${e => { let c = parse(e.target.value); if (c) color.value = toOklch(c); }} />
         <input type="color" class="native-color" value=${hex}
           onInput=${e => { let c = parse(e.target.value); if (c) color.value = toOklch(c); }} />
@@ -239,7 +239,7 @@ function MixTab() {
   let ColorInput = ({ value, onChange }) => html`
     <div class="mix-color">
       <${Swatch} hex=${value} size="lg" />
-      <input class="hex-input" type="text" maxlength="7" value=${value}
+      <input class="field hex-input" type="text" maxlength="7" value=${value}
         onInput=${e => { if (parse(e.target.value)) onChange(e.target.value); }} />
       <input type="color" class="native-color" value=${value}
         onInput=${e => onChange(e.target.value)} />
@@ -257,10 +257,7 @@ function MixTab() {
       <${Slider} label="Mix" value=${pct} min=0 max=100
         gradient=${'linear-gradient(to right,'+a+','+b+')'}
         onChange=${setPct} />
-      <div class="space-picker">
-        ${MIX_SPACES.map(s => html`
-          <button class=${'fmt-btn'+(sp===s?' active':'')} onClick=${() => setSp(s)}>${s}</button>`)}
-      </div>
+      <${Picker} options=${MIX_SPACES} value=${sp} onChange=${s => setSp(s)} />
       <div class="mix-result">
         <${Swatch} hex=${mixHex} size="lg" />
         <${CopyRows} value=${mixed}>
@@ -286,7 +283,7 @@ function ShadesTab() {
         <${Slider} label="Steps" value=${steps} min=3 max=20 onChange=${setSteps} />
         <div class="slider-row">
           <span class="slider-label">Name</span>
-          <input class="hex-input" type="text" value=${name} onInput=${e => setName(e.target.value)} />
+          <input class="field hex-input" type="text" value=${name} onInput=${e => setName(e.target.value)} />
         </div>
       </div>
       <div class="shade-grid">
@@ -322,10 +319,7 @@ function App() {
         <code class="header-hex" onClick=${() => navigator.clipboard.writeText(hex)}>${hex}</code>
       </div>
 
-      <div class="tab-bar">
-        ${TABS.map(t => html`
-          <button class=${'tab-btn'+(tab.value===t?' active':'')} onClick=${() => tab.value = t}>${t}</button>`)}
-      </div>
+      <${Picker} options=${TABS} value=${tab.value} onChange=${t => tab.value = t} />
       
       <div class='tab'>
         <${Active} />

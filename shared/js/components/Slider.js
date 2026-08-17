@@ -3,6 +3,11 @@
 // wraps <aufbau-slider>. the element carries its value as an array (it also
 // does two-handle ranges), the apps here all want a single number — so that is
 // what goes in and comes out.
+//
+// <aufbau-slider> renders its own value readout (and the unit) inside its
+// .slider-display, so the wrapper must NOT add a second one — the old version
+// did, which is why every app kept hand-rolling a raw <input type=range>
+// instead of using this component.
 
 import { html } from '@aufbau/kits/preact-htm';
 
@@ -15,8 +20,8 @@ export default function Slider ({
   max  = 100,
   step = 1,
   style,
-  showButtons,
-  showNumber,
+  showButtons,   // +/- stepper buttons around the track
+  editable,      // render the readout as an editable number field
   unit,
   onChange,
 }) {
@@ -24,7 +29,6 @@ export default function Slider ({
   const decimals = step < 0.01 ? 4 : 2;
   const clamp    = v => Math.min(max, Math.max(min, v));
   const disp     = isFloat ? +Number(value).toFixed(decimals) : Math.round(value);
-  const width    = (String(max).replace('.', '').length + (isFloat ? 2 : 0)) + 'ch';
 
   const set   = v => onChange?.(clamp(v));
   const input = event => set(single(event.detail?.value ?? event.target?.value));
@@ -35,8 +39,9 @@ export default function Slider ({
 
       <div class="slider-track" style=${style}>
         <aufbau-slider
+          style="width:100%"
           controls=${showButtons}
-          editable=${showNumber}
+          editable=${editable}
           min=${String(min)}
           max=${String(max)}
           step=${step}
@@ -45,7 +50,5 @@ export default function Slider ({
           onInput=${input}
         ></aufbau-slider>
       </div>
-
-      ${showNumber && html`<span class="slider-value" style=${{ width }}>${disp}${unit ?? ''}</span>`}
     </div>`;
 }

@@ -44,25 +44,3 @@
   gap             : 1rem;
   justify-content : space-between;
 }
-
-.quality-row {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  font-size: .85rem;
-}
-
-.quality-row label { opacity: .55; min-width: 3rem; }
-
-.quality-row input[type=range] {
-  flex: 1;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
-
-.quality-val {
-  min-width: 2.5rem;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  opacity: .7;
-}
