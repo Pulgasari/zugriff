@@ -6,7 +6,7 @@ import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb,
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Icon } from './../../shared/js/components/index.js';
+import { Icon, Picker } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -257,10 +257,7 @@ function MixTab() {
       <${Slider} label="Mix" value=${pct} min=0 max=100
         gradient=${'linear-gradient(to right,'+a+','+b+')'}
         onChange=${setPct} />
-      <div class="space-picker">
-        ${MIX_SPACES.map(s => html`
-          <button class=${'fmt-btn'+(sp===s?' active':'')} onClick=${() => setSp(s)}>${s}</button>`)}
-      </div>
+      <${Picker} options=${MIX_SPACES} value=${sp} onChange=${s => setSp(s)} />
       <div class="mix-result">
         <${Swatch} hex=${mixHex} size="lg" />
         <${CopyRows} value=${mixed}>
@@ -322,10 +319,7 @@ function App() {
         <code class="header-hex" onClick=${() => navigator.clipboard.writeText(hex)}>${hex}</code>
       </div>
 
-      <div class="tab-bar">
-        ${TABS.map(t => html`
-          <button class=${'tab-btn'+(tab.value===t?' active':'')} onClick=${() => tab.value = t}>${t}</button>`)}
-      </div>
+      <${Picker} options=${TABS} value=${tab.value} onChange=${t => tab.value = t} />
       
       <div class='tab'>
         <${Active} />

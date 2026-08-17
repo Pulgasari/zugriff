@@ -7,7 +7,7 @@ import * as PDFJS from 'pdfjs';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Dropzone, Icon } from './../../shared/js/components/index.js';
+import { Dropzone, Icon, Picker, Slider } from './../../shared/js/components/index.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -199,27 +199,17 @@ function App() {
 
         <div class="export-panel">
 
-          <div class="format-picker">
-            ${FORMATS.map(f => html`
-              <button class=${'chip' + (fmt === f ? ' active' : '')} onClick=${() => format.value = f}>
-                ${f}
-              </button>`)}
-          </div>
+          <${Picker} options=${FORMATS} value=${fmt} onChange=${f => format.value = f} />
 
           ${fmt !== 'pdf' && html`
-            <div class="setting-row">
-              <label>Quality</label>
-              <input type="range" min=1 max=100 value=${quality.value}
-                onInput=${e => quality.value = +e.target.value}
-                style="flex:1;accent-color:var(--accent)" />
-              <span class="val">${quality.value}%</span>
-            </div>
+            <${Slider} label="Quality" min=1 max=100 unit="%"
+              value=${quality.value} onChange=${v => quality.value = v} />
             <div class="setting-row">
               <label>Scale</label>
-              ${[1, 2, 3].map(s => html`
-                <button class=${'chip' + (scale.value === s ? ' active' : '')}
-                  onClick=${() => scale.value = s}>${s}×</button>`)}
-              <span class="val hint">(${s => s}× = higher resolution)</span>
+              <${Picker}
+                options=${[{ value: 1, label: '1×' }, { value: 2, label: '2×' }, { value: 3, label: '3×' }]}
+                value=${scale.value} onChange=${s => scale.value = +s} />
+              <span class="val hint">higher = sharper</span>
             </div>`}
 
           <button class="btn primary" onClick=${doExport}

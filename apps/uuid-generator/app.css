@@ -3,13 +3,6 @@
 
 .controls { display: flex; flex-direction: column; gap: .65rem; }
 
-.version-picker { display: flex; gap: .4rem; }
-
-/* narrower label than the shared .count-row default */
-.count-row label { min-width: 3rem; }
-
-.count-val { min-width: 2rem; text-align: right; opacity: .6; font-variant-numeric: tabular-nums; }
-
 .uuid-list { display: flex; flex-direction: column; gap: .3rem; }
 
 .uuid-row {

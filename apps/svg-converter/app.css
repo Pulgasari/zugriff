@@ -82,6 +82,3 @@
 .lock-btn:hover  { opacity: 1; }
 
 .lock-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); }
-
-/* quality — .quality-row / .quality-val base is shared */
-.quality-val { font-size: .82rem; }

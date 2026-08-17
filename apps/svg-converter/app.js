@@ -6,7 +6,7 @@ import { PDFDocument } from 'pdf-lib';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Dropzone, Icon } from './../../shared/js/components/index.js';
+import { Dropzone, Icon, Slider } from './../../shared/js/components/index.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -215,12 +215,8 @@ function App() {
 
             <div class="setting-group">
               <label class="setting-label">Quality <span class="setting-sub">(jpg / webp)</span></label>
-              <div class="quality-row">
-                <input type="range" min=1 max=100 value=${quality.value}
-                  onInput=${e => quality.value = +e.target.value}
-                  style="flex:1;accent-color:var(--accent)" />
-                <span class="quality-val">${quality.value}%</span>
-              </div>
+              <${Slider} min=1 max=100 unit="%"
+                value=${quality.value} onChange=${v => quality.value = v} />
             </div>
 
             <div class="setting-group">

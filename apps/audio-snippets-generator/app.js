@@ -7,7 +7,7 @@ import { fetchFile } from '@ffmpeg/util';
 // ::: shared
 import { boot } from './../../shared/js/app.js';
 import { loadFFmpeg } from './../../shared/js/lib/ffmpeg.js';
-import { Dropzone, Button, GhostButton, Icon } from './../../shared/js/components/index.js';
+import { Dropzone, Button, GhostButton, Icon, Picker } from './../../shared/js/components/index.js';
 import { WaveformWithHandles } from './../../shared/js/components/media.js';
 
 // ::: local
@@ -291,10 +291,7 @@ function App() {
         </div>
         
         <div class="export-bar">
-          <div class="format-picker">
-            ${FORMATS.map(f => html`
-              <button class=${'chip'+(format.value===f?' active':'')} onClick=${() => format.value = f}>${f}</button>`)}
-          </div>
+          <${Picker} options=${FORMATS} value=${format.value} onChange=${f => format.value = f} />
           <div class="export-btns">
             <button class="btn primary" onClick=${() => doExport('combined')} disabled=${busy}>
               <${Icon} name=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''} />

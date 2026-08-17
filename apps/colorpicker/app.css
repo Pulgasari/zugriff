@@ -23,21 +23,7 @@ h1 { font-size: 1rem; font-weight: 600; flex: 1; display: flex; align-items: cen
 .header-hex:hover { opacity: 1; }
 
 /* ── tabs ── */
-.tab-bar { display: flex; gap: .35rem; flex-wrap: wrap; }
-
-.tab-btn {
-  padding: .35rem .8rem; border-radius: 2rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
-  background: transparent; color: var(--fg);
-  cursor: pointer; font-size: .8rem; font-weight: 500;
-  transition: background .15s, border-color .15s, color .15s;
-}
-
-.tab-btn:hover  { border-color: var(--accent); color: var(--accent); }
-
-.tab-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-
-/* ── tab content ── */
+/* ── tab content (tab bar is now a shared <${Picker}>) ── */
 .tab {
   display         : grid;
   justify-content : stretch;
@@ -137,10 +123,6 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
 .swatch-lg    { width: 3.5rem; height: 3.5rem; }
 
 .swatch-shade { width: 100%; aspect-ratio: 1; border-radius: .3rem; }
-
-/* ── format picker ── */
-/* .fmt-btn is the shared pill button from shared/css/components.css */
-.space-picker { display: flex; gap: .35rem; flex-wrap: wrap; }
 
 /* ── mix tab ── */
 .mix-row { display: flex; gap: 1rem; }

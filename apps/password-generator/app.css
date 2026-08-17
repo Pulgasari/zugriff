@@ -1,21 +1,6 @@
 /* password-generator — app specific css.
    shared rules live in ./../../shared/css/ */
 
-/* ── mode picker ── */
-.mode-picker { display: flex; gap: .4rem; }
-
-.mode-btn {
-  flex: 1; display: flex; align-items: center; justify-content: center; gap: .35rem;
-  padding: .45rem .6rem; border-radius: .5rem; font-size: .85rem; font-weight: 500;
-  border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
-  background: transparent; color: var(--fg); cursor: pointer;
-  transition: background .15s, border-color .15s, color .15s;
-}
-
-.mode-btn:hover  { border-color: var(--accent); color: var(--accent); }
-
-.mode-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
-
 /* ── panel ── */
 .panel {
   display: flex; flex-direction: column; gap: .85rem;
@@ -26,11 +11,8 @@
 
 .settings-group { display: flex; flex-direction: column; gap: .65rem; }
 
-/* wider labels than the shared .setting-row / .count-row default */
-.setting-row label,
-.count-row label { min-width: 5.5rem; }
-
-.val { font-variant-numeric: tabular-nums; opacity: 1; margin-left: .25rem; }
+/* wider label than the shared .setting-row default (the separator row) */
+.setting-row label { min-width: 5.5rem; }
 
 /* ── chips ── */
 .chip-group { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; }

@@ -5,7 +5,7 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Button, Dropzone, Icon, Picker } from './../../shared/js/components/index.js';
+import { Button, Dropzone, Icon, Picker, Slider } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -64,12 +64,8 @@ function downloadAll() {
 function QualitySlider() {
   if (format.value === 'png') return null;
   return html`
-    <div class="quality-row">
-      <label>Quality</label>
-      <input type="range" min="0" max="100" value=${quality.value}
-        onInput=${e => quality.value = +e.target.value} />
-      <span class="quality-val">${quality.value}%</span>
-    </div>`;
+    <${Slider} label="Quality" min=0 max=100 unit="%"
+      value=${quality.value} onChange=${v => quality.value = v} />`;
 }
 
 function FileItem ({ entry }) {

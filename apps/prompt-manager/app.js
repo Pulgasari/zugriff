@@ -6,7 +6,7 @@ import { BunkerDB } from '@bunker/db';
 
 // ::: shared
 import { boot } from './../../shared/js/app.js';
-import { Icon } from './../../shared/js/components/index.js';
+import { Icon, Picker } from './../../shared/js/components/index.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -223,9 +223,8 @@ function Sidebar() {
 
       <div class="sort-row">
         <span class="section-label">Sort</span>
-        ${SORTS.map(s => html`
-          <button class=${'sort-btn' + (sortBy.value === s.id ? ' active' : '')}
-            onClick=${() => sortBy.value = s.id}>${s.label}</button>`)}
+        <${Picker} options=${SORTS.map(s => ({ value: s.id, label: s.label }))}
+          value=${sortBy.value} onChange=${id => sortBy.value = id} />
       </div>
 
       <div class="prompt-list zebra">

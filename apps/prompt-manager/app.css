@@ -55,19 +55,8 @@
 
 .tag-filter-btn.active { color: var(--tag-color, var(--accent)); font-weight: 600; }
 
-/* ── sort ── */
+/* ── sort (buttons are now a shared <${Picker}>) ── */
 .sort-row { display: flex; align-items: center; gap: .35rem; flex-shrink: 0; }
-
-.sort-btn {
-  padding: .18rem .5rem; border-radius: 2rem; font-size: .73rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 14%, transparent);
-  background: transparent; color: var(--fg); cursor: pointer; opacity: .6;
-  transition: opacity .12s, border-color .12s;
-}
-
-.sort-btn:hover  { opacity: 1; }
-
-.sort-btn.active { opacity: 1; border-color: var(--accent); color: var(--accent); }
 
 /* ── section label ── */
 .section-label {

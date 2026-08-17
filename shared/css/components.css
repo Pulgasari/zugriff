@@ -480,23 +480,11 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 }
 .field:focus { outline: none; border-color: var(--accent); }
 
-/* ── format picker (pill buttons) ───────────────────────────────────────── */
+/* ── button rows ────────────────────────────────────────────────────────── */
+/* single-select pickers are <${Picker} look='segments'> now; this is just the
+   flex row a few apps put their export buttons in. */
 
-.format-picker { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-.export-btns   { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-.fmt-btn {
-  padding       : 0.25rem 0.6rem;
-  border-radius : 2rem;
-  border        : 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
-  background    : transparent;
-  color         : var(--fg);
-  cursor        : pointer;
-  font-size     : 0.75rem;
-  transition    : background 0.15s, border-color 0.15s, color 0.15s;
-}
-.fmt-btn:hover  { border-color: var(--accent); color: var(--accent); }
-.fmt-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+.export-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 /* ── file list / file bar ───────────────────────────────────────────────── */
 
@@ -529,23 +517,13 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 
 /* ── labelled setting rows ──────────────────────────────────────────────── */
 
-.setting-row,
-.count-row {
+.setting-row {
   display     : flex;
   align-items : center;
   gap         : 0.65rem;
   font-size   : 0.85rem;
 }
-.setting-row label,
-.count-row label { opacity: 0.6; flex-shrink: 0; }
-
-.quality-row { display: flex; align-items: center; gap: 0.65rem; }
-.quality-val {
-  min-width            : 2.5rem;
-  text-align           : right;
-  opacity              : 0.6;
-  font-variant-numeric : tabular-nums;
-}
+.setting-row label { opacity: 0.6; flex-shrink: 0; }
 
 .copy-icon { opacity: 0.35; flex-shrink: 0; transition: opacity 0.12s; }
 

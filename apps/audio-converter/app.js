@@ -7,7 +7,7 @@ import { fetchFile } from '@ffmpeg/util';
 // ::: shared
 import { boot } from './../../shared/js/app.js';
 import { loadFFmpeg } from './../../shared/js/lib/ffmpeg.js';
-import { Dropzone, Icon } from './../../shared/js/components/index.js';
+import { Dropzone, Icon, Picker } from './../../shared/js/components/index.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -88,12 +88,7 @@ let downloadAll = () =>
 
 function FormatPicker() {
   return html`
-    <div class="format-picker">
-      ${FORMATS.map(f => html`
-        <button class=${'fmt-btn' + (format.value === f ? ' active' : '')} onClick=${() => format.value = f}>
-          ${f}
-        </button>`)}
-    </div>`;
+    <${Picker} options=${FORMATS} value=${format.value} onChange=${f => format.value = f} />`;
 }
 
 function FileItem({ entry: e }) {

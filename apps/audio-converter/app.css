@@ -10,14 +10,6 @@
 
 .dropzone u { color: var(--accent); text-underline-offset: 2px; }
 
-/* uppercase pill on top of the shared .fmt-btn base */
-.fmt-btn {
-  padding: .3rem .75rem;
-  font-size: .85rem;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
 /* audio files flag decode errors with a red icon */
 .file-item.error iconify-icon { color: #f66; }
 
