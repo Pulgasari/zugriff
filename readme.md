@@ -95,8 +95,10 @@ exactly like a tool's does.
 the apps so far:
 [apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS the cli
 uses; [apps/image-editor](./apps/image-editor/) — crop/rotate/flip/adjust images
-on a canvas; and [apps/gifmaker](./apps/gifmaker/) — sequence images into an
-animation and export a GIF or a project zip.
+on a canvas; [apps/gifmaker](./apps/gifmaker/) — sequence images into an
+animation and export a GIF or a project zip; and
+[apps/podcasts](./apps/podcasts/) — subscribe by RSS, play episodes and track
+progress, backed by `@bunker/db`.
 
 ## adding an app
 

@@ -32,6 +32,14 @@ export const apps = [
     description : 'Turn a stack of images into an animation — nudge, reorder, export as GIF or a project zip.',
     categories  : ['image'],
   },
+  {
+    slug        : 'podcasts',
+    name        : 'Podcasts',
+    short_name  : 'Podcasts',
+    icon        : 'mdi:podcast',
+    description : 'Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.',
+    categories  : ['media'],
+  },
 ];
 
 // ── defaults every app inherits ────────────────────────────────────────────
