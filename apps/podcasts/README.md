@@ -11,10 +11,16 @@ feed requests themselves.
 - **latest episodes** — a combined, newest-first stream across every subscription.
 - **podcasts view** — grid or list, sorted alphabetically or by most recently
   updated (the feed with the newest episode first).
-- **episodes per podcast** — sorted newest, oldest or A–Z.
+- **episodes per podcast** — sorted newest, oldest or A–Z, with a sticky filter.
+- **episode page** — a full view for a single episode: artwork, complete
+  description, playback controls and progress.
+- **filter** — the latest-episodes stream and each podcast page carry a
+  bottom-docked search that filters as you type.
 - **listen later** — a bookmark list of episodes to get to.
 - **progress & done** — the player saves your position as you listen and marks
   an episode done at ~95%; you can also toggle done by hand.
+- **layout** — the menu (top / bottom / left / right) and the player
+  (top / bottom) positions are set in Settings; the menu defaults to the bottom.
 - **import / export** — back up your subscriptions and listening state as JSON
   and restore them on another device.
 
