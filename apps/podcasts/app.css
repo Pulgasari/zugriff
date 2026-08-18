@@ -279,13 +279,15 @@
 .play-toggle:hover { background: var(--hover); }
 .play-toggle.current { background: var(--accent); border-color: transparent; color: #fff; }
 
-/* ── podcasts grid / list ────────────────────────────────────────────────── */
+/* ── podcasts grid / list ─────────────────────────────────────────────────
 
-.pc-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1.25rem;
-}
+   the grid/list layout is delegated to <aufbau-index viewmode="grid|list">;
+   these rules only style what sits inside each <aufbau-item> cell. the item is
+   overflow:hidden by default (its base sheet) — opened up here so the card's
+   hover lift is not clipped. */
+
+.pc-index aufbau-item { overflow: visible; }
+
 .pc-card {
   border: none;
   background: none;
@@ -293,6 +295,7 @@
   cursor: pointer;
   text-align: left;
   padding: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -310,7 +313,6 @@
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .pc-sub { font-size: 0.75rem; color: var(--fg-50, var(--fg)); }
 
-.pc-listing { display: flex; flex-direction: column; }
 .pc-row {
   display: flex;
   align-items: center;
