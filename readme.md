@@ -53,7 +53,7 @@ zugriff/
       components/               index.js (light) · code.js (panes) · media.js (audio)
       patterns/                 whole apps from a handful of options
       data/                     icons — short names for the iconify ids
-      lib/                      data-converters, signals, ffmpeg, theme
+      lib/                      data-converters, signals, thumbs, ffmpeg, theme
   cli/                          the wasm micro terminal
 ```
 
