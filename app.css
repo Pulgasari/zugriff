@@ -43,7 +43,18 @@
       flex           : 1 1 auto;
       min-width      : 0;
     }
-    .name { font-size: 1.1rem; }
+    .name { font-size: 1.1rem; display: inline-flex; align-items: baseline; gap: 0.4rem; }
+
+    .tag {
+      font-size      : 0.6rem;
+      text-transform : uppercase;
+      letter-spacing : 0.06em;
+      padding        : 0.1rem 0.35rem;
+      border-radius  : 0.25rem;
+      background     : var(--accent-25);
+      color          : var(--accent);
+      align-self     : center;
+    }
     .desc { font-size: 0.8rem; opacity: 0.5; }
 
     .logo {

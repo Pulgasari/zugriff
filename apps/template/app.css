@@ -1,0 +1,26 @@
+/* apps/template/app.css — app specific css only.
+
+   the reset, the theme tokens and the #app frame come from ./../base.css.
+   everything below is this app's own look — apps deliberately do not share a
+   layout or component sheet, so start from scratch here. */
+
+.topbar {
+  display     : flex;
+  align-items : center;
+  gap         : 0.5rem;
+  padding     : 0 1rem;
+  height      : 3rem;
+  flex        : none;
+  border-bottom: 1px solid var(--line);
+  background  : var(--panel);
+}
+
+.stage {
+  flex           : 1 1 auto;
+  display        : grid;
+  place-items    : center;
+  padding        : 2rem;
+  overflow       : auto;
+  text-align     : center;
+  opacity        : 0.7;
+}

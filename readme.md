@@ -11,11 +11,13 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 ## about
 
 - `/cli` basically is zugriff itself or the main app so to speak.
-- `/tools` here are the apps we build, kinda like multiple sub-projects of zugriff
+- `/tools` small single-purpose pages, rendered inside the shared tools shell
+- `/apps` the ones meant to feel like real apps — own chrome, own css
 - `/shared` stuff used by all/multiple apps
 
 every app is its own PWA: own manifest, own service worker scope, installable
-on its own. what they share is the shell, the components and the css.
+on its own. tools share the shell, the components and the css; apps deliberately
+do not — see [apps vs tools](#apps-vs-tools) below.
 
 ## structure
 
@@ -25,10 +27,16 @@ zugriff/
   manifest.json  sw.js          the launcher is an installable pwa too
   icon.svg
   tools/
-    registry.js                 single source of truth for every app's metadata
-    template/                   the blueprint — copy this to start an app
+    registry.js                 single source of truth for every tool's metadata
+    template/                   the blueprint — copy this to start a tool
     <slug>/                     index.html app.js app.config.js app.css
                                 sw.js manifest.json app.svg assets/
+  apps/
+    registry.js                 single source of truth for every app's metadata
+    base.css                    the apps foundation: reset + theme tokens + #app frame
+    template/                   the blueprint — copy this to start an app
+    <slug>/                     index.html app.js app.config.js app.css
+                                sw.js manifest.json app.svg
   shared/
     css/
       index.css                 always linked: reset + theme + typo + layout + components
@@ -48,14 +56,49 @@ zugriff/
   cli/                          the wasm micro terminal
 ```
 
-## adding an app
+## adding a tool
 
-1. `cp -r tools/template tools/my-app`
+1. `cp -r tools/template tools/my-tool`
 2. add an entry to `tools/registry.js`
-3. in `app.config.js` swap the literal for `appMeta('my-app')`
+3. in `app.config.js` swap the literal for `appMeta('my-tool')`
 4. drop an `app.svg` in and generate `assets/` with the
    [icon-generator](./tools/icon-generator/) app
 5. update `manifest.json`, write `app.js`
+
+## apps vs tools
+
+a **tool** is a small single-purpose page — it renders inside the shared tools
+`Shell` (header + settings panel) and links `shared/css/index.css`, so it
+inherits the whole tools look for free. most of `tools/` is a
+[pattern](#patterns) plus a handful of options.
+
+an **app** is meant to feel like a real application. it draws its own chrome and
+brings its own css — no `Shell`, and instead of `index.css` it links only
+`apps/base.css` (reset + theme tokens + the `#app` frame). `boot({ shell: false })`
+hands it the bare `#app` element and it takes it from there.
+
+|            | tools                                   | apps                                   |
+|------------|-----------------------------------------|----------------------------------------|
+| lives in   | `tools/<slug>/`                         | `apps/<slug>/`                         |
+| css        | `shared/css/index.css` + `app.css`      | `apps/base.css` + `app.css`            |
+| chrome     | shared `Shell` header + settings        | its own, `boot({ shell: false })`      |
+| registry   | `tools/registry.js`                     | `apps/registry.js`                     |
+
+what apps still share with everything else: the theme tokens (so a theme picked
+anywhere carries across), the import map, the aufbau runtime and the service
+worker. the launcher lists apps and tools together, apps tagged with an `app`
+badge; each app's own worker owns its files, exactly like a tool's does.
+
+first app: [apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS
+the cli uses.
+
+## adding an app
+
+1. `cp -r apps/template apps/my-app`
+2. add an entry to `apps/registry.js`
+3. in `app.config.js` swap the literal for `appMeta('my-app')`
+4. drop an `app.svg` in
+5. update `manifest.json`, write `app.js` and `app.css`
 
 ## patterns
 
@@ -175,7 +218,7 @@ not allow those headers: the icons would load once and then start failing.
 the revalidation is handed to `event.waitUntil` via bunker's `keepAlive`, so a
 refresh started on the last request of a session is not lost when the worker is
 killed. the launcher's scope is `/zugriff/`, which sits above every app — it
-deliberately ignores anything under `tools/` so each app's own worker owns its
+deliberately ignores anything under `tools/` and `apps/` so each app's own worker owns its
 files.
 
 the cache name comes from the registration scope, so nothing is generated per

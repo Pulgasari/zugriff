@@ -1,0 +1,18 @@
+{
+  "id"               : "template",
+  "name"             : "template",
+  "short_name"       : "template",
+  "description"      : "the blueprint every app is copied from.",
+  "lang"             : "en",
+  "dir"              : "ltr",
+  "scope"            : "./",
+  "start_url"        : "./",
+  "display"          : "standalone",
+  "orientation"      : "portrait",
+  "categories"       : ["utilities"],
+  "background_color" : "#282a36",
+  "theme_color"      : "#282a36",
+  "icons": [
+    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
