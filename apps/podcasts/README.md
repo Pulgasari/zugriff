@@ -49,11 +49,14 @@ zugriff.
 
 - Feeds load through the configured CORS proxy by default (`api.allorigins.win`).
   Change or clear it in Settings if you'd rather use your own.
-- Artwork is downscaled on the fly. Podcast covers are frequently 1400–3000px
-  squares, but we show them at 48–160px, so each `<Art>` requests its image
-  through a resizing proxy (`wsrv.nl` by default) at the pixel size it renders —
-  the client-only stand-in for server thumbnails, turning a multi-MB cover into
-  a few KB of webp. If the resizer fails the original is tried, then a
-  placeholder icon; set it to **Originals** in Settings to skip it entirely.
+- Artwork is downscaled and cached on-device — no image third party. Covers are
+  frequently 1400–3000px but shown at 48–160px, so the shared thumbnail cache
+  (`shared/js/lib/thumbs.js`) fetches each image once, shrinks it to a small
+  webp on a canvas and stores the blob in IndexedDB; from then on the original
+  host is never touched again. The byte fetch is direct first and only falls
+  back to the CORS proxy when an image host blocks it. While a thumbnail is
+  generating a placeholder shows; if it can't be made the original is shown for
+  display, then a placeholder — so the full-size image is downloaded at most
+  once and never rendered at full size on the happy path.
 - Audio streams from the podcast's own host; only feed metadata is stored
   locally, not the audio.

@@ -11,15 +11,6 @@
 
 export const DEFAULT_PROXY = 'https://api.allorigins.win/raw?url={url}';
 
-// artwork thumbnailing. podcast covers are often 1400–3000px squares served
-// straight from the feed host, but we only ever show them at 48–160px. an
-// on-the-fly image resizer (wsrv.nl, the images.weserv.nl project) shrinks them
-// to the requested width and re-encodes as webp, so the browser downloads a few
-// KB instead of a few MB — the client-only equivalent of a server thumbnail.
-// `{url}` is the source, `{w}` the target width in px; `we` avoids upscaling
-// small originals. clear it in settings to load the originals directly.
-export const DEFAULT_IMG_PROXY = 'https://wsrv.nl/?url={url}&w={w}&output=webp&we';
-
 function viaProxy (proxy, url) {
   const tpl = (proxy || '').trim();
   if (!tpl) return null;

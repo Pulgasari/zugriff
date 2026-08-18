@@ -16,15 +16,16 @@
 import { html, signal, computed, useEffect, useRef, useSignal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot }   from './../../shared/js/app.js';
-import { Icon }   from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot }             from './../../shared/js/app.js';
+import { Icon }             from './../../shared/js/components/index.js';
+import { stored }           from './../../shared/js/lib/signals.js';
+import { createThumbCache } from './../../shared/js/lib/thumbs.js';
 
 // ::: local
 import * as config from './app.config.js';
 import * as db     from './db.js';
 import * as player from './player.js';
-import { DEFAULT_PROXY, DEFAULT_IMG_PROXY } from './feed.js';
+import { DEFAULT_PROXY } from './feed.js';
 
 // :::::: SETTINGS (persisted signals) ::::::::::::::::::::::
 
@@ -32,9 +33,13 @@ const view        = stored('grid',   'podcasts:view');           // grid | list
 const podcastSort = stored('recent', 'podcasts:podcast-sort');   // recent | alpha
 const episodeSort = stored('newest', 'podcasts:episode-sort');   // newest | oldest | alpha
 const proxy       = stored(DEFAULT_PROXY, 'podcasts:proxy');
-const imgProxy    = stored(DEFAULT_IMG_PROXY, 'podcasts:img-proxy');
 const menuPos     = stored('bottom', 'podcasts:menu-pos');       // top | bottom | left | right
 const playerPos   = stored('bottom', 'podcasts:player-pos');     // top | bottom
+
+// artwork is downscaled and kept on-device (see shared/js/lib/thumbs.js). the
+// byte fetch reuses the CORS proxy only when an image host blocks a direct
+// request — nothing is sent to any image-resizing third party.
+const thumbs = createThumbCache({ proxy: () => proxy.value });
 
 // :::::: UI STATE ::::::::::::::::::::::::::::::::::::::::::
 
@@ -121,30 +126,37 @@ const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e =>
 
 // :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
 
-// route an artwork url through the thumbnail resizer at the size we actually
-// render it, so a 3000px cover arrives as a few-KB webp. returns the url
-// untouched when the resizer is turned off in settings.
-function thumb (url, size) {
-  if (!url) return '';
-  const tpl = imgProxy.value.trim();
-  if (!tpl) return url;
-  const dpr = Math.min(2, Math.max(1, Math.round(window.devicePixelRatio || 1)));
-  const w   = Math.min(640, Math.round(size * dpr));
-  return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
-}
-
-// artwork with a fallback chain: the resized thumbnail first, then the original
-// url if the resizer fails, then the placeholder icon. `failed` is keyed by url
-// so a changed src (list re-sort/filter) is retried from the top.
+// artwork, served from the on-device thumbnail cache. while the small copy is
+// being generated a placeholder shows; if it can't be made (image unreachable),
+// it falls back to the original url for display; if that is broken too, the
+// placeholder stays. the original is thus downloaded at most once and never
+// shown at full size on the happy path.
 function Art ({ src, size = 48, className = '' }) {
-  const failed = useSignal({});
-  const candidates = src ? [...new Set([thumb(src, size), src].filter(Boolean))] : [];
-  const url = candidates.find(u => !failed.value[u]);
+  // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
+  const st = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
 
-  return url
-    ? html`<img class=${'art ' + className} src=${url} alt="" loading="lazy"
+  useEffect(() => {
+    if (!src) { st.value = { url: null, phase: 'none', broken: false }; return; }
+    const cached = thumbs.peek(src);
+    if (cached) { st.value = { url: cached, phase: 'ready', broken: false }; return; }
+
+    st.value = { url: null, phase: 'pending', broken: false };
+    let alive = true;
+    thumbs.request(src).then(u => {
+      if (!alive) return;
+      st.value = u ? { url: u,   phase: 'ready', broken: false }
+                   : { url: src, phase: 'orig',  broken: false };
+    });
+    return () => { alive = false; };
+  }, [src]);
+
+  const s = st.value;
+  const showImg = (s.phase === 'ready' || s.phase === 'orig') && !s.broken;
+
+  return showImg
+    ? html`<img class=${'art ' + className} src=${s.url} alt="" loading="lazy"
                 width=${size} height=${size}
-                onError=${() => { failed.value = { ...failed.value, [url]: true }; }} />`
+                onError=${() => { st.value = { ...st.value, broken: true }; }} />`
     : html`<span class=${'art art-fallback ' + className} style=${`width:${size}px;height:${size}px`}>
              <${Icon} name="mdi:podcast" size=${Math.round(size * 0.5)} />
            </span>`;
@@ -351,7 +363,9 @@ function PodcastDetailView ({ id }) {
 
   const remove = async () => {
     if (!confirm(`Unsubscribe from “${podcast.title}”? This removes its episodes and their progress.`)) return;
+    const artwork = [podcast.image, ...all.map(e => e.image)].filter(Boolean);
     await db.unsubscribe(id);
+    thumbs.evict(artwork).catch(() => {});
     flash('Unsubscribed');
     go('podcasts');
   };
@@ -572,9 +586,8 @@ function AddDialog () {
 }
 
 function SettingsDialog () {
-  const proxyVal    = useSignal(proxy.value);
-  const imgProxyVal = useSignal(imgProxy.value);
-  const fileRef     = useRef(null);
+  const proxyVal = useSignal(proxy.value);
+  const fileRef  = useRef(null);
 
   const doExport = () => {
     const data = db.exportData();
@@ -633,18 +646,6 @@ function SettingsDialog () {
           </span>
         </label>
 
-        <label class="field">
-          <span class="field-label">Artwork thumbnails</span>
-          <span class="field-hint">Podcast covers are often huge. Artwork is loaded through this on-the-fly resizer at the size it's shown. <code>{url}</code> is the image, <code>{w}</code> the width. Clear it to load full-size originals directly.</span>
-          <input class="modal-input" type="text" value=${imgProxyVal.value}
-                 placeholder=${DEFAULT_IMG_PROXY}
-                 onInput=${e => imgProxyVal.value = e.target.value} />
-          <span class="field-row">
-            <button class="btn ghost small" onClick=${() => imgProxyVal.value = DEFAULT_IMG_PROXY}>Reset to default</button>
-            <button class="btn ghost small" onClick=${() => imgProxyVal.value = ''}>Originals</button>
-          </span>
-        </label>
-
         <div class="field">
           <span class="field-label">Subscriptions</span>
           <span class="field-hint">Back up your subscriptions and listening progress as JSON, or restore from a file.</span>
@@ -658,8 +659,7 @@ function SettingsDialog () {
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {
-            proxy.value    = proxyVal.value.trim();
-            imgProxy.value = imgProxyVal.value.trim();
+            proxy.value = proxyVal.value.trim();
             dialog.value = null; flash('Settings saved');
           }}>Done</button>
         </div>
@@ -752,7 +752,9 @@ function Body () {
 
 function App () {
   useEffect(() => {
-    db.load().catch(err => flash('Could not open the library: ' + err.message, 'err'));
+    db.load()
+      .then(() => thumbs.prewarm(db.podcasts.value.map(p => p.image)))
+      .catch(err => flash('Could not open the library: ' + err.message, 'err'));
 
     const onKey = e => {
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
