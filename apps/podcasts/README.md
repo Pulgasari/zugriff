@@ -49,14 +49,15 @@ zugriff.
 
 - Feeds load through the configured CORS proxy by default (`api.allorigins.win`).
   Change or clear it in Settings if you'd rather use your own.
-- Artwork is downscaled and cached on-device — no image third party. Covers are
-  frequently 1400–3000px but shown at 48–160px, so the shared thumbnail cache
-  (`shared/js/lib/thumbs.js`) fetches each image once, shrinks it to a small
-  webp on a canvas and stores the blob in IndexedDB; from then on the original
-  host is never touched again. The byte fetch is direct first and only falls
-  back to the CORS proxy when an image host blocks it. While a thumbnail is
-  generating a placeholder shows; if it can't be made the original is shown for
-  display, then a placeholder — so the full-size image is downloaded at most
-  once and never rendered at full size on the happy path.
+- Artwork is downscaled by a self-hosted resizer — no third party. Covers are
+  frequently 1400–3000px but shown at 48–160px, so each image goes through
+  `img.pulgasari.dev` (see [`/img-proxy`](./../../img-proxy/)), a tiny PHP
+  endpoint that fetches the original server-side (no browser CORS) and returns a
+  small webp. The shared cache (`shared/js/lib/thumbs.js`) stores that result in
+  IndexedDB, so from then on nothing is fetched again. While it loads a
+  placeholder shows; if the resizer is unreachable the original is shown for
+  display, then a placeholder. The endpoint is set in **Settings → Artwork
+  resizer**; clear it to resize in the browser instead (works only for hosts
+  that allow cross-origin reads).
 - Audio streams from the podcast's own host; only feed metadata is stored
   locally, not the audio.
