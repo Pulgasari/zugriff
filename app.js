@@ -1,19 +1,19 @@
 // app.js — the launcher
 //
-// renders the app list from apps/registry.js. this replaces index.php, which
+// renders the app list from tools/registry.js. this replaces index.php, which
 // used to scan the directory and build the same list server-side.
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 import { boot } from './shared/js/app.js';
-import { registry, categories } from './apps/registry.js';
+import { registry, categories } from './tools/registry.js';
 import Icon from './shared/js/components/Icon.js';
 import Nav  from './shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './shared/js/components/Settings.js';
 import { launcher, themeGroup } from './shared/js/lib/settings.js';
 
 const config = {
-  app    : { slug: 'zugriff', name: 'zugriff apps', theme: 'dracula', lang: 'en' },
+  app    : { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en' },
   aufbau : { elements: { mode: 'auto' } },
 };
 
@@ -51,7 +51,7 @@ function Filter () {
         ref=${ref}
         class="search-input"
         type="search"
-        placeholder="Filter apps…"
+        placeholder="Filter tools…"
         value=${query.value}
         onInput=${event => query.value = event.target.value}
       />
@@ -79,10 +79,10 @@ function AppList () {
                   onClick=${() => category.value = name}>${name}</button>`)}
       </div>
 
-      <ul id="apps">
+      <ul id="tools">
         ${list.map(app => html`
           <li key=${app.slug}>
-            <a href=${`./apps/${app.slug}/`}>
+            <a href=${`./tools/${app.slug}/`}>
               <span class="title">
                 <span class="name">${app.name}</span>
                 ${app.description && html`<span class="desc">${app.description}</span>`}
@@ -102,9 +102,9 @@ function AppList () {
 function Launcher () {
   return html`
     <div id="app-head">
-      <div id="app-logo"><strong>zugriff</strong> apps</div>
+      <div id="app-logo"><strong>zugriff</strong> tools</div>
       <div class="actions">
-        <${Nav} here='apps' base='./' />
+        <${Nav} here='tools' base='./' />
         <${SettingsButton} />
       </div>
     </div>

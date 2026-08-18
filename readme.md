@@ -11,7 +11,7 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 ## about
 
 - `/cli` basically is zugriff itself or the main app so to speak.
-- `/apps` here are the apps we build, kinda like multiple sub-projects of zugriff
+- `/tools` here are the apps we build, kinda like multiple sub-projects of zugriff
 - `/shared` stuff used by all/multiple apps
 
 every app is its own PWA: own manifest, own service worker scope, installable
@@ -21,10 +21,10 @@ on its own. what they share is the shell, the components and the css.
 
 ```
 zugriff/
-  index.html  app.js  app.css   the launcher, rendered from apps/registry.js
+  index.html  app.js  app.css   the launcher, rendered from tools/registry.js
   manifest.json  sw.js          the launcher is an installable pwa too
   icon.svg
-  apps/
+  tools/
     registry.js                 single source of truth for every app's metadata
     template/                   the blueprint — copy this to start an app
     <slug>/                     index.html app.js app.config.js app.css
@@ -50,11 +50,11 @@ zugriff/
 
 ## adding an app
 
-1. `cp -r apps/template apps/my-app`
-2. add an entry to `apps/registry.js`
+1. `cp -r tools/template tools/my-app`
+2. add an entry to `tools/registry.js`
 3. in `app.config.js` swap the literal for `appMeta('my-app')`
 4. drop an `app.svg` in and generate `assets/` with the
-   [icon-generator](./apps/icon-generator/) app
+   [icon-generator](./tools/icon-generator/) app
 5. update `manifest.json`, write `app.js`
 
 ## patterns
@@ -175,7 +175,7 @@ not allow those headers: the icons would load once and then start failing.
 the revalidation is handed to `event.waitUntil` via bunker's `keepAlive`, so a
 refresh started on the last request of a session is not lost when the worker is
 killed. the launcher's scope is `/zugriff/`, which sits above every app — it
-deliberately ignores anything under `apps/` so each app's own worker owns its
+deliberately ignores anything under `tools/` so each app's own worker owns its
 files.
 
 the cache name comes from the registration scope, so nothing is generated per
