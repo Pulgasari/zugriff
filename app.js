@@ -1,12 +1,12 @@
 // app.js — the launcher
 //
-// renders the app list from apps/registry.js. this replaces index.php, which
+// renders the app list from tools/registry.js. this replaces index.php, which
 // used to scan the directory and build the same list server-side.
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 import { boot } from './shared/js/app.js';
-import { registry, categories } from './apps/registry.js';
+import { registry, categories } from './tools/registry.js';
 import Icon from './shared/js/components/Icon.js';
 import Nav  from './shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './shared/js/components/Settings.js';
@@ -82,7 +82,7 @@ function AppList () {
       <ul id="apps">
         ${list.map(app => html`
           <li key=${app.slug}>
-            <a href=${`./apps/${app.slug}/`}>
+            <a href=${`./tools/${app.slug}/`}>
               <span class="title">
                 <span class="name">${app.name}</span>
                 ${app.description && html`<span class="desc">${app.description}</span>`}

@@ -97,7 +97,7 @@ self.addEventListener('activate', event => {
 
 // the launcher's scope is /zugriff/, which sits above every app — it must not
 // answer (or cache) their files, those belong to the app's own worker
-const NESTED = new URL('./apps/', SCOPE).href;
+const NESTED = new URL('./tools/', SCOPE).href;
 const isNested = url => url.startsWith(NESTED) && !SCOPE.startsWith(NESTED);
 
 self.addEventListener('fetch', event => {
