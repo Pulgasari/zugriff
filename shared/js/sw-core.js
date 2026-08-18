@@ -96,9 +96,10 @@ self.addEventListener('activate', event => {
 // ── fetch ──────────────────────────────────────────────────────────────────
 
 // the launcher's scope is /zugriff/, which sits above every app — it must not
-// answer (or cache) their files, those belong to the app's own worker
-const NESTED = new URL('./tools/', SCOPE).href;
-const isNested = url => url.startsWith(NESTED) && !SCOPE.startsWith(NESTED);
+// answer (or cache) their files, those belong to the app's own worker. both
+// nests live one level down: tools/<slug>/ and apps/<slug>/
+const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
+const isNested = url => NESTED.some(root => url.startsWith(root) && !SCOPE.startsWith(root));
 
 self.addEventListener('fetch', event => {
   const { request } = event;

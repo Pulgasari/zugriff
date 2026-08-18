@@ -6,7 +6,8 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 import { boot } from './shared/js/app.js';
-import { registry, categories } from './tools/registry.js';
+import { registry as tools, categories as toolCategories } from './tools/registry.js';
+import { registry as apps,  categories as appCategories  } from './apps/registry.js';
 import Icon from './shared/js/components/Icon.js';
 import Nav  from './shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './shared/js/components/Settings.js';
@@ -21,6 +22,12 @@ const groups = [
   { title: 'launcher', settings: launcher },
   themeGroup,
 ];
+
+// apps and tools share the launcher — apps come first so they read as the
+// headline, and each entry keeps its own base so the link points at the right
+// directory
+const registry   = [...apps, ...tools];
+const categories = [...new Set([...appCategories, ...toolCategories])].sort();
 
 const query    = signal('');
 const category = signal('');
@@ -81,10 +88,13 @@ function AppList () {
 
       <ul id="tools">
         ${list.map(app => html`
-          <li key=${app.slug}>
-            <a href=${`./tools/${app.slug}/`}>
+          <li key=${`${app.base ?? 'tools'}/${app.slug}`}>
+            <a href=${`./${app.base ?? 'tools'}/${app.slug}/`}>
               <span class="title">
-                <span class="name">${app.name}</span>
+                <span class="name">
+                  ${app.name}
+                  ${app.base === 'apps' && html`<span class="tag">app</span>`}
+                </span>
                 ${app.description && html`<span class="desc">${app.description}</span>`}
               </span>
               <span class="logo"><${Icon} name=${app.icon} /></span>

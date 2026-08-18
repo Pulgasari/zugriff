@@ -1,0 +1,64 @@
+/* apps/base.css — the shared foundation for /apps.
+
+   deliberately NOT the tools' shared/css/index.css. apps are their own thing:
+   this file is only a reset, the theme tokens, and a full-viewport app root.
+   everything that makes an app *look* like an app lives in that app's own
+   app.css — there is no shared layout or component sheet here on purpose.
+
+   an app links exactly two sheets:
+     <link rel="stylesheet" href="./../base.css">   this file
+     <link rel="stylesheet" href="./app.css">        the app itself
+*/
+
+/* the palette only — the tokens the settings panel writes to, shared so a
+   theme chosen anywhere in zugriff carries into every app */
+@import url('./../shared/css/theme.css');
+
+*, *::before, *::after {
+  box-sizing : border-box;
+  margin     : 0;
+  padding    : 0;
+}
+
+:root {
+  --ui   : system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono : 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* app chrome tokens, derived from the theme */
+  --panel   : color-mix(in oklch, var(--bg) 92%, black);
+  --panel-2 : color-mix(in oklch, var(--bg) 84%, black);
+  --line    : color-mix(in oklch, var(--fg) 12%, transparent);
+  --hover    : color-mix(in oklch, var(--fg) 7%,  transparent);
+  --radius  : 0.5rem;
+}
+
+html { -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+
+body {
+  font-family        : var(--ui);
+  font-size          : 14px;
+  background         : var(--bg);
+  color              : var(--fg);
+  overflow           : hidden;         /* apps own their scroll regions */
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* boot() renders the app straight into #app; make it the viewport frame */
+#app {
+  height        : 100dvh;
+  display       : flex;
+  flex-direction: column;
+  overflow      : hidden;
+}
+
+#app-loading {
+  margin     : auto;
+  font-size  : 2rem;
+  opacity    : 0.4;
+}
+
+a { color: var(--accent); }
+
+::selection { background: var(--accent-25); }
