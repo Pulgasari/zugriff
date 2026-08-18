@@ -8,10 +8,13 @@ is never uploaded anywhere.
 
 - **open** an image (button, or drag-and-drop onto the stage)
 - **crop** with an interactive rule-of-thirds box (drag the body to move, the
-  handles to resize)
+  handles to resize), or pick an **aspect preset** — Free, Original, 1:1, 4:3,
+  3:4, 3:2, 2:3, 16:9, 9:16, up to the device **Screen** ratio — which drops a
+  centered box in and locks that ratio while you resize
 - **rotate** in 90° steps, **flip** horizontally or vertically
 - **resize** with an optional aspect-ratio lock
-- **adjust** brightness, contrast, saturation and grayscale (live preview)
+- **adjust** brightness, contrast, saturation and grayscale (live preview) — the
+  side panel is tabbed into **Adjust · Resize · Export**
 - **undo / redo** every geometry step (`Ctrl/Cmd+Z`, `Ctrl/Cmd+Shift+Z`) and
   **reset** back to the original
 - **export** as PNG, JPEG or WebP, with a quality slider for the lossy formats
