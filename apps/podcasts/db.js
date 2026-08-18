@@ -18,10 +18,9 @@
 
 import { signal, computed } from '@aufbau/kits/preact-htm';
 import { createDb } from '@bunker/db';
-
 import { fetchFeed, parseFeed } from './feed.js';
 
-const db = createDb('zugriff-podcasts');
+const db = createDb ('zugriff-podcasts');
 
 // ── ids ──────────────────────────────────────────────────────────────────
 // a small, stable string hash (cyrb53). feed urls and guids can be long and
@@ -41,15 +40,17 @@ function hash (str = '') {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
-export const podcastId  = url         => 'p' + hash(url);
-export const episodeId  = (pid, guid) => pid + ':' + hash(guid);
+export const 
+podcastId  = url         => 'p' + hash(url),
+episodeId  = (pid, guid) => pid + ':' + hash(guid);
 
 // ── signals ────────────────────────────────────────────────────────────────
 
-export const podcasts = signal([]);          // array of podcast records
-export const episodes = signal([]);          // flat array of every episode
-export const states   = signal({});          // episodeId -> state record
-export const ready    = signal(false);       // false until the first load lands
+export const
+podcasts = signal([]),    // array of podcast records
+episodes = signal([]),    // flat array of every episode
+states   = signal({}),    // episodeId -> state record
+ready    = signal(false); // false until the first load lands
 
 // episodes grouped once, so a podcast view is a lookup instead of a filter
 export const episodesByPodcast = computed(() => {
@@ -94,8 +95,7 @@ export async function patchState (id, patch) {
   return next;
 }
 
-export const setProgress = (id, position, duration) =>
-  patchState(id, { position, duration });
+export const setProgress = (id, position, duration) => patchState(id, { position, duration });
 
 export async function markDone (id, done = true) {
   return patchState(id, { done, doneAt: done ? Date.now() : 0 });
@@ -240,12 +240,8 @@ export async function unsubscribe (pid) {
   const doomed = episodes.value.filter(e => e.podcastId === pid).map(e => e.id);
 
   await db.delete('podcasts', pid);
-  await db.task('episodes', 'readwrite', store => {
-    for (const id of doomed) store.delete(id);
-  });
-  await db.task('state', 'readwrite', store => {
-    for (const id of doomed) store.delete(id);
-  });
+  await db.task('episodes' , 'readwrite', store => { for (const id of doomed) store.delete(id); });
+  await db.task('state'    , 'readwrite', store => { for (const id of doomed) store.delete(id); });
 
   podcasts.value = podcasts.value.filter(p => p.id !== pid);
   episodes.value = episodes.value.filter(e => e.podcastId !== pid);
