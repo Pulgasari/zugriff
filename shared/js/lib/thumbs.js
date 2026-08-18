@@ -17,8 +17,15 @@
 //   import { createThumbCache } from './../../shared/js/lib/thumbs.js';
 //   const thumbs = createThumbCache({ proxy: () => corsProxy.value });
 //   const url = await thumbs.request(imageUrl);   // -> blob object-url or null
+//
+// logging (@pulgasari/logger, scope 'thumbs'): a generated thumbnail and a
+// proxy fallback log at info, a failure at warn — both visible by default. cache
+// hits log at debug; run `setLogLevel('debug')` from @pulgasari/logger to see
+// them. a host that blocks the direct fetch is remembered so the browser's
+// unsuppressable CORS error is not logged again for it.
 
-import { createDb } from '@bunker/db';
+import { createDb }     from '@bunker/db';
+import { createLogger } from '@pulgasari/logger';
 
 // a small stable string hash (cyrb53) — the same one the apps use for ids.
 function hash (str = '') {
@@ -67,6 +74,7 @@ const canResize = typeof createImageBitmap === 'function' && typeof document !==
  * @param {number}   [opts.maxBytes]               soft cap on total cache size; oldest entries are dropped past it
  * @param {number}   [opts.quality=0.82]           webp quality
  * @param {number}   [opts.concurrency=3]          parallel generations
+ * @param {string}   [opts.scope='thumbs']         logger scope
  */
 export function createThumbCache ({
   name        = 'zugriff-images',
@@ -75,44 +83,67 @@ export function createThumbCache ({
   maxBytes    = 64 * 1024 * 1024,
   quality     = 0.82,
   concurrency = 3,
+  scope       = 'thumbs',
 } = {}) {
   const db       = createDb(name);
   const mem      = new Map();   // key -> object-url (this session)
   const inflight = new Map();   // key -> Promise<string|null>
   const gate     = limiter(concurrency);
+  const log      = createLogger(scope);
+
+  // hosts whose direct fetch we already saw blocked by CORS. remembering them
+  // means we stop re-issuing a cross-origin fetch the browser will only reject
+  // and log again — the repeated "blocked by CORS" console spam — and go
+  // straight to the proxy for that host instead.
+  const corsBlocked = new Set();
 
   let setup = null;
   const ensure = () => (setup ??= db.setup({ thumbs: {}, meta: {} }));
 
-  const keyOf = url => `${hash(url)}@${width}`;
+  const keyOf   = url => `${hash(url)}@${width}`;
+  const hostOf  = url => { try { return new URL(url).host; } catch { return url; } };
+  const label   = url => { try { return decodeURIComponent(new URL(url).pathname.split('/').pop()) || url; } catch { return url; } };
+  const asKb    = bytes => `${Math.round(bytes / 1024)} KB`;
 
   // ── byte fetch: direct, then proxy ─────────────────────────────────────────
+  // returns { blob, via } where via is 'direct' | 'proxy', or null on failure.
   async function fetchBytes (url) {
-    try {
-      const res = await fetch(url, { mode: 'cors', credentials: 'omit' });
-      if (res.ok) return await res.blob();
-    } catch { /* CORS or network — fall through to the proxy */ }
+    const host = hostOf(url);
+
+    // skip the direct attempt for hosts already known to block it, so the
+    // browser does not log the same CORS rejection over and over
+    if (!corsBlocked.has(host)) {
+      try {
+        const res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+        if (res.ok) return { blob: await res.blob(), via: 'direct' };
+      } catch {
+        corsBlocked.add(host);
+        log.debug('cors', host, '→ proxy from now on');
+      }
+    }
 
     const proxied = viaProxy(proxy(), url);
     if (!proxied) return null;
     try {
       const res = await fetch(proxied, { credentials: 'omit' });
-      if (res.ok) return await res.blob();
+      if (res.ok) return { blob: await res.blob(), via: 'proxy' };
     } catch { /* give up, the caller falls back to the original */ }
     return null;
   }
 
   // ── generate a downscaled webp blob from the original ──────────────────────
+  // returns { blob, via, w, h } on success, or { error } describing the failure.
   async function generate (url) {
-    if (!canResize) return null;
-    const bytes = await fetchBytes(url);
-    if (!bytes) return null;
+    if (!canResize) return { error: 'unsupported' };
+
+    const got = await fetchBytes(url);
+    if (!got) return { error: 'fetch' };
 
     let bitmap;
     try {
-      bitmap = await createImageBitmap(bytes);   // decode once; bail if it is not an image
+      bitmap = await createImageBitmap(got.blob);   // decode once; bail if not an image
     } catch {
-      return null;
+      return { error: 'decode' };
     }
 
     // downscale only — a small original is kept at its own size, never blown up
@@ -129,7 +160,8 @@ export function createThumbCache ({
     bitmap.close?.();
 
     const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', quality));
-    return blob || null;
+    if (!blob) return { error: 'encode' };
+    return { blob, via: got.via, w, h };
   }
 
   // ── storage bookkeeping (soft LRU by creation time) ───────────────────────
@@ -176,21 +208,27 @@ export function createThumbCache ({
     async request (url) {
       if (!url) return null;
       const key = keyOf(url);
-      if (mem.has(key)) return mem.get(key);
+      if (mem.has(key)) { log.debug('cache', 'mem', label(url)); return mem.get(key); }
       if (inflight.has(key)) return inflight.get(key);
 
       const job = (async () => {
         await ensure();
         const cached = await loadFromDb(key);
-        if (cached) return cached;
+        if (cached) { log.debug('cache', 'db', label(url)); return cached; }
         try {
-          const blob = await gate(() => generate(url));
-          if (!blob) return null;
-          await store(key, url, blob);
-          const u = URL.createObjectURL(blob);
+          const res = await gate(() => generate(url));
+          if (!res || res.error) {
+            log.warn('fail', res?.error || 'unknown', label(url));
+            return null;
+          }
+          await store(key, url, res.blob);
+          const u = URL.createObjectURL(res.blob);
           mem.set(key, u);
+          log.info(res.via === 'proxy' ? 'made (via proxy)' : 'made',
+                   `${res.w}×${res.h}`, asKb(res.blob.size), label(url));
           return u;
-        } catch {
+        } catch (err) {
+          log.warn('fail', 'store', label(url), err?.message || err);
           return null;
         } finally {
           inflight.delete(key);
