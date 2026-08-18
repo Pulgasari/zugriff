@@ -6,7 +6,9 @@
 // them and writes the position back as it goes (player.js).
 //
 // like every app under /apps it draws its own chrome — there is no tools Shell.
-// the layout is a fixed sidebar, a scrolling main column and a docked player.
+// the layout is a menu bar, a scrolling main column and a docked player; the
+// menu (top/bottom/left/right) and the player (top/bottom) positions are
+// user-set and driven by data-menu / data-player on the root.
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -30,10 +32,13 @@ const view        = stored('grid',   'podcasts:view');           // grid | list
 const podcastSort = stored('recent', 'podcasts:podcast-sort');   // recent | alpha
 const episodeSort = stored('newest', 'podcasts:episode-sort');   // newest | oldest | alpha
 const proxy       = stored(DEFAULT_PROXY, 'podcasts:proxy');
+const menuPos     = stored('bottom', 'podcasts:menu-pos');       // top | bottom | left | right
+const playerPos   = stored('bottom', 'podcasts:player-pos');     // top | bottom
 
 // :::::: UI STATE ::::::::::::::::::::::::::::::::::::::::::
 
 const route    = signal({ name: 'latest' });   // { name, id? }
+const search   = signal('');                   // the episode filter, per view
 const dialog   = signal(null);                 // 'add' | 'settings' | null
 const toast    = signal(null);                 // { text, kind }
 const busy     = signal('');                   // a label while a long task runs
@@ -45,7 +50,8 @@ function flash (text, kind = 'ok') {
   toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 3000);
 }
 
-const go = (name, id) => { route.value = { name, id }; };
+// navigating always clears the current filter
+const go = (name, id) => { route.value = { name, id }; search.value = ''; };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -76,6 +82,30 @@ function plain (htmlStr = '') {
   return (el.textContent || '').replace(/\s+/g, ' ').trim();
 }
 
+// a feed description as readable paragraphs — block tags become breaks, then the
+// text is taken via textContent, so nothing from the feed's markup is executed
+function paragraphs (htmlStr = '') {
+  const el = document.createElement('div');
+  el.innerHTML = String(htmlStr)
+    .replace(/<\/(p|div|li|h[1-6]|tr)>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n');
+  return (el.textContent || '')
+    .replace(/\n{3,}/g, '\n\n')
+    .split('\n\n')
+    .map(s => s.trim())
+    .filter(Boolean);
+}
+
+// filter an episode list by the shared search query; `withPodcast` also matches
+// on the podcast title, for the mixed "latest" stream
+function filterEpisodes (list, withPodcast = false) {
+  const q = search.value.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(ep =>
+    ep.title.toLowerCase().includes(q) ||
+    (withPodcast && podcastById.value[ep.podcastId]?.title.toLowerCase().includes(q)));
+}
+
 const sortEpisodes = (list, mode) => [...list].sort((a, b) =>
   mode === 'oldest' ? (a.pubDate || 0) - (b.pubDate || 0)
   : mode === 'alpha' ? a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
@@ -86,6 +116,7 @@ const sortPodcasts = (list, mode) => [...list].sort((a, b) =>
   :                  (b.lastEpisodeAt || 0) - (a.lastEpisodeAt || 0));
 
 const podcastById = computed(() => Object.fromEntries(db.podcasts.value.map(p => [p.id, p])));
+const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e => [e.id, e])));
 
 // :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
 
@@ -133,7 +164,9 @@ function EpisodeRow ({ episode, showPodcast = false }) {
 
   return html`
     <div class=${'ep' + (st.done ? ' done' : '') + (player.current.value?.id === episode.id ? ' playing' : '')}>
-      <${Art} src=${episode.image || podcast?.image} size=${48} />
+      <button class="ep-art" onClick=${() => go('episode', episode.id)} aria-label="Open episode">
+        <${Art} src=${episode.image || podcast?.image} size=${48} />
+      </button>
       <div class="ep-body">
         <div class="ep-meta">
           ${showPodcast && podcast && html`
@@ -141,7 +174,7 @@ function EpisodeRow ({ episode, showPodcast = false }) {
           <span class="ep-date">${fmtDate(episode.pubDate)}</span>
           ${episode.duration && html`<span class="ep-dur">· ${fmtDuration(episode.duration)}</span>`}
         </div>
-        <div class="ep-title">${episode.title}</div>
+        <button class="ep-title" onClick=${() => go('episode', episode.id)}>${episode.title}</button>
         ${teaser && html`<div class="ep-teaser">${teaser}</div>`}
         <${ProgressBar} state=${st} />
       </div>
@@ -180,12 +213,31 @@ function Empty ({ icon, title, hint, action }) {
     </div>`;
 }
 
+// a filter bar docked at the bottom of the scroll area — writes the shared
+// `search` signal that the episode views filter on
+function SearchBar ({ placeholder }) {
+  return html`
+    <div class="search-dock">
+      <div class="search-bar">
+        <${Icon} name="mdi:magnify" size=${18} />
+        <input type="search" placeholder=${placeholder} value=${search.value}
+               onInput=${e => search.value = e.target.value} />
+        ${search.value && html`
+          <button class="ibtn" aria-label="Clear filter" onClick=${() => search.value = ''}>
+            <${Icon} name="mdi:close" size=${16} />
+          </button>`}
+      </div>
+    </div>`;
+}
+
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
 function LatestView () {
-  const recent = [...db.episodes.value]
-    .sort((a, b) => (b.pubDate || 0) - (a.pubDate || 0))
-    .slice(0, 200);
+  const hasSubs = db.podcasts.value.length > 0;
+  const recent = filterEpisodes(
+    [...db.episodes.value].sort((a, b) => (b.pubDate || 0) - (a.pubDate || 0)),
+    true,
+  ).slice(0, 200);
 
   return html`
     <div class="view">
@@ -195,15 +247,18 @@ function LatestView () {
           <${IconBtn} icon="mdi:refresh" label="Refresh all feeds" onClick=${refreshAll} disabled=${!!busy.value} />
         </div>
       </div>
-      ${!db.podcasts.value.length
+      ${!hasSubs
         ? html`<${Empty} icon="mdi:rss" title="No subscriptions yet"
                  hint="Add a podcast by its RSS feed URL to see its latest episodes here."
                  action=${html`<button class="btn primary" onClick=${() => dialog.value = 'add'}>
                    <${Icon} name="mdi:plus" size=${16} /> Add a podcast</button>`} />`
         : !recent.length
-        ? html`<${Empty} icon="mdi:playlist-remove" title="No episodes found" hint="Try refreshing your feeds." />`
+        ? html`<${Empty} icon=${search.value ? 'mdi:magnify-close' : 'mdi:playlist-remove'}
+                 title=${search.value ? 'Nothing matches your filter' : 'No episodes found'}
+                 hint=${search.value ? '' : 'Try refreshing your feeds.'} />`
         : html`<div class="ep-list">${recent.map(ep => html`<${EpisodeRow} episode=${ep} showPodcast key=${ep.id} />`)}</div>`}
-    </div>`;
+    </div>
+    ${hasSubs && html`<${SearchBar} placeholder="Filter episodes…" />`}`;
 }
 
 function PodcastCard ({ podcast }) {
@@ -268,8 +323,9 @@ function PodcastDetailView ({ id }) {
   const podcast = podcastById.value[id];
   if (!podcast) return html`<${Empty} icon="mdi:alert-outline" title="Podcast not found" />`;
 
-  const eps = sortEpisodes(db.episodesByPodcast.value[id] ?? [], episodeSort.value);
-  const doneCount = eps.filter(e => db.stateOf(e.id).done).length;
+  const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], episodeSort.value);
+  const eps = filterEpisodes(all, false);
+  const doneCount = all.filter(e => db.stateOf(e.id).done).length;
 
   const remove = async () => {
     if (!confirm(`Unsubscribe from “${podcast.title}”? This removes its episodes and their progress.`)) return;
@@ -315,7 +371,75 @@ function PodcastDetailView ({ id }) {
            options=${[['newest', 'Newest'], ['oldest', 'Oldest'], ['alpha', 'A–Z']]} />
       </div>
 
-      <div class="ep-list">${eps.map(ep => html`<${EpisodeRow} episode=${ep} key=${ep.id} />`)}</div>
+      ${eps.length
+        ? html`<div class="ep-list">${eps.map(ep => html`<${EpisodeRow} episode=${ep} key=${ep.id} />`)}</div>`
+        : html`<${Empty} icon="mdi:magnify-close" title="Nothing matches your filter" />`}
+    </div>
+    ${all.length > 0 && html`<${SearchBar} placeholder=${`Filter ${podcast.title}…`} />`}`;
+}
+
+function EpisodeDetailView ({ id }) {
+  const episode = episodeById.value[id];
+  if (!episode) return html`
+    <div class="view">
+      <button class="back" onClick=${() => go('latest')}><${Icon} name="mdi:arrow-left" size=${16} /> Back</button>
+      <${Empty} icon="mdi:alert-outline" title="Episode not found" />
+    </div>`;
+
+  const podcast = podcastById.value[episode.podcastId];
+  const st      = db.stateOf(id);
+  const paras   = paragraphs(episode.description);
+  const dur     = st.duration || episode.duration || 0;
+  const pct     = st.done ? 100 : (dur && st.position ? Math.min(100, (st.position / dur) * 100) : 0);
+
+  const isCurrent = player.current.value?.id === id;
+  const isPlaying = isCurrent && player.playing.value;
+
+  return html`
+    <div class="view">
+      <button class="back" onClick=${() => podcast ? go('podcast', podcast.id) : go('latest')}>
+        <${Icon} name="mdi:arrow-left" size=${16} /> ${podcast ? podcast.title : 'Back'}
+      </button>
+
+      <header class="ed-head">
+        <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
+        <div class="ed-info">
+          ${podcast && html`<button class="ed-podcast" onClick=${() => go('podcast', podcast.id)}>${podcast.title}</button>`}
+          <h1>${episode.title}</h1>
+          <div class="ed-meta">
+            <span>${fmtDate(episode.pubDate)}</span>
+            ${episode.duration && html`<span>· ${fmtDuration(episode.duration)}</span>`}
+            ${st.done && html`<span class="ed-done">· <${Icon} name="mdi:check-circle" size=${13} /> done</span>`}
+          </div>
+
+          <div class="ed-actions">
+            <button class="btn primary" onClick=${() => player.play(episode)}>
+              <${Icon} name=${isPlaying ? 'mdi:pause' : 'mdi:play'} size=${18} />
+              ${isPlaying ? 'Pause' : st.position && !st.done ? 'Resume' : 'Play'}
+            </button>
+            <${IconBtn} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
+                        label=${st.saved ? 'Remove from list' : 'Save for later'}
+                        active=${st.saved} size=${20} onClick=${() => db.toggleSaved(id)} />
+            <${IconBtn} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+                        label=${st.done ? 'Mark unplayed' : 'Mark as done'}
+                        active=${st.done} size=${20} onClick=${() => db.toggleDone(id)} />
+            ${episode.link && html`<a class="btn ghost" href=${episode.link} target="_blank" rel="noopener">
+              <${Icon} name="mdi:open-in-new" size=${16} /> Episode page</a>`}
+          </div>
+
+          ${(st.position > 0 || st.done) && html`
+            <div class="ed-progress">
+              <span class="ep-progress"><span class="ep-progress-fill" style=${`width:${pct}%`}></span></span>
+              <span class="ed-progress-label">
+                ${st.done ? 'Finished' : `${fmtDuration(st.position)}${dur ? ' / ' + fmtDuration(dur) : ''}`}
+              </span>
+            </div>`}
+        </div>
+      </header>
+
+      ${paras.length
+        ? html`<div class="ed-desc">${paras.map((p, i) => html`<p key=${i}>${p}</p>`)}</div>`
+        : html`<p class="ed-desc empty-hint">No description.</p>`}
     </div>`;
 }
 
@@ -462,6 +586,18 @@ function SettingsDialog () {
       <div class="modal wide">
         <h2>Settings</h2>
 
+        <div class="field">
+          <span class="field-label">Menu position</span>
+          <${SortPicker} value=${menuPos.value} onChange=${v => menuPos.value = v}
+             options=${[['top', 'Top'], ['bottom', 'Bottom'], ['left', 'Left'], ['right', 'Right']]} />
+        </div>
+
+        <div class="field">
+          <span class="field-label">Player position</span>
+          <${SortPicker} value=${playerPos.value} onChange=${v => playerPos.value = v}
+             options=${[['top', 'Top'], ['bottom', 'Bottom']]} />
+        </div>
+
         <label class="field">
           <span class="field-label">CORS proxy</span>
           <span class="field-hint">Most podcast feeds block direct browser requests. Feeds are fetched directly first, then through this proxy. <code>{url}</code> is replaced with the feed URL. Clear it to use direct requests only.</span>
@@ -516,9 +652,6 @@ function Sidebar () {
     <aside class="sidebar">
       <div class="brand"><${Icon} name="mdi:podcast" size=${24} /> <span>Podcasts</span></div>
 
-      <button class="btn primary add" onClick=${() => dialog.value = 'add'}>
-        <${Icon} name="mdi:plus" size=${16} /> Add podcast</button>
-
       <nav class="nav">
         <${NavItem} icon="mdi:playlist-play"   label="Latest"    name="latest" />
         <${NavItem} icon="mdi:view-grid-outline" label="Podcasts" name="podcasts" count=${db.podcasts.value.length} />
@@ -572,6 +705,7 @@ function Body () {
   switch (r.name) {
     case 'podcasts': return html`<${PodcastsView} />`;
     case 'podcast':  return html`<${PodcastDetailView} id=${r.id} />`;
+    case 'episode':  return html`<${EpisodeDetailView} id=${r.id} />`;
     case 'saved':    return html`<${SavedView} />`;
     default:         return html`<${LatestView} />`;
   }
@@ -594,9 +728,11 @@ function App () {
   }, []);
 
   return html`
-    <div class="pc-app">
-      <${Sidebar} />
-      <main class="main"><${Body} /></main>
+    <div class="pc-app" data-menu=${menuPos.value} data-player=${playerPos.value}>
+      <div class="pc-body">
+        <${Sidebar} />
+        <main class="main"><${Body} /></main>
+      </div>
       <${PlayerBar} />
       ${dialog.value === 'add'      && html`<${AddDialog} />`}
       ${dialog.value === 'settings' && html`<${SettingsDialog} />`}

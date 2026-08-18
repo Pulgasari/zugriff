@@ -1,17 +1,46 @@
 /* apps/podcasts/app.css — the podcasts app's own look.
 
    the reset, the theme tokens and the #app frame come from ./../base.css.
-   this app draws its own chrome: a fixed sidebar, a scrolling main column and a
-   docked player bar, laid out on one grid. */
+   this app draws its own chrome: a menu bar, a scrolling main column and a
+   docked player. the menu (top/bottom/left/right) and player (top/bottom)
+   positions are user-set, carried on data-menu / data-player on the root and
+   resolved here with flex order — see the LAYOUT block. */
 
 .pc-app {
-  height : 100%;
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  grid-template-rows   : 1fr auto;
-  grid-template-areas  : "sidebar main" "player player";
+  height  : 100%;
+  display : flex;
+  flex-direction: column;
   overflow: hidden;
 }
+
+/* the menu + main pair; player docks above or below it */
+.pc-body {
+  display : flex;
+  flex    : 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── LAYOUT: where the menu and the player sit ────────────────────────────── */
+
+/* menu orientation drives the body axis … */
+.pc-app[data-menu="left"]  .pc-body,
+.pc-app[data-menu="right"] .pc-body { flex-direction: row; }
+.pc-app[data-menu="top"]   .pc-body,
+.pc-app[data-menu="bottom"] .pc-body { flex-direction: column; }
+
+/* … and the menu's order within it */
+.pc-app[data-menu="left"]  .sidebar,
+.pc-app[data-menu="top"]   .sidebar { order: 0; }
+.pc-app[data-menu="right"] .sidebar,
+.pc-app[data-menu="bottom"] .sidebar { order: 2; }
+.main { order: 1; }
+
+/* player above or below the body */
+.pc-app[data-player="top"]    .player  { order: 0; }
+.pc-app[data-player="top"]    .pc-body { order: 1; }
+.pc-app[data-player="bottom"] .pc-body { order: 0; }
+.pc-app[data-player="bottom"] .player  { order: 1; }
 
 /* ── shared controls ─────────────────────────────────────────────────────── */
 
@@ -98,15 +127,39 @@
 /* ── sidebar ─────────────────────────────────────────────────────────────── */
 
 .sidebar {
-  grid-area : sidebar;
   background: var(--panel);
-  border-right: 1px solid var(--line);
   display   : flex;
   flex-direction: column;
   gap       : 0.75rem;
   padding   : 1rem 0.75rem;
   overflow  : hidden;
+  flex      : none;
 }
+
+/* vertical menu (left / right) — the classic sidebar column */
+.pc-app[data-menu="left"]  .sidebar,
+.pc-app[data-menu="right"] .sidebar { width: 240px; }
+.pc-app[data-menu="left"]  .sidebar { border-right: 1px solid var(--line); }
+.pc-app[data-menu="right"] .sidebar { border-left:  1px solid var(--line); }
+
+/* horizontal menu (top / bottom) — a compact bar */
+.pc-app[data-menu="top"]    .sidebar,
+.pc-app[data-menu="bottom"] .sidebar {
+  flex-direction: row;
+  align-items   : center;
+  gap           : 0.5rem;
+  padding       : 0.4rem 0.75rem;
+}
+.pc-app[data-menu="top"]    .sidebar { border-bottom: 1px solid var(--line); }
+.pc-app[data-menu="bottom"] .sidebar { border-top:    1px solid var(--line); }
+.pc-app[data-menu="top"]    .nav,
+.pc-app[data-menu="bottom"] .nav { flex-direction: row; margin: 0; gap: 0.25rem; flex: 1 1 auto; justify-content: center; }
+.pc-app[data-menu="top"]    .nav-item,
+.pc-app[data-menu="bottom"] .nav-item { width: auto; }
+.pc-app[data-menu="top"]    .side-foot,
+.pc-app[data-menu="bottom"] .side-foot { margin: 0; flex-direction: row; align-items: center; gap: 0.25rem; }
+.pc-app[data-menu="top"]    .side-links,
+.pc-app[data-menu="bottom"] .side-links { display: none; }
 .brand {
   display    : flex;
   align-items: center;
@@ -117,7 +170,6 @@
   color      : var(--fg);
 }
 .brand .icon { color: var(--accent); }
-.add { justify-content: center; }
 
 .nav { display: flex; flex-direction: column; gap: 0.15rem; margin-top: 0.25rem; }
 .nav-item {
@@ -167,7 +219,14 @@
 
 /* ── main column ─────────────────────────────────────────────────────────── */
 
-.main { grid-area: main; overflow-y: auto; overflow-x: hidden; }
+.main {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
 .view { padding: 1.5rem clamp(1rem, 3vw, 2.25rem) 2.5rem; max-width: 1100px; margin: 0 auto; }
 
 .booting { height: 100%; display: grid; place-items: center; color: var(--fg-50, var(--fg)); }
@@ -210,6 +269,8 @@
 .ep.playing { background: var(--accent-10, var(--hover)); border-radius: var(--radius); }
 .ep.done .ep-title { color: var(--fg-50, var(--fg)); }
 .ep .art { border-radius: 0.4rem; width: 48px; height: 48px; }
+.ep-art { flex: none; border: none; background: none; padding: 0; cursor: pointer; border-radius: 0.4rem; }
+.ep-art:hover { opacity: 0.85; }
 
 .ep-body { flex: 1 1 auto; min-width: 0; }
 .ep-meta {
@@ -235,7 +296,20 @@
   white-space: nowrap;
 }
 .ep-podcast:hover { text-decoration: underline; }
-.ep-title { font-weight: 600; font-size: 0.95rem; line-height: 1.3; }
+.ep-title {
+  display: block;
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  cursor: pointer;
+}
+.ep-title:hover { color: var(--accent); }
 .ep-teaser {
   font-size: 0.82rem;
   color: var(--fg-50, var(--fg));
@@ -357,6 +431,63 @@
 }
 .pd-tools-label { font-weight: 600; flex: 1 1 auto; }
 
+/* ── episode detail ──────────────────────────────────────────────────────── */
+
+.ed-head { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.ed-art { width: 160px; height: 160px; border-radius: 0.7rem; box-shadow: var(--shadow); }
+.ed-info { flex: 1 1 280px; min-width: 0; }
+.ed-podcast {
+  border: none; background: none; padding: 0; cursor: pointer;
+  color: var(--accent); font: inherit; font-size: 0.85rem; font-weight: 600;
+}
+.ed-podcast:hover { text-decoration: underline; }
+.ed-info h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.25; margin: 0.2rem 0; }
+.ed-meta {
+  display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;
+  font-size: 0.8rem; color: var(--fg-50, var(--fg));
+}
+.ed-done { display: inline-flex; align-items: center; gap: 0.2rem; color: var(--success, var(--accent)); }
+.ed-actions { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.9rem; flex-wrap: wrap; }
+.ed-progress { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.9rem; max-width: 30rem; }
+.ed-progress .ep-progress { flex: 1 1 auto; margin: 0; max-width: none; }
+.ed-progress-label { flex: none; font-size: 0.72rem; color: var(--fg-50, var(--fg)); font-variant-numeric: tabular-nums; }
+.ed-desc { font-size: 0.9rem; line-height: 1.6; color: var(--fg-75, var(--fg)); max-width: 65ch; }
+.ed-desc p { margin: 0 0 0.85rem; }
+
+/* ── search dock (sticky at the bottom of the scroll area) ────────────────── */
+
+.search-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  padding: 0.6rem clamp(1rem, 3vw, 2.25rem);
+  background: color-mix(in oklch, var(--panel) 90%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.35rem 0.7rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.search-bar:focus-within { border-color: var(--accent); }
+.search-bar .icon { color: var(--fg-50, var(--fg)); flex: none; }
+.search-bar input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  outline: none;
+}
+
 /* ── empty states ────────────────────────────────────────────────────────── */
 
 .empty {
@@ -376,15 +507,16 @@
 /* ── player bar ──────────────────────────────────────────────────────────── */
 
 .player {
-  grid-area : player;
+  flex      : none;
   display   : grid;
   grid-template-columns: minmax(160px, 1fr) auto minmax(0, 1.7fr) auto;
   align-items: center;
   gap       : 1rem;
   padding   : 0.6rem 1rem;
   background: var(--panel);
-  border-top: 1px solid var(--line);
 }
+.pc-app[data-player="bottom"] .player { border-top:    1px solid var(--line); }
+.pc-app[data-player="top"]    .player { border-bottom: 1px solid var(--line); }
 .pl-meta { display: flex; align-items: center; gap: 0.7rem; min-width: 0; }
 .pl-meta .art { width: 52px; height: 52px; }
 .pl-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
@@ -509,17 +641,38 @@
 /* ── responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 780px) {
-  .pc-app { grid-template-columns: 60px 1fr; }
-  .brand span, .nav-item span, .side-links, .add span, .nav-count { display: none; }
-  .brand, .nav-item { justify-content: center; }
-  .add { padding: 0.5rem; }
-  .sidebar { padding: 0.75rem 0.4rem; }
+  /* a vertical menu collapses to an icon rail */
+  .pc-app[data-menu="left"]  .sidebar,
+  .pc-app[data-menu="right"] .sidebar { width: 60px; padding: 0.75rem 0.4rem; }
+  .pc-app[data-menu="left"]  .brand span,
+  .pc-app[data-menu="right"] .brand span,
+  .pc-app[data-menu="left"]  .nav-item span,
+  .pc-app[data-menu="right"] .nav-item span,
+  .pc-app[data-menu="left"]  .side-links,
+  .pc-app[data-menu="right"] .side-links,
+  .pc-app[data-menu="left"]  .nav-count,
+  .pc-app[data-menu="right"] .nav-count { display: none; }
+  .pc-app[data-menu="left"]  .brand,
+  .pc-app[data-menu="right"] .brand,
+  .pc-app[data-menu="left"]  .nav-item,
+  .pc-app[data-menu="right"] .nav-item { justify-content: center; }
+
   .player { grid-template-columns: auto auto 1fr auto; gap: 0.5rem; padding: 0.5rem; }
   .pl-info { display: none; }
   .pl-time { min-width: 2.5rem; }
   .pl-right .ibtn:not(:last-child), .rate { display: none; }
 }
+@media (max-width: 560px) {
+  /* a horizontal menu drops the brand + labels to fit a phone bar */
+  .pc-app[data-menu="top"]    .brand span,
+  .pc-app[data-menu="bottom"] .brand span,
+  .pc-app[data-menu="top"]    .nav-item span,
+  .pc-app[data-menu="bottom"] .nav-item span,
+  .pc-app[data-menu="top"]    .nav-count,
+  .pc-app[data-menu="bottom"] .nav-count { display: none; }
+}
 @media (max-width: 480px) {
   .ep-teaser { display: none; }
   .view { padding: 1rem 0.9rem 2rem; }
+  .ed-art { width: 120px; height: 120px; }
 }
