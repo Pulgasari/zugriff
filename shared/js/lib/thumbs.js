@@ -84,17 +84,17 @@ const canResize = typeof createImageBitmap === 'function' && typeof document !==
  */
 export function createThumbCache ({
   name        = 'zugriff-images',
-  width       = 400,
+  width       = 250,
   proxy       = () => '',
   maxBytes    = 64 * 1024 * 1024,
-  quality     = 0.82,
+  quality     = 0.80,
   concurrency = 3,
   scope       = 'thumbs',
   resizer     = null,
 } = {}) {
   const db       = createDb(name);
-  const mem      = new Map();   // key -> object-url (this session)
-  const inflight = new Map();   // key -> Promise<string|null>
+  const mem      = new Map; // key -> object-url (this session)
+  const inflight = new Map; // key -> Promise<string|null>
   const gate     = limiter(concurrency);
   const log      = new Logger({ prefix: scope });
 
@@ -102,7 +102,7 @@ export function createThumbCache ({
   // means we stop re-issuing a cross-origin fetch the browser will only reject
   // and log again — the repeated "blocked by CORS" console spam — and go
   // straight to the proxy for that host instead.
-  const corsBlocked = new Set();
+  const corsBlocked = new Set;
 
   let setup = null;
   const ensure = () => (setup ??= db.setup({ thumbs: {}, meta: {} }));
@@ -158,11 +158,8 @@ export function createThumbCache ({
     if (!got) return { error: 'fetch' };
 
     let bitmap;
-    try {
-      bitmap = await createImageBitmap(got.blob);   // decode once; bail if not an image
-    } catch {
-      return { error: 'decode' };
-    }
+    try   { bitmap = await createImageBitmap(got.blob); } // decode once; bail if not an image
+    catch { return { error: 'decode' }; }
 
     // downscale only — a small original is kept at its own size, never blown up
     const scale = Math.min(1, width / (bitmap.width || width));
