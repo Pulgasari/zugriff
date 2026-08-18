@@ -272,6 +272,43 @@ canvas.view {
 .statusbar .err     { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--c-null, #e06c75); }
 .statusbar .working { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent); }
 
+/* aufbau slider wrapper (delay steppers) — the shared Slider's layout classes
+   live in components.css, which apps don't link, so give them a home here */
+.slider-row   { display: flex; flex-direction: column; gap: 0.3rem; }
+.slider-label { font-size: 0.8rem; color: var(--fg-50); }
+.slider-track { width: 100%; }
+
+/* ── immersive mode (double-tap to hide the chrome) ──────────────────────── */
+
+.gm.immersive .toolbar,
+.gm.immersive .panel,
+.gm.immersive .filmstrip,
+.gm.immersive .statusbar { display: none; }
+
+.gm.immersive .stage { padding: 0; }
+.gm.immersive canvas.view { max-height: 100dvh; }
+
+.exit-immersive {
+  position       : fixed;
+  top            : 0.6rem;
+  right          : 0.6rem;
+  z-index        : 30;
+  width          : 38px;
+  height         : 38px;
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  border         : 1px solid var(--line);
+  border-radius  : 999px;
+  background     : color-mix(in oklch, var(--bg) 55%, transparent);
+  backdrop-filter: blur(6px);
+  color          : var(--fg);
+  cursor         : pointer;
+  opacity        : 0.5;
+  transition     : opacity 0.15s;
+}
+.exit-immersive:hover { opacity: 1; }
+
 /* ── narrow screens ──────────────────────────────────────────────────────── */
 
 @media (max-width: 760px) {
