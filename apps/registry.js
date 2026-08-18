@@ -16,6 +16,14 @@ export const apps = [
     description : 'Browse the private on-device storage — the same OPFS the cli uses.',
     categories  : ['files'],
   },
+  {
+    slug        : 'image-editor',
+    name        : 'Image Editor',
+    short_name  : 'Editor',
+    icon        : 'mdi:image-edit-outline',
+    description : 'Crop, rotate, flip and adjust images — all on your device.',
+    categories  : ['image'],
+  },
 ];
 
 // ── defaults every app inherits ────────────────────────────────────────────

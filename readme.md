@@ -92,8 +92,10 @@ worker. apps and tools live in **separate overviews** — `/` lists the tools,
 three places: `cli`, `tools`, `apps`. each app's own worker owns its files,
 exactly like a tool's does.
 
-first app: [apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS
-the cli uses.
+the apps so far:
+[apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS the cli
+uses — and [apps/image-editor](./apps/image-editor/) — crop/rotate/flip/adjust
+images on a canvas.
 
 ## adding an app
 
