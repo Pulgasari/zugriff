@@ -106,6 +106,7 @@ const map = { imports: {
   "@ffmpeg/util"   : "https://esm.sh/@ffmpeg/util@0.12.1",
   "@ffmpeg/core"   : "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js",
   "upng-js"        : "https://esm.sh/upng-js@2.1.0",
+  "gifenc"         : "https://esm.sh/gifenc@1.0.3",
 
   // ::: color
   "culori" : "https://esm.sh/culori@3.3.0",
