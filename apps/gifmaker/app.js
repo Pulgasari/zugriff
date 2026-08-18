@@ -11,9 +11,9 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot }   from './../../shared/js/app.js';
-import { Icon }   from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot }         from './../../shared/js/app.js';
+import { Icon, Slider } from './../../shared/js/components/index.js';
+import { stored }       from './../../shared/js/lib/signals.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -28,6 +28,7 @@ const playing  = signal(false);
 const busy     = signal(false);
 const error    = signal('');
 const dragging = signal(false);   // a file is dragged over the app
+const immersive = signal(false);  // chrome hidden, just the canvas
 
 const sizeMode = signal('auto');  // 'auto' | 'custom'
 const customW  = signal(480);
@@ -164,7 +165,12 @@ async function exportGif () {
   const list = frames.value; if (!list.length) return;
   busy.value = true; error.value = '';
   try {
-    const { GIFEncoder, quantize, applyPalette } = await import('gifenc');
+    // esm.sh sometimes exposes gifenc's api on the default export instead of as
+    // named exports, so unwrap whichever shape we get
+    const mod = await import('gifenc');
+    const api = mod.GIFEncoder ? mod : (mod.default ?? mod);
+    const { GIFEncoder, quantize, applyPalette } = api;
+    if (typeof GIFEncoder !== 'function') throw new Error('gifenc failed to load');
     const size = canvasSize.value;
     const c = document.createElement('canvas'); c.width = size.w; c.height = size.h;
     const ctx = c.getContext('2d', { willReadFrequently: true });
@@ -320,10 +326,20 @@ function Preview ({ onAdd }) {
     </div>`;
 
   return html`
-    <div class="stage">
+    <div class="stage" onPointerUp=${stageTap} title="Double-tap to hide/show the interface">
       <div class="canvas-wrap"><canvas ref=${ref} class="view"></canvas></div>
       <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" size="40" /> <span>Drop to add</span></div>
     </div>`;
+}
+
+// double-tap (or double-click) the canvas area to toggle the chrome. two taps
+// within 300ms; taps on actual controls are ignored.
+let lastTap = 0;
+function stageTap (e) {
+  if (e.target.closest('button, input, a')) return;
+  const now = Date.now();
+  if (now - lastTap < 300) { immersive.value = !immersive.value; lastTap = 0; }
+  else lastTap = now;
 }
 
 function Thumb ({ frame, index }) {
@@ -399,7 +415,8 @@ function FramePanel () {
           <${NumField} label="Y" value=${f.dy} onInput=${v => patchFrame(i, { dy: v | 0 })} />
         </div>
         <${NumField} label="Step (px)" value=${step.value} min="1" onInput=${v => step.value = Math.max(1, v | 0)} />
-        <${NumField} label="Delay (ms)" value=${f.delay} min="20" step="10" onInput=${v => patchFrame(i, { delay: Math.max(20, v | 0) })} />
+        <${Slider} label="Delay" value=${f.delay} min="20" max="2000" step="10" unit="ms" showButtons editable
+                   onChange=${v => patchFrame(i, { delay: Math.max(20, v | 0) })} />
 
         <div class="row-btns">
           <button class="btn ghost" onClick=${() => duplicateAt(i)}><${Icon} name="mdi:content-duplicate" size="15" /> Duplicate</button>
@@ -414,8 +431,8 @@ function AnimationPanel () {
     <section class="panel-sec">
       <h3><${Icon} name="mdi:animation-outline" size="16" /> Animation</h3>
 
-      <${NumField} label="Default delay (ms)" value=${delayDef.value} min="20" step="10"
-                   onInput=${v => delayDef.value = Math.max(20, v | 0)} />
+      <${Slider} label="Default delay" value=${delayDef.value} min="20" max="2000" step="10" unit="ms" showButtons editable
+                 onChange=${v => delayDef.value = Math.max(20, v | 0)} />
       <button class="btn ghost wide" disabled=${!frames.value.length}
               onClick=${() => frames.value = frames.value.map(f => ({ ...f, delay: delayDef.value }))}>
         Apply delay to all frames
@@ -509,6 +526,7 @@ function App () {
   // keyboard: arrows nudge the selected frame, space toggles play
   useEffect(() => {
     const onKey = e => {
+      if (e.key === 'Escape' && immersive.value) { immersive.value = false; return; }
       const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
       if (typing) return;
       if (e.key === ' ' && frames.value.length > 1) { e.preventDefault(); playing.value = !playing.value; return; }
@@ -532,7 +550,7 @@ function App () {
   };
 
   return html`
-    <div class="gm"
+    <div class=${'gm' + (immersive.value ? ' immersive' : '')}
          onDragOver=${e => { e.preventDefault(); dragging.value = true; }}
          onDragLeave=${e => { if (e.target === e.currentTarget) dragging.value = false; }}
          onDrop=${onDrop}>
@@ -543,6 +561,11 @@ function App () {
       </div>
       <${Filmstrip} onAdd=${openAdd} />
       <${StatusBar} />
+
+      ${immersive.value && html`
+        <button class="exit-immersive" title="Show interface (Esc)" onClick=${() => immersive.value = false}>
+          <${Icon} name="mdi:fullscreen-exit" size="20" />
+        </button>`}
 
       <input ref=${addInput} type="file" accept="image/*" multiple hidden
              onChange=${e => { addFiles(e.target.files); e.target.value = ''; }} />

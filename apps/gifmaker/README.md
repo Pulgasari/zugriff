@@ -17,6 +17,8 @@ uploaded.
 - **nudge** the selected frame — arrow-pad buttons, X/Y number fields, or the
   arrow keys (a configurable step, e.g. "left −5px"; hold Shift for 1px)
 - **play** it back (space bar), with per-frame delays and a default delay
+- **double-tap the canvas** to hide the whole interface and just watch it play
+  (double-tap again, or `Esc`, to bring it back)
 - pick the **canvas size** (auto = largest frame, or custom) and a **background**
 - **export as GIF** (via `gifenc`, loaded on demand)
 - **export a project `.zip`** — the original PNGs plus a `project.json` manifest
