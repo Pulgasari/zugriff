@@ -1,6 +1,27 @@
 // apps/registry.js
 // adding an app: copy apps/template/, add an entry here, done.
 
+export const defaults = {
+  base        : 'apps',
+  lang        : 'en',
+  theme       : 'dracula',
+  dir         : 'ltr',
+  display     : 'standalone',
+  orientation : 'portrait',
+  viewport    : 'width=device-width, initial-scale=1, viewport-fit=cover',
+};
+
+export const podcasts = {
+  ...defaults,
+  id          : 'podcasts',
+  slug        : 'podcasts',
+  name        : 'Podcasts',
+  short_name  : 'Podcasts',
+  icon        : 'mdi:podcast',
+  description : 'Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.',
+  categories  : ['media'],
+};
+
 export const apps = [
   {
     slug        : 'file-explorer',
@@ -36,17 +57,7 @@ export const apps = [
   },
 ];
 
-// ── defaults every app inherits ────────────────────────────────────────────
 
-export const defaults = {
-  base        : 'apps',
-  lang        : 'en',
-  theme       : 'dracula',
-  dir         : 'ltr',
-  display     : 'standalone',
-  orientation : 'portrait',
-  viewport    : 'width=device-width, initial-scale=1, viewport-fit=cover',
-};
 
 const withDefaults = entry => ({
   ...defaults,
@@ -58,6 +69,7 @@ const withDefaults = entry => ({
 export const 
 registry   = apps.map(withDefaults),
 bySlug     = Object.fromEntries(registry.map(entry => [entry.slug, entry])),
+//bySlug   = new Map(registry.map(app => [app.slug, app])),
 categories = [...new Set(registry.flatMap(entry => entry.categories ?? []))].sort();
 
 /** the entry for one app — throws early rather than rendering a nameless app */
