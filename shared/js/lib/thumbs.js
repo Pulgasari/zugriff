@@ -24,8 +24,8 @@
 // them. a host that blocks the direct fetch is remembered so the browser's
 // unsuppressable CORS error is not logged again for it.
 
-import { createDb }     from '@bunker/db';
-import { createLogger } from '@pulgasari/logger';
+import { createDb } from '@bunker/db';
+import { Logger }   from '@pulgasari/logger';
 
 // a small stable string hash (cyrb53) — the same one the apps use for ids.
 function hash (str = '') {
@@ -96,7 +96,7 @@ export function createThumbCache ({
   const mem      = new Map();   // key -> object-url (this session)
   const inflight = new Map();   // key -> Promise<string|null>
   const gate     = limiter(concurrency);
-  const log      = new Logger(scope);
+  const log      = new Logger({ prefix: scope });
 
   // hosts whose direct fetch we already saw blocked by CORS. remembering them
   // means we stop re-issuing a cross-origin fetch the browser will only reject
