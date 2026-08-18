@@ -1,0 +1,18 @@
+{
+  "id"               : "podcasts",
+  "name"             : "Podcasts",
+  "short_name"       : "Podcasts",
+  "description"      : "Subscribe to podcasts by RSS, track progress, mark episodes done and keep a listen-later list — all on your device.",
+  "lang"             : "en",
+  "dir"              : "ltr",
+  "scope"            : "./",
+  "start_url"        : "./",
+  "display"          : "standalone",
+  "orientation"      : "any",
+  "categories"       : ["news", "entertainment", "utilities"],
+  "background_color" : "#282a36",
+  "theme_color"      : "#282a36",
+  "icons": [
+    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
