@@ -27,6 +27,10 @@ import * as db     from './db.js';
 import * as player from './player.js';
 import { DEFAULT_PROXY } from './feed.js';
 
+// the self-hosted image resizer (see /img-proxy). `{url}` is the source image,
+// `{w}` the target width. clear it in settings to resize client-side instead.
+const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
+
 // :::::: SETTINGS (persisted signals) ::::::::::::::::::::::
 
 const view        = stored('grid',   'podcasts:view');           // grid | list
@@ -35,11 +39,19 @@ const episodeSort = stored('newest', 'podcasts:episode-sort');   // newest | old
 const proxy       = stored(DEFAULT_PROXY, 'podcasts:proxy');
 const menuPos     = stored('bottom', 'podcasts:menu-pos');       // top | bottom | left | right
 const playerPos   = stored('bottom', 'podcasts:player-pos');     // top | bottom
+const imgResizer  = stored(DEFAULT_IMG_RESIZER, 'podcasts:img-resizer');
 
-// artwork is downscaled and kept on-device (see shared/js/lib/thumbs.js). the
-// byte fetch reuses the CORS proxy only when an image host blocks a direct
-// request — nothing is sent to any image-resizing third party.
-const thumbs = createThumbCache({ proxy: () => proxy.value });
+// artwork goes through a self-hosted resizer (img.pulgasari.dev — see
+// /img-proxy) that shrinks the image server-side, so no cross-origin bytes and
+// no third party are involved; the small result is cached on-device
+// (shared/js/lib/thumbs.js). clear the endpoint in settings to fall back to
+// client-side resizing (direct fetch only).
+function buildResizer (url, w) {
+  const tpl = imgResizer.value.trim();
+  if (!tpl || !url) return null;
+  return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
+}
+const thumbs = createThumbCache({ resizer: buildResizer });
 
 // :::::: UI STATE ::::::::::::::::::::::::::::::::::::::::::
 
@@ -586,8 +598,9 @@ function AddDialog () {
 }
 
 function SettingsDialog () {
-  const proxyVal = useSignal(proxy.value);
-  const fileRef  = useRef(null);
+  const proxyVal   = useSignal(proxy.value);
+  const resizerVal = useSignal(imgResizer.value);
+  const fileRef    = useRef(null);
 
   const doExport = () => {
     const data = db.exportData();
@@ -646,6 +659,18 @@ function SettingsDialog () {
           </span>
         </label>
 
+        <label class="field">
+          <span class="field-label">Artwork resizer</span>
+          <span class="field-hint">A self-hosted endpoint that shrinks cover art server-side (see <code>/img-proxy</code>), so no third party is involved. <code>{url}</code> is the image, <code>{w}</code> the width. Clear it to resize in the browser instead (only works for images whose host allows it).</span>
+          <input class="modal-input" type="text" value=${resizerVal.value}
+                 placeholder=${DEFAULT_IMG_RESIZER}
+                 onInput=${e => resizerVal.value = e.target.value} />
+          <span class="field-row">
+            <button class="btn ghost small" onClick=${() => resizerVal.value = DEFAULT_IMG_RESIZER}>Reset to default</button>
+            <button class="btn ghost small" onClick=${() => resizerVal.value = ''}>In-browser</button>
+          </span>
+        </label>
+
         <div class="field">
           <span class="field-label">Subscriptions</span>
           <span class="field-hint">Back up your subscriptions and listening progress as JSON, or restore from a file.</span>
@@ -659,7 +684,8 @@ function SettingsDialog () {
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {
-            proxy.value = proxyVal.value.trim();
+            proxy.value      = proxyVal.value.trim();
+            imgResizer.value = resizerVal.value.trim();
             dialog.value = null; flash('Settings saved');
           }}>Done</button>
         </div>

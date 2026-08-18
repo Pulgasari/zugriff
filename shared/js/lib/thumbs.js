@@ -75,6 +75,12 @@ const canResize = typeof createImageBitmap === 'function' && typeof document !==
  * @param {number}   [opts.quality=0.82]           webp quality
  * @param {number}   [opts.concurrency=3]          parallel generations
  * @param {string}   [opts.scope='thumbs']         logger scope
+ * @param {(url:string,width:number)=>string|null} [opts.resizer]
+ *        a server-side resizer endpoint builder. when it returns a url, the
+ *        already-small image is fetched from there and stored as-is (no client
+ *        decode/canvas, no CORS proxy) — the preferred path when a self-hosted
+ *        resizer is available. return null/empty to fall back to client-side
+ *        canvas resizing.
  */
 export function createThumbCache ({
   name        = 'zugriff-images',
@@ -84,6 +90,7 @@ export function createThumbCache ({
   quality     = 0.82,
   concurrency = 3,
   scope       = 'thumbs',
+  resizer     = null,
 } = {}) {
   const db       = createDb(name);
   const mem      = new Map();   // key -> object-url (this session)
@@ -134,6 +141,17 @@ export function createThumbCache ({
   // ── generate a downscaled webp blob from the original ──────────────────────
   // returns { blob, via, w, h } on success, or { error } describing the failure.
   async function generate (url) {
+    // preferred path: a self-hosted resizer already returns a small image, so
+    // just fetch and keep it — no cross-origin bytes, no canvas.
+    const endpoint = resizer?.(url, width) || null;
+    if (endpoint) {
+      try {
+        const res = await fetch(endpoint, { credentials: 'omit' });
+        if (res.ok) return { blob: await res.blob(), via: 'resizer' };
+      } catch { /* fall through to the error below */ }
+      return { error: 'resizer' };
+    }
+
     if (!canResize) return { error: 'unsupported' };
 
     const got = await fetchBytes(url);
@@ -224,8 +242,9 @@ export function createThumbCache ({
           await store(key, url, res.blob);
           const u = URL.createObjectURL(res.blob);
           mem.set(key, u);
-          log.info(res.via === 'proxy' ? 'made (via proxy)' : 'made',
-                   `${res.w}×${res.h}`, asKb(res.blob.size), label(url));
+          const dims = res.w && res.h ? `${res.w}×${res.h}` : null;
+          log.info(res.via === 'direct' ? 'made' : `made (via ${res.via})`,
+                   ...[dims, asKb(res.blob.size), label(url)].filter(Boolean));
           return u;
         } catch (err) {
           log.warn('fail', 'store', label(url), err?.message || err);
