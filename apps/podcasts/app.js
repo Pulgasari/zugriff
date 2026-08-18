@@ -251,9 +251,16 @@ function PodcastsView () {
                  hint="Paste a podcast's RSS feed URL to subscribe."
                  action=${html`<button class="btn primary" onClick=${() => dialog.value = 'add'}>
                    <${Icon} name="mdi:plus" size=${16} /> Add a podcast</button>`} />`
-        : view.value === 'grid'
-        ? html`<div class="pc-grid">${list.map(p => html`<${PodcastCard} podcast=${p} key=${p.id} />`)}</div>`
-        : html`<div class="pc-listing">${list.map(p => html`<${PodcastListRow} podcast=${p} key=${p.id} />`)}</div>`}
+        : html`
+          <aufbau-index class="pc-index" viewmode=${view.value}
+                        item-size="150px" gap=${view.value === 'grid' ? '1.25rem' : '0'}>
+            ${list.map(p => html`
+              <aufbau-item key=${p.id}>
+                ${view.value === 'grid'
+                  ? html`<${PodcastCard} podcast=${p} />`
+                  : html`<${PodcastListRow} podcast=${p} />`}
+              </aufbau-item>`)}
+          </aufbau-index>`}
     </div>`;
 }
 

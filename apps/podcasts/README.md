@@ -35,7 +35,9 @@ zugriff.
   survives navigation, with its state mirrored into signals and the position
   written back to the db as it plays.
 - **`app.js`** — the UI: a fixed sidebar, a scrolling main column and the docked
-  player, all drawn by the app itself (`boot({ shell: false })`).
+  player, all drawn by the app itself (`boot({ shell: false })`). The
+  grid/list podcasts view is laid out by `<aufbau-index viewmode="grid|list">`
+  with each podcast in an `<aufbau-item>`.
 
 ## notes
 
