@@ -1,0 +1,18 @@
+{
+  "id"               : "image_editor",
+  "name"             : "Image Editor",
+  "short_name"       : "Editor",
+  "description"      : "Crop, rotate, flip and adjust images — all on your device.",
+  "lang"             : "en",
+  "dir"              : "ltr",
+  "scope"            : "./",
+  "start_url"        : "./",
+  "display"          : "standalone",
+  "orientation"      : "any",
+  "categories"       : ["photo", "graphics", "utilities"],
+  "background_color" : "#282a36",
+  "theme_color"      : "#282a36",
+  "icons": [
+    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
