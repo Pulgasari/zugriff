@@ -24,6 +24,14 @@ export const apps = [
     description : 'Crop, rotate, flip and adjust images — all on your device.',
     categories  : ['image'],
   },
+  {
+    slug        : 'gifmaker',
+    name        : 'Gifmaker',
+    short_name  : 'Gifmaker',
+    icon        : 'mdi:animation-play-outline',
+    description : 'Turn a stack of images into an animation — nudge, reorder, export as GIF or a project zip.',
+    categories  : ['image'],
+  },
 ];
 
 // ── defaults every app inherits ────────────────────────────────────────────

@@ -1,0 +1,18 @@
+{
+  "id"               : "gifmaker",
+  "name"             : "Gifmaker",
+  "short_name"       : "Gifmaker",
+  "description"      : "Turn a stack of images into an animation — nudge, reorder, export as GIF or a project zip.",
+  "lang"             : "en",
+  "dir"              : "ltr",
+  "scope"            : "./",
+  "start_url"        : "./",
+  "display"          : "standalone",
+  "orientation"      : "any",
+  "categories"       : ["photo", "graphics", "utilities"],
+  "background_color" : "#282a36",
+  "theme_color"      : "#282a36",
+  "icons": [
+    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
