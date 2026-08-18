@@ -13,7 +13,7 @@ import Settings, { SettingsButton } from './shared/js/components/Settings.js';
 import { launcher, themeGroup } from './shared/js/lib/settings.js';
 
 const config = {
-  app    : { slug: 'zugriff', name: 'zugriff apps', theme: 'dracula', lang: 'en' },
+  app    : { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en' },
   aufbau : { elements: { mode: 'auto' } },
 };
 
@@ -51,7 +51,7 @@ function Filter () {
         ref=${ref}
         class="search-input"
         type="search"
-        placeholder="Filter apps…"
+        placeholder="Filter tools…"
         value=${query.value}
         onInput=${event => query.value = event.target.value}
       />
@@ -79,7 +79,7 @@ function AppList () {
                   onClick=${() => category.value = name}>${name}</button>`)}
       </div>
 
-      <ul id="apps">
+      <ul id="tools">
         ${list.map(app => html`
           <li key=${app.slug}>
             <a href=${`./tools/${app.slug}/`}>
@@ -102,9 +102,9 @@ function AppList () {
 function Launcher () {
   return html`
     <div id="app-head">
-      <div id="app-logo"><strong>zugriff</strong> apps</div>
+      <div id="app-logo"><strong>zugriff</strong> tools</div>
       <div class="actions">
-        <${Nav} here='apps' base='./' />
+        <${Nav} here='tools' base='./' />
         <${SettingsButton} />
       </div>
     </div>
