@@ -51,6 +51,42 @@
   padding   : 0 0.4rem;
 }
 
+/* ── crop bar (aspect presets) ───────────────────────────────────────────── */
+
+.cropbar {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.5rem;
+  padding     : 0.4rem 0.75rem;
+  background  : var(--panel-2);
+  border-bottom: 1px solid var(--line);
+  flex-wrap   : wrap;
+}
+.cropbar .spacer { flex: 1 1 auto; }
+.cb-label {
+  font-size     : 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color         : var(--fg-50);
+  font-weight   : 700;
+}
+.cb-presets { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.chip {
+  padding      : 0.3rem 0.6rem;
+  border       : 1px solid var(--line);
+  border-radius: 999px;
+  background   : transparent;
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.76rem;
+  cursor       : pointer;
+  white-space  : nowrap;
+}
+.chip:hover  { border-color: var(--accent-50); color: var(--fg); }
+.chip.active { background: var(--accent-25); border-color: var(--accent-50); color: var(--accent); font-weight: 600; }
+
 /* ── body: stage + panel ─────────────────────────────────────────────────── */
 
 .body {
@@ -191,22 +227,43 @@ canvas.view {
 }
 .empty-panel { align-items: center; justify-content: center; color: var(--fg-50); font-size: 0.85rem; }
 
+/* tab bar — color adjustments, resize and export are each their own menu item */
+.tabs {
+  flex        : none;
+  display     : flex;
+  gap         : 2px;
+  padding     : 0.4rem;
+  background  : var(--panel-2);
+  border-bottom: 1px solid var(--line);
+  position    : sticky;
+  top         : 0;
+  z-index     : 1;
+}
+.tab {
+  flex         : 1;
+  display      : inline-flex;
+  align-items  : center;
+  justify-content: center;
+  gap          : 0.3rem;
+  padding      : 0.45rem 0.4rem;
+  border       : 0;
+  border-radius: var(--radius);
+  background   : transparent;
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.78rem;
+  cursor       : pointer;
+}
+.tab:hover  { background: var(--hover); }
+.tab.active { background: var(--accent-25); color: var(--accent); font-weight: 600; }
+
+.tab-body { display: flex; flex-direction: column; }
+
 .panel-sec {
   padding      : 0.9rem;
-  border-bottom: 1px solid var(--line);
   display      : flex;
   flex-direction: column;
   gap          : 0.7rem;
-}
-.panel-sec h3 {
-  display    : flex;
-  align-items: center;
-  gap        : 0.4rem;
-  font-size  : 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color      : var(--fg-50);
-  font-weight: 700;
 }
 
 /* sliders */
@@ -329,12 +386,9 @@ canvas.view {
   .panel {
     width      : 100%;
     flex       : none;
-    max-height : 45%;
+    max-height : 48%;
     border-left: 0;
     border-top : 1px solid var(--line);
-    flex-direction: row;
-    overflow-x : auto;
   }
-  .panel-sec { border-bottom: 0; border-right: 1px solid var(--line); min-width: 220px; }
   canvas.view { max-height: 100%; }
 }

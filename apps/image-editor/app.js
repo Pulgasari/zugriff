@@ -26,6 +26,8 @@ const work     = signal(null);   // the current canvas (geometry baked in)
 const filters  = signal({ ...edit.IDENTITY });
 const mode     = signal('view'); // 'view' | 'crop'
 const cropRect = signal(null);   // { x, y, w, h } in image pixels
+const cropAR   = signal(null);   // locked aspect ratio (w/h) while cropping, or null
+const cropPreset = signal('free');
 const undo     = signal([]);     // canvases, oldest first
 const redo     = signal([]);
 const fileName = signal('image');
@@ -39,6 +41,7 @@ const lockAR   = signal(true);
 
 const exportFmt = stored('image/png', 'image-editor:format');
 const quality   = stored(92, 'image-editor:quality');
+const panelTab  = stored('adjust', 'image-editor:tab'); // 'adjust' | 'resize' | 'export'
 
 const HISTORY = 30;
 const MIN_CROP = 8; // px
@@ -54,6 +57,48 @@ const FORMATS = [
   { type: 'image/webp', label: 'WebP', ext: 'webp', lossy: true  },
 ];
 const fmtOf = type => FORMATS.find(f => f.type === type) ?? FORMATS[0];
+
+// crop aspect presets. `ar` is a width/height ratio, or a keyword resolved
+// against the current image ('img') or the device screen ('screen'), or null
+// for a free crop. the list runs from the common video/photo ratios up to the
+// screen's own aspect.
+const CROP_PRESETS = [
+  { id: 'free',     label: 'Free',     ar: null },
+  { id: 'original', label: 'Original', ar: 'img' },
+  { id: '1:1',      label: '1:1',      ar: 1 },
+  { id: '4:3',      label: '4:3',      ar: 4 / 3 },
+  { id: '3:4',      label: '3:4',      ar: 3 / 4 },
+  { id: '3:2',      label: '3:2',      ar: 3 / 2 },
+  { id: '2:3',      label: '2:3',      ar: 2 / 3 },
+  { id: '16:9',     label: '16:9',     ar: 16 / 9 },
+  { id: '9:16',     label: '9:16',     ar: 9 / 16 },
+  { id: 'screen',   label: 'Screen',   ar: 'screen' },
+];
+
+const TABS = [
+  { id: 'adjust', label: 'Adjust', icon: 'mdi:tune-variant' },
+  { id: 'resize', label: 'Resize', icon: 'mdi:resize' },
+  { id: 'export', label: 'Export', icon: 'mdi:export-variant' },
+];
+
+/** the width/height ratio of the device screen, in its physical orientation */
+function screenAR () {
+  const w = window.screen?.width || window.innerWidth || 16;
+  const h = window.screen?.height || window.innerHeight || 9;
+  return w / h;
+}
+
+/** the largest rect of aspect `ar` that fits in W×H, centered */
+function centeredRect (ar, W, H) {
+  let w = W, h = W / ar;
+  if (h > H) { h = H; w = H * ar; }
+  return {
+    x: Math.round((W - w) / 2),
+    y: Math.round((H - h) / 2),
+    w: Math.round(w),
+    h: Math.round(h),
+  };
+}
 
 function pushHistory (canvas) {
   undo.value = [...undo.value, canvas].slice(-HISTORY);
@@ -138,6 +183,8 @@ function enterCrop () {
     w: Math.round(w.width  * (1 - inset * 2)),
     h: Math.round(w.height * (1 - inset * 2)),
   };
+  cropAR.value = null;
+  cropPreset.value = 'free';
   mode.value = 'crop';
 }
 function cancelCrop () { mode.value = 'view'; cropRect.value = null; }
@@ -148,6 +195,86 @@ function applyCrop () {
   cropRect.value = null;
   syncResize();
 }
+
+/** pick a crop preset: lock its aspect ratio and drop a centered box in */
+function applyPreset (preset) {
+  const w = work.value; if (!w) return;
+  cropPreset.value = preset.id;
+
+  let ar = preset.ar;
+  if (ar === 'img')    ar = w.width / w.height;
+  if (ar === 'screen') ar = screenAR();
+
+  cropAR.value = ar; // null for 'free'
+  if (ar) cropRect.value = centeredRect(ar, w.width, w.height);
+}
+
+// the next crop rect for a drag: `d` is the drag start (type, origin, rect),
+// `p` the pointer in image px. free crops move every edge on its own; an
+// aspect-locked crop keeps its ratio, anchored at the corner/edge opposite the
+// handle being dragged.
+function nextCrop (d, p, W, H, ar) {
+  const r = d.rect;
+  const startL = r.x, startT = r.y, startR = r.x + r.w, startB = r.y + r.h;
+
+  if (d.type === 'move') {
+    const dx = p.x - d.origin.x, dy = p.y - d.origin.y;
+    const l = Math.min(Math.max(0, r.x + dx), W - r.w);
+    const t = Math.min(Math.max(0, r.y + dy), H - r.h);
+    return { x: Math.round(l), y: Math.round(t), w: r.w, h: r.h };
+  }
+
+  const west = d.type.includes('w'), east = d.type.includes('e');
+  const north = d.type.includes('n'), south = d.type.includes('s');
+
+  if (!ar) {
+    let l = startL, t = startT, rgt = startR, bot = startB;
+    if (west)  l   = Math.min(Math.max(0, p.x), rgt - MIN_CROP);
+    if (east)  rgt = Math.max(Math.min(W, p.x), l + MIN_CROP);
+    if (north) t   = Math.min(Math.max(0, p.y), bot - MIN_CROP);
+    if (south) bot = Math.max(Math.min(H, p.y), t + MIN_CROP);
+    return { x: Math.round(l), y: Math.round(t), w: Math.round(rgt - l), h: Math.round(bot - t) };
+  }
+
+  // aspect-locked
+  const minW = Math.max(MIN_CROP, MIN_CROP * ar);
+  let ax, ay, w, h;
+
+  if ((east || west) && (north || south)) {         // corner: anchor opposite corner
+    ax = east ? startL : startR;
+    ay = south ? startT : startB;
+    w = Math.max(Math.abs(p.x - ax), Math.abs(p.y - ay) * ar);
+    const maxW = east ? (W - ax) : ax;
+    const maxH = south ? (H - ay) : ay;
+    w = Math.min(w, maxW, maxH * ar);
+  } else if (east || west) {                         // horizontal edge: center vertically
+    ax = east ? startL : startR;
+    const cy = (startT + startB) / 2;
+    w = Math.abs(p.x - ax);
+    const maxW = east ? (W - ax) : ax;
+    w = Math.max(minW, Math.min(w, maxW, 2 * Math.min(cy, H - cy) * ar));
+    h = w / ar;
+    const l = east ? ax : ax - w;
+    return round4(l, cy - h / 2, w, h);
+  } else {                                           // vertical edge: center horizontally
+    ay = south ? startT : startB;
+    const cx = (startL + startR) / 2;
+    h = Math.abs(p.y - ay);
+    const maxH = south ? (H - ay) : ay;
+    h = Math.max(minW / ar, Math.min(h, maxH, 2 * Math.min(cx, W - cx) / ar));
+    w = h * ar;
+    const t = south ? ay : ay - h;
+    return round4(cx - w / 2, t, w, h);
+  }
+
+  w = Math.max(w, minW);
+  h = w / ar;
+  const l = east ? ax : ax - w;
+  const t = south ? ay : ay - h;
+  return round4(l, t, w, h);
+}
+
+const round4 = (x, y, w, h) => ({ x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) });
 
 // ── resize ───────────────────────────────────────────────────────────────────
 
@@ -219,13 +346,25 @@ function Toolbar ({ onOpen }) {
 
       <div class="spacer"></div>
 
-      ${cropping && cropRect.value && html`
-        <span class="crop-size">${cropRect.value.w} × ${cropRect.value.h}</span>
-        <button class="btn ghost"  onClick=${cancelCrop}>Cancel</button>
-        <button class="btn primary" onClick=${applyCrop}><${Icon} name="mdi:check" size="16" /> Apply crop</button>`}
+      <${ToolButton} icon="mdi:restore" label="Reset to original" onClick=${reset} disabled=${!dirty.value} />
+    </div>`;
+}
 
-      ${!cropping && html`
-        <${ToolButton} icon="mdi:restore" label="Reset to original" onClick=${reset} disabled=${!dirty.value} />`}
+function CropBar () {
+  const r = cropRect.value;
+  return html`
+    <div class="cropbar">
+      <span class="cb-label">Aspect</span>
+      <div class="cb-presets">
+        ${CROP_PRESETS.map(p => html`
+          <button class=${'chip' + (cropPreset.value === p.id ? ' active' : '')} key=${p.id}
+                  title=${p.id === 'screen' ? `${window.screen?.width || '?'}×${window.screen?.height || '?'}` : p.label}
+                  onClick=${() => applyPreset(p)}>${p.label}</button>`)}
+      </div>
+      <div class="spacer"></div>
+      ${r && html`<span class="crop-size">${r.w} × ${r.h}</span>`}
+      <button class="btn ghost"   onClick=${cancelCrop}>Cancel</button>
+      <button class="btn primary" onClick=${applyCrop}><${Icon} name="mdi:check" size="16" /> Apply crop</button>
     </div>`;
 }
 
@@ -288,22 +427,7 @@ function CropOverlay () {
     const move = e => {
       const d = drag.current; if (!d) return;
       const p = toImage(e.clientX, e.clientY);
-      const W = w.width, H = w.height;
-      let { x, y, w: rw, h: rh } = d.rect;
-      let l = x, t = y, rgt = x + rw, bot = y + rh;
-
-      if (d.type === 'move') {
-        const dx = p.x - d.origin.x, dy = p.y - d.origin.y;
-        l = Math.min(Math.max(0, x + dx), W - rw);
-        t = Math.min(Math.max(0, y + dy), H - rh);
-        cropRect.value = { x: Math.round(l), y: Math.round(t), w: rw, h: rh };
-        return;
-      }
-      if (d.type.includes('w')) l   = Math.min(Math.max(0, p.x), rgt - MIN_CROP);
-      if (d.type.includes('e')) rgt = Math.max(Math.min(W, p.x), l + MIN_CROP);
-      if (d.type.includes('n')) t   = Math.min(Math.max(0, p.y), bot - MIN_CROP);
-      if (d.type.includes('s')) bot = Math.max(Math.min(H, p.y), t + MIN_CROP);
-      cropRect.value = { x: Math.round(l), y: Math.round(t), w: Math.round(rgt - l), h: Math.round(bot - t) };
+      cropRect.value = nextCrop(d, p, w.width, w.height, cropAR.value);
     };
     const up = () => { drag.current = null; };
     window.addEventListener('pointermove', move);
@@ -347,7 +471,6 @@ function Adjustments () {
   const set = (k, v) => filters.value = { ...filters.value, [k]: v };
   return html`
     <section class="panel-sec">
-      <h3><${Icon} name="mdi:tune-variant" size="16" /> Adjust</h3>
       <${Slider} label="Brightness" value=${f.brightness} min="0" max="200" onInput=${v => set('brightness', v)} reset=${() => set('brightness', 100)} />
       <${Slider} label="Contrast"   value=${f.contrast}   min="0" max="200" onInput=${v => set('contrast', v)}   reset=${() => set('contrast', 100)} />
       <${Slider} label="Saturation" value=${f.saturate}   min="0" max="200" onInput=${v => set('saturate', v)}   reset=${() => set('saturate', 100)} />
@@ -362,7 +485,6 @@ function Adjustments () {
 function ResizePanel () {
   return html`
     <section class="panel-sec">
-      <h3><${Icon} name="mdi:resize" size="16" /> Resize</h3>
       <div class="dim-row">
         <label class="field"><span>W</span>
           <input type="number" min="1" value=${resizeW.value} onInput=${e => onResizeInput('w', +e.target.value)} />
@@ -386,7 +508,6 @@ function ExportPanel () {
   const fmt = fmtOf(exportFmt.value);
   return html`
     <section class="panel-sec">
-      <h3><${Icon} name="mdi:export-variant" size="16" /> Export</h3>
       <div class="seg wide">
         ${FORMATS.map(f => html`
           <button class=${'seg-btn' + (exportFmt.value === f.type ? ' active' : '')} key=${f.type}
@@ -406,11 +527,21 @@ function ExportPanel () {
 
 function Panel () {
   if (!work.value) return html`<aside class="panel empty-panel"><p>No image loaded.</p></aside>`;
+  const tab = panelTab.value;
   return html`
     <aside class="panel">
-      <${Adjustments} />
-      <${ResizePanel} />
-      <${ExportPanel} />
+      <nav class="tabs">
+        ${TABS.map(t => html`
+          <button class=${'tab' + (tab === t.id ? ' active' : '')} key=${t.id}
+                  onClick=${() => panelTab.value = t.id}>
+            <${Icon} name=${t.icon} size="16" /> <span>${t.label}</span>
+          </button>`)}
+      </nav>
+      <div class="tab-body">
+        ${tab === 'adjust' && html`<${Adjustments} />`}
+        ${tab === 'resize' && html`<${ResizePanel} />`}
+        ${tab === 'export' && html`<${ExportPanel} />`}
+      </div>
     </aside>`;
 }
 
@@ -449,6 +580,7 @@ function App () {
   return html`
     <div class="ed">
       <${Toolbar} onOpen=${pick} />
+      ${mode.value === 'crop' && html`<${CropBar} />`}
       <div class="body">
         <${Stage} onPick=${pick} />
         <${Panel} />
