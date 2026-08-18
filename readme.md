@@ -32,6 +32,7 @@ zugriff/
     <slug>/                     index.html app.js app.config.js app.css
                                 sw.js manifest.json app.svg assets/
   apps/
+    index.html  app.js          the apps overview — the /tools launcher's sibling
     registry.js                 single source of truth for every app's metadata
     base.css                    the apps foundation: reset + theme tokens + #app frame
     template/                   the blueprint — copy this to start an app
@@ -86,8 +87,10 @@ hands it the bare `#app` element and it takes it from there.
 
 what apps still share with everything else: the theme tokens (so a theme picked
 anywhere carries across), the import map, the aufbau runtime and the service
-worker. the launcher lists apps and tools together, apps tagged with an `app`
-badge; each app's own worker owns its files, exactly like a tool's does.
+worker. apps and tools live in **separate overviews** — `/` lists the tools,
+`/apps/` lists the apps — and the nav in the top-right switches between the
+three places: `cli`, `tools`, `apps`. each app's own worker owns its files,
+exactly like a tool's does.
 
 first app: [apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS
 the cli uses.

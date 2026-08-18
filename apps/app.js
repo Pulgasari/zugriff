@@ -1,19 +1,21 @@
-// app.js — the launcher
+// apps/app.js — the apps overview
 //
-// renders the app list from tools/registry.js. this replaces index.php, which
-// used to scan the directory and build the same list server-side.
+// the sibling of the root launcher (app.js), but for /apps instead of /tools.
+// apps and tools are kept in separate overviews on purpose; the nav switches
+// between them. this renders apps/registry.js exactly the way the launcher
+// renders tools/registry.js.
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
-import { boot } from './shared/js/app.js';
-import { registry, categories } from './tools/registry.js';
-import Icon from './shared/js/components/Icon.js';
-import Nav  from './shared/js/components/Nav.js';
-import Settings, { SettingsButton } from './shared/js/components/Settings.js';
-import { launcher, themeGroup } from './shared/js/lib/settings.js';
+import { boot } from './../shared/js/app.js';
+import { registry, categories } from './registry.js';
+import Icon from './../shared/js/components/Icon.js';
+import Nav  from './../shared/js/components/Nav.js';
+import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
+import { launcher, themeGroup } from './../shared/js/lib/settings.js';
 
 const config = {
-  app    : { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en' },
+  app    : { slug: 'apps', name: 'zugriff apps', theme: 'dracula', lang: 'en' },
   aufbau : { elements: { mode: 'auto' } },
 };
 
@@ -36,8 +38,8 @@ const visible = computed(() => {
 });
 
 function Filter () {
-  const ref     = useRef(null);
-  const sticky  = launcher.value('filter-sticky');
+  const ref      = useRef(null);
+  const sticky   = launcher.value('filter-sticky');
   const position = launcher.value('filter-position');
 
   useEffect(() => {
@@ -51,7 +53,7 @@ function Filter () {
         ref=${ref}
         class="search-input"
         type="search"
-        placeholder="Filter tools…"
+        placeholder="Filter apps…"
         value=${query.value}
         onInput=${event => query.value = event.target.value}
       />
@@ -82,7 +84,7 @@ function AppList () {
       <ul id="tools">
         ${list.map(app => html`
           <li key=${app.slug}>
-            <a href=${`./tools/${app.slug}/`}>
+            <a href=${`./${app.slug}/`}>
               <span class="title">
                 <span class="name">${app.name}</span>
                 ${app.description && html`<span class="desc">${app.description}</span>`}
@@ -102,9 +104,9 @@ function AppList () {
 function Launcher () {
   return html`
     <div id="app-head">
-      <div id="app-logo"><strong>zugriff</strong> tools</div>
+      <div id="app-logo"><strong>zugriff</strong> apps</div>
       <div class="actions">
-        <${Nav} here='tools' base='./' />
+        <${Nav} here='apps' base='./../' />
         <${SettingsButton} />
       </div>
     </div>
@@ -115,5 +117,5 @@ function Launcher () {
   `;
 }
 
-// the launcher draws its own header, so it skips the app shell
+// the overview draws its own header, so it skips the app shell
 boot({ config, App: Launcher, shell: false });
