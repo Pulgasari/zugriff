@@ -24,7 +24,7 @@ import { stored } from './../../shared/js/lib/signals.js';
 import * as config from './app.config.js';
 import * as db     from './db.js';
 import * as player from './player.js';
-import { DEFAULT_PROXY } from './feed.js';
+import { DEFAULT_PROXY, DEFAULT_IMG_PROXY } from './feed.js';
 
 // :::::: SETTINGS (persisted signals) ::::::::::::::::::::::
 
@@ -32,6 +32,7 @@ const view        = stored('grid',   'podcasts:view');           // grid | list
 const podcastSort = stored('recent', 'podcasts:podcast-sort');   // recent | alpha
 const episodeSort = stored('newest', 'podcasts:episode-sort');   // newest | oldest | alpha
 const proxy       = stored(DEFAULT_PROXY, 'podcasts:proxy');
+const imgProxy    = stored(DEFAULT_IMG_PROXY, 'podcasts:img-proxy');
 const menuPos     = stored('bottom', 'podcasts:menu-pos');       // top | bottom | left | right
 const playerPos   = stored('bottom', 'podcasts:player-pos');     // top | bottom
 
@@ -120,9 +121,30 @@ const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e =>
 
 // :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
 
+// route an artwork url through the thumbnail resizer at the size we actually
+// render it, so a 3000px cover arrives as a few-KB webp. returns the url
+// untouched when the resizer is turned off in settings.
+function thumb (url, size) {
+  if (!url) return '';
+  const tpl = imgProxy.value.trim();
+  if (!tpl) return url;
+  const dpr = Math.min(2, Math.max(1, Math.round(window.devicePixelRatio || 1)));
+  const w   = Math.min(640, Math.round(size * dpr));
+  return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
+}
+
+// artwork with a fallback chain: the resized thumbnail first, then the original
+// url if the resizer fails, then the placeholder icon. `failed` is keyed by url
+// so a changed src (list re-sort/filter) is retried from the top.
 function Art ({ src, size = 48, className = '' }) {
-  return src
-    ? html`<img class=${'art ' + className} src=${src} alt="" loading="lazy" width=${size} height=${size} />`
+  const failed = useSignal({});
+  const candidates = src ? [...new Set([thumb(src, size), src].filter(Boolean))] : [];
+  const url = candidates.find(u => !failed.value[u]);
+
+  return url
+    ? html`<img class=${'art ' + className} src=${url} alt="" loading="lazy"
+                width=${size} height=${size}
+                onError=${() => { failed.value = { ...failed.value, [url]: true }; }} />`
     : html`<span class=${'art art-fallback ' + className} style=${`width:${size}px;height:${size}px`}>
              <${Icon} name="mdi:podcast" size=${Math.round(size * 0.5)} />
            </span>`;
@@ -550,8 +572,9 @@ function AddDialog () {
 }
 
 function SettingsDialog () {
-  const proxyVal = useSignal(proxy.value);
-  const fileRef  = useRef(null);
+  const proxyVal    = useSignal(proxy.value);
+  const imgProxyVal = useSignal(imgProxy.value);
+  const fileRef     = useRef(null);
 
   const doExport = () => {
     const data = db.exportData();
@@ -610,6 +633,18 @@ function SettingsDialog () {
           </span>
         </label>
 
+        <label class="field">
+          <span class="field-label">Artwork thumbnails</span>
+          <span class="field-hint">Podcast covers are often huge. Artwork is loaded through this on-the-fly resizer at the size it's shown. <code>{url}</code> is the image, <code>{w}</code> the width. Clear it to load full-size originals directly.</span>
+          <input class="modal-input" type="text" value=${imgProxyVal.value}
+                 placeholder=${DEFAULT_IMG_PROXY}
+                 onInput=${e => imgProxyVal.value = e.target.value} />
+          <span class="field-row">
+            <button class="btn ghost small" onClick=${() => imgProxyVal.value = DEFAULT_IMG_PROXY}>Reset to default</button>
+            <button class="btn ghost small" onClick=${() => imgProxyVal.value = ''}>Originals</button>
+          </span>
+        </label>
+
         <div class="field">
           <span class="field-label">Subscriptions</span>
           <span class="field-hint">Back up your subscriptions and listening progress as JSON, or restore from a file.</span>
@@ -622,7 +657,11 @@ function SettingsDialog () {
         </div>
 
         <div class="modal-actions">
-          <button class="btn primary" onClick=${() => { proxy.value = proxyVal.value.trim(); dialog.value = null; flash('Settings saved'); }}>Done</button>
+          <button class="btn primary" onClick=${() => {
+            proxy.value    = proxyVal.value.trim();
+            imgProxy.value = imgProxyVal.value.trim();
+            dialog.value = null; flash('Settings saved');
+          }}>Done</button>
         </div>
       </div>
     <//>`;

@@ -61,6 +61,14 @@ export const episodesByPodcast = computed(() => {
 // ── loading ──────────────────────────────────────────────────────────────
 
 export async function load () {
+  // create all three stores in ONE upgrade before touching them. without this,
+  // the three reads below would each lazily trigger their own version-upgrade to
+  // create a missing store, and those upgrade cycles overlap with each other's
+  // read transactions on a cold database — which is exactly the "upgrade blocked
+  // by another connection" error on first load. setup() is idempotent, so on
+  // every later load it opens no upgrade at all.
+  await db.setup({ podcasts: {}, episodes: {}, state: {} });
+
   const [pods, eps, st] = await Promise.all([
     db.getAll('podcasts'),
     db.getAll('episodes'),
