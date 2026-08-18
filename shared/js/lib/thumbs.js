@@ -96,7 +96,7 @@ export function createThumbCache ({
   const mem      = new Map();   // key -> object-url (this session)
   const inflight = new Map();   // key -> Promise<string|null>
   const gate     = limiter(concurrency);
-  const log      = createLogger(scope);
+  const log      = new Logger(scope);
 
   // hosts whose direct fetch we already saw blocked by CORS. remembering them
   // means we stop re-issuing a cross-origin fetch the browser will only reject
