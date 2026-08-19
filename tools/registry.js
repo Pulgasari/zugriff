@@ -4,7 +4,7 @@
 import { createRegistry } from './../shared/js/registry.js';
 
 export const { registry, categories } = createRegistry ({
-  defaults = {
+  defaults : {
     lang        : 'en',
     theme       : 'dracula',
     dir         : 'ltr',
