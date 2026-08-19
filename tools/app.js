@@ -5,12 +5,12 @@
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
-import { boot } from './shared/js/app.js';
-import { registry, categories } from './tools/registry.js';
-import Icon from './shared/js/components/Icon.js';
-import Nav  from './shared/js/components/Nav.js';
-import Settings, { SettingsButton } from './shared/js/components/Settings.js';
-import { launcher, themeGroup } from './shared/js/lib/settings.js';
+import { boot } from './../shared/js/app.js';
+import { registry, categories } from '.registry.js';
+import Icon from './../shared/js/components/Icon.js';
+import Nav  from './../shared/js/components/Nav.js';
+import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
+import { launcher, themeGroup } from './../shared/js/lib/settings.js';
 
 const config = {
   app    : { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en' },
