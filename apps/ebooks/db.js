@@ -9,12 +9,13 @@
 //   progress  per-book reading position (pdf page or epub cfi) + last-opened
 //
 // scanning is two-phase: a fast pass lists the files and shows the shelf right
-// away with filename titles, then a throttled background queue opens each new
-// or changed book to pull real metadata and a cover, updating the grid as each
-// one lands.
+// away with filename titles, then a bounded background pool opens each new or
+// changed book to pull real metadata and a cover, updating the grid as each one
+// lands.
 
 import { signal, computed } from '@aufbau/kits/preact-htm';
 import { createDb } from '@bunker/db';
+import { createPool } from './../../shared/js/lib/pool.js';
 import * as fs from './../../shared/js/lib/fsaccess.js';
 import { accept, kindOf, prettyName, extractMeta } from './library.js';
 
@@ -167,51 +168,51 @@ export const rescanAll = () => Promise.all(
 );
 
 // ── background metadata queue ────────────────────────────────────────────────
-// one book at a time keeps the ui responsive and avoids a burst of parallel
-// unzips/pdf-parses churning memory on a big folder.
+// extraction (unzip / pdf-parse / cover render) is the slow part of a scan, so
+// it runs off to the side through a bounded concurrency gate. a few books go at
+// once — the pdf.js worker, disk reads and epub unzips then overlap instead of
+// waiting single file — while the cap still avoids a burst of parallel parses
+// churning memory on a big folder, the reason this used to run one at a time.
+// see shared/js/lib/pool.js.
 
-let queue = [];
-let running = false;
+const META_CONCURRENCY = 3;
+const gate   = createPool(META_CONCURRENCY);
+const queued = new Set();   // keys queued or in flight, so a rescan can't double-enqueue one
 
 function enqueueMeta (list) {
-  const keys = new Set(queue.map(b => b.key));
-  for (const b of list) if (!keys.has(b.key)) queue.push(b);
-  pending.value = queue.length;
-  if (!running) runQueue();
+  for (const b of list) {
+    if (queued.has(b.key)) continue;
+    queued.add(b.key);
+    gate(() => extractOne(b)).finally(() => { queued.delete(b.key); pending.value = queued.size; });
+  }
+  pending.value = queued.size;
 }
 
-async function runQueue () {
-  running = true;
-  while (queue.length) {
-    const b = queue.shift();
-    pending.value = queue.length;
-    const cur = bookByKey(b.key);
-    if (!cur || cur.metaDone || cur.sig !== b.sig) continue;   // superseded by a rescan
+async function extractOne (b) {
+  const cur = bookByKey(b.key);
+  if (!cur || cur.metaDone || cur.sig !== b.sig) return;   // superseded by a rescan
 
-    const source = sourceById(b.sourceId);
-    if (!source) continue;
+  const source = sourceById(b.sourceId);
+  if (!source) return;
 
-    try {
-      const handle = await fileHandleFor(source.handle, b.path);
-      const meta = await extractMeta(b.kind, handle);
-      const merged = {
-        ...cur,
-        title  : meta.title  || cur.title,
-        author : meta.author || cur.author,
-        cover  : meta.cover  ?? cur.cover,
-        pages  : meta.pages ?? cur.pages,
-        metaDone: true,
-      };
-      await db.set('books', merged.key, merged);
-      books.value = books.value.map(x => x.key === merged.key ? merged : x);
-    } catch {
-      const merged = { ...cur, metaDone: true };   // don't retry a broken file every load
-      await db.set('books', merged.key, merged);
-      books.value = books.value.map(x => x.key === merged.key ? merged : x);
-    }
+  try {
+    const handle = await fileHandleFor(source.handle, b.path);
+    const meta = await extractMeta(b.kind, handle);
+    const merged = {
+      ...cur,
+      title  : meta.title  || cur.title,
+      author : meta.author || cur.author,
+      cover  : meta.cover  ?? cur.cover,
+      pages  : meta.pages ?? cur.pages,
+      metaDone: true,
+    };
+    await db.set('books', merged.key, merged);
+    books.value = books.value.map(x => x.key === merged.key ? merged : x);
+  } catch {
+    const merged = { ...cur, metaDone: true };   // don't retry a broken file every load
+    await db.set('books', merged.key, merged);
+    books.value = books.value.map(x => x.key === merged.key ? merged : x);
   }
-  running = false;
-  pending.value = 0;
 }
 
 // walk a stored path to its file handle, live from the granted folder
