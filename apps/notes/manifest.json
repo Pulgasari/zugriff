@@ -1,18 +1,38 @@
 {
-  "id"               : "notes",
-  "name"             : "Notes",
-  "short_name"       : "Notes",
-  "description"      : "Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline. Everything stays on your device.",
-  "lang"             : "en",
-  "dir"              : "ltr",
-  "scope"            : "./",
-  "start_url"        : "./",
-  "display"          : "standalone",
-  "orientation"      : "any",
-  "categories"       : ["productivity", "utilities"],
-  "background_color" : "#282a36",
-  "theme_color"      : "#282a36",
+  "id": "notes",
+  "name": "Notes",
+  "short_name": "Notes",
+  "description": "Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline.",
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "categories": [
+    "files",
+    "docs"
+  ],
+  "background_color": "#282a36",
+  "theme_color": "#282a36",
   "icons": [
-    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

@@ -1,0 +1,4 @@
+# build tooling only — the static site ships no node deps
+node_modules/
+package-lock.json
+npm-debug.log*

@@ -1,0 +1,53 @@
+name: app assets
+
+# Regenerate every app's icons (assets/icon-192.png, icon-512.png, icon.svg)
+# and manifest.json from the single source of truth — apps/registry.js + each
+# app's app.svg — and commit the result. Runs whenever a source that feeds them
+# changes, so the derived files never drift or go missing.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/registry.js'
+      - 'apps/**/app.svg'
+      - 'apps/**/app.config.js'
+      - 'scripts/gen-app-assets.mjs'
+      - 'package.json'
+      - '.github/workflows/app-assets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: app-assets-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install the rasteriser
+        run: npm install --no-audit --no-fund
+
+      - name: Generate icons + manifests
+        run: node scripts/gen-app-assets.mjs
+
+      - name: Commit any changes
+        run: |
+          if [[ -n "$(git status --porcelain apps)" ]]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add apps
+            git commit -m "chore: regenerate app icons + manifests [skip ci]"
+            git push
+          else
+            echo "App assets already up to date."
+          fi

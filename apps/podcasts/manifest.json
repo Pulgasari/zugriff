@@ -1,18 +1,37 @@
 {
-  "id"               : "podcasts",
-  "name"             : "Podcasts",
-  "short_name"       : "Podcasts",
-  "description"      : "Subscribe to podcasts by RSS, track progress, mark episodes done and keep a listen-later list — all on your device.",
-  "lang"             : "en",
-  "dir"              : "ltr",
-  "scope"            : "./",
-  "start_url"        : "./",
-  "display"          : "standalone",
-  "orientation"      : "any",
-  "categories"       : ["news", "entertainment", "utilities"],
-  "background_color" : "#282a36",
-  "theme_color"      : "#282a36",
+  "id": "podcasts",
+  "name": "Podcasts",
+  "short_name": "Podcasts",
+  "description": "Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.",
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "categories": [
+    "media"
+  ],
+  "background_color": "#282a36",
+  "theme_color": "#282a36",
   "icons": [
-    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }

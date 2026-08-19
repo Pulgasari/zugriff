@@ -8,9 +8,10 @@ export const { registry, categories } = createRegistry ({
     base        : 'apps',
     lang        : 'en',
     theme       : 'dracula',
+    color       : '#282a36',   // theme_color / background_color for the manifest + <meta theme-color>
     dir         : 'ltr',
     display     : 'standalone',
-    orientation : 'portrait',
+    orientation : 'any',       // the manifest orientation (apps aren't locked to portrait)
     viewport    : 'width=device-width, initial-scale=1, viewport-fit=cover',
   },
 

@@ -122,7 +122,16 @@ OPFS the file-explorer uses).
 2. add an entry to `apps/registry.js`
 3. in `app.config.js` swap the literal for `appMeta('my-app')`
 4. drop an `app.svg` in
-5. update `manifest.json`, write `app.js` and `app.css`
+5. write `app.js` and `app.css`
+
+`manifest.json` and each app's `assets/` icons are **generated** from the
+registry entry + `app.svg` by [`scripts/gen-app-assets.mjs`](./scripts/gen-app-assets.mjs)
+— `npm run gen:assets` locally, or just push and the *app assets* GitHub Action
+([`.github/workflows/app-assets.yml`](./.github/workflows/app-assets.yml))
+regenerates and commits them whenever `app.svg`, `app.config.js` or the registry
+changes. `npm run check:assets` fails if anything is stale or missing. So the
+registry is the one place name, icon, description, categories and colour are
+declared — the launcher, the app and its manifest stay in lock-step.
 
 ## patterns
 

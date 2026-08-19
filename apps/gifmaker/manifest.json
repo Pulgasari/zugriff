@@ -1,18 +1,37 @@
 {
-  "id"               : "gifmaker",
-  "name"             : "Gifmaker",
-  "short_name"       : "Gifmaker",
-  "description"      : "Turn a stack of images into an animation — nudge, reorder, export as GIF or a project zip.",
-  "lang"             : "en",
-  "dir"              : "ltr",
-  "scope"            : "./",
-  "start_url"        : "./",
-  "display"          : "standalone",
-  "orientation"      : "any",
-  "categories"       : ["photo", "graphics", "utilities"],
-  "background_color" : "#282a36",
-  "theme_color"      : "#282a36",
+  "id": "gifmaker",
+  "name": "Gifmaker",
+  "short_name": "Gifmaker",
+  "description": "Turn a stack of images into an animation — nudge, reorder, export as GIF or a project zip.",
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "categories": [
+    "image"
+  ],
+  "background_color": "#282a36",
+  "theme_color": "#282a36",
   "icons": [
-    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
