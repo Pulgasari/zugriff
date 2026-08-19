@@ -14,9 +14,10 @@ image) and your reading position — never a copy of the book.
 - **Add folders** — `showDirectoryPicker()`. One is enough; add several and
   filter between them. Files are read-only and never modified.
 - **Two-phase scan** — the shelf appears immediately with filename titles, then
-  a throttled background queue opens each new or changed book to read the real
-  title/author and render a cover. Results are cached against a size+mtime
-  signature, so a second visit is instant and only changed files re-scan.
+  a bounded background pool (`shared/js/lib/pool.js`) opens a few new or changed
+  books at once to read the real title/author and render a cover. Results are
+  cached against a size+mtime signature, so a second visit is instant and only
+  changed files re-scan.
 - **Covers** — extracted from the EPUB package or the PDF's first page,
   downscaled to WebP so a big library stays light in IndexedDB. Books without
   one get a coloured, titled placeholder.

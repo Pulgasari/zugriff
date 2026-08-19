@@ -4,8 +4,8 @@
 // epub.js unzips it, reads the OPF package and hands us the cover; pdf metadata
 // and a first-page render come from pdf.js. both libraries are already in the
 // shared importmap. extraction is the slow part of a library scan, so db.js
-// runs it in a throttled background queue and caches the result (cover included,
-// as a Blob) keyed by the file's size+mtime signature.
+// runs it through a bounded background pool and caches the result (cover
+// included, as a Blob) keyed by the file's size+mtime signature.
 
 import ePub          from 'epubjs';
 import * as pdfjs    from 'pdfjs';
