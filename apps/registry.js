@@ -1,7 +1,7 @@
 // apps/registry.js
 // adding an app: copy apps/template/, add an entry here, done.
 
-import { createRegistry } from './bla/registry.js';
+import { createRegistry } from './../shared/js/registry.js';
 
 export const { registry, categories } = createRegistry ({
   defaults: {
