@@ -39,9 +39,25 @@ export async function queryPermission (handle, mode = 'read') {
  * there is no need to query first.
  */
 export async function ensurePermission (handle, mode = 'read') {
-  if (!handle?.requestPermission) return true;
-  try       { return (await handle.requestPermission({ mode })) === 'granted'; }
-  catch (e) { console.warn('[fsaccess] requestPermission failed:', e); return false; }
+  return (await requestRead(handle, mode)).granted;
+}
+
+/**
+ * like ensurePermission, but reports exactly what happened so a caller can show
+ * the real reason a re-grant failed instead of a generic message. call it as
+ * the FIRST awaited thing in a click handler (never after another await).
+ * returns { granted, state?, error? } — `state` is the raw permission string
+ * ('granted' | 'prompt' | 'denied'), `error` is set only if the call threw.
+ */
+export async function requestRead (handle, mode = 'read') {
+  if (!handle?.requestPermission) return { granted: true, state: 'granted' };
+  try {
+    const state = await handle.requestPermission({ mode });
+    return { granted: state === 'granted', state };
+  } catch (error) {
+    console.warn('[fsaccess] requestPermission threw:', error);
+    return { granted: false, error };
+  }
 }
 
 // ── walking ──────────────────────────────────────────────────────────────

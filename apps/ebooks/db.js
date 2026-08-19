@@ -79,14 +79,15 @@ export async function addFolder () {
   return rec;
 }
 
-// fast path: re-grant via the stored handle (call straight from a click)
+// fast path: re-grant via the stored handle (call straight from a click).
+// returns { granted, state?, error? } so the ui can show the real failure.
 export async function reconnect (id) {
   const s = sourceById(id);
-  if (!s) return false;
-  const ok = await fs.ensurePermission(s.handle, 'read');
-  perms.value = { ...perms.value, [id]: ok ? 'granted' : 'denied' };
-  if (ok) await scan(id);
-  return ok;
+  if (!s) return { granted: false };
+  const res = await fs.requestRead(s.handle, 'read');
+  perms.value = { ...perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
+  if (res.granted) await scan(id);
+  return res;
 }
 
 // reliable fallback: re-pick the same folder (the picker remembers it). works
