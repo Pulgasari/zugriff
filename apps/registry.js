@@ -31,6 +31,7 @@ export const { registry, categories } = createRegistry ({
       icon        : 'mdi:image-edit-outline',
       description : 'Crop, rotate, flip and adjust images — all on your device.',
       categories  : ['image'],
+      autopack    : true,
     },
     {
       slug        : 'gifmaker',
