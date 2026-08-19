@@ -17,7 +17,7 @@ pdfjs.GlobalWorkerOptions.workerSrc =
 
 const COVER_MAX = 512;   // longest cover edge we keep, px
 
-export const EXT = /\.(epub|pdf)$/i;
+export const EXT    = /\.(epub|pdf)$/i;
 export const accept = name => EXT.test(name);
 export const kindOf = name => /\.pdf$/i.test(name) ? 'pdf' : 'epub';
 
@@ -35,10 +35,10 @@ export function prettyName (name) {
 // full-res covers doesn't blow up IndexedDB
 async function downscale (blob) {
   try {
-    const bmp = await createImageBitmap(blob);
-    const scale = Math.min(1, COVER_MAX / Math.max(bmp.width, bmp.height));
-    const w = Math.max(1, Math.round(bmp.width * scale));
-    const h = Math.max(1, Math.round(bmp.height * scale));
+    const bmp    = await createImageBitmap(blob);
+    const scale  = Math.min(1, COVER_MAX / Math.max(bmp.width, bmp.height));
+    const w      = Math.max(1, Math.round(bmp.width  * scale));
+    const h      = Math.max(1, Math.round(bmp.height * scale));
     const canvas = document.createElement('canvas');
     canvas.width = w; canvas.height = h;
     canvas.getContext('2d').drawImage(bmp, 0, 0, w, h);
@@ -85,11 +85,11 @@ async function fromPdf (arrayBuffer) {
 
     let cover = null;
     try {
-      const page = await doc.getPage(1);
-      const base = page.getViewport({ scale: 1 });
-      const scale = Math.min(2, COVER_MAX / Math.max(base.width, base.height));
+      const page     = await doc.getPage(1);
+      const base     = page.getViewport({ scale: 1 });
+      const scale    = Math.min(2, COVER_MAX / Math.max(base.width, base.height));
       const viewport = page.getViewport({ scale });
-      const canvas = document.createElement('canvas');
+      const canvas   = document.createElement('canvas');
       canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
       await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
       cover = await new Promise(res => canvas.toBlob(res, 'image/webp', 0.82));
@@ -111,8 +111,11 @@ async function fromPdf (arrayBuffer) {
  */
 export async function extractMeta (kind, fileHandle) {
   try {
-    const buf = await (await fileHandle.getFile()).arrayBuffer();
-    return kind === 'pdf' ? await fromPdf(buf) : await fromEpub(buf);
+    const file   = await fileHandle.getFile();
+    const buffer = await file.arrayBuffer();
+    return kind === 'pdf' 
+      ? await fromPdf  (buffer) 
+      : await fromEpub (buffer);
   } catch (err) {
     console.warn('[ebooks] metadata extraction failed:', err);
     return { title: '', author: '', cover: null };
