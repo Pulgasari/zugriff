@@ -14,8 +14,8 @@
 
 // ::: vendors
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
-const { signal } = aufbau;
-const { computed, useEffect, useRef, useSignal } = preact;
+//const { signal } = aufbau;
+const { computed, signal, useEffect, useRef, useSignal } = preact;
 
 // ::: shared
 import { boot }             from './../../shared/js/app.js';
