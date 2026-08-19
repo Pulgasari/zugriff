@@ -173,8 +173,14 @@
 .crumb { color: var(--fg-50, var(--fg)); white-space: nowrap; }
 .crumb.last { color: var(--fg); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
 .crumb-sep { color: var(--fg-50, var(--fg)); margin: 0 0.4rem; }
+.head-brand { font-weight: 700; color: var(--fg); }
 
 .reader-scroll { flex: 1 1 auto; overflow-y: auto; }
+.reader-empty { flex: 1 1 auto; display: flex; min-height: 0; }
+
+/* with no note open the desktop needs no top bar — the tree is always in view;
+   on a phone the bar stays so its menu button can reveal the drawer */
+@media (min-width: 681px) { .reader-head.empty { display: none; } }
 .reader-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
