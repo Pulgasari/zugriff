@@ -1,8 +1,8 @@
 // apps/gifmaker/app.config.js
 
-import { appMeta } from './../registry.js';
+import { registry } from './../registry.js';
 
-export const app = appMeta('gifmaker');
+export const app = registry.get('gifmaker');
 
 export const aufbau = {
   elements : { mode: 'auto' },
