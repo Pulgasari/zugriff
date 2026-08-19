@@ -12,6 +12,8 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 - [gifmaker](https://pulgasari.github.io/zugriff/apps/gifmaker/)
 - [image editor](https://pulgasari.github.io/zugriff/apps/image-editor/)
 - [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
+- [notes](https://pulgasari.github.io/zugriff/apps/notes/)
+- [ebooks](https://pulgasari.github.io/zugriff/apps/ebooks/)
 
 ---
 
@@ -103,9 +105,16 @@ the apps so far:
 [apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS the cli
 uses; [apps/image-editor](./apps/image-editor/) — crop/rotate/flip/adjust images
 on a canvas; [apps/gifmaker](./apps/gifmaker/) — sequence images into an
-animation and export a GIF or a project zip; and
+animation and export a GIF or a project zip;
 [apps/podcasts](./apps/podcasts/) — subscribe by RSS, play episodes and track
-progress, backed by `@bunker/db`.
+progress, backed by `@bunker/db`;
+[apps/notes](./apps/notes/) — grant a folder of Markdown files and read it as a
+foldered notebook, the directory tree becoming the outline; and
+[apps/ebooks](./apps/ebooks/) — grant your book folders and read the EPUB/PDF
+library with covers, search and a remembered reading position. The last two
+share [`shared/js/lib/fsaccess.js`](./shared/js/lib/fsaccess.js), the File System
+Access wrapper that grants a real on-disk folder (the counterpart to the private
+OPFS the file-explorer uses).
 
 ## adding an app
 

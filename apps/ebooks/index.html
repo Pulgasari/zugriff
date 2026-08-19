@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- app colour -->
+  <meta name="theme-color" content="#282a36">
+  <meta name="msapplication-TileColor" content="#282a36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#282a36">
+
+  <!-- icon -->
+  <link rel="icon" href="./app.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./app.svg">
+
+  <!-- title (also set from the registry at boot) -->
+  <title>eBooks</title>
+  <meta name="apple-mobile-web-app-title" content="eBooks">
+
+  <!-- apps do NOT link the tools' shared/css/index.css — just the apps base
+       (reset + theme tokens + app root) and the app's own sheet -->
+  <link rel="stylesheet" href="./../base.css">
+  <link rel="stylesheet" href="./app.css">
+
+  <script src="./../../shared/js/theme-boot.js"></script>
+  <script src="./../../shared/js/importmap.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="app-loading">…</div>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
