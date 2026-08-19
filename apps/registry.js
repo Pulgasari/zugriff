@@ -45,6 +45,20 @@ export const { registry, categories } = createRegistry ({
       description : 'Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.',
       categories  : ['media'],
     },
+    {
+      slug        : 'notes',
+      name        : 'Notes',
+      icon        : 'mdi:notebook-outline',
+      description : 'Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline.',
+      categories  : ['files', 'docs'],
+    },
+    {
+      slug        : 'ebooks',
+      name        : 'eBooks',
+      icon        : 'mdi:bookshelf',
+      description : 'Point it at your book folders and read your EPUB and PDF library — covers, search and remembered reading position.',
+      categories  : ['docs', 'media'],
+    },
   ],
 });
 

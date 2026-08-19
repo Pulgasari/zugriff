@@ -98,6 +98,10 @@ const map = { imports: {
   "pdf-lib"      : "https://esm.sh/pdf-lib@1.17.1",
   "pdfjs"        : "https://esm.sh/pdfjs-dist@4.4.168",
   "pdfjs-worker" : "https://esm.sh/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs",
+  // epub is a zip of xhtml; epub.js does the unzip, spine walk and rendering,
+  // and doubles as the metadata + cover reader in the ebooks library scan. it
+  // pulls jszip in itself, bundled by esm.sh, so no separate zip entry is needed
+  "epubjs"       : "https://esm.sh/epubjs@0.3.93",
 
   // ::: media
   // the ffmpeg core wasm is ~32 mb and stays off this repo — it is fetched

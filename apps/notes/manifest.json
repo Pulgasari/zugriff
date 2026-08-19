@@ -1,0 +1,18 @@
+{
+  "id"               : "notes",
+  "name"             : "Notes",
+  "short_name"       : "Notes",
+  "description"      : "Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline. Everything stays on your device.",
+  "lang"             : "en",
+  "dir"              : "ltr",
+  "scope"            : "./",
+  "start_url"        : "./",
+  "display"          : "standalone",
+  "orientation"      : "any",
+  "categories"       : ["productivity", "utilities"],
+  "background_color" : "#282a36",
+  "theme_color"      : "#282a36",
+  "icons": [
+    { "src": "./app.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
