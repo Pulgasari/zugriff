@@ -6,7 +6,7 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 import { boot } from './../shared/js/app.js';
-import { registry, categories } from '.registry.js';
+import { registry, categories } from './registry.js';
 import Icon from './../shared/js/components/Icon.js';
 import Nav  from './../shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
