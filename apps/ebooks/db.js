@@ -18,9 +18,8 @@ import { createDb } from '@bunker/db';
 import * as fs from './../../shared/js/lib/fsaccess.js';
 import { accept, kindOf, prettyName, extractMeta } from './library.js';
 
-const db = createDb('zugriff-ebooks');
-
-const SEP = '/';   // key = sourceId + '/' + path; sourceIds are UUIDs, so this never collides
+const db    = createDb('zugriff-ebooks');
+const SEP   = '/';   // key = sourceId + '/' + path; sourceIds are UUIDs, so this never collides
 const keyOf = (sourceId, path) => sourceId + SEP + path;
 
 // ── signals ────────────────────────────────────────────────────────────────
@@ -95,9 +94,9 @@ export async function removeFolder (id) {
   await db.task('books',    'readwrite', store => { for (const k of doomed) store.delete(k); });
   await db.task('progress', 'readwrite', store => { for (const k of doomed) store.delete(k); });
 
-  sources.value = sources.value.filter(s => s.id !== id);
-  books.value   = books.value.filter(b => b.sourceId !== id);
-  const p = { ...progress.value }; for (const k of doomed) delete p[k]; progress.value = p;
+  sources.value = sources.value.filter(s => s.id       !== id);
+    books.value =   books.value.filter(b => b.sourceId !== id);
+  const p  = { ...progress.value }; for (const k of doomed) delete p[k]; progress.value = p;
   const pm = { ...perms.value };   delete pm[id];  perms.value = pm;
 }
 
