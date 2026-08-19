@@ -31,7 +31,7 @@ const visible = computed(() => {
   const q = query.value.trim().toLowerCase();
   const c = category.value;
 
-  return registry.filter(app =>
+  return registry.getAll().filter(app =>
     (!c || app.categories?.includes(c)) &&
     (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
   );
