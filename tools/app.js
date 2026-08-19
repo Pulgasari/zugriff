@@ -36,8 +36,8 @@ const visible = computed(() => {
 });
 
 function Filter () {
-  const ref     = useRef(null);
-  const sticky  = launcher.value('filter-sticky');
+  const ref      = useRef(null);
+  const sticky   = launcher.value('filter-sticky');
   const position = launcher.value('filter-position');
 
   useEffect(() => {
@@ -82,7 +82,7 @@ function AppList () {
       <ul id="tools">
         ${list.map(app => html`
           <li key=${app.slug}>
-            <a href=${`./tools/${app.slug}/`}>
+            <a href=${`./${app.slug}/`}>
               <span class="title">
                 <span class="name">${app.name}</span>
                 ${app.description && html`<span class="desc">${app.description}</span>`}
