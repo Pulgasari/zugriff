@@ -8,8 +8,16 @@ own css. copy this folder, rename it to your slug, then:
 1. add an entry for the slug to `apps/registry.js`
 2. in `app.config.js` swap the literal for `appMeta('<slug>')`
 3. drop an `app.svg` in
-4. update `manifest.json` (name, description, id)
-5. write the app in `app.js`
+4. write the app in `app.js`
+
+`manifest.json` and the `assets/` icons (`icon.svg`, `icon-192.png`,
+`icon-512.png`) are **generated** from the registry entry + `app.svg` — don't
+hand-edit them. Run `npm run gen:assets` (or just push: the *app assets* GitHub
+Action regenerates and commits them). Everything user-facing — name, short
+name, description, categories, colour — lives in the registry entry, so the
+launcher, the app and the manifest can never drift. Need manifest-only tweaks
+(e.g. app-store categories)? Add a `manifest: { … }` object to the registry
+entry; it overrides just those keys.
 
 ## what makes an app an app
 
@@ -31,6 +39,7 @@ worker.
 | `app.js`        | the app itself, mounted through `boot({ shell: false })` |
 | `app.config.js` | registry entry + aufbau runtime options |
 | `app.css`       | the app's own look — starts from nothing |
-| `manifest.json` | pwa manifest, all paths relative |
+| `manifest.json` | pwa manifest — **generated** from the registry, don't hand-edit |
 | `sw.js`         | one-liner, pulls in `shared/js/sw-core.js` |
-| `app.svg`       | the app icon |
+| `app.svg`       | the app icon — the source the `assets/` PNGs are rasterised from |
+| `assets/`       | **generated** icons (`icon.svg`, `icon-192.png`, `icon-512.png`) |
