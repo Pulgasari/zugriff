@@ -3,9 +3,9 @@
 client-side mini-PWAs. static files only — no build step, no bundler, no node
 or deno. ESM in the browser, served straight off GitHub Pages.
 
-- cli: [zugriff/cli](https://pulgasari.github.io/zugriff/cli/)
+- [zugriff/cli](https://pulgasari.github.io/zugriff/cli/)
 - [apps](https://pulgasari.github.io/zugriff/apps/)
-- [tools](https://pulgasari.github.io/zugriff/)
+- [tools](https://pulgasari.github.io/zugriff/tools/)
 
 ## apps
 
