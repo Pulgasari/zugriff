@@ -10,8 +10,7 @@
 // a "path" here is a forward-slash string relative to the granted root, e.g.
 // "journal/2026/entry.md". the root itself has path "".
 
-export const supported = () =>
-  typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
+export const supported = () => typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
 
 /** open the OS folder picker. resolves to a handle, or null if the user cancels. */
 export async function pickDirectory ({ id, mode = 'read', startIn } = {}) {
@@ -41,8 +40,8 @@ export async function queryPermission (handle, mode = 'read') {
  */
 export async function ensurePermission (handle, mode = 'read') {
   if (!handle?.requestPermission) return true;
-  try { return (await handle.requestPermission({ mode })) === 'granted'; }
-  catch (err) { console.warn('[fsaccess] requestPermission failed:', err); return false; }
+  try       { return (await handle.requestPermission({ mode })) === 'granted'; }
+  catch (e) { console.warn('[fsaccess] requestPermission failed:', e); return false; }
 }
 
 // ── walking ──────────────────────────────────────────────────────────────
@@ -52,8 +51,7 @@ export const extOf = name => {
   return dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
 };
 
-const byName = (a, b) =>
-  a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+const byName = (a,b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
 
 /**
  * walk `dirHandle` recursively into a tree that mirrors the folder structure.
@@ -125,7 +123,6 @@ export async function resolveRelative (rootHandle, fromPath, relative) {
     let dir = rootHandle;
     for (const seg of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(seg);
     return await dir.getFileHandle(parts.at(-1));
-  } catch {
-    return null;
   }
+  catch { return null; }
 }
