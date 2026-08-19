@@ -11,9 +11,7 @@
 
 import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
-/* global self, caches */
-
-// ── identity ───────────────────────────────────────────────────────────────
+// ::::::
 
 // the app slug is the last path segment of the registration scope, so nothing
 // has to be templated into this file
@@ -21,47 +19,27 @@ const SCOPE   = self.registration.scope;
 const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
 const VERSION = 'v2';
 
-const APP_CACHE    = `zugriff-${SLUG}-${VERSION}`;
-const VENDOR_CACHE = `zugriff-vendor-${VERSION}`;
-
-// ── caches ─────────────────────────────────────────────────────────────────
-
-// the app's own files: small, and they change whenever the repo is pushed, so
-// every load revalidates — conditionally, so an unchanged file costs a 304
-const app = createCache({
-  name    : APP_CACHE,
-  onError : ({ operation, key, error }) => console.warn(`[sw] ${operation} failed for ${key}`, error),
-});
-
-// third party modules pinned to a version in the url. those bytes can never
-// change, so once they are here they are never fetched again — and the cache is
-// shared by every app instead of each one keeping its own copy of preact
-const vendor = createCache({
-  name    : VENDOR_CACHE,
-  onError : ({ operation, key, error }) => console.warn(`[sw] vendor ${operation} failed for ${key}`, error),
-});
-
+const CACHE_APP     = `zugriff-${SLUG}-${VERSION}`;
+const CACHE_VENDOR  = `zugriff-vendor-${VERSION}`;
 const IMMUTABLE_TTL = 365 * 24 * 60 * 60 * 1000;
+const VERSIONED     = /(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\/.*@\d+\.\d+\.\d+/;
 
-// esm.sh/preact@10.20.1, unpkg.com/@ffmpeg/core@0.12.6/…, jsdelivr /npm/x@1.2.3/
-const VERSIONED = /(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\/.*@\d+\.\d+\.\d+/;
+const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
+const OWN    = ['./', './app.js', './app.css', './manifest.json'];
+const SHARED = ['./../css/index.css', './importmap.js', './app.js'];
 
-const isVendor    = url => VERSIONED.test(url);
+const onError = ({ operation, key, error }) => console.warn(`[sw] vendor ${operation} failed for ${key}`, error);    
+const app     = createCache ({ onError, name: CACHE_APP    }); // stale while revalidate
+const vendor  = createCache ({ onError, name: CACHE_VENDOR }); // loaded once
+
+const isNested     = url => NESTED.some(root => url.startsWith(root) && !SCOPE.startsWith(root));
 const isSameOrigin = url => url.startsWith(self.location.origin + '/');
+const isVendor     = url => VERSIONED.test(url);
 
 // ── install ────────────────────────────────────────────────────────────────
 
-// the app's own files hang off the scope, the shared ones off this module —
-// the launcher sits at /zugriff/ and the apps two levels deeper, so resolving
-// both against the same base would break one of them
-// entry points only — everything they import is picked up by the fetch
-// handler on the first load anyway
-const OWN = ['./', './app.js', './app.css', './manifest.json'];
-
-const SHARED = ['./../css/index.css', './importmap.js', './app.js'];
-
 const precacheUrls = () => [
-  ...OWN.map(path    => new URL(path, SCOPE).href),
+     ...OWN.map(path => new URL(path, SCOPE).href),
   ...SHARED.map(path => new URL(path, import.meta.url).href),
 ];
 
@@ -95,11 +73,6 @@ self.addEventListener('activate', event => {
 
 // ── fetch ──────────────────────────────────────────────────────────────────
 
-// the launcher's scope is /zugriff/, which sits above every app — it must not
-// answer (or cache) their files, those belong to the app's own worker. both
-// nests live one level down: tools/<slug>/ and apps/<slug>/
-const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
-const isNested = url => NESTED.some(root => url.startsWith(root) && !SCOPE.startsWith(root));
 
 self.addEventListener('fetch', event => {
   const { request } = event;
@@ -108,10 +81,9 @@ self.addEventListener('fetch', event => {
 
   const url = request.url;
 
-  // extension and devtools schemes are not ours to answer
-  if (!url.startsWith('http')) return;
-
-  if (isNested(url)) return;
+  
+  if (!url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
+  if (isNested(url))           return;
 
   const versioned = isVendor(url);
 
