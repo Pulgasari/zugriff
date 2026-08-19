@@ -19,6 +19,7 @@ import { boot }   from './../../shared/js/app.js';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
+import * as pwa   from './../../shared/js/lib/pwa.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -174,6 +175,22 @@ function SourceStatus () {
     </div>`;
 }
 
+// installing the app is what makes the browser persist folder permission
+// across visits — otherwise a tab drops it each session and every return needs
+// a reconnect. shown once folders are in use and the app isn't installed.
+function InstallTip () {
+  if (pwa.installed.value || !db.sources.value.length) return null;
+  return html`
+    <div class="install-tip">
+      <${Icon} name="mdi:information-outline" size=${18} />
+      <span class="install-tip-text">Install the app to keep your book folders connected between visits — no reconnecting.</span>
+      ${pwa.canInstall.value
+        ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
+            <${Icon} name="mdi:download" size=${15} /> Install app</button>`
+        : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
+    </div>`;
+}
+
 function Library () {
   const books = visibleBooks.value;
   const cont  = continueReading.value;
@@ -193,6 +210,7 @@ function Library () {
       </header>
 
       <${SourceStatus} />
+      <${InstallTip} />
 
       ${!hasFolders
         ? html`<${Empty} icon="mdi:bookshelf" title="Your library is empty"

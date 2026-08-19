@@ -22,6 +22,7 @@ import { boot }   from './../../shared/js/app.js';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
+import * as pwa   from './../../shared/js/lib/pwa.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -221,6 +222,7 @@ function Sidebar () {
       </div>
 
       <div class="side-foot">
+        <${InstallTip} />
         <button class="btn small primary" onClick=${addFolder}>
           <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>
         <div class="side-links">
@@ -229,6 +231,24 @@ function Sidebar () {
         </div>
       </div>
     </aside>`;
+}
+
+// the one real cure for re-granting every visit: install the app, so the
+// browser persists folder permissions ("Allow on every visit"). only shown
+// while folders are in use and the app isn't installed yet.
+function InstallTip () {
+  if (pwa.installed.value || !db.sources.value.length) return null;
+  return html`
+    <div class="install-tip">
+      <${Icon} name="mdi:information-outline" size=${15} />
+      <div class="install-tip-body">
+        <span>Install the app so your folders stay connected between visits — no reconnecting.</span>
+        ${pwa.canInstall.value
+          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
+              <${Icon} name="mdi:download" size=${14} /> Install app</button>`
+          : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
+      </div>
+    </div>`;
 }
 
 // :::::: READER ::::::::::::::::::::::::::::::::::::::::::::

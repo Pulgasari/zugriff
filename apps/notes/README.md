@@ -52,3 +52,13 @@ eBooks app reuses.
 
 Needs the File System Access API (`window.showDirectoryPicker`) — Chrome, Edge
 and other Chromium browsers. The app says so plainly where it isn't available.
+
+### Keeping folders connected (installing)
+
+A folder's permission only persists across sessions once the app is **installed
+as a PWA** — then the browser grants "Allow on every visit" and the tree just
+loads on return, no reconnect. In a plain tab the permission is dropped when the
+tab's session ends and has to be re-granted each visit (by design, for
+security). The app shows an **Install** button / hint while folders are open and
+it isn't installed; `shared/js/lib/pwa.js` drives it. See
+[Chrome's persistent permissions](https://developer.chrome.com/blog/persistent-permissions-for-the-file-system-access-api).

@@ -142,6 +142,18 @@
   border-top: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 0.6rem;
 }
+.install-tip {
+  display: flex; gap: 0.45rem; align-items: flex-start;
+  padding: 0.5rem 0.6rem; border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: color-mix(in oklch, var(--accent) 9%, var(--panel));
+  font-size: 0.75rem; color: var(--fg-75, var(--fg)); line-height: 1.4;
+}
+.install-tip > .icon { color: var(--accent); flex: none; margin-top: 1px; }
+.install-tip-body { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
+.install-tip-hint { color: var(--fg-50, var(--fg)); }
+.install-tip-hint b { color: var(--fg-75, var(--fg)); font-weight: 600; }
+.install-tip .btn { align-self: flex-start; }
 .side-foot .btn { justify-content: center; }
 .side-links { display: flex; gap: 0.75rem; padding: 0 0.1rem; font-size: 0.75rem; }
 .side-links a {
