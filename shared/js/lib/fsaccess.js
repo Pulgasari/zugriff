@@ -33,13 +33,16 @@ export async function queryPermission (handle, mode = 'read') {
 
 /**
  * make sure we may read `handle`, prompting if needed. requestPermission must
- * run inside a user gesture, so call this from a click, never at load.
+ * run inside a user gesture (transient activation), so call this straight from
+ * a click and do not `await` anything else first — an intervening await can
+ * consume the activation and make the prompt silently reject. requestPermission
+ * already returns 'granted' without a prompt when permission is still held, so
+ * there is no need to query first.
  */
 export async function ensurePermission (handle, mode = 'read') {
-  if (!handle?.queryPermission) return true;
-  if (await handle.queryPermission({ mode }) === 'granted') return true;
+  if (!handle?.requestPermission) return true;
   try { return (await handle.requestPermission({ mode })) === 'granted'; }
-  catch { return false; }
+  catch (err) { console.warn('[fsaccess] requestPermission failed:', err); return false; }
 }
 
 // ── walking ──────────────────────────────────────────────────────────────

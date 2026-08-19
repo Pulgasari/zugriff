@@ -327,51 +327,56 @@ function Reader () {
     }
   };
 
-  if (!note) {
-    return html`
-      <${Empty} icon="mdi:file-document-outline" title="No note open"
-        hint=${db.sources.value.length ? 'Pick a note from the tree on the left.'
-                                        : 'Open a folder of Markdown files to get started.'}
-        action=${!db.sources.value.length && html`
-          <button class="btn primary" onClick=${addFolder}>
-            <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>`} />`;
-  }
-
   return html`
     <${ReaderBody} note=${note} bodyRef=${bodyRef} onClick=${onClick} />`;
 }
 
+// the frame is always drawn — header (with the mobile menu button) included —
+// so on a phone the tree drawer is always reachable, note open or not
 function ReaderBody ({ note, bodyRef, onClick }) {
   const toc  = noteToc.value;
-  const segs = note.node.path.split('/');
+  const segs = note ? note.node.path.split('/') : [];
 
   return html`
     <div class="reader">
-      <header class="reader-head">
-        <button class="ibtn nav-open" aria-label="Notes" onClick=${() => navOpen.value = true}>
+      <header class=${'reader-head' + (note ? '' : ' empty')}>
+        <button class="ibtn nav-open" aria-label="Open notes" onClick=${() => navOpen.value = true}>
           <${Icon} name="mdi:menu" size=${20} /></button>
-        <nav class="crumbs">
-          ${segs.map((seg, i) => html`
-            <span key=${i}>${i > 0 && html`<span class="crumb-sep">/</span>`}
-              <span class=${i === segs.length - 1 ? 'crumb last' : 'crumb'}>${seg}</span></span>`)}
-        </nav>
+        ${note
+          ? html`<nav class="crumbs">
+              ${segs.map((seg, i) => html`
+                <span key=${i}>${i > 0 && html`<span class="crumb-sep">/</span>`}
+                  <span class=${i === segs.length - 1 ? 'crumb last' : 'crumb'}>${seg}</span></span>`)}
+            </nav>`
+          : html`<span class="crumb head-brand">Notes</span>`}
       </header>
 
-      <div class="reader-scroll">
-        <div class="reader-grid">
-          <article class="md" ref=${bodyRef} onClick=${onClick}></article>
-          ${toc.length > 2 && html`
-            <aside class="toc">
-              <div class="toc-title">On this page</div>
-              ${toc.map(item => html`
-                <a key=${item.id} href=${'#' + item.id} class=${'toc-item lvl' + item.level}
-                   onClick=${e => { e.preventDefault();
-                     bodyRef.current?.querySelector('#' + CSS.escape(item.id))
-                       ?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                  ${item.text}</a>`)}
-            </aside>`}
-        </div>
-      </div>
+      ${note
+        ? html`
+          <div class="reader-scroll">
+            <div class="reader-grid">
+              <article class="md" ref=${bodyRef} onClick=${onClick}></article>
+              ${toc.length > 2 && html`
+                <aside class="toc">
+                  <div class="toc-title">On this page</div>
+                  ${toc.map(item => html`
+                    <a key=${item.id} href=${'#' + item.id} class=${'toc-item lvl' + item.level}
+                       onClick=${e => { e.preventDefault();
+                         bodyRef.current?.querySelector('#' + CSS.escape(item.id))
+                           ?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
+                      ${item.text}</a>`)}
+                </aside>`}
+            </div>
+          </div>`
+        : html`
+          <div class="reader-empty">
+            <${Empty} icon="mdi:file-document-outline" title="No note open"
+              hint=${db.sources.value.length ? 'Choose a note to start reading.'
+                                              : 'Open a folder of Markdown files to get started.'}
+              action=${!db.sources.value.length && html`
+                <button class="btn primary" onClick=${addFolder}>
+                  <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>`} />
+          </div>`}
     </div>`;
 }
 
