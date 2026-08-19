@@ -8,12 +8,12 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 - [tools](https://pulgasari.github.io/zugriff/tools/)
 
 ## apps
-
+- [ebooks](https://pulgasari.github.io/zugriff/apps/ebooks/)
+- [file explorer](https://pulgasari.github.io/zugriff/apps/file-explorer/)
 - [gifmaker](https://pulgasari.github.io/zugriff/apps/gifmaker/)
 - [image editor](https://pulgasari.github.io/zugriff/apps/image-editor/)
-- [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
 - [notes](https://pulgasari.github.io/zugriff/apps/notes/)
-- [ebooks](https://pulgasari.github.io/zugriff/apps/ebooks/)
+- [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
 
 ---
 
