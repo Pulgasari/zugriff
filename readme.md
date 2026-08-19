@@ -9,6 +9,8 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 
 ## apps
 
+- [gifmaker](https://pulgasari.github.io/zugriff/apps/gifmaker/)
+- [image editor](https://pulgasari.github.io/zugriff/apps/image-editor/)
 - [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
 
 ---
