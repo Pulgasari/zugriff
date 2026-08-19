@@ -28,6 +28,10 @@ image) and your reading position — never a copy of the book.
     that follows the app's colours.
 - **Remembers your place** — PDF page or EPUB CFI is saved as you read and
   restored next time; a *Continue reading* shelf lists what you had open.
+- **Reconnecting** — when the browser won't silently re-grant a stored folder
+  handle, *Reconnect* re-requests permission and *Choose folder* re-picks the
+  same folder as a reliable fallback. Books are keyed by path, so covers,
+  metadata and progress survive the swap.
 - **Search & sort** — by title, author, most-recent or date added.
 
 ## Files
@@ -54,3 +58,13 @@ PDF rendering come from `epubjs` and `pdfjs`, both already in the shared
 
 Needs the File System Access API (`window.showDirectoryPicker`) — Chrome, Edge
 and other Chromium browsers. The app says so plainly where it isn't available.
+
+### Keeping folders connected (installing)
+
+Folder permission only persists across sessions once the app is **installed as a
+PWA** — then the browser grants "Allow on every visit" and the library loads on
+return without a reconnect. In a plain tab the permission is dropped at the end
+of the session and must be re-granted each visit (by design). The app surfaces
+an **Install** button / hint (`shared/js/lib/pwa.js`) while folders are in use
+and it isn't installed. See
+[Chrome's persistent permissions](https://developer.chrome.com/blog/persistent-permissions-for-the-file-system-access-api).

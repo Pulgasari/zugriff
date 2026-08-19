@@ -70,7 +70,12 @@ export async function addFolder () {
   return rec;
 }
 
-/** re-request read permission for a folder granted in an earlier session. */
+/**
+ * fast path: re-grant a folder from an earlier session via the stored handle.
+ * requestPermission() must run inside the click, so this is called directly
+ * from the button. browsers are flaky about re-granting a *stored* handle,
+ * which is why repick() exists as the reliable fallback.
+ */
 export async function reconnect (id) {
   const s = sourceById(id);
   if (!s) return false;
@@ -78,6 +83,26 @@ export async function reconnect (id) {
   perms.value = { ...perms.value, [id]: ok ? 'granted' : 'denied' };
   if (ok) await scan(id);
   return ok;
+}
+
+/**
+ * reliable fallback: re-pick the same folder. showDirectoryPicker() remembers
+ * the location (via the shared id / startIn) and always hands back a freshly
+ * granted handle, so this works even when reconnect() can't re-grant the stored
+ * one. the new handle replaces the old, and progress/expansion is keyed by path
+ * so nothing is lost.
+ */
+export async function repick (id) {
+  const s = sourceById(id);
+  if (!s) return false;
+  const handle = await fs.pickDirectory({ id: 'zugriff-notes', mode: 'read' });
+  if (!handle) return false;                       // cancelled
+  const rec = { ...s, name: handle.name, handle };
+  await db.set('sources', id, rec);
+  sources.value = sources.value.map(x => x.id === id ? rec : x);
+  perms.value   = { ...perms.value, [id]: 'granted' };
+  await scan(id);
+  return true;
 }
 
 /** forget a folder — drops the handle only, never touches the files on disk. */

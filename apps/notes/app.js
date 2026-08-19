@@ -22,6 +22,7 @@ import { boot }   from './../../shared/js/app.js';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
+import * as pwa   from './../../shared/js/lib/pwa.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -157,12 +158,20 @@ function SourceBlock ({ source }) {
 
   let body;
   if (state !== 'granted') {
+    const tryReconnect = () => db.reconnect(source.id).then(ok =>
+      ok || flash('The browser wouldn’t re-grant it — tap “Choose folder”.', 'err'));
+    const repick = () => db.repick(source.id).then(ok =>
+      ok || flash('Could not open that folder', 'err'));
     body = html`
       <div class="src-reconnect">
-        <span>${state === 'denied' ? 'Permission denied.' : 'Reconnect to read this folder.'}</span>
-        <button class="btn small" onClick=${() => db.reconnect(source.id).then(ok =>
-          ok || flash('Could not open that folder', 'err'))}>
-          <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+        <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
+        <div class="src-reconnect-row">
+          <button class="btn small primary" onClick=${tryReconnect}>
+            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+          <button class="btn small ghost" title="Re-select the folder — always works"
+                  onClick=${repick}>
+            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+        </div>
       </div>`;
   } else if (busy && !tree) {
     body = html`<div class="src-loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${16} /> Scanning…</div>`;
@@ -213,6 +222,7 @@ function Sidebar () {
       </div>
 
       <div class="side-foot">
+        <${InstallTip} />
         <button class="btn small primary" onClick=${addFolder}>
           <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>
         <div class="side-links">
@@ -221,6 +231,24 @@ function Sidebar () {
         </div>
       </div>
     </aside>`;
+}
+
+// the one real cure for re-granting every visit: install the app, so the
+// browser persists folder permissions ("Allow on every visit"). only shown
+// while folders are in use and the app isn't installed yet.
+function InstallTip () {
+  if (pwa.installed.value || !db.sources.value.length) return null;
+  return html`
+    <div class="install-tip">
+      <${Icon} name="mdi:information-outline" size=${15} />
+      <div class="install-tip-body">
+        <span>Install the app so your folders stay connected between visits — no reconnecting.</span>
+        ${pwa.canInstall.value
+          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
+              <${Icon} name="mdi:download" size=${14} /> Install app</button>`
+          : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
+      </div>
+    </div>`;
 }
 
 // :::::: READER ::::::::::::::::::::::::::::::::::::::::::::

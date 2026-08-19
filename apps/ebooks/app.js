@@ -19,6 +19,7 @@ import { boot }   from './../../shared/js/app.js';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
+import * as pwa   from './../../shared/js/lib/pwa.js';
 
 // ::: local
 import * as config from './app.config.js';
@@ -162,9 +163,31 @@ function SourceStatus () {
       <${Icon} name="mdi:folder-alert-outline" size=${18} />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(s => html`
-        <button key=${s.id} class="btn small" onClick=${() => db.reconnect(s.id).then(ok =>
-          ok || flash(`Could not open ${s.name}`, 'err'))}>
-          <${Icon} name="mdi:folder-key-outline" size=${15} /> ${s.name}</button>`)}
+        <div key=${s.id} class="reconnect-item">
+          <span class="reconnect-name">${s.name}</span>
+          <button class="btn small primary" onClick=${() => db.reconnect(s.id).then(ok =>
+            ok || flash('The browser wouldn’t re-grant it — tap “Choose folder”.', 'err'))}>
+            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+          <button class="btn small ghost" title="Re-select the folder — always works"
+                  onClick=${() => db.repick(s.id).then(ok => ok || flash(`Could not open ${s.name}`, 'err'))}>
+            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+        </div>`)}
+    </div>`;
+}
+
+// installing the app is what makes the browser persist folder permission
+// across visits — otherwise a tab drops it each session and every return needs
+// a reconnect. shown once folders are in use and the app isn't installed.
+function InstallTip () {
+  if (pwa.installed.value || !db.sources.value.length) return null;
+  return html`
+    <div class="install-tip">
+      <${Icon} name="mdi:information-outline" size=${18} />
+      <span class="install-tip-text">Install the app to keep your book folders connected between visits — no reconnecting.</span>
+      ${pwa.canInstall.value
+        ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
+            <${Icon} name="mdi:download" size=${15} /> Install app</button>`
+        : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
     </div>`;
 }
 
@@ -187,6 +210,7 @@ function Library () {
       </header>
 
       <${SourceStatus} />
+      <${InstallTip} />
 
       ${!hasFolders
         ? html`<${Empty} icon="mdi:bookshelf" title="Your library is empty"
