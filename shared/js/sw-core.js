@@ -45,7 +45,7 @@ const precacheUrls = () => [
 
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
-    const cache = await caches.open(APP_CACHE);
+    const cache = await caches.open(CACHE_APP);
     // one missing file must not fail the whole install
     await Promise.all(precacheUrls().map(url =>
       cache.add(new Request(url, { cache: 'reload' }))
@@ -61,7 +61,7 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter(key => key.startsWith('zugriff-') && key !== APP_CACHE && key !== VENDOR_CACHE)
+      keys.filter(key => key.startsWith('zugriff-') && key !== CACHE_APP && key !== CACHE_VENDOR)
           // another app's cache is none of our business — only drop our own
           // older versions, and the vendor cache when its version moved on
           .filter(key => key.startsWith(`zugriff-${SLUG}-`) || key.startsWith('zugriff-vendor-'))
