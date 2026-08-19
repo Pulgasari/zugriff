@@ -26,7 +26,7 @@ export async function pickDirectory ({ id, mode = 'read', startIn } = {}) {
 /** the current permission state without prompting: 'granted' | 'prompt' | 'denied' */
 export async function queryPermission (handle, mode = 'read') {
   if (!handle?.queryPermission) return 'granted';   // no gate on this platform
-  try { return await handle.queryPermission({ mode }); }
+  try   { return await handle.queryPermission({ mode }); }
   catch { return 'denied'; }
 }
 
