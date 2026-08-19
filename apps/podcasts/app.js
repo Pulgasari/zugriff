@@ -13,7 +13,9 @@
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef, useSignal } from '@aufbau/kits/preact-htm';
+import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+const { signal } = aufbau;
+const { computed, useEffect, useRef, useSignal } = preact;
 
 // ::: shared
 import { boot }             from './../../shared/js/app.js';
@@ -27,8 +29,6 @@ import * as db     from './db.js';
 import * as player from './player.js';
 import { DEFAULT_PROXY } from './feed.js';
 
-// the self-hosted image resizer (see /img-proxy). `{url}` is the source image,
-// `{w}` the target width. clear it in settings to resize client-side instead.
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
 // :::::: SETTINGS (persisted signals) ::::::::::::::::::::::
@@ -41,11 +41,6 @@ const menuPos     = stored('bottom', 'podcasts:menu-pos');       // top | bottom
 const playerPos   = stored('bottom', 'podcasts:player-pos');     // top | bottom
 const imgResizer  = stored(DEFAULT_IMG_RESIZER, 'podcasts:img-resizer');
 
-// artwork goes through a self-hosted resizer (img.pulgasari.dev — see
-// /img-proxy) that shrinks the image server-side, so no cross-origin bytes and
-// no third party are involved; the small result is cached on-device
-// (shared/js/lib/thumbs.js). clear the endpoint in settings to fall back to
-// client-side resizing (direct fetch only).
 function buildResizer (url, w) {
   const tpl = imgResizer.value.trim();
   if (!tpl || !url) return null;
