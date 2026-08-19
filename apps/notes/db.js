@@ -78,11 +78,11 @@ export async function addFolder () {
  */
 export async function reconnect (id) {
   const s = sourceById(id);
-  if (!s) return false;
-  const ok = await fs.ensurePermission(s.handle, 'read');
-  perms.value = { ...perms.value, [id]: ok ? 'granted' : 'denied' };
-  if (ok) await scan(id);
-  return ok;
+  if (!s) return { granted: false };
+  const res = await fs.requestRead(s.handle, 'read');
+  perms.value = { ...perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
+  if (res.granted) await scan(id);
+  return res;
 }
 
 /**

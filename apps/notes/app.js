@@ -158,8 +158,12 @@ function SourceBlock ({ source }) {
 
   let body;
   if (state !== 'granted') {
-    const tryReconnect = () => db.reconnect(source.id).then(ok =>
-      ok || flash('The browser wouldn’t re-grant it — tap “Choose folder”.', 'err'));
+    const tryReconnect = () => db.reconnect(source.id).then(res => {
+      if (res.granted) return;
+      const why = res.error ? `${res.error.name || 'error'}` : `browser said “${res.state}”`;
+      console.warn('[notes] reconnect failed', { source, ...res });
+      flash(`Reconnect failed — ${why}. Try “Choose folder”.`, 'err');
+    });
     const repick = () => db.repick(source.id).then(ok =>
       ok || flash('Could not open that folder', 'err'));
     body = html`
