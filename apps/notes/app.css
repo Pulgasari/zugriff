@@ -118,6 +118,7 @@
 .src-x:hover:not(:disabled) { background: var(--hover); color: var(--fg); }
 .src-x:disabled { opacity: 0.35; cursor: default; }
 .src-reconnect { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.src-reconnect-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
 /* the tree itself */
 .tree-children { display: flex; flex-direction: column; }

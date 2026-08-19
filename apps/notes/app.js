@@ -157,12 +157,20 @@ function SourceBlock ({ source }) {
 
   let body;
   if (state !== 'granted') {
+    const tryReconnect = () => db.reconnect(source.id).then(ok =>
+      ok || flash('The browser wouldn’t re-grant it — tap “Choose folder”.', 'err'));
+    const repick = () => db.repick(source.id).then(ok =>
+      ok || flash('Could not open that folder', 'err'));
     body = html`
       <div class="src-reconnect">
-        <span>${state === 'denied' ? 'Permission denied.' : 'Reconnect to read this folder.'}</span>
-        <button class="btn small" onClick=${() => db.reconnect(source.id).then(ok =>
-          ok || flash('Could not open that folder', 'err'))}>
-          <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+        <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
+        <div class="src-reconnect-row">
+          <button class="btn small primary" onClick=${tryReconnect}>
+            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+          <button class="btn small ghost" title="Re-select the folder — always works"
+                  onClick=${repick}>
+            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+        </div>
       </div>`;
   } else if (busy && !tree) {
     body = html`<div class="src-loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${16} /> Scanning…</div>`;

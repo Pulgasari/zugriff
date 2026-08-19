@@ -79,6 +79,7 @@ export async function addFolder () {
   return rec;
 }
 
+// fast path: re-grant via the stored handle (call straight from a click)
 export async function reconnect (id) {
   const s = sourceById(id);
   if (!s) return false;
@@ -86,6 +87,22 @@ export async function reconnect (id) {
   perms.value = { ...perms.value, [id]: ok ? 'granted' : 'denied' };
   if (ok) await scan(id);
   return ok;
+}
+
+// reliable fallback: re-pick the same folder (the picker remembers it). works
+// even when the browser won't re-grant the stored handle; book keys are keyed
+// by path, so covers/metadata/progress survive the swap.
+export async function repick (id) {
+  const s = sourceById(id);
+  if (!s) return false;
+  const handle = await fs.pickDirectory({ id: 'zugriff-ebooks', mode: 'read' });
+  if (!handle) return false;
+  const rec = { ...s, name: handle.name, handle };
+  await db.set('sources', id, rec);
+  sources.value = sources.value.map(x => x.id === id ? rec : x);
+  perms.value   = { ...perms.value, [id]: 'granted' };
+  await scan(id);
+  return true;
 }
 
 export async function removeFolder (id) {
@@ -208,9 +225,12 @@ export async function fileHandleFor (rootHandle, path) {
 export async function openFile (book) {
   const source = sourceById(book.sourceId);
   if (!source) throw new Error('This book’s folder is no longer open.');
+  // opening happens after the click (in an effect), so there's no user gesture
+  // to prompt with — if the folder isn't already granted, send them back to
+  // reconnect it in the library rather than silently failing to prompt
   if (await fs.queryPermission(source.handle, 'read') !== 'granted') {
-    const ok = await fs.ensurePermission(source.handle, 'read');
-    if (!ok) throw new Error('Permission to read the folder was denied.');
+    perms.value = { ...perms.value, [source.id]: 'prompt' };
+    throw new Error('Reconnect this book’s folder in the library first.');
   }
   const handle = await fileHandleFor(source.handle, book.path);
   return handle.getFile();

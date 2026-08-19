@@ -28,6 +28,10 @@ image) and your reading position — never a copy of the book.
     that follows the app's colours.
 - **Remembers your place** — PDF page or EPUB CFI is saved as you read and
   restored next time; a *Continue reading* shelf lists what you had open.
+- **Reconnecting** — when the browser won't silently re-grant a stored folder
+  handle, *Reconnect* re-requests permission and *Choose folder* re-picks the
+  same folder as a reliable fallback. Books are keyed by path, so covers,
+  metadata and progress survive the swap.
 - **Search & sort** — by title, author, most-recent or date added.
 
 ## Files

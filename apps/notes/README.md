@@ -25,7 +25,11 @@ folder next time instead of asking you to pick it again.
 - **Filter** — type to narrow the tree to matching paths.
 - **Persistent** — the open note, expanded folders and granted folders survive
   a reload. Coming back re-grants silently when the browser still remembers the
-  permission, and offers a one-click *Reconnect* when it doesn't.
+  permission; when it doesn't, *Reconnect* re-requests it, and *Choose folder*
+  re-picks the same folder (the picker reopens at the remembered location) — a
+  reliable fallback for browsers that won't re-grant a stored handle. The new
+  handle replaces the old; open note and expanded folders are keyed by path, so
+  nothing is lost.
 
 ## Files
 

@@ -64,6 +64,8 @@
   font-size: 0.85rem;
 }
 .reconnect-bar > .icon { color: var(--accent); }
+.reconnect-item { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.reconnect-name { font-weight: 600; }
 
 .lib-controls { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.9rem; flex-wrap: wrap; }
 .lib-search {

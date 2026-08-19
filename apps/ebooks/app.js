@@ -162,9 +162,15 @@ function SourceStatus () {
       <${Icon} name="mdi:folder-alert-outline" size=${18} />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(s => html`
-        <button key=${s.id} class="btn small" onClick=${() => db.reconnect(s.id).then(ok =>
-          ok || flash(`Could not open ${s.name}`, 'err'))}>
-          <${Icon} name="mdi:folder-key-outline" size=${15} /> ${s.name}</button>`)}
+        <div key=${s.id} class="reconnect-item">
+          <span class="reconnect-name">${s.name}</span>
+          <button class="btn small primary" onClick=${() => db.reconnect(s.id).then(ok =>
+            ok || flash('The browser wouldn’t re-grant it — tap “Choose folder”.', 'err'))}>
+            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+          <button class="btn small ghost" title="Re-select the folder — always works"
+                  onClick=${() => db.repick(s.id).then(ok => ok || flash(`Could not open ${s.name}`, 'err'))}>
+            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+        </div>`)}
     </div>`;
 }
 
