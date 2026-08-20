@@ -12,11 +12,10 @@ import { html } from '@aufbau/kits/preact-htm';
 import Icon from './Icon.js';
 
 export default function Nav ({ here, base = './' }) {
-  // the page we are on links to itself, rather than up and back down again
   const links = [
-    { id: 'cli',   label: 'cli',   icon: 'mdi:console',        href: here === 'cli'   ? './' : `${base}cli/` },
-    { id: 'tools', label: 'tools', icon: 'mdi:apps',           href: here === 'tools' ? './' : base },
-    { id: 'apps',  label: 'apps',  icon: 'mdi:widgets-outline', href: here === 'apps'  ? './' : `${base}apps/` },
+    { id: 'cli',   label: 'cli',   icon: 'mdi:console',         href: here === 'cli'   ? './' : `${base}cli/`   },
+    { id: 'tools', label: 'tools', icon: 'mdi:apps',            href: here === 'tools' ? './' : `${base}tools/` },    
+    { id: 'apps',  label: 'apps',  icon: 'mdi:widgets-outline', href: here === 'apps'  ? './' : `${base}apps/`  },
   ];
 
   return html`
