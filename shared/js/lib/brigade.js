@@ -48,11 +48,11 @@ const defaultSize = () => {
 export function createBrigade (url, { size = defaultSize(), type = 'module', spawn } = {}) {
   const make    = spawn || (() => new Worker(url, { type }));
   const count   = Math.max(1, size | 0);
-  const idle    = [];        // workers ready for a job
-  const waiting = [];        // queued jobs with no free worker: { payload, transfer, resolve, reject }
-  const jobs    = new Map(); // id -> { resolve, reject, worker }
-  const drains  = [];        // resolvers waiting for the pool to go quiet
-  let workers   = null;      // spawned lazily on first run
+  const idle    = [];      // workers ready for a job
+  const waiting = [];      // queued jobs with no free worker: { payload, transfer, resolve, reject }
+  const jobs    = new Map; // id -> { resolve, reject, worker }
+  const drains  = [];      // resolvers waiting for the pool to go quiet
+  let workers   = null;    // spawned lazily on first run
   let seq       = 0;
   let dead      = false;
 
@@ -75,10 +75,11 @@ export function createBrigade (url, { size = defaultSize(), type = 'module', spa
   };
 
   const assign = (w, job) => {
+    const { payload, reject, resolve } = job;
     const id = ++seq;
-    jobs.set(id, { resolve: job.resolve, reject: job.reject, worker: w });
-    try { w.postMessage({ id, payload: job.payload }, job.transfer || []); }
-    catch (err) { jobs.delete(id); job.reject(err); release(w); }
+    jobs.set(id, { reject, resolve, worker: w });
+    try       { w.postMessage({ id, payload }, job.transfer || []); }
+    catch (e) { jobs.delete(id); job.reject(e); release(w); }
   };
 
   const release = w => {
@@ -101,7 +102,7 @@ export function createBrigade (url, { size = defaultSize(), type = 'module', spa
     settleDrains();
   };
 
-  const quiet = () => waiting.length === 0 && jobs.size === 0;
+  const quiet        = () => waiting.length === 0 && jobs.size === 0;
   const settleDrains = () => { if (quiet()) { while (drains.length) drains.shift()(); } };
 
   return {
@@ -126,20 +127,15 @@ export function createBrigade (url, { size = defaultSize(), type = 'module', spa
       }));
     },
 
-    /** resolve once every queued and in-flight job has settled (resolved or rejected). */
-    drain () {
-      if (quiet()) return Promise.resolve();
-      return new Promise(res => drains.push(res));
-    },
-
-    size ()    { return count; },
-    active ()  { return jobs.size; },     // jobs on a worker right now
-    pending () { return waiting.length; }, // jobs queued for a free worker
+    drain   : () => quiet() ? Promise.resolve() : new Promise(drains.push), // resolve once every queued and in-flight job has settled (resolved or rejected)   
+    size    : () => count,
+    active  : () => jobs.size,      // jobs on a worker right now
+    pending : () => waiting.length, // jobs queued for a free worker
 
     /** stop every worker and reject anything still outstanding. */
     terminate () {
       dead = true;
-      for (const job of waiting) job.reject(new Error('brigade terminated'));
+      for (const job of waiting)  job.reject(new Error('brigade terminated'));
       for (const [, job] of jobs) job.reject(new Error('brigade terminated'));
       waiting.length = 0;
       jobs.clear();
