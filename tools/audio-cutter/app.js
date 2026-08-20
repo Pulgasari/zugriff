@@ -11,7 +11,9 @@ import { Dropzone, Icon } from './../../shared/js/components/index.js';
 import { WaveformWithHandles } from './../../shared/js/components/media.js';
 
 // ::: local
-import * as config from './app.config.js';
+import config from './../registry.js?id=audio-cutter';
+
+// Still returns
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let audioFile = signal(null);
