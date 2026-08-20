@@ -46,12 +46,8 @@ export const icons = {
   'workspaces'        : 'grommet-icons:projects',
 };
 
-export const FALLBACK = 'material-symbols:help';
-
-/** short name -> iconify id; anything with a ':' is already an iconify id */
-export const resolveIcon = name =>
-  !name                ? FALLBACK
-  : name.includes(':') ? name
-  :                      icons[name] ?? FALLBACK;
+export const 
+FALLBACK    = 'material-symbols:help',
+resolveIcon = name => !name ? FALLBACK : name.includes(':') ? name : icons[name] ?? FALLBACK;     
 
 export default icons;
