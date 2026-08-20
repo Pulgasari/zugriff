@@ -240,4 +240,9 @@ export const { registry, categories } = createRegistry ({
   ],
 });
 
-export default registry;
+//export default registry;
+
+const url  = new URL(import.meta.url);
+const slug = url.searchParams.get('slug');
+
+export default slug ? registry.get(slug) : registry;
