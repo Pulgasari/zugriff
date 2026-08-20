@@ -10,7 +10,7 @@ import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
 //import * as config from './app.config.js';
-import { registry } from './../registry.js;
+import { registry } from './../registry.js';
 const config = registry.get('image-batch-processor');
 
 // ── state ────────────────────────────────────────────────────────────
