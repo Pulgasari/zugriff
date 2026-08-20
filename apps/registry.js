@@ -61,6 +61,15 @@ export const { registry, categories } = createRegistry ({
       description : 'Point it at your book folders and read your EPUB and PDF library — covers, search and remembered reading position.',
       categories  : ['docs', 'media'],
     },
+    {
+      slug        : 'videoplayer',
+      name        : 'Video Player',
+      short_name  : 'Video',
+      icon        : 'mdi:play-circle-outline',
+      description : 'Open a video off your device and play it — frame-stepping, loop, crop, mirror, rotate and reverse, tuned for the phone.',
+      categories  : ['media'],
+      orientation : 'any',
+    },
   ],
 });
 
