@@ -13,34 +13,19 @@ import Toggle from './Toggle.js';
 // a handful of options reads best side by side, a long list wants a dropdown.
 // a schema entry can always say `look` for itself.
 const LOOK_THRESHOLD = 4;
-
-const lookFor = entry => entry.look ?? (entry.values.length > LOOK_THRESHOLD ? 'combobox' : 'segments');
-
-/** one panel per document, so the header button can toggle it from anywhere */
-export const settingsOpen = signal(false);
-
-export const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
+const lookFor        = entry => entry.look ?? (entry.values.length > LOOK_THRESHOLD ? 'combobox' : 'segments');
+const settingsOpen   = signal(false);
+const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 
 function Field ({ group, name }) {
   const entry = group.schema[name];
   const value = group.signals[name].value;
   const set   = next => group.set(name, next);
-
-  const control =
-      entry.type === 'boolean' ? html`<${Toggle} value=${value} onChange=${set} />`
-
-    : entry.type === 'enum' ? html`
-        <div class="setting-options">
-          <${Picker} look=${lookFor(entry)} options=${entry.values} value=${value} onChange=${set} />
-        </div>`
-
-    : entry.type === 'color' ? html`
-        <div class="setting-options">
-          <input type="color" value=${value} onInput=${event => set(event.target.value)} />
-          <code class="setting-value">${value}</code>
-        </div>`
-
-    : html`<code class="setting-value">${String(value)}</code>`;
+  
+  const control = entry.type === 'boolean' ? html`<${Toggle} value=${value} onChange=${set} />`
+                : entry.type === 'enum'    ? html`<${Picker} look=${lookFor(entry)} options=${entry.values} value=${value} onChange=${set} />`     
+                : entry.type === 'color'   ? html`<div class="setting-options"><input type="color" value=${value} onInput=${event => set(event.target.value)} /><code class="setting-value">${value}</code></div>`     
+                : html`<code class="setting-value">${String(value)}</code>`;
 
   return html`
     <div class=${'setting setting-' + entry.type}>
@@ -48,6 +33,7 @@ function Field ({ group, name }) {
       ${control}
     </div>`;
 }
+
 
 function Group ({ group }) {
   const { title, settings } = group;
@@ -82,4 +68,9 @@ export function SettingsButton () {
       aria-expanded=${settingsOpen.value}>
       <${Icon} name="settings" />
     </button>`;
+}
+
+export {
+  settingsOpen,
+  toggleSettings,
 }
