@@ -4,11 +4,10 @@
 import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=downloader';
 import { Icon } from './../../shared/js/components/index.js';
 
 // ::: local
-import * as config from './app.config.js';
 
 let url     = signal('');
 let status  = signal('idle'); // idle | loading | done | error

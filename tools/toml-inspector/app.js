@@ -1,9 +1,8 @@
 // tools/toml-inspector/app.js
 
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=toml-inspector';
 import { DataInspectorApp } from './../../shared/js/patterns/index.js';
 import { parse } from 'smol-toml';
-import * as config from './app.config.js';
 
 const App = DataInspectorApp({
   appID       : 'toml-inspector',

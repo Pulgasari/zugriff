@@ -4,12 +4,27 @@
 // set up the document, boot the runtime, register the service worker and mount
 // the app.
 //
-//   import { boot } from './../../shared/js/app.js';
-//   import * as config from './app.config.js';
+// a page pulls its own registry entry in through the module url — each distinct
+// ?slug=… is its own module instance, so `config` below is this page's entry:
+//
+//   import { boot, config } from './../../shared/js/app.js?slug=ebooks';
 //   boot({ config, App });
+//
+// `config` is the resolved registry entry (name, icon, theme, aufbau options …).
+// whether the tools Shell wraps the app is decided from the entry's `type`
+// ('tool' gets the shell, 'app' draws its own chrome) unless boot is given an
+// explicit `shell`.
 
 import aufbau, { html, render } from '@aufbau/kits/preact-htm';
 import Shell from './components/Shell.js';
+import { registry } from './registry.js';
+
+// ── this page's config, from ?slug=… on our own module url ───────────────────
+
+const slug = new URL(import.meta.url).searchParams.get('slug');
+
+/** the resolved registry entry for the page that imported this module, or {} */
+export const config = (slug && registry.get(slug)) || {};
 
 // ── url overrides ──────────────────────────────────────────────────────────
 // every ?--custom-prop=value in the query string is written onto :root, which
@@ -51,17 +66,18 @@ export function registerServiceWorker (url = './sw.js') {
 // ── boot ───────────────────────────────────────────────────────────────────
 
 export async function boot ({
-  config = {},
+  config: cfg = config,   // defaults to this page's ?slug= entry
   App,
   mount = '#app',
   serviceWorker = true,
-  shell = true,
+  shell,                  // undefined → decide from the entry's type
 } = {}) {
-  //const { app = {}, aufbau: aufbauConfig = {} } = config;
-  //const { app = {} } = config;
-  const app = config;
-  const aufbauConfig = app.aufbau;
-  
+  const app = cfg ?? {};
+  const aufbauConfig = app.aufbau ?? {};
+
+  // tools live inside the shared Shell; apps draw their own chrome. an explicit
+  // `shell` still wins (the launchers pass shell:false for their overview page).
+  const useShell = shell ?? (app.type !== 'app');
 
   if (app.name)  document.title = app.title ?? app.name;
   if (app.theme) document.documentElement.dataset.theme = app.theme;
@@ -78,7 +94,7 @@ export async function boot ({
 
   if (App) {
     render(
-      shell ? html`<${Shell} app=${app}><${App} /><//>` : html`<${App} />`,
+      useShell ? html`<${Shell} app=${app}><${App} /><//>` : html`<${App} />`,
       target
     );
   }

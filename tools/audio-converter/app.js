@@ -5,13 +5,9 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 import { fetchFile } from '@ffmpeg/util';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=audio-converter';
 import { loadFFmpeg } from './../../shared/js/lib/ffmpeg.js';
 import { Dropzone, Icon, Picker } from './../../shared/js/components/index.js';
-
-// ::: local
-import registry from './../registry.js';
-const config = registry.get('audio-converter');
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let files     = signal([]);

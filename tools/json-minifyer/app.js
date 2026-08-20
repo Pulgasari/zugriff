@@ -1,8 +1,7 @@
 // tools/json-minifyer/app.js
 
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=json-minifyer';
 import { CodeTransformerApp } from './../../shared/js/patterns/index.js';
-import * as config from './app.config.js';
 
 const App = CodeTransformerApp({
   appID       : 'json-minifyer',

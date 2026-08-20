@@ -2,22 +2,22 @@
 //
 // the sibling of the root launcher (app.js), but for /apps instead of /tools.
 // apps and tools are kept in separate overviews on purpose; the nav switches
-// between them. this renders apps/registry.js exactly the way the launcher
-// renders tools/registry.js.
+// between them. this renders shared/js/registry.js (type: 'app') the same way
+// the tools launcher renders the tools.
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 import { boot } from './../shared/js/app.js';
-import { registry, categories } from './registry.js';
+import { registry } from './../shared/js/registry.js';
 import Icon from './../shared/js/components/Icon.js';
 import Nav  from './../shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
 import { launcher, themeGroup } from './../shared/js/lib/settings.js';
 
-const config = {
-  app    : { slug: 'apps', name: 'zugriff apps', theme: 'dracula', lang: 'en' },
-  aufbau : { elements: { mode: 'auto' } },
-};
+// the overview page is not a registry entry, so it carries its own flat config
+const config = { slug: 'apps', name: 'zugriff apps', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };
+
+const categories = registry.categories('app');
 
 const groups = [
   { title: 'launcher', settings: launcher },
@@ -31,7 +31,7 @@ const visible = computed(() => {
   const q = query.value.trim().toLowerCase();
   const c = category.value;
 
-  return registry.getAll().filter(app =>
+  return registry.getAll('app').filter(app =>
     (!c || app.categories?.includes(c)) &&
     (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
   );

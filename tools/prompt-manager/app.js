@@ -5,11 +5,10 @@ import { computed, effect, html, signal, useEffect, useRef, useState } from '@au
 import { BunkerDB } from '@bunker/db';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=prompt-manager';
 import { Icon, Picker } from './../../shared/js/components/index.js';
 
 // ::: local
-import * as config from './app.config.js';
 
 // ── db ────────────────────────────────────────────────────────────────────────
 let db = new BunkerDB ('promptmanagerx');

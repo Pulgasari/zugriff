@@ -4,12 +4,11 @@
 import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=password-generator';
 import { Icon, Picker, Slider, Toggle } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
-import * as config from './app.config.js';
 
 // ── charsets ──────────────────────────────────────────────────────────────────
 let CHARS = {

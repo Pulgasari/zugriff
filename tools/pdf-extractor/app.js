@@ -6,11 +6,10 @@ import { PDFDocument } from 'pdf-lib';
 import * as PDFJS from 'pdfjs';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=pdf-extractor';
 import { Dropzone, Icon, Picker, Slider } from './../../shared/js/components/index.js';
 
 // ::: local
-import * as config from './app.config.js';
 
 // the worker url comes out of the importmap instead of being pinned here
 PDFJS.GlobalWorkerOptions.workerSrc = import.meta.resolve('pdfjs-worker');

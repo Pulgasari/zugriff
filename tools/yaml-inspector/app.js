@@ -1,9 +1,8 @@
 // tools/yaml-inspector/app.js
 
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=yaml-inspector';
 import { DataInspectorApp } from './../../shared/js/patterns/index.js';
 import { parse, stringify } from 'yaml';
-import * as config from './app.config.js';
 
 const App = DataInspectorApp({
   appID       : 'yaml-inspector',

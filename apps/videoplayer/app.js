@@ -25,11 +25,10 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=videoplayer';
 import { Icon } from './../../shared/js/components/index.js';
 
 // ::: local
-import * as config from './app.config.js';
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 // plain signals — this app has no persistence, so state lives only for the
@@ -196,7 +195,7 @@ const videoTransform = computed(() => {
 function TopBar () {
   return html`
     <header class="topbar">
-      <span class="title">${title.value || config.app.name}</span>
+      <span class="title">${title.value || config.name}</span>
       <button class="icon-btn" title="Settings" onClick=${() => settingsOpen.value = true}>
         <${Icon} name="mdi:cog-outline" size="22" />
       </button>
@@ -358,4 +357,4 @@ function App () {
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
 // the app draws its own chrome, so it skips the tools Shell
-boot({ config, App, shell: false });
+boot({ config, App });

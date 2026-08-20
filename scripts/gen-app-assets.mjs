@@ -1,7 +1,7 @@
 // scripts/gen-app-assets.mjs
 //
-// one source of truth → every derived icon + manifest. for each app in
-// apps/registry.js this reads apps/<slug>/app.svg and writes:
+// one source of truth → every derived icon + manifest. for each `type: 'app'`
+// entry in shared/js/registry.js this reads apps/<slug>/app.svg and writes:
 //
 //   apps/<slug>/assets/icon.svg      a copy of app.svg (self-contained assets/)
 //   apps/<slug>/assets/icon-192.png  rasterised install icon
@@ -108,8 +108,8 @@ async function processApp (app) {
 
 // ── main ─────────────────────────────────────────────────────────────────────
 
-const { registry } = await import(new URL('../apps/registry.js', import.meta.url));
-let apps = registry.getAll();
+const { registry } = await import(new URL('../shared/js/registry.js', import.meta.url));
+let apps = registry.getAll('app');
 if (only.length) apps = apps.filter(a => only.includes(a.slug));
 if (!apps.length) { console.error(`[gen-app-assets] no apps matched ${only.join(', ')}`); process.exit(1); }
 
