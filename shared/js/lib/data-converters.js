@@ -98,3 +98,42 @@ export function convert(src, fromFmt, toFmt) {
   let data = PARSERS[fromFmt](src);
   return STRINGIFIERS[toFmt](data);
 }
+
+
+
+
+// work in progress utilization
+
+const CSV = {};
+
+CSV.parse = function (input) {
+  let lines    = input.trim().split('\n');
+  let headers  = CSV.splitLine(lines[0]);
+  let sliced   = lines.slice(1);
+  let filtered = sliced.filter(line => line.trim());
+  let mapped   = filtered.map(line => {
+    let vals     = CSV.splitLine(line);
+    let headers2 = headers.map((header, index) => [header.trim(), coerce(vals[index]?.trim() ?? '')]);    
+    return Object.fromEntries(headers2);
+  });
+  return mapped;
+}
+
+export function csvParse(src) {
+  let lines   = src.trim().split('\n');
+  let headers = splitCSVLine(lines[0]);
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    let vals = splitCSVLine(line);
+    return Object.fromEntries(headers.map((h, i) => [h.trim(), coerce(vals[i]?.trim() ?? '')]));
+  });
+}
+
+function splitCSVLine(line) {
+  let result = [], re = /("([^"]*)"|([^,]*))(,|$)/g;
+  let m;
+  while ((m = re.exec(line)) !== null) {
+    result.push(m[2] ?? m[3] ?? '');
+    if (m[4] === '') break;
+  }
+  return result;
+}
