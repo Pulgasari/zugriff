@@ -39,10 +39,10 @@ function Group ({ group }) {
   const { title, settings } = group;
 
   return html`
-    <section class="settings-group">
-      <header class="settings-group-head">
+    <section>
+      <header>
         <code class="settings-title">${title}</code>
-        <button class="ghost-btn" onClick=${() => settings.reset()} title="back to defaults">
+        <button class="ghost-btn" onClick=${settings.reset} title="back to defaults">
           <${Icon} name="mdi:restore" /> reset
         </button>
       </header>
@@ -50,7 +50,7 @@ function Group ({ group }) {
     </section>`;
 }
 
-export default function Settings ({ groups = [] }) {
+function Settings ({ groups = [] }) {
   if (!settingsOpen.value) return null;
 
   return html`
@@ -59,7 +59,7 @@ export default function Settings ({ groups = [] }) {
     </div>`;
 }
 
-export function SettingsButton () {
+function SettingsButton () {
   return html`
     <button
       class=${'ghost-btn' + (settingsOpen.value ? ' active' : '')}
@@ -73,4 +73,9 @@ export function SettingsButton () {
 export {
   settingsOpen,
   toggleSettings,
+  // components
+  Settings,
+  SettingsButton,
 }
+
+export default Settings;
