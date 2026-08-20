@@ -2,7 +2,7 @@
 
 import { boot } from './../../shared/js/app.js';
 import { CodeTransformerApp } from './../../shared/js/patterns/index.js';
-import * as config from './app.config.js';
+import config from './../registry.js?id=base64-decoder';
 
 const App = CodeTransformerApp({
   appID       : 'base64-decoder',
