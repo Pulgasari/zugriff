@@ -11,6 +11,7 @@ export const { registry, categories } = createRegistry ({
     display     : 'standalone',
     orientation : 'portrait',
     viewport    : 'width=device-width, initial-scale=1, viewport-fit=cover',
+    aufbau      : { elements : { mode: 'auto' } },
   },
 
   apps: [
