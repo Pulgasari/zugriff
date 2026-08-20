@@ -11,7 +11,7 @@ import { Dropzone, Button, GhostButton, Icon, Picker } from './../../shared/js/c
 import { WaveformWithHandles } from './../../shared/js/components/media.js';
 
 // ::: local
-import * as config from './app.config.js';
+import config from './../registry.js?id=audio-snippets-generator';
 
 // ── ffmpeg ────────────────────────────────────────────────────────────────────
 let ffReady   = signal(false);
