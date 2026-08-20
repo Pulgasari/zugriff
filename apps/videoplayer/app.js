@@ -103,7 +103,7 @@ function drive () {
   if (!v) return;
   cancelAnimationFrame(rafId); rafId = 0;
   if (reversed.value) { v.pause(); lastTs = 0; rafId = requestAnimationFrame(reverseTick); }
-  else { v.play().catch(() => {}); }
+  else { v.play().catch(err => console.warn('[videoplayer] play() rejected:', err)); }
 }
 
 function play () {
@@ -162,13 +162,22 @@ const rotate     = () => rotation.value = (rotation.value + 90) % 360;
 // again.
 function loadFile (file) {
   if (!file) return;
-  if (src.value) URL.revokeObjectURL(src.value);   // free the previous clip
-  src.value      = URL.createObjectURL(file);
+  const v = videoRef.current;
+  pause();                                          // stop any playback / rAF loop
+  if (src.value) URL.revokeObjectURL(src.value);    // free the previous clip
+  const url = URL.createObjectURL(file);
+  src.value      = url;
   title.value    = file.name;
   duration.value = 0;
   current.value  = 0;
   reversed.value = false;
   playing.value  = false;
+
+  // drive the media element imperatively — the same pattern podcasts uses for
+  // its <audio>. binding a media element's src reactively (and rendering an
+  // empty src="" while no file is loaded) pushes it into an error state it does
+  // not always recover from; setting src here and calling load() is reliable.
+  if (v) { v.src = url; v.load(); }
 }
 
 // :::::: TRANSFORM STYLE :::::::::::::::::::::::::::::::::::
@@ -299,13 +308,16 @@ function Stage () {
     const onMeta = () => { duration.value = v.duration || 0; };
     const onTime = () => { if (!reversed.value) current.value = v.currentTime; };
     const onEnd  = () => { if (!loop.value) playing.value = false; };
+    const onErr  = () => { console.warn('[videoplayer] media error:', v.error); playing.value = false; };
     v.addEventListener('loadedmetadata', onMeta);
     v.addEventListener('timeupdate', onTime);
     v.addEventListener('ended', onEnd);
+    v.addEventListener('error', onErr);
     return () => {
       v.removeEventListener('loadedmetadata', onMeta);
       v.removeEventListener('timeupdate', onTime);
       v.removeEventListener('ended', onEnd);
+      v.removeEventListener('error', onErr);
     };
   }, []);
 
@@ -316,7 +328,6 @@ function Stage () {
         <video
           ref=${setVideoEl}
           class="video"
-          src=${src.value || ''}
           playsinline
           loop=${loop.value}
           style=${`--fit:${fit.value}; transform:${videoTransform.value}`}></video>
