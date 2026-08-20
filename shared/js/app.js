@@ -57,7 +57,11 @@ export async function boot ({
   serviceWorker = true,
   shell = true,
 } = {}) {
-  const { app = {}, aufbau: aufbauConfig = {} } = config;
+  //const { app = {}, aufbau: aufbauConfig = {} } = config;
+  //const { app = {} } = config;
+  const app = config;
+  const aufbauConfig = app.aufbau;
+  
 
   if (app.name)  document.title = app.title ?? app.name;
   if (app.theme) document.documentElement.dataset.theme = app.theme;
