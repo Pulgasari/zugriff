@@ -15,14 +15,13 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot }   from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=ebooks';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
 import * as pwa   from './../../shared/js/lib/pwa.js';
 
 // ::: local
-import * as config from './app.config.js';
 import * as db     from './db.js';
 import { createPdfReader, createEpubReader } from './reader.js';
 
@@ -461,4 +460,4 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
-boot({ config, App, shell: false });
+boot({ config, App });

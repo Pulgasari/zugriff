@@ -18,13 +18,12 @@ import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 const { computed, signal, useEffect, useRef, useSignal } = preact;
 
 // ::: shared
-import { boot }             from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=podcasts';
 import { Icon }             from './../../shared/js/components/index.js';
 import { stored }           from './../../shared/js/lib/signals.js';
 import { createThumbCache } from './../../shared/js/lib/thumbs.js';
 
 // ::: local
-import * as config from './app.config.js';
 import * as db     from './db.js';
 import * as player from './player.js';
 import { DEFAULT_PROXY } from './feed.js';
@@ -805,4 +804,4 @@ function App () {
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
 // the app draws its own chrome, so it skips the tools Shell
-boot({ config, App, shell: false });
+boot({ config, App });

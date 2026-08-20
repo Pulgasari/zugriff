@@ -1,9 +1,8 @@
 // tools/js-minifyer/app.js
 
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=js-minifyer';
 import { CodeTransformerApp } from './../../shared/js/patterns/index.js';
 import { minify } from 'terser';
-import * as config from './app.config.js';
 
 const App = CodeTransformerApp({
   appID       : 'js-minifyer',

@@ -11,12 +11,11 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot }   from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=image-editor';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
-import * as config from './app.config.js';
 import * as edit   from './edit.js';
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
@@ -594,4 +593,4 @@ function App () {
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
 // the app draws its own chrome, so it skips the tools Shell
-boot({ config, App, shell: false });
+boot({ config, App });

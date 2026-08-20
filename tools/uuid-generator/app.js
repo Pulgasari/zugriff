@@ -4,12 +4,11 @@
 import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot } from './../../shared/js/app.js';
+import { boot, config } from './../../shared/js/app.js?slug=uuid-generator';
 import { CopyIcon, Icon, Picker, Slider } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
-import * as config from './app.config.js';
 
 let count   = stored(5,    'uuidgen:count');
 let version = stored('v4', 'uuidgen:version');

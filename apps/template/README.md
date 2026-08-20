@@ -5,8 +5,8 @@ is a small single-purpose page rendered inside the shared tools shell, an app is
 meant to feel like a real application — it draws its own chrome and brings its
 own css. copy this folder, rename it to your slug, then:
 
-1. add an entry for the slug to `apps/registry.js`
-2. in `app.config.js` swap the literal for `appMeta('<slug>')`
+1. add an entry for the slug to `shared/js/registry.js` with `type: 'app'`
+2. change the slug in `app.js`'s `app.js?slug=…` import to yours
 3. drop an `app.svg` in
 4. write the app in `app.js`
 
@@ -24,7 +24,7 @@ entry; it overrides just those keys.
 | | tools | apps |
 |---|---|---|
 | css | `shared/css/index.css` (reset + theme + typo + layout + components) | `apps/base.css` (reset + theme tokens + `#app` frame) **only** — the rest is the app's own `app.css` |
-| chrome | the shared `Shell` header + settings panel | the app draws everything itself; `boot({ shell: false })` |
+| chrome | the shared `Shell` header + settings panel | the app draws everything itself — boot skips the Shell for `type: 'app'` |
 | feel | a form on a page | a real app |
 
 what apps still share with everything else: the theme tokens (so a theme picked
@@ -36,8 +36,7 @@ worker.
 | file            | what it is |
 |-----------------|------------|
 | `index.html`    | the static shell — links `../base.css`, the app css and the importmap |
-| `app.js`        | the app itself, mounted through `boot({ shell: false })` |
-| `app.config.js` | registry entry + aufbau runtime options |
+| `app.js`        | the app itself; imports its entry via `app.js?slug=…` and mounts through `boot()` |
 | `app.css`       | the app's own look — starts from nothing |
 | `manifest.json` | pwa manifest — **generated** from the registry, don't hand-edit |
 | `sw.js`         | one-liner, pulls in `shared/js/sw-core.js` |
