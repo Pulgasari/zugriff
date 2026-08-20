@@ -30,10 +30,10 @@ button.secondary,
 }
 
 button:disabled,
-.btn:disabled { opacity: 0.25; cursor: not-allowed; }
+  .btn:disabled { opacity: 0.25; cursor: not-allowed; }
 
 button:hover:not(:disabled),
-.btn:hover:not(:disabled) { opacity: 1; }
+  .btn:hover:not(:disabled) { opacity: 1; }
 
 .ghost-btn {
   display       : flex;
@@ -388,23 +388,24 @@ button:hover:not(:disabled),
   padding        : 1rem;
   background     : color-mix(in oklch, var(--bg) 92%, black);
   border-bottom  : 1px solid var(--fg-25);
-}
 
-.settings-group {
-  display        : flex;
-  flex-direction : column;
-  gap            : 0.5rem;
-  margin         : 0 auto;
-  width          : 100%;
-  max-width      : 640px;
-}
+  section {
+    display        : flex;
+    flex-direction : column;
+    gap            : 0.5rem;
+    margin         : 0 auto;
+    width          : 100%;
+    max-width      : 640px;
+  }
 
-.settings-group-head {
-  display         : flex;
-  align-items     : center;
-  justify-content : space-between;
-  border-bottom   : 1px solid var(--fg-25);
-  padding-bottom  : 0.25rem;
+  section header {
+    display         : flex;
+    align-items     : center;
+    justify-content : space-between;
+    border-bottom   : 1px solid var(--fg-25);
+    padding-bottom  : 0.25rem;
+  }
+
 }
 
 .settings-title {
