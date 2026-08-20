@@ -119,21 +119,13 @@ CSV.parse = function (input) {
   return mapped;
 }
 
-export function csvParse(src) {
-  let lines   = src.trim().split('\n');
-  let headers = splitCSVLine(lines[0]);
-  return lines.slice(1).filter(l => l.trim()).map(line => {
-    let vals = splitCSVLine(line);
-    return Object.fromEntries(headers.map((h, i) => [h.trim(), coerce(vals[i]?.trim() ?? '')]));
-  });
-}
-
-function splitCSVLine(line) {
-  let result = [], re = /("([^"]*)"|([^,]*))(,|$)/g;
-  let m;
-  while ((m = re.exec(line)) !== null) {
-    result.push(m[2] ?? m[3] ?? '');
-    if (m[4] === '') break;
+CSV.splitLine = function (line) {
+  let result = [];
+  let regexp = /("([^"]*)"|([^,]*))(,|$)/g;
+  let match;
+  while ((match = regexp.exec(line)) !== null) {
+    result.push(match[2] ?? match[3] ?? '');
+    if (match[4] === '') break;
   }
   return result;
 }
