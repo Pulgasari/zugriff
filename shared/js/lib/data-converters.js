@@ -43,8 +43,7 @@ export function csvStringify(data) {
 }
 
 // ── JS Object ─────────────────────────────────────────────────────────────────
-export let jsStringify = data =>
-  'let data = ' + JSON.stringify(data, null, 2).replace(/"([^"]+)":/g, '$1:');
+export let jsStringify = data => 'let data = ' + JSON.stringify(data, null, 2).replace(/"([^"]+)":/g, '$1:');
 
 // ── re-exports ────────────────────────────────────────────────────────────────
 export { yamlStringify, yamlParse, tomlParse };
@@ -129,3 +128,19 @@ CSV.splitLine = function (line) {
   }
   return result;
 }
+
+CSV.stringify = function (data) {
+  let arr  = Array.isArray(data) ? data : [data]; if (!arr.length) return '';
+  let keys = Object.keys(arr[0]);
+  let esc  = value => {
+    let string = value === null ? '' : String(value);
+    return string.includes(',') || string.includes('"') || string.includes('\n') ? `"${string.replace(/"/g,'""')}"` : string;    
+  };
+  return [keys.join(','), ...arr.map(row => keys.map(k => esc(row[k])).join(','))].join('\n');
+}
+
+
+
+
+
+
