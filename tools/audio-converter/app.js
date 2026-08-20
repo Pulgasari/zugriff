@@ -10,7 +10,8 @@ import { loadFFmpeg } from './../../shared/js/lib/ffmpeg.js';
 import { Dropzone, Icon, Picker } from './../../shared/js/components/index.js';
 
 // ::: local
-import * as config from './app.config.js';
+import registry from './../registry.js';
+const config = registry.get('audio-converter');
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let files     = signal([]);
