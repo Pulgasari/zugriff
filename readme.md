@@ -14,6 +14,7 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 - [image editor](https://pulgasari.github.io/zugriff/apps/image-editor/)
 - [notes](https://pulgasari.github.io/zugriff/apps/notes/)
 - [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
+- [videoplayer](https://pulgasari.github.io/zugriff/apps/videoplayer/)
 
 ---
 
