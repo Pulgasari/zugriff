@@ -192,36 +192,37 @@ three types so far — `boolean`, `enum`, `color`.
 onto `:root` and the whole thing repaints.
 - editing a colour by hand switches the preset to `custom`.
 
-## techstack
+---
 
-### @aufbau
+# techstack
+
+## @aufbau
 
 the core we use gonna be `@aufbau/kits/preact-htm` containing all the
 aufbau-packages under one hood, combined with htm and preact (and some
 preact-extensions).
 
-- `@aufbau/elements` — the shared components are thin preact wrappers around
-  `<aufbau-icon>`, `<aufbau-picker>`, `<aufbau-slider>`, `<aufbau-toggle>` and
-  `<aufbau-upload>`, so the look comes from aufbau and the api stays preact
+- `@aufbau/elements` — the shared components are thin preact wrappers around the aufbau-elements, so the look comes from aufbau and the api stays preact
+- `@aufbau/filters`
 - `@aufbau/import`
 
-### @bunker
+## @bunker
 
 for caching and storage stuff we gonna use [@bunker](https://github.com/pulgasari/bunker/).
-`stored()` in `shared/js/lib/signals.js` is the persisted-signal helper every
-app uses for its settings.
 
-### @domina
+`stored()` in `shared/js/lib/signals.js` is the persisted-signal helper every app uses for its settings.
+
+## @domina
 
 for dom manipulation stuff we gonna use [@domina](https://github.com/pulgasari/domina/).
 
-### utils
+## utils
 
 - `@pulgasari/is`
 - `@pulgasari/str`
 - `@pulgasari/timing`
 
-### vendors
+## vendors
 
 everything else comes off a cdn through the import map in
 `shared/js/importmap.js` — yaml, smol-toml, csso, terser,
