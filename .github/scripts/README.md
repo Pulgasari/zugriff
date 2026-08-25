@@ -61,9 +61,10 @@ Für echte Builds:
   `base64`-kodiert + Passwörter als **Repo-Secrets** hinterlegen,
 - im Workflow den „throwaway keystore"-Schritt durch einen Decode-Schritt +
   `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD` aus Secrets ersetzen,
-- die Signing-**SHA-256** je App unter
-  `apps/<slug>/.well-known/assetlinks.json` auf der Site veröffentlichen (entfernt
-  die Browser-URL-Leiste in der App).
+- die Signing-**SHA-256** jeder App in die **eine** Root-Datei
+  `/.well-known/assetlinks.json` eintragen (liegt im Repo-Root; enthält schon die
+  manuell gebauten `dev.zugriff.ebooks` + `dev.zugriff.notes`) — das entfernt die
+  Browser-URL-Leiste in der App. Die Package-IDs folgen `dev.zugriff.<slug>`.
 
 ## `img-proxy.php`
 

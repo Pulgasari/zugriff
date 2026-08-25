@@ -19,7 +19,9 @@
 //   KEYSTORE_PATH   path to the signing keystore (default ./android.keystore)
 //   KEY_ALIAS       key alias inside the keystore (default android)
 //   APP_ID_PREFIX   reverse-dns prefix for the packageId
-//                   (default dev.pulgasari.zugriff)
+//                   (default dev.zugriff — reverse-dns of zugriff.dev; the
+//                    packageId is `${APP_ID_PREFIX}.${slug}`, e.g. dev.zugriff.notes,
+//                    matching the /.well-known/assetlinks.json entries)
 
 import { TwaManifest } from '@bubblewrap/core';
 
@@ -31,7 +33,7 @@ const manifestUrl = process.env.MANIFEST_URL || `${base}/apps/${slug}/manifest.j
 const out         = process.argv[2] || 'twa-manifest.json';
 const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';
 const alias       = process.env.KEY_ALIAS || 'android';
-const idPrefix    = process.env.APP_ID_PREFIX || 'dev.pulgasari.zugriff';
+const idPrefix    = process.env.APP_ID_PREFIX || 'dev.zugriff';
 
 // a valid Android package segment: only [a-zA-Z0-9_], never leading with a digit
 const segment = slug.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');

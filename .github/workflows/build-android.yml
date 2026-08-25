@@ -18,8 +18,9 @@ name: Build Android packages
 # TODO(stable key): create one Android keystore per app (or one shared), store it
 #   base64 + its passwords as repo secrets, and swap the "generate keystore" step
 #   for a decode step + `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD`
-#   from secrets. Then publish each app's signing SHA-256 in
-#   apps/<slug>/.well-known/assetlinks.json on the site.
+#   from secrets. Then add each CI-signed app's SHA-256 to the site's single
+#   /.well-known/assetlinks.json (repo root — already holds the manually-built
+#   ebooks + notes apps).
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
