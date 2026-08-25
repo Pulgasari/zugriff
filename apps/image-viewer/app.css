@@ -1,0 +1,232 @@
+/* apps/image-viewer/app.css — the viewer's own chrome.
+
+   the reset, theme tokens and #app frame come from ./../base.css. this is a
+   top bar, a full-bleed stage and a thumbnail strip; the stage goes edge to
+   edge and the image sits on a darker ground so photos read cleanly. */
+
+.iv-app {
+  flex          : 1 1 auto;
+  display       : flex;
+  flex-direction: column;
+  min-height    : 0;
+  min-width     : 0;
+  background    : var(--bg);
+}
+
+/* ── top bar ─────────────────────────────────────────────────────────────── */
+
+.iv-top {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.75rem;
+  padding     : 0.4rem 0.6rem;
+  min-height  : 48px;
+  background  : var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.iv-title {
+  display    : flex;
+  align-items: center;
+  gap        : 0.5rem;
+  min-width  : 0;
+  color      : var(--fg-75);
+}
+.iv-title > :first-child { color: var(--accent); flex: none; }
+.iv-name {
+  font-weight  : 600;
+  color        : var(--fg);
+  overflow     : hidden;
+  text-overflow: ellipsis;
+  white-space  : nowrap;
+}
+.iv-count {
+  flex          : none;
+  font-size     : 0.75rem;
+  padding       : 0.1rem 0.45rem;
+  border-radius : 999px;
+  background    : var(--accent-25);
+  color         : var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.iv-meta {
+  flex      : none;
+  font-size : 0.74rem;
+  color     : var(--fg-50);
+  white-space: nowrap;
+}
+@media (max-width: 620px) { .iv-meta { display: none; } }
+
+.iv-actions {
+  margin-left: auto;
+  display    : flex;
+  align-items: center;
+  gap        : 0.15rem;
+  flex       : none;
+}
+
+.iv-btn {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 36px;
+  height         : 36px;
+  border         : 1px solid transparent;
+  border-radius  : var(--radius);
+  background     : transparent;
+  color          : var(--fg);
+  cursor         : pointer;
+}
+.iv-btn:hover:not(:disabled) { background: var(--hover); }
+.iv-btn.active   { background: var(--accent-25); color: var(--accent); }
+.iv-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── stage ───────────────────────────────────────────────────────────────── */
+
+.iv-stage {
+  position  : relative;
+  flex      : 1 1 auto;
+  min-height: 0;
+  display   : flex;
+  align-items: center;
+  justify-content: center;
+  overflow  : hidden;
+  background: color-mix(in oklch, var(--bg) 82%, #000);
+  touch-action: none;   /* we handle pan + pinch ourselves */
+  user-select: none;
+}
+.iv-stage.grab { cursor: grab; }
+.iv-stage.grab:active { cursor: grabbing; }
+
+.iv-image {
+  max-width : 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transform-origin: center center;
+  will-change: transform;
+  -webkit-user-drag: none;
+}
+
+/* on-screen prev / next */
+.iv-nav {
+  position       : absolute;
+  top            : 50%;
+  transform      : translateY(-50%);
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 48px;
+  height         : 64px;
+  border         : 0;
+  border-radius  : var(--radius);
+  background      : color-mix(in oklch, var(--bg) 55%, transparent);
+  color          : var(--fg);
+  cursor         : pointer;
+  opacity        : 0.55;
+  transition     : opacity 0.15s ease;
+}
+.iv-nav:hover { opacity: 1; background: color-mix(in oklch, var(--bg) 75%, transparent); }
+.iv-nav.prev { left: 0.5rem; }
+.iv-nav.next { right: 0.5rem; }
+
+/* ── thumbnail strip ─────────────────────────────────────────────────────── */
+
+.iv-strip {
+  flex       : none;
+  display    : flex;
+  gap        : 0.4rem;
+  padding    : 0.45rem 0.5rem;
+  overflow-x : auto;
+  background  : var(--panel);
+  border-top  : 1px solid var(--line);
+}
+.iv-thumb {
+  flex         : none;
+  width        : 64px;
+  height       : 48px;
+  padding      : 0;
+  border       : 2px solid transparent;
+  border-radius: var(--radius);
+  overflow     : hidden;
+  background   : var(--panel-2);
+  cursor       : pointer;
+}
+.iv-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iv-thumb.active { border-color: var(--accent); }
+
+/* ── immersive (chrome hidden) ───────────────────────────────────────────── */
+
+.iv-app.bare .iv-stage { background: #000; }
+
+/* ── welcome / empty ─────────────────────────────────────────────────────── */
+
+.iv-welcome {
+  max-width     : 30rem;
+  margin        : auto;
+  padding       : 2rem 1.5rem;
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  gap           : 0.9rem;
+  text-align    : center;
+  color         : var(--fg-75);
+}
+.iv-welcome > :first-child { color: var(--accent); }
+.iv-welcome h1 { font-size: 1.4rem; color: var(--fg); }
+.iv-welcome p  { line-height: 1.55; }
+
+.iv-cta {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 0.45rem;
+  padding        : 0.6rem 1.1rem;
+  border         : 1px solid var(--accent);
+  border-radius  : var(--radius);
+  background     : var(--accent);
+  color          : #1a1a1a;
+  font           : inherit;
+  font-weight    : 600;
+  cursor         : pointer;
+}
+.iv-cta.small { padding: 0.35rem 0.7rem; font-size: 0.8rem; margin-top: 0.4rem; }
+.iv-cta:hover { filter: brightness(1.05); }
+
+.iv-error {
+  display    : inline-flex;
+  align-items: center;
+  gap        : 0.35rem;
+  color      : var(--c-null, #e06c75);
+  font-size  : 0.85rem;
+}
+
+.iv-tip {
+  display      : flex;
+  gap          : 0.5rem;
+  align-items  : flex-start;
+  padding      : 0.6rem 0.75rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel);
+  font-size    : 0.8rem;
+  color        : var(--fg-75);
+  text-align   : left;
+}
+.iv-tip > :first-child { color: var(--accent); flex: none; margin-top: 0.1rem; }
+.iv-tip.install > div { display: flex; flex-direction: column; gap: 0.4rem; }
+.iv-tip-hint { opacity: 0.75; }
+
+.iv-links {
+  display  : flex;
+  gap      : 0.9rem;
+  margin-top: 0.5rem;
+  font-size: 0.78rem;
+  opacity  : 0.7;
+}
+.iv-links a {
+  display    : inline-flex;
+  align-items: center;
+  gap        : 0.25rem;
+  color      : inherit;
+  text-decoration: none;
+}
+.iv-links a:hover { color: var(--accent); }

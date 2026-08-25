@@ -53,6 +53,15 @@ function buildManifest (app) {
       { src: './assets/icon-192.png', sizes: '192x192', type: 'image/png',     purpose: 'any' },
       { src: './assets/icon-512.png', sizes: '512x512', type: 'image/png',     purpose: 'any' },
     ],
+    // opt-in manifest members that don't derive from the shared shape — an app
+    // declares them under `manifest:` in its registry entry (e.g. the
+    // image-viewer's file_handlers, so Android can "open with" it). only emitted
+    // when present, so nothing changes for apps that don't use them.
+    ...(m.file_handlers   ? { file_handlers   : m.file_handlers   } : {}),
+    ...(m.launch_handler  ? { launch_handler  : m.launch_handler  } : {}),
+    ...(m.display_override ? { display_override: m.display_override } : {}),
+    ...(m.protocol_handlers ? { protocol_handlers: m.protocol_handlers } : {}),
+    ...(m.shortcuts       ? { shortcuts       : m.shortcuts       } : {}),
   };
 }
 

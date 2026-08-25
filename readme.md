@@ -12,8 +12,10 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 - [file explorer](https://pulgasari.github.io/zugriff/apps/file-explorer/)
 - [gifmaker](https://pulgasari.github.io/zugriff/apps/gifmaker/)
 - [image editor](https://pulgasari.github.io/zugriff/apps/image-editor/)
+- [image viewer](https://pulgasari.github.io/zugriff/apps/image-viewer/)
 - [notes](https://pulgasari.github.io/zugriff/apps/notes/)
 - [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
+- [rss reader](https://pulgasari.github.io/zugriff/apps/rss-reader/)
 - [videoplayer](https://pulgasari.github.io/zugriff/apps/videoplayer/)
 
 ---
@@ -110,10 +112,15 @@ browse it as the root, built on the shared
 [`FileExplorer`](./shared/js/components/FileExplorer.js) component (which, over
 `dirfs.js`'s `opfsBackend`, also browses the private OPFS the cli uses);
 [apps/image-editor](./apps/image-editor/) — crop/rotate/flip/adjust images
-on a canvas; [apps/gifmaker](./apps/gifmaker/) — sequence images into an
-animation and export a GIF or a project zip;
+on a canvas; [apps/image-viewer](./apps/image-viewer/) — view images opened via
+the OS "open with" (File Handling API / `launchQueue`), a picker or drag-and-drop,
+with zoom/pan and multi-image nav; [apps/gifmaker](./apps/gifmaker/) — sequence
+images into an animation and export a GIF or a project zip;
 [apps/podcasts](./apps/podcasts/) — subscribe by RSS, play episodes and track
 progress, backed by `@bunker/db`;
+[apps/rss-reader](./apps/rss-reader/) — follow RSS/Atom feeds, skim the latest
+across all of them and click through to the original, with YouTube channels in
+their own section;
 [apps/notes](./apps/notes/) — grant a folder of Markdown files and read it as a
 foldered notebook, the directory tree becoming the outline; and
 [apps/ebooks](./apps/ebooks/) — grant your book folders and read the EPUB/PDF
