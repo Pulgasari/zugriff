@@ -60,8 +60,10 @@ const map = { imports: {
   "@poo/compiler" : `${pkg}/poo/js-packages/compiler/index.js`,
   "@poo/hljs"     : `${pkg}/poo/js-packages/hljs/index.js`,
 
+  "@pulgasari/array"  : `${pkg}/js/array.js`,
   "@pulgasari/is"     : `${pkg}/js/is.js`,
   "@pulgasari/logger" : `${pkg}/js/logger.js`,
+  "@pulgasari/obj"    : `${pkg}/js/obj.js`,
   "@pulgasari/random" : `${pkg}/js/random.js`,
   "@pulgasari/str"    : `${pkg}/js/str.js`,
   "@pulgasari/timing" : `${pkg}/js/timing.js`,
