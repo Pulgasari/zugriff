@@ -3,20 +3,20 @@
 client-side mini-PWAs. static files only — no build step, no bundler, no node
 or deno. ESM in the browser, served straight off GitHub Pages.
 
-- [zugriff/cli](https://pulgasari.github.io/zugriff/cli/)
-- [apps](https://pulgasari.github.io/zugriff/apps/)
-- [tools](https://pulgasari.github.io/zugriff/tools/)
+- [zugriff/cli](https://zugriff.dev/cli/)
+- [apps](https://zugriff.dev/apps/)
+- [tools](https://zugriff.dev/tools/)
 
 ## apps
-- [ebooks](https://pulgasari.github.io/zugriff/apps/ebooks/)
-- [file explorer](https://pulgasari.github.io/zugriff/apps/file-explorer/)
-- [gifmaker](https://pulgasari.github.io/zugriff/apps/gifmaker/)
-- [image editor](https://pulgasari.github.io/zugriff/apps/image-editor/)
-- [image viewer](https://pulgasari.github.io/zugriff/apps/image-viewer/)
-- [notes](https://pulgasari.github.io/zugriff/apps/notes/)
-- [podcasts](https://pulgasari.github.io/zugriff/apps/podcasts/)
-- [rss reader](https://pulgasari.github.io/zugriff/apps/rss-reader/)
-- [videoplayer](https://pulgasari.github.io/zugriff/apps/videoplayer/)
+- [ebooks](https://zugriff.dev/apps/ebooks/)
+- [file explorer](https://zugriff.dev/apps/file-explorer/)
+- [gifmaker](https://zugriff.dev/apps/gifmaker/)
+- [image editor](https://zugriff.dev/apps/image-editor/)
+- [image viewer](https://zugriff.dev/apps/image-viewer/)
+- [notes](https://zugriff.dev/apps/notes/)
+- [podcasts](https://zugriff.dev/apps/podcasts/)
+- [rss reader](https://zugriff.dev/apps/rss-reader/)
+- [videoplayer](https://zugriff.dev/apps/videoplayer/)
 
 ---
 
@@ -262,9 +262,9 @@ not allow those headers: the icons would load once and then start failing.
 
 the revalidation is handed to `event.waitUntil` via bunker's `keepAlive`, so a
 refresh started on the last request of a session is not lost when the worker is
-killed. the launcher's scope is `/zugriff/`, which sits above every app — it
-deliberately ignores anything under `tools/` and `apps/` so each app's own worker owns its
-files.
+killed. the launcher's scope is the site root `/` (on `zugriff.dev`), which sits
+above every app — it deliberately ignores anything under `tools/` and `apps/` so
+each app's own worker owns its files.
 
 the cache name comes from the registration scope, so nothing is generated per
 app. bump `VERSION` in `sw-core.js` to invalidate everything.

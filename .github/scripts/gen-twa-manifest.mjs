@@ -14,8 +14,7 @@
 //
 // env:
 //   APP_SLUG        (required)  the app's registry slug, e.g. "podcasts"
-//   SITE_BASE       base url the app is deployed at
-//                   (default https://code.pulgasari.dev/zugriff)
+//   SITE_BASE       base url the app is deployed at (default https://zugriff.dev)
 //   MANIFEST_URL    full manifest url (default `${SITE_BASE}/apps/${slug}/manifest.json`)
 //   KEYSTORE_PATH   path to the signing keystore (default ./android.keystore)
 //   KEY_ALIAS       key alias inside the keystore (default android)
@@ -27,7 +26,7 @@ import { TwaManifest } from '@bubblewrap/core';
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-twa-manifest: APP_SLUG is required'); process.exit(1); }
 
-const base        = (process.env.SITE_BASE || 'https://code.pulgasari.dev/zugriff').replace(/\/+$/, '');
+const base        = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
 const manifestUrl = process.env.MANIFEST_URL || `${base}/apps/${slug}/manifest.json`;
 const out         = process.argv[2] || 'twa-manifest.json';
 const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';

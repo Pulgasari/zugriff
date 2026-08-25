@@ -2,11 +2,11 @@
 //
 // the three places that are not a single app: the terminal, the tools list and
 // the apps list. `here` marks which one is showing. `base` is the path back up
-// to /zugriff/ — the tools list lives there, so it *is* the base.
+// to the site root — the tools list lives there, so it *is* the base.
 //
-//   <${Nav} here='cli'   base='./../' />   from /zugriff/cli/
-//   <${Nav} here='tools' base='./'    />   from /zugriff/
-//   <${Nav} here='apps'  base='./../' />   from /zugriff/apps/
+//   <${Nav} here='cli'   base='./../' />   from /cli/
+//   <${Nav} here='tools' base='./'    />   from /       (the root)
+//   <${Nav} here='apps'  base='./../' />   from /apps/
 
 import { html } from '@aufbau/kits/preact-htm';
 import Icon from './Icon.js';

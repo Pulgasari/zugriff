@@ -46,8 +46,8 @@ wenn Registry/Manifeste/Build-Skripte sich ändern.
 ### Origin
 
 Die TWA wird an die Origin des Manifest-URLs gebunden — aktuell
-`https://code.pulgasari.dev/zugriff` (im Workflow als `SITE_BASE`). Ändert sich
-der Deploy-Host, muss das dort angepasst werden.
+`https://zugriff.dev` (im Workflow als `SITE_BASE`). Ändert sich der Deploy-Host,
+muss das dort angepasst werden.
 
 ### ⚠️ TODO: stabiler Signing-Key
 

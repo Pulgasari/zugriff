@@ -65,7 +65,7 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
-      SITE_BASE: https://code.pulgasari.dev/zugriff   # the app's live origin (baked into the TWA)
+      SITE_BASE: https://zugriff.dev   # the app's live origin (baked into the TWA)
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
       KEY_ALIAS: android
       # TEST-ONLY passwords for the throwaway keystore — Bubblewrap reads these
