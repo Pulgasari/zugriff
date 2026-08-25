@@ -35,7 +35,7 @@ const CACHE_TTL = 60 * 60 * 24 * 30;      // 30 days
 // hosts allowed to embed this endpoint (Referer host). empty = allow any.
 // a missing Referer (stripped by referrer-policy) is always allowed, since
 // <img> requests often send none.
-const REFERER_ALLOW = ['code.pulgasari.dev', 'pulgasari.github.io', 'localhost', '127.0.0.1'];
+const REFERER_ALLOW = ['zugriff.dev', 'code.pulgasari.dev', 'pulgasari.github.io', 'localhost', '127.0.0.1'];
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 function fail(int $code, string $msg): void {

@@ -1,4 +1,4 @@
-// scripts/gen-twa-manifest.mjs
+// .github/scripts/gen-twa-manifest.mjs
 //
 // writes a Bubblewrap `twa-manifest.json` for one app, deterministically and
 // without any of Bubblewrap's interactive `init` prompts — which is what makes
@@ -10,29 +10,30 @@
 // then override only what CI must control — the Android packageId and the
 // signing key — and save.
 //
-//   APP_SLUG=podcasts node scripts/gen-twa-manifest.mjs build/podcasts/twa-manifest.json
+//   APP_SLUG=podcasts node .github/scripts/gen-twa-manifest.mjs build/podcasts/twa-manifest.json
 //
 // env:
 //   APP_SLUG        (required)  the app's registry slug, e.g. "podcasts"
-//   SITE_BASE       base url the app is deployed at
-//                   (default https://code.pulgasari.dev/zugriff)
+//   SITE_BASE       base url the app is deployed at (default https://zugriff.dev)
 //   MANIFEST_URL    full manifest url (default `${SITE_BASE}/apps/${slug}/manifest.json`)
 //   KEYSTORE_PATH   path to the signing keystore (default ./android.keystore)
 //   KEY_ALIAS       key alias inside the keystore (default android)
 //   APP_ID_PREFIX   reverse-dns prefix for the packageId
-//                   (default dev.pulgasari.zugriff)
+//                   (default dev.zugriff — reverse-dns of zugriff.dev; the
+//                    packageId is `${APP_ID_PREFIX}.${slug}`, e.g. dev.zugriff.notes,
+//                    matching the /.well-known/assetlinks.json entries)
 
 import { TwaManifest } from '@bubblewrap/core';
 
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-twa-manifest: APP_SLUG is required'); process.exit(1); }
 
-const base        = (process.env.SITE_BASE || 'https://code.pulgasari.dev/zugriff').replace(/\/+$/, '');
+const base        = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
 const manifestUrl = process.env.MANIFEST_URL || `${base}/apps/${slug}/manifest.json`;
 const out         = process.argv[2] || 'twa-manifest.json';
 const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';
 const alias       = process.env.KEY_ALIAS || 'android';
-const idPrefix    = process.env.APP_ID_PREFIX || 'dev.pulgasari.zugriff';
+const idPrefix    = process.env.APP_ID_PREFIX || 'dev.zugriff';
 
 // a valid Android package segment: only [a-zA-Z0-9_], never leading with a digit
 const segment = slug.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');

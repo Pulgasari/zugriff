@@ -4,7 +4,7 @@
 // entry declares its `type` ('app' | 'tool'); the shared defaults (including the
 // aufbau runtime config) are folded in once, with a couple of per-type defaults
 // on top. this is the single source of truth the launchers, shared/js/app.js
-// (which turns ?slug=… into a booted config) and scripts/gen-app-assets.mjs all
+// (which turns ?slug=… into a booted config) and .github/scripts/gen-app-assets.mjs all
 // read.
 //
 //   registry.get('ebooks')       -> the resolved entry, or null

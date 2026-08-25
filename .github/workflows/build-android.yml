@@ -18,8 +18,9 @@ name: Build Android packages
 # TODO(stable key): create one Android keystore per app (or one shared), store it
 #   base64 + its passwords as repo secrets, and swap the "generate keystore" step
 #   for a decode step + `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD`
-#   from secrets. Then publish each app's signing SHA-256 in
-#   apps/<slug>/.well-known/assetlinks.json on the site.
+#   from secrets. Then add each CI-signed app's SHA-256 to the site's single
+#   /.well-known/assetlinks.json (repo root — already holds the manually-built
+#   ebooks + notes apps).
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
@@ -29,8 +30,8 @@ on:
     paths:                  # only when something that affects a package changes
       - 'shared/js/registry.js'
       - 'apps/**/manifest.json'
-      - 'scripts/gen-twa-manifest.mjs'
-      - 'scripts/get-autopack-apps.js'
+      - '.github/scripts/gen-twa-manifest.mjs'
+      - '.github/scripts/get-autopack-apps.js'
       - '.github/workflows/build-android.yml'
 
 permissions:
@@ -53,7 +54,7 @@ jobs:
           node-version: 20
       - name: Extract autopack apps
         id: parse
-        run: node scripts/get-autopack-apps.js
+        run: node .github/scripts/get-autopack-apps.js
 
   # Job 2 — one parallel build per app slug
   build-android:
@@ -65,7 +66,7 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
-      SITE_BASE: https://code.pulgasari.dev/zugriff   # the app's live origin (baked into the TWA)
+      SITE_BASE: https://zugriff.dev   # the app's live origin (baked into the TWA)
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
       KEY_ALIAS: android
       # TEST-ONLY passwords for the throwaway keystore — Bubblewrap reads these
@@ -119,7 +120,7 @@ jobs:
         run: |
           DIR="build/${{ matrix.app }}"
           mkdir -p "$DIR"
-          APP_SLUG="${{ matrix.app }}" node scripts/gen-twa-manifest.mjs "$DIR/twa-manifest.json"
+          APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-twa-manifest.mjs "$DIR/twa-manifest.json"
           cd "$DIR"
           bubblewrap update --skipVersionUpgrade    # scaffold the Android project from twa-manifest.json
           bubblewrap build --skipPwaValidation      # -> app-release-signed.apk + app-release-bundle.aab
