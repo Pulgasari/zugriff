@@ -42,7 +42,7 @@ const entries = [
     name        : 'File Explorer',
     short_name  : 'Files',
     icon        : 'mdi:folder-outline',
-    description : 'Browse the private on-device storage — the same OPFS the cli uses.',
+    description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
     categories  : ['files'],
   },
   {

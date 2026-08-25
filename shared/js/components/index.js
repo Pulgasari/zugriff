@@ -11,6 +11,7 @@
 export { default as Button      } from './Button.js';
 export { default as CopyIcon    } from './CopyIcon.js';
 export { default as Dropzone    } from './Dropzone.js';
+export { default as FileExplorer } from './FileExplorer.js';
 export { default as GhostButton } from './GhostButton.js';
 export { default as Icon        } from './Icon.js';
 export { default as Nav         } from './Nav.js';

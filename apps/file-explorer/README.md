@@ -1,21 +1,23 @@
 # apps/file-explorer
 
-A file explorer for the browser's **Origin Private File System** (OPFS) — the
-private, per-origin storage that lives on the device and never leaves it. It
-reads and writes the very same OPFS the [`cli`](./../../cli/) uses, so a file
-you drop in the terminal shows up here and vice versa.
+A file explorer over a folder from your **own disk**. You grant one folder with
+the [File System Access API](./../../shared/js/lib/fsaccess.js) and it becomes
+the root of the explorer — browse the tree, preview files, download them back
+out. Nothing is uploaded and nothing is copied; only the directory handle is
+persisted, and only so we can re-ask for it on the next visit.
 
 ## what it does
 
-- browse a real directory tree — double-click a folder to open it, breadcrumb
-  or `Backspace` to go back
-- **create** folders and files, **upload** (button or drag-and-drop), **rename**,
-  **delete** (recursive), and **download** any file back out
+- **grant a folder** — it becomes the root; the handle is remembered (in one
+  `@bunker/db` store) so a returning visit just re-asks for permission
+- browse the directory tree — double-click a folder to open it, breadcrumb or
+  `Backspace` to go back, list and grid views, a live filter
 - a details panel with inline previews — images render, small text files show
-  their contents
-- list and grid views, a live filter, and a storage meter (`navigator.storage`)
+  their contents — and **download** any file
+- **change** the granted folder or **close** it (which only forgets the handle)
 
-Everything is client-side; nothing is uploaded anywhere.
+Browsing is read-only for now (the folder is picked with `mode:'read'`) — this
+is the “grant a folder as root” sketch; granting write is a later step.
 
 ## how it's built
 
@@ -24,20 +26,32 @@ This is an *app*, not a *tool*: it draws its own chrome and brings its own css
 `shared/css/index.css`. It still shares the theme tokens, the import map, the
 aufbau runtime and the service worker with the rest of zugriff.
 
+The browsing surface itself is the shared
+[`FileExplorer`](./../../shared/js/components/FileExplorer.js) component. This
+app only builds a *backend* around the granted folder and hands it to the
+component; the same component, over `dirfs.js`'s `opfsBackend`, browses the
+private OPFS the cli uses. So the OPFS browser this app used to be now lives as
+a reusable component any app can embed.
+
 | file            | what it is |
 |-----------------|------------|
-| `app.js`        | the explorer UI (preact + htm + signals), booted with `shell: false` |
-| `fs.js`         | a small OPFS wrapper with directory support (the tree `shared/js/vfs.js` doesn't need) |
-| `app.css`       | the app's own look — sidebar, toolbar, listing, details, status bar |
-| `app.config.js` | pulls its entry from `apps/registry.js` |
-| `index.html`    | links `../base.css` + `app.css` and the importmap |
-| `manifest.json` | pwa manifest |
+| `app.js`        | the app chrome — sidebar + welcome/reconnect screens — around `<${FileExplorer}>` |
+| `db.js`         | persists the one granted root handle (`@bunker/db`) + the permission dance |
+| `app.css`       | the app's own look — sidebar and hero screens only |
+| `index.html`    | links `../base.css` + `shared/css/explorer.css` + `app.css` and the importmap |
+| `manifest.json` | pwa manifest (generated from the registry) |
 | `sw.js`         | one-liner, pulls in `shared/js/sw-core.js` |
 | `app.svg`       | the app icon |
 
+The explorer engine lives in `shared/`:
+
+- [`shared/js/components/FileExplorer.js`](./../../shared/js/components/FileExplorer.js) — the UI
+- [`shared/css/explorer.css`](./../../shared/css/explorer.css) — its look (scoped under `.fx`)
+- [`shared/js/lib/dirfs.js`](./../../shared/js/lib/dirfs.js) — directory-tree ops over any `FileSystemDirectoryHandle` root, plus the ready-made `opfsBackend`
+
 ## notes
 
-OPFS has no atomic move, so a rename is a copy followed by a delete — for a
-directory that means walking it and rebuilding it entry by entry (`fs.js`).
-Browsers that don't expose OPFS get a friendly "no private storage" screen
-instead of a broken page.
+Folder permissions don't survive a plain reload in every browser, so the app
+nudges you to **install** it — an installed PWA keeps the grant (“allow on every
+visit”). Browsers without the File System Access API get a friendly
+“can't open folders here” screen instead of a broken page.

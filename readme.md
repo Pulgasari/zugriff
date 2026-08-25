@@ -53,13 +53,15 @@ zugriff/
       index.css                 always linked: reset + theme + typo + layout + components
       panes.css                 opt-in: the code input/output panes
       inspector.css             opt-in: the data tree
+      explorer.css              opt-in: the FileExplorer component
       hljs.css                  opt-in: syntax highlighting theme
     js/
       theme-boot.js             puts the saved theme on :root before the first paint
       importmap.js              injects the import map, classic script in <head>
       app.js                    boot(): document setup, runtime, sw, mount
       sw-core.js                the shared service worker body
-      vfs.js                    OPFS wrapper (used by the cli)
+      vfs.js                    flat OPFS wrapper (used by the cli)
+      lib/dirfs.js              directory-tree fs over any handle + opfsBackend
       components/               index.js (light) · code.js (panes) · media.js (audio)
       patterns/                 whole apps from a handful of options
       data/                     icons — short names for the iconify ids
@@ -103,8 +105,11 @@ three places: `cli`, `tools`, `apps`. each app's own worker owns its files,
 exactly like a tool's does.
 
 the apps so far:
-[apps/file-explorer](./apps/file-explorer/) — a browser for the OPFS the cli
-uses; [apps/image-editor](./apps/image-editor/) — crop/rotate/flip/adjust images
+[apps/file-explorer](./apps/file-explorer/) — grant a folder off your disk and
+browse it as the root, built on the shared
+[`FileExplorer`](./shared/js/components/FileExplorer.js) component (which, over
+`dirfs.js`'s `opfsBackend`, also browses the private OPFS the cli uses);
+[apps/image-editor](./apps/image-editor/) — crop/rotate/flip/adjust images
 on a canvas; [apps/gifmaker](./apps/gifmaker/) — sequence images into an
 animation and export a GIF or a project zip;
 [apps/podcasts](./apps/podcasts/) — subscribe by RSS, play episodes and track

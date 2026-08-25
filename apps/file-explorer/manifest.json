@@ -2,7 +2,7 @@
   "id": "file_explorer",
   "name": "File Explorer",
   "short_name": "Files",
-  "description": "Browse the private on-device storage — the same OPFS the cli uses.",
+  "description": "Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
