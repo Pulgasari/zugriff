@@ -1,0 +1,135 @@
+name: Build Android packages
+
+# Packages the PWAs flagged `autopack: true` in shared/js/registry.js into Android
+# apps (APK + AAB), one matrix job per app. Each app is wrapped as a Trusted Web
+# Activity pointing at its live deployment with Bubblewrap — Google's official TWA
+# tool, the same engine PWABuilder uses under the hood.
+#
+# (The old plan used a `pwa-builder/pwabuilder-action` — that action does not
+#  exist, so this drives Bubblewrap directly instead.)
+#
+# ── TEST-ONLY SIGNING ────────────────────────────────────────────────────────
+# Every run generates a THROWAWAY keystore, so the outputs are only good for
+# "does it build / does it install to test". They are NOT Play-Store-uploadable
+# and NOT stable: the app identity changes every run and Digital Asset Links
+# (the /.well-known/assetlinks.json that removes the browser URL bar) can't be
+# set up against an ephemeral key.
+#
+# TODO(stable key): create one Android keystore per app (or one shared), store it
+#   base64 + its passwords as repo secrets, and swap the "generate keystore" step
+#   for a decode step + `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD`
+#   from secrets. Then publish each app's signing SHA-256 in
+#   apps/<slug>/.well-known/assetlinks.json on the site.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:        # run it on demand — the main way to use this for now
+  push:
+    branches: [main]
+    paths:                  # only when something that affects a package changes
+      - 'shared/js/registry.js'
+      - 'apps/**/manifest.json'
+      - 'scripts/gen-twa-manifest.mjs'
+      - 'scripts/get-autopack-apps.js'
+      - '.github/workflows/build-android.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1 — read the registry, emit the list of autopack app slugs as JSON
+  discover-apps:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.parse.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Extract autopack apps
+        id: parse
+        run: node scripts/get-autopack-apps.js
+
+  # Job 2 — one parallel build per app slug
+  build-android:
+    needs: discover-apps
+    if: ${{ needs.discover-apps.outputs.apps != '[]' && needs.discover-apps.outputs.apps != '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
+    env:
+      SITE_BASE: https://code.pulgasari.dev/zugriff   # the app's live origin (baked into the TWA)
+      KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
+      KEY_ALIAS: android
+      # TEST-ONLY passwords for the throwaway keystore — Bubblewrap reads these
+      # for non-interactive signing. Replace with secrets when a stable key lands.
+      BUBBLEWRAP_KEYSTORE_PASSWORD: android
+      BUBBLEWRAP_KEY_PASSWORD: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+
+      - name: Install Bubblewrap
+        run: |
+          npm install -g @bubblewrap/cli
+          npm install --no-save @bubblewrap/core   # for gen-twa-manifest.mjs
+
+      - name: Point Bubblewrap at the preinstalled JDK + SDK
+        # writing this config up front stops Bubblewrap's interactive first-run
+        # from trying to download its own JDK/SDK (which would hang in CI)
+        run: |
+          mkdir -p ~/.bubblewrap
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' \
+            "$JAVA_HOME" "${ANDROID_SDK_ROOT:-$ANDROID_HOME}" > ~/.bubblewrap/config.json
+          cat ~/.bubblewrap/config.json
+
+      - name: Generate a throwaway signing key (TEST ONLY)
+        run: |
+          keytool -genkeypair -v \
+            -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
+            -keyalg RSA -keysize 2048 -validity 3650 \
+            -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" -keypass "$BUBBLEWRAP_KEY_PASSWORD" \
+            -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
+
+      - name: Build ${{ matrix.app }}
+        run: |
+          DIR="build/${{ matrix.app }}"
+          mkdir -p "$DIR"
+          APP_SLUG="${{ matrix.app }}" node scripts/gen-twa-manifest.mjs "$DIR/twa-manifest.json"
+          cd "$DIR"
+          bubblewrap update --skipVersionUpgrade    # scaffold the Android project from twa-manifest.json
+          bubblewrap build --skipPwaValidation      # -> app-release-signed.apk + app-release-bundle.aab
+
+      - name: Upload APK + AAB for ${{ matrix.app }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ matrix.app }}
+          path: |
+            build/${{ matrix.app }}/*.apk
+            build/${{ matrix.app }}/*.aab
+          if-no-files-found: error
+          retention-days: 14

@@ -53,7 +53,6 @@ const entries = [
     icon        : 'mdi:image-edit-outline',
     description : 'Crop, rotate, flip and adjust images — all on your device.',
     categories  : ['image'],
-    autopack    : true,
   },
   {
     type        : 'app',
@@ -100,6 +99,7 @@ const entries = [
     icon        : 'mdi:podcast',
     description : 'Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.',
     categories  : ['media'],
+    autopack    : true,   // built into an Android package by the build-android workflow
   },
   {
     type        : 'app',
@@ -117,6 +117,7 @@ const entries = [
     icon        : 'mdi:notebook-outline',
     description : 'Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline.',
     categories  : ['files', 'docs'],
+    autopack    : true,   // built into an Android package by the build-android workflow
   },
   {
     type        : 'app',
