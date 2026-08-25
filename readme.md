@@ -138,7 +138,7 @@ OPFS the file-explorer uses).
 5. write `app.js` and `app.css`
 
 `manifest.json` and each app's `assets/` icons are **generated** from the
-registry entry + `app.svg` by [`scripts/gen-app-assets.mjs`](./scripts/gen-app-assets.mjs)
+registry entry + `app.svg` by [`.github/scripts/gen-app-assets.mjs`](./.github/scripts/gen-app-assets.mjs)
 — `npm run gen:assets` locally, or just push and the *app assets* GitHub Action
 ([`.github/workflows/app-assets.yml`](./.github/workflows/app-assets.yml))
 regenerates and commits them whenever `app.svg`, `app.config.js` or the registry

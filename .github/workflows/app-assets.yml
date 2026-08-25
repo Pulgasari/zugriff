@@ -11,7 +11,7 @@ on:
     paths:
       - 'shared/js/registry.js'
       - 'apps/**/app.svg'
-      - 'scripts/gen-app-assets.mjs'
+      - '.github/scripts/gen-app-assets.mjs'
       - 'package.json'
       - '.github/workflows/app-assets.yml'
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Generate icons + manifests
-        run: node scripts/gen-app-assets.mjs
+        run: node .github/scripts/gen-app-assets.mjs
 
       - name: Commit any changes
         run: |

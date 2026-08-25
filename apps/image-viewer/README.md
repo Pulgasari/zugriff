@@ -30,7 +30,7 @@ The “open with” wiring is two halves:
 - the **manifest** declares `file_handlers` + `launch_handler`. Those aren't part
   of the shared manifest shape, so they're declared under `manifest:` in the
   app's `shared/js/registry.js` entry and
-  [`scripts/gen-app-assets.mjs`](./../../scripts/gen-app-assets.mjs) passes them
+  [`.github/scripts/gen-app-assets.mjs`](./../../.github/scripts/gen-app-assets.mjs) passes them
   through when it generates `manifest.json`.
 - `app.js` reads `window.launchQueue.setConsumer(...)` on boot; each launched
   file is a `FileSystemFileHandle`, so `handle.getFile()` gives the `File`.

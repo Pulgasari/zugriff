@@ -1,4 +1,4 @@
-// scripts/gen-app-assets.mjs
+// .github/scripts/gen-app-assets.mjs
 //
 // one source of truth → every derived icon + manifest. for each `type: 'app'`
 // entry in shared/js/registry.js this reads apps/<slug>/app.svg and writes:
@@ -10,9 +10,9 @@
 //
 // nothing here is hand-authored — edit the registry entry or app.svg and rerun.
 //
-//   node scripts/gen-app-assets.mjs            # write everything
-//   node scripts/gen-app-assets.mjs notes      # just one (or more) slugs
-//   node scripts/gen-app-assets.mjs --check    # verify, exit 1 on drift/missing
+//   node .github/scripts/gen-app-assets.mjs            # write everything
+//   node .github/scripts/gen-app-assets.mjs notes      # just one (or more) slugs
+//   node .github/scripts/gen-app-assets.mjs --check    # verify, exit 1 on drift/missing
 //
 // the --check mode is what CI uses to tell you "you changed app.svg or the
 // registry but didn't regenerate". the GitHub Action then regenerates and
@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join, relative } from 'node:path';
 import sharp from 'sharp';
 
-const ROOT     = join(dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT     = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const APPS_DIR = join(ROOT, 'apps');
 const SIZES    = [192, 512];
 
@@ -117,7 +117,7 @@ async function processApp (app) {
 
 // ── main ─────────────────────────────────────────────────────────────────────
 
-const { registry } = await import(new URL('../shared/js/registry.js', import.meta.url));
+const { registry } = await import(new URL('../../shared/js/registry.js', import.meta.url));
 let apps = registry.getAll('app');
 if (only.length) apps = apps.filter(a => only.includes(a.slug));
 if (!apps.length) { console.error(`[gen-app-assets] no apps matched ${only.join(', ')}`); process.exit(1); }
@@ -130,7 +130,7 @@ const problems = results.filter(r => r.missingSvg || r.drift?.length);
 if (check) {
   for (const r of results) (r.drift ?? []).forEach(d => console.error(`  ✗ ${d}`));
   if (problems.length) {
-    console.error(`\n[gen-app-assets] ${problems.length} app(s) out of date — run: node scripts/gen-app-assets.mjs`);
+    console.error(`\n[gen-app-assets] ${problems.length} app(s) out of date — run: node .github/scripts/gen-app-assets.mjs`);
     process.exit(1);
   }
   console.log(`[gen-app-assets] ${results.length} app(s) up to date ✓`);

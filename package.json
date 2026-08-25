@@ -4,8 +4,8 @@
   "type": "module",
   "description": "Build tooling for the zugriff static site. The site itself ships no build step — this is only for generating app icons + manifests from the registry.",
   "scripts": {
-    "gen:assets": "node scripts/gen-app-assets.mjs",
-    "check:assets": "node scripts/gen-app-assets.mjs --check"
+    "gen:assets": "node .github/scripts/gen-app-assets.mjs",
+    "check:assets": "node .github/scripts/gen-app-assets.mjs --check"
   },
   "devDependencies": {
     "sharp": "^0.35.3"

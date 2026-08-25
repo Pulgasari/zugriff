@@ -29,8 +29,8 @@ on:
     paths:                  # only when something that affects a package changes
       - 'shared/js/registry.js'
       - 'apps/**/manifest.json'
-      - 'scripts/gen-twa-manifest.mjs'
-      - 'scripts/get-autopack-apps.js'
+      - '.github/scripts/gen-twa-manifest.mjs'
+      - '.github/scripts/get-autopack-apps.js'
       - '.github/workflows/build-android.yml'
 
 permissions:
@@ -53,7 +53,7 @@ jobs:
           node-version: 20
       - name: Extract autopack apps
         id: parse
-        run: node scripts/get-autopack-apps.js
+        run: node .github/scripts/get-autopack-apps.js
 
   # Job 2 — one parallel build per app slug
   build-android:
@@ -119,7 +119,7 @@ jobs:
         run: |
           DIR="build/${{ matrix.app }}"
           mkdir -p "$DIR"
-          APP_SLUG="${{ matrix.app }}" node scripts/gen-twa-manifest.mjs "$DIR/twa-manifest.json"
+          APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-twa-manifest.mjs "$DIR/twa-manifest.json"
           cd "$DIR"
           bubblewrap update --skipVersionUpgrade    # scaffold the Android project from twa-manifest.json
           bubblewrap build --skipPwaValidation      # -> app-release-signed.apk + app-release-bundle.aab

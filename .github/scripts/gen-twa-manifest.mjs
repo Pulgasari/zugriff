@@ -1,4 +1,4 @@
-// scripts/gen-twa-manifest.mjs
+// .github/scripts/gen-twa-manifest.mjs
 //
 // writes a Bubblewrap `twa-manifest.json` for one app, deterministically and
 // without any of Bubblewrap's interactive `init` prompts — which is what makes
@@ -10,7 +10,7 @@
 // then override only what CI must control — the Android packageId and the
 // signing key — and save.
 //
-//   APP_SLUG=podcasts node scripts/gen-twa-manifest.mjs build/podcasts/twa-manifest.json
+//   APP_SLUG=podcasts node .github/scripts/gen-twa-manifest.mjs build/podcasts/twa-manifest.json
 //
 // env:
 //   APP_SLUG        (required)  the app's registry slug, e.g. "podcasts"
