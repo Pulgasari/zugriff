@@ -42,7 +42,7 @@ const entries = [
     name        : 'File Explorer',
     short_name  : 'Files',
     icon        : 'mdi:folder-outline',
-    description : 'Browse the private on-device storage — the same OPFS the cli uses.',
+    description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
     categories  : ['files'],
   },
   {
@@ -65,10 +65,49 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'image-viewer',
+    name        : 'Image Viewer',
+    short_name  : 'Viewer',
+    icon        : 'mdi:image-outline',
+    description : 'Open and view images — set it as your device’s image opener, or drop files straight in.',
+    categories  : ['image'],
+    // registers the installed PWA as a handler for image files, so Android (and
+    // desktop) can "open with" it; the launched files arrive via launchQueue.
+    manifest    : {
+      launch_handler : { client_mode: ['focus-existing', 'auto'] },
+      file_handlers  : [{
+        action : './',
+        accept : {
+          'image/png'    : ['.png'],
+          'image/jpeg'   : ['.jpg', '.jpeg', '.jfif'],
+          'image/gif'    : ['.gif'],
+          'image/webp'   : ['.webp'],
+          'image/avif'   : ['.avif'],
+          'image/bmp'    : ['.bmp'],
+          'image/svg+xml': ['.svg'],
+          'image/x-icon' : ['.ico'],
+          'image/heic'   : ['.heic'],
+          'image/heif'   : ['.heif'],
+          'image/tiff'   : ['.tif', '.tiff'],
+        },
+      }],
+    },
+  },
+  {
+    type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
     icon        : 'mdi:podcast',
     description : 'Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.',
+    categories  : ['media'],
+  },
+  {
+    type        : 'app',
+    slug        : 'rss-reader',
+    name        : 'RSS Reader',
+    short_name  : 'Feeds',
+    icon        : 'mdi:rss',
+    description : 'Follow RSS/Atom feeds, skim the latest across all of them, and jump to the original — YouTube channels get their own section.',
     categories  : ['media'],
   },
   {
