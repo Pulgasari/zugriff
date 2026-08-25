@@ -1,9 +1,5 @@
 // apps/app.js — the apps overview
-//
-// the sibling of the root launcher (app.js), but for /apps instead of /tools.
-// apps and tools are kept in separate overviews on purpose; the nav switches
-// between them. this renders shared/js/registry.js (type: 'app') the same way
-// the tools launcher renders the tools.
+// this renders shared/js/registry.js (type: 'app')
 
 // :::::: IMPORTS
 
