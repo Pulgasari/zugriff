@@ -5,24 +5,24 @@
 // between them. this renders shared/js/registry.js (type: 'app') the same way
 // the tools launcher renders the tools.
 
+// :::::: IMPORTS
+
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
-import { boot } from './../shared/js/app.js';
+import { boot }     from './../shared/js/app.js';
 import { registry } from './../shared/js/registry.js';
-import Icon from './../shared/js/components/Icon.js';
-import Nav  from './../shared/js/components/Nav.js';
+import Icon         from './../shared/js/components/Icon.js';
+import Nav          from './../shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
 import { launcher, themeGroup } from './../shared/js/lib/settings.js';
 
-// the overview page is not a registry entry, so it carries its own flat config
-const config = { slug: 'apps', name: 'zugriff apps', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };
+// :::::: CONFIG
 
 const categories = registry.categories('app');
+const config     = { slug: 'apps', name: 'zugriff apps', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
+const groups     = [ { title: 'launcher', settings: launcher }, themeGroup ];
 
-const groups = [
-  { title: 'launcher', settings: launcher },
-  themeGroup,
-];
+// :::::: STATES
 
 const query    = signal('');
 const category = signal('');
@@ -36,6 +36,8 @@ const visible = computed(() => {
     (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
   );
 });
+
+// :::::: COMPONENTS
 
 function Filter () {
   const ref      = useRef(null);
@@ -117,5 +119,6 @@ function Launcher () {
   `;
 }
 
-// the overview draws its own header, so it skips the app shell
+// :::::: BOOT
+
 boot({ config, App: Launcher, shell: false });
