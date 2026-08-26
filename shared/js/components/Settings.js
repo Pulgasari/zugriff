@@ -22,7 +22,7 @@ const LOOK_THRESHOLD = 4;
 const lookFor        = entry => entry.look ?? (entry.values.length > LOOK_THRESHOLD ? 'combobox' : 'segments');
 const settingsOpen   = signal(false);
 const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
-const toggleSettings = () => toggleSignal(settingsOpen);
+//const toggleSettings = () => toggleSignal(settingsOpen);
 
 // :::::: COMPONENTS
 
