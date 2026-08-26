@@ -1,4 +1,4 @@
-# apps/rss-reader
+# apps/feeds
 
 A feed reader that runs entirely on the device. Follow RSS/Atom feeds, skim the
 **latest across all** of them or **per channel**, and click through to the

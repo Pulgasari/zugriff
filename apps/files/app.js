@@ -1,4 +1,4 @@
-// apps/file-explorer/app.js
+// apps/files/app.js
 //
 // a file explorer over a folder from the user's own disk. the user grants one
 // folder (File System Access API, see shared/js/lib/fsaccess.js) and it becomes
@@ -19,7 +19,7 @@
 import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }  from './../../shared/js/app.js?slug=file-explorer';
+import { boot, config }  from './../../shared/js/app.js?slug=files';
 import { Icon, FileExplorer } from './../../shared/js/components/index.js';
 import * as fs   from './../../shared/js/lib/fsaccess.js';
 import * as pwa  from './../../shared/js/lib/pwa.js';
@@ -50,7 +50,7 @@ const backend = computed(() => {
 async function chooseFolder () {
   if (!fs.supported()) return;
   try { await db.grant(); }
-  catch (err) { console.warn('[file-explorer] grant failed', err); }
+  catch (err) { console.warn('[files] grant failed', err); }
 }
 
 async function tryReconnect () {
@@ -162,7 +162,7 @@ function Sidebar () {
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
-  useEffect(() => { db.load().catch(err => console.warn('[file-explorer] load failed', err)); }, []);
+  useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
   if (!fs.supported())  return html`<div class="fe-app centered"><${Unsupported} /></div>`;
   if (!db.ready.value)  return html`<div class="fe-app centered"><div class="fe-booting"><${Icon} name="svg-spinners:bars-scale-middle" size="28" /></div></div>`;
