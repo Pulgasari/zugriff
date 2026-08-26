@@ -22,6 +22,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 import { boot, config } from './../../shared/js/app.js?slug=image-viewer';
 import { Icon } from './../../shared/js/components/index.js';
 import * as pwa from './../../shared/js/lib/pwa.js';
+import { useGesture } from '@aufbau/gestures/preact';
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -247,12 +248,11 @@ function OpenWithTip () {
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
-  const stageRef = useRef(null);
-  const imageRef = useRef(null);
-  const inputRef = useRef(null);
-  const drag     = useRef(null);           // { startX, startY, panX, panY }
-  const pointers = useRef(new Map());
-  const pinch    = useRef(null);           // { dist, zoom }
+  const stageRef   = useRef(null);
+  const imageRef   = useRef(null);
+  const inputRef   = useRef(null);
+  const panStart   = useRef({ x: 0, y: 0 });
+  const pinchStart = useRef(1);
 
   useEffect(() => {
     fallbackInput = inputRef.current;
@@ -288,51 +288,30 @@ function App () {
   // keep the module refs to live nodes for the pan clamp
   useEffect(() => { stageEl = stageRef.current; imgEl = imageRef.current; });
 
-  // ── pointer gestures: drag-pan (zoomed), pinch-zoom (two fingers) ──────────
-  const onPointerDown = e => {
-    if (!current.value) return;
-    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    e.currentTarget.setPointerCapture?.(e.pointerId);
-    if (pointers.current.size === 2) {
-      const [a, b] = [...pointers.current.values()];
-      pinch.current = { dist: Math.hypot(a.x - b.x, a.y - b.y) || 1, zoom: zoom.value };
-    } else if (zoom.value > 1) {
-      drag.current = { startX: e.clientX, startY: e.clientY, panX: pan.value.x, panY: pan.value.y };
-    }
-  };
-  const onPointerMove = e => {
-    if (!pointers.current.has(e.pointerId)) return;
-    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-    if (pointers.current.size === 2 && pinch.current) {
-      const [a, b] = [...pointers.current.values()];
-      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
-      setZoom(pinch.current.zoom * (dist / pinch.current.dist));
-      return;
-    }
-    if (drag.current && zoom.value > 1) {
-      pan.value = { x: drag.current.panX + (e.clientX - drag.current.startX),
-                    y: drag.current.panY + (e.clientY - drag.current.startY) };
+  // gestures via @aufbau/gestures (pinch + drag-pan + wheel + double-tap). the
+  // view model below is unchanged — zoom stays centred and clamped, pan clamped
+  // to keep the image on screen. drag only pans once zoomed in.
+  const gestureRef = useGesture({
+    onDoubleClick : () => { if (current.value) setZoom(zoom.value > 1 ? 1 : 2.5); },
+    onPanStart    : () => { panStart.current = { ...pan.value }; },
+    onPan         : p => {
+      if (zoom.value <= 1) return;
+      pan.value = { x: panStart.current.x + p.deltaX, y: panStart.current.y + p.deltaY };
       clampPan();
-    }
-  };
-  const onPointerUp = e => {
-    pointers.current.delete(e.pointerId);
-    if (pointers.current.size < 2) pinch.current = null;
-    if (pointers.current.size === 0) drag.current = null;
-  };
+    },
+    onPinchStart  : () => { pinchStart.current = zoom.value; },
+    onPinch       : p => { if (current.value) setZoom(pinchStart.current * p.scale); },
+    onWheel       : w => { if (current.value) setZoom(zoom.value * (w.deltaY < 0 ? 1.15 : 1 / 1.15)); },
+  });
 
-  const onWheel = e => {
-    if (!current.value) return;
-    e.preventDefault();
-    setZoom(zoom.value * (e.deltaY < 0 ? 1.15 : 1 / 1.15));
-  };
-
-  const onDoubleClick = () => { if (current.value) setZoom(zoom.value > 1 ? 1 : 2.5); };
+  // the stage node has two consumers: the pan-clamp measurement ref and the
+  // gesture binding. a stable callback ref feeds both (never re-created, so a
+  // re-render never detaches the gestures mid-drag).
+  const setStage = useRef(null);
+  if (!setStage.current) setStage.current = node => { stageRef.current = node; stageEl = node; gestureRef(node); };
 
   const onDrop = e => {
     e.preventDefault();
-    drag.current = null;
     if (e.dataTransfer?.files?.length) setFiles(e.dataTransfer.files);
   };
 
@@ -344,13 +323,7 @@ function App () {
          onDragOver=${e => e.preventDefault()} onDrop=${onDrop}>
       ${!bare.value && html`<${TopBar} />`}
 
-      <div class=${'iv-stage' + (dragging ? ' grab' : '')} ref=${stageRef}
-           onWheel=${onWheel}
-           onDblClick=${onDoubleClick}
-           onPointerDown=${onPointerDown}
-           onPointerMove=${onPointerMove}
-           onPointerUp=${onPointerUp}
-           onPointerCancel=${onPointerUp}
+      <div class=${'iv-stage' + (dragging ? ' grab' : '')} ref=${setStage.current}
            onClick=${() => { if (bare.value) bare.value = false; }}>
         ${s
           ? html`<img class="iv-image" ref=${imageRef} src=${s.url} alt=${s.name} draggable="false"
