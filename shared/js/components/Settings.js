@@ -4,18 +4,27 @@
 // the settings themselves — a new entry in a schema shows up here by itself.
 //
 //   <${Settings} groups=${[{ title: 'theme', settings: theme }]} />
+//
+// TODO:should use `aufbau.gui` (@aufbau/runtime/gui.js)
+
+// :::::: IMPORT
 
 import { html, signal } from '@aufbau/kits/preact-htm';
 import Icon   from './Icon.js';
+import Taplet from './Taplet.js';
+
 import Picker from './Picker.js';
 import Toggle from './Toggle.js';
 
-// a handful of options reads best side by side, a long list wants a dropdown.
-// a schema entry can always say `look` for itself.
+// :::::: STATE + HELPERS
+
 const LOOK_THRESHOLD = 4;
 const lookFor        = entry => entry.look ?? (entry.values.length > LOOK_THRESHOLD ? 'combobox' : 'segments');
 const settingsOpen   = signal(false);
 const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
+const toggleSettings = () => toggleSignal(settingsOpen);
+
+// :::::: COMPONENTS
 
 function Field ({ group, name }) {
   const entry = group.schema[name];
@@ -69,6 +78,8 @@ function SettingsButton () {
       <${Icon} name="settings" />
     </button>`;
 }
+
+// :::::: EXPORT
 
 export {
   settingsOpen,
