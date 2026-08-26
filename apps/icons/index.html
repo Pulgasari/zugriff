@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <link rel="manifest" href="./manifest.json">
+
+  <meta name="theme-color" content="#282a36">
+  <meta name="msapplication-TileColor" content="#282a36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#282a36">
+
+  <link rel="icon" href="./app.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./app.svg">
+
+  <title>Icons</title>
+  <meta name="apple-mobile-web-app-title" content="Icons">
+
+  <link rel="stylesheet" href="./../base.css">
+  <link rel="stylesheet" href="./app.css">
+
+  <!-- iconify web component: batches + caches the icon svgs the grid renders -->
+  <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+
+  <script src="./../../shared/js/theme-boot.js"></script>
+  <script src="./../../shared/js/importmap.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="app-loading">…</div>
+  </div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
