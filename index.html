@@ -1,24 +1,84 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dracula">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#282a36">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>zugriff</title>
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="./manifest.json">
-
-  <link rel="stylesheet" href="./shared/css/index.css">
-  <link rel="stylesheet" href="./app.css">
-
-  <script src="./shared/js/theme-boot.js"></script>
-  <script src="./shared/js/importmap.js"></script>
+  <script src="./../shared/js/importmap.js"></script>
 </head>
-<body>
-  <div id="app">
-    <div id="app-body">
-      <div id="app-loading">…</div>
+
+<body class="mobilefix">
+
+  <header>
+	  <!--
+    <nav>
+      <a href="./docs">Docs</a>
+      <a href="#">@GitHub</a>
+    </nav>
+	  -->
+  </header>
+  
+  <div id="welcome">
+    <div id="logo">
+      zugriff
     </div>
   </div>
+
+  <footer>
+    <div></div>
+  </footer>
+
+  <script type="module">
+    import { applyFilter } from '@aufbau/filters';
+    import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
+  	const { effect, signal  } = preact;
+  
+  	//aufbau.init();
+
+	function getRandomEntry (map) {
+      const keys = Object.keys(map);
+      const key  = keys[Math.floor(Math.random() * keys.length)];
+      return { key, value: map[key] };
+    }
+
+	function getRandomItem (arr) {
+  	  if (!arr || arr.length === 0) return undefined;
+  	  return arr[Math.floor(Math.random() * arr.length)];
+	}
+    
+    const filtersMap = {
+      'glitch-heavy-cyber' : { animate: true, frequency: "0.0 0.95", scale: 40, speed: "1.5s" },
+      'glitch-live'        : { animate: true, speed: "2s" },
+      'night-vision'       : { animate: true, noise: 0.5, speed: "0.4s" },
+    };
+
+    const { key, value } = getRandomEntry(filtersMap);
+    applyFilter('body', key, value);
+
+	  const theme = getRandomItem(aufbau.data.css.themes);
+    aufbau.init({ css: { theme }});
+
+    //const Test = () => html`<div>moin!</div>`;
+    //aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
+    
+
+    // Register custom CSS custom properties
+    //define({ key: 'bg', type: 'property' });
+    //define({ key: 'fg', type: 'property' });
+
+    //const indexSignal = signal(0);
+
+    // Reactively update theme variables via signal effect
+    /*
+    effect(() => {
+      const { bg, fg } = colors[indexSignal.value];
+      update({ key: 'bg', value: bg });
+      update({ key: 'fg', value: fg });
+    });
+    */
+
+    //setInterval(() => { indexSignal.value = (indexSignal.value + 1) % colors.length; }, 1000);
+  </script>
+
 </body>
-</html>
+  </html>
