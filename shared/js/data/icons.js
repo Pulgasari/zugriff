@@ -32,6 +32,7 @@ export const icons = {
   'previewer'         : 'material-symbols:preview',
   'redo'              : 'bx:redo',
   'refresh'           : 'material-symbols:refresh',
+  'reset'             : 'mdi:restore',
   'save'              : 'material-symbols:file-save',
   'search'            : 'material-symbols:search',
   'select-all'        : 'material-symbols:select-all',
