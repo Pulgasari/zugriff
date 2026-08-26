@@ -26,7 +26,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=videoplayer';
-import { Icon } from './../../shared/js/components/index.js';
+import { Icon, Taplet } from './../../shared/js/components/index.js';
 
 // ::: local
 
@@ -192,13 +192,29 @@ const videoTransform = computed(() => {
 
 // :::::: COMPONENTS ::::::::::::::::::::::::::::::::::::::::
 
+/*
+function Taplet ({ icon, size, title, onClick }) {
+  return html`
+    <button class="taplet" title=${title} onClick=${onClick}>
+      <${Icon} name=${icon} size=${size} />
+    </button>
+  `;
+}
+*/
+
+const setBoolSignal = (signal, value) => typeof !== 'undefined' && signal.value = Boolean(value);
+
+function SettingsTaplet () {
+  return html`<${Taplet} icon='settings' title='Settings' onClick=${() => settingsOpen.value = true} />`;    
+}
+
+
+
 function TopBar () {
   return html`
     <header class="topbar">
       <span class="title">${title.value || config.name}</span>
-      <button class="icon-btn" title="Settings" onClick=${() => settingsOpen.value = true}>
-        <${Icon} name="mdi:cog-outline" size="22" />
-      </button>
+      
     </header>`;
 }
 
