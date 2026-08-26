@@ -178,7 +178,7 @@
 .tl-glyph { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; color: var(--fg); }
 .tl-row:hover .tl-num { visibility: hidden; }
 .tl-row:hover .tl-glyph { display: flex; }
-.tl-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-title { overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tl-artist { color: var(--fg-50); font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14rem; }
 .tl-time { text-align: right; font-size: 0.82rem; color: var(--fg-50); font-variant-numeric: tabular-nums; }
 @media (max-width: 620px) { .tl-row { grid-template-columns: 2rem 1fr 3.4rem; } .tl-artist { display: none; } }
