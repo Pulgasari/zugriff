@@ -52,7 +52,7 @@ function Group ({ group }) {
       <header>
         <code class="settings-title">${title}</code>
         <button class="ghost-btn" onClick=${settings.reset} title="back to defaults">
-          <${Icon} name="mdi:restore" /> reset
+          <${Icon} name="reset" /> reset
         </button>
       </header>
       ${settings.keys.map(name => html`<${Field} key=${name} group=${settings} name=${name} />`)}
