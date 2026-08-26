@@ -121,6 +121,15 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'icons',
+    name        : 'Icons',
+    short_name  : 'Icons',
+    icon        : 'mdi:emoticon-outline',
+    description : 'Browse and search the whole Iconify library by set, copy or download any icon, and keep favourites.',
+    categories  : ['design'],
+  },
+  {
+    type        : 'app',
     slug        : 'notes',
     name        : 'Notes',
     icon        : 'mdi:notebook-outline',

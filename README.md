@@ -12,6 +12,7 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 - [ebooks](https://zugriff.dev/apps/ebooks/)
 - [file explorer](https://zugriff.dev/apps/file-explorer/)
 - [gifmaker](https://zugriff.dev/apps/gifmaker/)
+- [icons](https://zugriff.dev/apps/icons/)
 - [image editor](https://zugriff.dev/apps/image-editor/)
 - [image viewer](https://zugriff.dev/apps/image-viewer/)
 - [notes](https://zugriff.dev/apps/notes/)
@@ -125,6 +126,9 @@ their own section;
 [apps/audio-manager](./apps/audio-manager/) — grant your music folders and browse
 the library by song, album and artist, tags + cover art read on device and played
 straight off disk;
+[apps/icons](./apps/icons/) — browse and search the whole Iconify library by set,
+copy or download any icon and keep favourites, the grid rendered through
+`<iconify-icon>`;
 [apps/notes](./apps/notes/) — grant a folder of Markdown files and read it as a
 foldered notebook, the directory tree becoming the outline; and
 [apps/ebooks](./apps/ebooks/) — grant your book folders and read the EPUB/PDF
