@@ -33,7 +33,7 @@
     import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
   	const { effect, signal  } = preact;
   
-  	//aufbau.init();
+  	aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
 
 	function getRandomEntry (map) {
       const keys = Object.keys(map);
@@ -55,8 +55,7 @@
     const { key, value } = getRandomEntry(filtersMap);
     applyFilter('body', key, value);
 
-	  const theme = getRandomItem(aufbau.data.css.themes);
-    aufbau.init({ css: { theme }});
+    
 
     //const Test = () => html`<div>moin!</div>`;
     //aufbau.render(html`<${Test} />`, document.querySelector('footer div'));
