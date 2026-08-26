@@ -8,6 +8,7 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 - [tools](https://zugriff.dev/tools/)
 
 ## apps
+- [audio manager](https://zugriff.dev/apps/audio-manager/)
 - [ebooks](https://zugriff.dev/apps/ebooks/)
 - [file explorer](https://zugriff.dev/apps/file-explorer/)
 - [gifmaker](https://zugriff.dev/apps/gifmaker/)
@@ -121,6 +122,9 @@ progress, backed by `@bunker/db`;
 [apps/rss-reader](./apps/rss-reader/) — follow RSS/Atom feeds, skim the latest
 across all of them and click through to the original, with YouTube channels in
 their own section;
+[apps/audio-manager](./apps/audio-manager/) — grant your music folders and browse
+the library by song, album and artist, tags + cover art read on device and played
+straight off disk;
 [apps/notes](./apps/notes/) — grant a folder of Markdown files and read it as a
 foldered notebook, the directory tree becoming the outline; and
 [apps/ebooks](./apps/ebooks/) — grant your book folders and read the EPUB/PDF

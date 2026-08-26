@@ -112,6 +112,15 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'audio-manager',
+    name        : 'Audio Manager',
+    short_name  : 'Music',
+    icon        : 'mdi:music-box-multiple-outline',
+    description : 'Grant your music folders and browse the library by song, album and artist — ID3 tags and cover art read on device.',
+    categories  : ['media'],
+  },
+  {
+    type        : 'app',
     slug        : 'notes',
     name        : 'Notes',
     icon        : 'mdi:notebook-outline',

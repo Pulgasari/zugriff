@@ -117,6 +117,9 @@ const map = { imports: {
   "@ffmpeg/core"   : "https://unpkg.com/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js",
   "upng-js"        : "https://esm.sh/upng-js@2.1.0",
   "gifenc"         : "https://cdn.jsdelivr.net/npm/gifenc@1.0.3/+esm",
+  // reads id3 / vorbis / mp4 tags + cover art off local audio files in the
+  // audio-manager library scan (mp3, ogg, flac, m4a, wav …)
+  "music-metadata" : "https://esm.sh/music-metadata@11",
 
   // ::: color
   "culori" : "https://esm.sh/culori@3.3.0",
