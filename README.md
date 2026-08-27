@@ -9,6 +9,7 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 
 ## apps
 - [audio manager](https://zugriff.dev/apps/audio-manager/)
+- [code](https://zugriff.dev/apps/code/)
 - [ebooks](https://zugriff.dev/apps/ebooks/)
 - [feeds](https://zugriff.dev/apps/feeds/)
 - [files](https://zugriff.dev/apps/files/)
