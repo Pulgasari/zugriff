@@ -20,4 +20,4 @@
 
 ## misc
 
-- [ ] urls der der apps/tools direkt als unterpfad der domain ohne sie aus den `apps`- bzw. `tools`-ordnern eine ebene höher schieben zu müssen. also z.b `zugriff.dev/code` statt`zugriff.dev/apps/code`. (theoretisch wären subdomains noch nicer, aber das macht vermutlich caching, resourcen-sharing usw wieder übertrieben komplizierter)
+- [ ] urls der der apps/tools direkt als unterpfad der domain ohne sie aus den `apps`- bzw. `tools`-ordnern eine ebene höher schieben zu müssen. also z.b `zugriff.dev/code` statt `zugriff.dev/apps/code`. (theoretisch wären subdomains noch nicer, aber das macht vermutlich caching, resourcen-sharing usw wieder übertrieben komplizierter)
