@@ -13,7 +13,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=audio-manager';
 import { Icon, AppSettings } from './../../shared/js/components/index.js';
-import * as fs    from './../../shared/js/lib/fsaccess.js';
+import * as fs    from './../../shared/js/filesystem/fsaccess.js';
 import * as pwa   from './../../shared/js/lib/pwa.js';
 
 // ::: local

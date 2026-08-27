@@ -14,7 +14,7 @@ import * as config from './app.config.js';
 import Nav     from './../shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
 import { themeGroup } from './../shared/js/lib/settings.js';
-import { vfs } from './../shared/js/vfs.js';
+import { vfs } from './../shared/js/filesystem/opfs.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
 

@@ -11,7 +11,7 @@
 // app builds). the component itself knows nothing about *where* the tree lives.
 //
 //   import { FileExplorer } from './../../shared/js/components/index.js';
-//   import { opfsBackend }  from './../../shared/js/lib/dirfs.js';
+//   import { opfsBackend }  from './../../shared/js/filesystem/dirfs.js';
 //   html`<${FileExplorer} backend=${opfsBackend} />`
 //
 // styles live in shared/css/explorer.css (opt-in, scoped under .fx) — a host
@@ -24,7 +24,7 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 import Icon        from './Icon.js';
 import { stored }  from './../lib/signals.js';
-import * as dirfs  from './../lib/dirfs.js';
+import * as dirfs  from './../filesystem/dirfs.js';
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 

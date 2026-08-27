@@ -1,36 +1,32 @@
 // apps/audio-manager/db.js
 //
-// storage for the music library — two @bunker/db stores:
+// storage for the music library. the granted-folder lifecycle (the `sources`
+// store, permissions, scanning) is the shared FolderLibrary
+// (shared/js/filesystem/folders.js); this module owns the `tracks` store it
+// scans into: one record per audio file — path, tags, a cover Blob and a
+// size+mtime signature so tags are only re-read when a file changes.
 //
-//   sources   granted folder handles (the only durable thing)
-//   tracks    one record per audio file: path, tags, a cover Blob and a
-//             size+mtime signature so tags are only re-read when a file changes
-//
-// scanning is two-phase: a fast pass lists the files and shows the library right
-// away with filename titles, then a bounded pool reads real tags + cover off
-// each new or changed file. nothing but the handles and the extracted tags is
-// stored — audio is streamed from disk on play (see player.js).
+// scanning is two-phase: syncSource() lists the files and shows the library
+// right away with filename titles, then a bounded MetaQueue reads real tags +
+// cover off each new or changed file. nothing but the handles and the extracted
+// tags is stored — audio is streamed from disk on play (see player.js).
 
 import { signal, computed } from '@aufbau/kits/preact-htm';
-import { createDb } from '@bunker/db';
-import { createPool } from './../../shared/js/lib/pool.js';
-import * as fs from './../../shared/js/lib/fsaccess.js';
+import { zugriff } from './../../shared/js/runtime.js';
+import { syncSource, MetaQueue } from './../../shared/js/filesystem/scan.js';
+import * as fs from './../../shared/js/filesystem/fsaccess.js';
 import { accept, prettyName, extractMeta } from './library.js';
 
-const db    = createDb('zugriff-audio');
 const keyOf = (sourceId, path) => sourceId + '\n' + path;
 
 // ── signals ────────────────────────────────────────────────────────────────
+// sources / perms / scanning / ready come from the library below.
 
-export const
-sources  = signal([]),      // [{ id, name, handle, addedAt }]
-tracks   = signal([]),      // [{ key, sourceId, path, name, title, artist, album, … }]
-perms    = signal({}),      // sourceId -> 'granted' | 'prompt' | 'denied'
-scanning = signal({}),      // sourceId -> true while scanning
-pending  = signal(0),       // tracks still queued for tag extraction
-ready    = signal(false);
+export const tracks = signal([]);   // [{ key, sourceId, path, name, title, artist, album, … }]
 
-export const sourceById = id => sources.value.find(s => s.id === id) ?? null;
+const meta = new MetaQueue(3);
+export const pending = meta.pending;   // tracks still queued for tag extraction
+
 export const trackByKey = key => tracks.value.find(t => t.key === key) ?? null;
 
 const cmp = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
@@ -40,158 +36,75 @@ export const displayArtist = t => t.artist || 'Unknown Artist';
 export const displayAlbum  = t => t.album  || 'Unknown Album';
 export const displayTitle  = t => t.title  || prettyName(t.name);
 
-// ── loading ────────────────────────────────────────────────────────────────
+// ── the library ──────────────────────────────────────────────────────────
 
-export async function load () {
-  await db.setup({ sources: {}, tracks: {} });
-  const [srcRows, trackRows] = await Promise.all([db.getAll('sources'), db.getAll('tracks')]);
-  sources.value = Object.values(srcRows).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
-  tracks.value  = Object.values(trackRows);
+const lib = new zugriff.fs.FolderLibrary({
+  db:       'zugriff-audio',
+  pickerId: 'zugriff-audio',
+  stores:   { sources: {}, tracks: {} },
 
-  await Promise.all(sources.value.map(async s => {
-    perms.value = { ...perms.value, [s.id]: await fs.queryPermission(s.handle, 'read') };
-  }));
-  ready.value = true;
+  onLoad: async (db) => {
+    tracks.value = Object.values(await db.getAll('tracks'));
+  },
 
-  sources.value.forEach(s => { if (perms.value[s.id] === 'granted') scan(s.id).catch(() => {}); });
-}
-
-// ── folders ──────────────────────────────────────────────────────────────
-
-export async function addFolder () {
-  const handle = await fs.pickDirectory({ id: 'zugriff-audio', mode: 'read' });
-  if (!handle) return null;
-  for (const s of sources.value) {
-    if (await s.handle.isSameEntry?.(handle)) throw new Error('That folder is already in your library.');
-  }
-  const rec = { id: crypto.randomUUID(), name: handle.name, handle, addedAt: Date.now() };
-  await db.set('sources', rec.id, rec);
-  sources.value = [...sources.value, rec];
-  perms.value   = { ...perms.value, [rec.id]: 'granted' };
-  await scan(rec.id);
-  return rec;
-}
-
-export async function reconnect (id) {
-  const s = sourceById(id);
-  if (!s) return { granted: false };
-  const res = await fs.requestRead(s.handle, 'read');
-  perms.value = { ...perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
-  if (res.granted) await scan(id);
-  return res;
-}
-
-export async function repick (id) {
-  const s = sourceById(id);
-  if (!s) return false;
-  const handle = await fs.pickDirectory({ id: 'zugriff-audio', mode: 'read' });
-  if (!handle) return false;
-  const rec = { ...s, name: handle.name, handle };
-  await db.set('sources', id, rec);
-  sources.value = sources.value.map(x => x.id === id ? rec : x);
-  perms.value   = { ...perms.value, [id]: 'granted' };
-  await scan(id);
-  return true;
-}
-
-export async function removeFolder (id) {
-  const doomed = tracks.value.filter(t => t.sourceId === id).map(t => t.key);
-  await db.delete('sources', id);
-  await db.task('tracks', 'readwrite', store => { for (const k of doomed) store.delete(k); });
-  sources.value = sources.value.filter(s => s.id !== id);
-  tracks.value  = tracks.value.filter(t => t.sourceId !== id);
-  const pm = { ...perms.value }; delete pm[id]; perms.value = pm;
-}
-
-// ── scanning ───────────────────────────────────────────────────────────────
-
-export async function scan (id) {
-  const s = sourceById(id);
-  if (!s) return;
-  scanning.value = { ...scanning.value, [id]: true };
-  try {
-    const files   = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    const seen    = new Set();
-    const known   = new Map(tracks.value.map(t => [t.key, t]));
-    const next    = tracks.value.filter(t => t.sourceId !== id);
-    const toWrite = [];
-
-    for (const f of files) {
-      const key = keyOf(id, f.path);
-      seen.add(key);
-      const file = await f.handle.getFile();
-      const sig  = `${file.size}:${file.lastModified}`;
-      const prev = known.get(key);
-
-      const rec = (prev && prev.sig === sig) ? prev : {
-        key, sourceId: id, path: f.path, name: f.name,
+  scan: async (s, { db }) => {
+    const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
+    const next  = await syncSource({
+      db, store: 'tracks', sourceId: s.id, files, rows: tracks.value, keyOf,
+      makeRecord: (f, { key, sourceId, sig, prev }) => ({
+        key, sourceId, path: f.path, name: f.name,
         title: '', artist: '', album: '', albumArtist: '', trackNo: null, year: null,
         genre: '', duration: null, cover: prev?.cover ?? null,
         sig, metaDone: false, addedAt: prev?.addedAt ?? Date.now(),
-      };
-      next.push(rec);
-      if (rec !== prev) toWrite.push(rec);
-    }
-
-    const gone = tracks.value.filter(t => t.sourceId === id && !seen.has(t.key)).map(t => t.key);
-    if (gone.length)    await db.task('tracks', 'readwrite', store => { for (const k of gone) store.delete(k); });
-    if (toWrite.length) await db.task('tracks', 'readwrite', store => { for (const r of toWrite) store.put(r, r.key); });
-
+      }),
+    });
     tracks.value = next;
-    enqueueMeta(next.filter(t => t.sourceId === id && !t.metaDone));
-  } finally {
-    scanning.value = { ...scanning.value, [id]: false };
-  }
-}
+    meta.enqueue(next.filter(t => t.sourceId === s.id && !t.metaDone), extractOne);
+  },
 
-export const rescanAll = () => Promise.all(
-  sources.value.filter(s => perms.value[s.id] === 'granted').map(s => scan(s.id).catch(() => {})),
-);
+  cascade: async (id, db) => {
+    const doomed = tracks.value.filter(t => t.sourceId === id).map(t => t.key);
+    await db.task('tracks', 'readwrite', store => { for (const k of doomed) store.delete(k); });
+    tracks.value = tracks.value.filter(t => t.sourceId !== id);
+  },
+});
+
+export const { sources, perms, scanning, ready } = lib;
+export const sourceById = lib.sourceById;
+
+export const load         = lib.load;
+export const addFolder    = lib.addFolder;
+export const reconnect    = lib.reconnect;
+export const repick       = lib.repick;
+export const removeFolder = lib.removeFolder;
+export const scan         = lib.scan;
+export const rescanAll    = lib.rescanAll;
 
 // ── background tag queue ─────────────────────────────────────────────────────
-
-const gate   = createPool(3);
-const queued = new Set();
-
-function enqueueMeta (list) {
-  for (const t of list) {
-    if (queued.has(t.key)) continue;
-    queued.add(t.key);
-    gate(() => extractOne(t)).finally(() => { queued.delete(t.key); pending.value = queued.size; });
-  }
-  pending.value = queued.size;
-}
 
 async function extractOne (t) {
   const cur = trackByKey(t.key);
   if (!cur || cur.metaDone || cur.sig !== t.sig) return;
   try {
     const file   = await fileAt(t);
-    const meta   = await extractMeta(file);
-    const merged = { ...cur, ...meta, cover: meta.cover ?? cur.cover, metaDone: true };
-    await db.set('tracks', merged.key, merged);
+    const info   = await extractMeta(file);
+    const merged = { ...cur, ...info, cover: info.cover ?? cur.cover, metaDone: true };
+    await lib.db.set('tracks', merged.key, merged);
     tracks.value = tracks.value.map(x => x.key === merged.key ? merged : x);
   } catch {
     const merged = { ...cur, metaDone: true };   // don't retry a file we can't read
-    await db.set('tracks', merged.key, merged);
+    await lib.db.set('tracks', merged.key, merged);
     tracks.value = tracks.value.map(x => x.key === merged.key ? merged : x);
   }
 }
 
 // ── file access ──────────────────────────────────────────────────────────
 
-async function handleAt (root, path) {
-  const parts = path.split('/');
-  let dir = root;
-  for (const seg of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(seg);
-  return dir.getFileHandle(parts.at(-1));
-}
-
 /** the File object for a track, read from disk on demand (playback, re-tag) */
 export async function fileAt (track) {
-  const s = sourceById(track.sourceId);
+  const s = lib.sourceById(track.sourceId);
   if (!s) throw new Error('folder is gone');
-  return (await handleAt(s.handle, track.path)).getFile();
+  return lib.fileAt(s, track.path);
 }
 
 // ── grouping ─────────────────────────────────────────────────────────────

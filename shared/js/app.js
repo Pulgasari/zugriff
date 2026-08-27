@@ -22,6 +22,7 @@ whether the tools Shell wraps the app is decided from the entry's `type`
 import aufbau, { html, render } from '@aufbau/kits/preact-htm';
 import Shell        from './components/Shell.js';
 import { registry } from './registry.js';
+import './runtime.js';   // establishes globalThis.zugriff (fs / opfs) once per page
 
 const $root = document.documentElement;
 

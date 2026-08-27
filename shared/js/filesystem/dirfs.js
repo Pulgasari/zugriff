@@ -1,4 +1,4 @@
-// shared/js/lib/dirfs.js
+// shared/js/filesystem/dirfs.js
 //
 // directory-tree operations over a FileSystemDirectoryHandle "root". the trick
 // is that OPFS and a folder the user grants off their real disk expose the very
@@ -7,7 +7,7 @@
 // that is what a `backend` (below) captures.
 //
 // this is the generalised descendant of the old apps/file-explorer/fs.js (now apps/files):
-// shared/js/vfs.js stays flat (root only, all the cli needs); anything that
+// opfs.js stays flat (root only, all the cli needs); anything that
 // walks a tree — the FileExplorer component, and through it the files
 // app — uses this.
 //

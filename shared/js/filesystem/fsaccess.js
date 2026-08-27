@@ -1,7 +1,7 @@
-// shared/js/lib/fsaccess.js
+// shared/js/filesystem/fsaccess.js
 //
-// the File System Access side of things — the counterpart to fs.js / vfs.js.
-// where those wrap the *private* OPFS the cli owns, this wraps a folder the
+// the File System Access side of things — the counterpart to opfs.js.
+// where that wraps the *private* OPFS the cli owns, this wraps a folder the
 // user hands us from their real disk with showDirectoryPicker(). the handle it
 // returns is structured-cloneable, so an app persists it in its own @bunker/db
 // and re-authorises it on the next load; this module is only the picker, the

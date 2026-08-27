@@ -1,19 +1,14 @@
 // apps/notes/db.js
 //
-// notes has almost nothing to store: the app *is* a live view onto folders the
-// user grants, so the only durable state is the set of granted directory
-// handles. those live in one @bunker/db store ("sources"); a FileSystemHandle
-// is structured-cloneable, so it round-trips through IndexedDB and we re-ask
-// for permission on the next visit rather than re-picking the folder.
-//
-// everything shown on screen — the tree, a note's text — is read straight from
-// disk on demand and never copied into the database.
+// notes is a live view onto folders the user grants: the only durable state is
+// the set of granted directory handles, and the folder lifecycle around them is
+// the shared FolderLibrary (shared/js/filesystem/folders.js). the one app-owned
+// bit is the scanned tree per source — everything shown on screen (the tree, a
+// note's text) is read straight from disk on demand and never copied into the db.
 
 import { signal } from '@aufbau/kits/preact-htm';
-import { createDb } from '@bunker/db';
-import * as fs from './../../shared/js/lib/fsaccess.js';
-
-const db = createDb('zugriff-notes');
+import { zugriff } from './../../shared/js/runtime.js';
+import * as fs from './../../shared/js/filesystem/fsaccess.js';
 
 // what counts as a note. markdown and its usual spellings; a folder full of
 // anything else simply scans to nothing.
@@ -22,118 +17,43 @@ export const accept = name => MD.test(name);
 
 // ── signals ────────────────────────────────────────────────────────────────
 
-export const
-sources = signal([]),      // [{ id, name, handle, addedAt }]
-trees   = signal({}),      // sourceId -> scanned tree node | null
-perms   = signal({}),      // sourceId -> 'granted' | 'prompt' | 'denied'
-scanning = signal({}),     // sourceId -> true while a scan is in flight
-ready   = signal(false);
+export const trees = signal({});   // sourceId -> scanned tree node | null
 
-export const sourceById = id => sources.value.find(s => s.id === id) ?? null;
+const lib = new zugriff.fs.FolderLibrary({
+  db:       'zugriff-notes',
+  pickerId: 'zugriff-notes',
+  stores:   { sources: {} },
 
-// ── loading ────────────────────────────────────────────────────────────────
+  // a scan just (re)builds this source's tree; on a lost grant, flip it back to
+  // "prompt" and surface the error on the node, then rethrow (rescanAll swallows)
+  scan: async (s, { lib }) => {
+    try {
+      const tree = await fs.scanTree(s.handle, { accept });
+      trees.value = { ...trees.value, [s.id]: tree };
+    } catch (err) {
+      if (err?.name === 'NotAllowedError') lib.perms.value = { ...lib.perms.value, [s.id]: 'prompt' };
+      trees.value = { ...trees.value, [s.id]: { ...(trees.value[s.id]), error: err.message } };
+      throw err;
+    }
+  },
 
-export async function load () {
-  await db.setup({ sources: {} });
-  const rows = await db.getAll('sources');
-  sources.value = Object.values(rows).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
+  // drop the source's tree when the folder is forgotten
+  cascade: (id) => {
+    const t = { ...trees.value }; delete t[id]; trees.value = t;
+  },
+});
 
-  // resolve every handle's permission first (fast, never prompts) so the tree
-  // never flashes a spurious "reconnect", then reveal the ui …
-  await Promise.all(sources.value.map(async s => {
-    const state = await fs.queryPermission(s.handle, 'read');
-    perms.value = { ...perms.value, [s.id]: state };
-  }));
-  ready.value = true;
+// sources / perms / scanning / ready are owned by the library
+export const { sources, perms, scanning, ready } = lib;
+export const sourceById = lib.sourceById;
 
-  // … and scan the already-granted folders in the background, so a big vault
-  // doesn't hold up first paint
-  sources.value.forEach(s => { if (perms.value[s.id] === 'granted') scan(s.id).catch(() => {}); });
-}
-
-// ── folders ──────────────────────────────────────────────────────────────
-
-/** grant a new folder. returns the record, or null if the picker was dismissed. */
-export async function addFolder () {
-  const handle = await fs.pickDirectory({ id: 'zugriff-notes', mode: 'read' });
-  if (!handle) return null;
-
-  for (const s of sources.value) {
-    if (await s.handle.isSameEntry?.(handle)) throw new Error('That folder is already open.');
-  }
-
-  const rec = { id: crypto.randomUUID(), name: handle.name, handle, addedAt: Date.now() };
-  await db.set('sources', rec.id, rec);
-  sources.value = [...sources.value, rec];
-  perms.value   = { ...perms.value, [rec.id]: 'granted' };
-  await scan(rec.id);
-  return rec;
-}
-
-/**
- * fast path: re-grant a folder from an earlier session via the stored handle.
- * requestPermission() must run inside the click, so this is called directly
- * from the button. browsers are flaky about re-granting a *stored* handle,
- * which is why repick() exists as the reliable fallback.
- */
-export async function reconnect (id) {
-  const s = sourceById(id);
-  if (!s) return { granted: false };
-  const res = await fs.requestRead(s.handle, 'read');
-  perms.value = { ...perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
-  if (res.granted) await scan(id);
-  return res;
-}
-
-/**
- * reliable fallback: re-pick the same folder. showDirectoryPicker() remembers
- * the location (via the shared id / startIn) and always hands back a freshly
- * granted handle, so this works even when reconnect() can't re-grant the stored
- * one. the new handle replaces the old, and progress/expansion is keyed by path
- * so nothing is lost.
- */
-export async function repick (id) {
-  const s = sourceById(id);
-  if (!s) return false;
-  const handle = await fs.pickDirectory({ id: 'zugriff-notes', mode: 'read' });
-  if (!handle) return false;                       // cancelled
-  const rec = { ...s, name: handle.name, handle };
-  await db.set('sources', id, rec);
-  sources.value = sources.value.map(x => x.id === id ? rec : x);
-  perms.value   = { ...perms.value, [id]: 'granted' };
-  await scan(id);
-  return true;
-}
-
-/** forget a folder — drops the handle only, never touches the files on disk. */
-export async function removeFolder (id) {
-  await db.delete('sources', id);
-  sources.value = sources.value.filter(s => s.id !== id);
-  const t = { ...trees.value };   delete t[id];   trees.value   = t;
-  const p = { ...perms.value };   delete p[id];   perms.value   = p;
-}
-
-// ── scanning ───────────────────────────────────────────────────────────────
-
-export async function scan (id) {
-  const s = sourceById(id);
-  if (!s) return;
-  scanning.value = { ...scanning.value, [id]: true };
-  try {
-    const tree = await fs.scanTree(s.handle, { accept });
-    trees.value = { ...trees.value, [id]: tree };
-  } catch (err) {
-    if (err?.name === 'NotAllowedError') perms.value = { ...perms.value, [id]: 'prompt' };
-    trees.value = { ...trees.value, [id]: { ...(trees.value[id]), error: err.message } };
-    throw err;
-  } finally {
-    scanning.value = { ...scanning.value, [id]: false };
-  }
-}
-
-export const rescanAll = () => Promise.all(
-  sources.value.filter(s => perms.value[s.id] === 'granted').map(s => scan(s.id).catch(() => {})),
-);
+export const load         = lib.load;
+export const addFolder    = lib.addFolder;
+export const reconnect    = lib.reconnect;
+export const repick       = lib.repick;
+export const removeFolder = lib.removeFolder;
+export const scan         = lib.scan;
+export const rescanAll    = lib.rescanAll;
 
 // ── reading ────────────────────────────────────────────────────────────────
 

@@ -1,13 +1,22 @@
-// shared/js/vfs.js
-// Virtual File System wrapper using Origin Private File System (OPFS)
+// shared/js/filesystem/opfs.js
+//
+// the private Origin Private File System (OPFS) — storage the origin owns
+// outright, with no picker and no permission prompt. this is the counterpart to
+// fsaccess.js, which wraps a folder the *user* hands us off their real disk.
+// there is exactly one OPFS per origin, so this module exports a single shared
+// instance (`opfs`); it is what hangs off the runtime as `zugriff.opfs`.
+//
+// a "path" here is a plain filename in the flat root — all the cli needs.
+// anything that walks a tree of handles (OPFS or a granted folder alike) uses
+// dirfs.js on top of a root handle instead.
 
-export class VFS {
-  constructor() {
+export class OPFS {
+  constructor () {
     this.root = null;
   }
 
   // Initialize connection to browser OPFS
-  async init() {
+  async init () {
     if ('storage' in navigator && 'getDirectory' in navigator.storage) {
       this.root = await navigator.storage.getDirectory();
     } else {
@@ -16,7 +25,7 @@ export class VFS {
   }
 
   // List all files in the root virtual directory
-  async listFiles() {
+  async listFiles () {
     if (!this.root) await this.init();
     const files = [];
     for await (const [name, handle] of this.root.entries()) {
@@ -52,5 +61,11 @@ export class VFS {
   }
 }
 
-export const   vfs = new VFS;
-export default vfs;
+export const opfs = new OPFS;
+
+// legacy names — the class and instance used to be called VFS / vfs (vfs.js).
+// kept so existing importers (e.g. cli/app.js) keep working.
+export const VFS = OPFS;
+export const vfs = opfs;
+
+export default opfs;
