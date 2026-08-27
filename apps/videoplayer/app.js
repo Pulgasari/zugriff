@@ -1,10 +1,4 @@
 // apps/videoplayer/app.js
-//
-// a phone-first video player for a single file off the device. no library, no
-// storage: pick a video, play it, and reach for the transform row when a clip
-// is the wrong way round — loop, forced aspect, crop-to-fill, reverse, mirror,
-// rotate. the file never leaves the page (a local object url), and the chrome
-// gets out of the way on a double-tap.
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -18,9 +12,6 @@ import { Icon, Taplet } from './../../shared/js/components/index.js';
 // ::: local
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
-// plain signals — this app has no persistence, so state lives only for the
-// session. the <video> element is the source of truth for time; the signals
-// mirror it so the ui can render.
 
 const
 src      = signal(null),      // object url of the loaded file, or null
@@ -359,5 +350,4 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
-// the app draws its own chrome, so it skips the tools Shell
 boot({ config, App });
