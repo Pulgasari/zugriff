@@ -14,9 +14,9 @@
 // lands.
 
 import { signal, computed } from '@aufbau/kits/preact-htm';
-import { createDb } from '@bunker/db';
-import { createPool } from './../../shared/js/lib/pool.js';
-import * as fs from './../../shared/js/lib/fsaccess.js';
+import { createDb }         from '@bunker/db';
+import { createPool } .     from './../../shared/js/lib/pool.js';
+import * as fs              from './../../shared/js/lib/fsaccess.js';
 import { accept, kindOf, prettyName, extractMeta } from './library.js';
 
 const db    = createDb('zugriff-ebooks');
