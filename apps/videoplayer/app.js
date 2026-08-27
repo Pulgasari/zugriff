@@ -7,7 +7,8 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=videoplayer';
-import { Icon, Taplet } from './../../shared/js/components/index.js';
+import { Icon, Taplet, SettingsGroups } from './../../shared/js/components/index.js';
+import { appGroup } from './../../shared/js/lib/settings.js';
 
 // ::: local
 
@@ -180,7 +181,7 @@ function Taplet ({ icon, size, title, onClick }) {
 }
 */
 
-const setBoolSignal = (signal, value) => typeof signal !== 'undefined' && signal.value = Boolean(value);
+const setBoolSignal = (signal, value) => { if (typeof signal !== 'undefined') signal.value = Boolean(value); };
 
 function SettingsTaplet () {
   return html`<${Taplet} icon='settings' title='Settings' onClick=${() => settingsOpen.value = true} />`;    
@@ -192,7 +193,8 @@ function TopBar () {
   return html`
     <header class="topbar">
       <span class="title">${title.value || config.name}</span>
-      
+      <span class="spacer"></span>
+      <${SettingsTaplet} />
     </header>`;
 }
 
@@ -260,7 +262,6 @@ function Controls () {
     </div>`;
 }
 
-// stub — the panel is only prepared for now; real settings land later
 function SettingsPanel () {
   if (!settingsOpen.value) return null;
   return html`
@@ -273,8 +274,7 @@ function SettingsPanel () {
           </button>
         </header>
         <div class="sheet-body">
-          <p class="muted">Nothing to tune yet — this is where playback and gesture
-            settings will live.</p>
+          <${SettingsGroups} groups=${[appGroup]} />
         </div>
       </aside>
     </div>`;

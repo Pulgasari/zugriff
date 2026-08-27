@@ -19,8 +19,9 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=feeds';
-import { Icon }   from './../../shared/js/components/index.js';
+import { Icon, SettingsGroups } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
+import { appGroup } from './../../shared/js/lib/settings.js';
 
 // ::: local
 import * as db from './db.js';
@@ -337,6 +338,7 @@ function SettingsDialog () {
             <button class="btn ghost small" onClick=${() => proxy.value = ''}>Direct only</button>
           </div>
         </label>
+        <${SettingsGroups} groups=${[appGroup]} />
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => { dialog.value = null; flash('Settings saved'); }}>Done</button>
         </div>

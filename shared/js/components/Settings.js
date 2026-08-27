@@ -14,6 +14,7 @@
 import { html, signal, useRef, useEffect, useState } from '@aufbau/kits/preact-htm';
 import * as gui from '@aufbau/runtime/gui.js';
 import Icon from './Icon.js';
+import { appGroup, themeGroup } from './../lib/settings.js';
 
 // :::::: STATE + HELPERS
 
@@ -57,7 +58,7 @@ function Group ({ group }) {
   const reset = () => { settings.reset(); setNonce(n => n + 1); };
 
   return html`
-    <section>
+    <section class="settings-group">
       <header>
         <code class="settings-title">${title}</code>
         <button class="ghost-btn" onClick=${reset} title="back to defaults">
@@ -68,12 +69,23 @@ function Group ({ group }) {
     </section>`;
 }
 
-function Settings ({ groups = [] }) {
+// just the group sections — no open/close gating, no panel wrapper. this is what
+// an app folds into its own settings dialog to show, say, only the app (font/dir)
+// group inline.
+function SettingsGroups ({ groups = [] }) {
+  return groups.map(group => html`<${Group} key=${group.title} group=${group} />`);
+}
+
+// the standalone panel: gated by the shared settingsOpen signal and wrapped in
+// #app-settings. `overlay` marks it as the fixed dropdown the /apps chrome uses
+// (styled by shared/css/settings.css); the tools Shell + launcher leave it off
+// and keep the inline panel their own sheets style.
+function Settings ({ groups = [], overlay = false }) {
   if (!settingsOpen.value) return null;
 
   return html`
-    <div id="app-settings">
-      ${groups.map(group => html`<${Group} key=${group.title} group=${group} />`)}
+    <div id="app-settings" class=${overlay ? 'app-settings-overlay' : ''}>
+      <${SettingsGroups} groups=${groups} />
     </div>`;
 }
 
@@ -88,6 +100,15 @@ function SettingsButton () {
     </button>`;
 }
 
+// drop-in for an app that draws its own chrome: the header gear plus the overlay
+// panel, defaulting to the predefined app settings (font + direction) and theme.
+// place it in the app's header actions — the panel positions itself.
+function AppSettings ({ groups = [appGroup, themeGroup] }) {
+  return html`
+    <${SettingsButton} />
+    <${Settings} groups=${groups} overlay />`;
+}
+
 // :::::: EXPORT
 
 export {
@@ -95,7 +116,9 @@ export {
   toggleSettings,
   // components
   Settings,
+  SettingsGroups,
   SettingsButton,
+  AppSettings,
 }
 
 export default Settings;

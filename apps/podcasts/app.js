@@ -19,8 +19,9 @@ const { computed, signal, useEffect, useRef, useSignal } = preact;
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=podcasts';
-import { Icon }             from './../../shared/js/components/index.js';
+import { Icon, SettingsGroups } from './../../shared/js/components/index.js';
 import { stored }           from './../../shared/js/lib/signals.js';
+import { appGroup }         from './../../shared/js/lib/settings.js';
 import { createThumbCache } from './../../shared/js/lib/thumbs.js';
 
 // ::: local
@@ -675,6 +676,8 @@ function SettingsDialog () {
                    onChange=${e => { doImport(e.target.files[0]); e.target.value = ''; }} />
           </span>
         </div>
+
+        <${SettingsGroups} groups=${[appGroup]} />
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {

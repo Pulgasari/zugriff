@@ -14,6 +14,10 @@
    theme chosen anywhere in zugriff carries into every app */
 @import url('./../shared/css/theme.css');
 
+/* the shared Settings panel (gear + font/dir/theme dropdown). self-contained so
+   an app gets it from base.css alone, without the tools' components.css */
+@import url('./../shared/css/settings.css');
+
 *, *::before, *::after {
   box-sizing : border-box;
   margin     : 0;

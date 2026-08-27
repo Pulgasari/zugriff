@@ -20,7 +20,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=image-viewer';
-import { Icon } from './../../shared/js/components/index.js';
+import { Icon, AppSettings } from './../../shared/js/components/index.js';
 import * as pwa from './../../shared/js/lib/pwa.js';
 import { useGesture } from '@aufbau/gestures/preact';
 
@@ -190,6 +190,7 @@ function TopBar () {
         <${IconBtn} icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
         <${IconBtn} icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
         ${s && html`<${IconBtn} icon="mdi:close" label="Close image" onClick=${removeCurrent} />`}
+        <${AppSettings} />
       </div>
     </header>`;
 }

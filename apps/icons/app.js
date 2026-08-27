@@ -13,7 +13,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=icons';
-import { Icon }   from './../../shared/js/components/index.js';
+import { Icon, AppSettings } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -294,6 +294,7 @@ function TopBar () {
 
       <span class="spacer"></span>
       ${grid && html`<${SizeControl} />`}
+      <${AppSettings} />
     </header>`;
 }
 
