@@ -56,11 +56,11 @@ const youtubeFeeds = computed(() => db.feeds.value.filter(f => f.kind === 'youtu
 // the list + heading for whatever the route points at
 const currentView = computed(() => {
   const r = route.value;
-  if (r.name === 'youtube') return { title: 'YouTube', icon: 'mdi:youtube', kind: 'youtube', list: db.latestVideos.value };
+  if (r.name === 'youtube') return { title: 'YouTube', icon: 'youtube', kind: 'youtube', list: db.latestVideos.value };
   if (r.name === 'feed') {
     const f = db.feedById(r.id);
-    if (!f) return { title: 'Gone', icon: 'mdi:rss', kind: 'feed', list: [] };
-    return { title: f.title, icon: f.kind === 'youtube' ? 'mdi:youtube' : 'mdi:rss', kind: f.kind, list: db.itemsByFeed.value[f.id] || [], feed: f };
+    if (!f) return { title: 'Gone', icon: 'rss', kind: 'feed', list: [] };
+    return { title: f.title, icon: f.kind === 'youtube' ? 'youtube' : 'rss', kind: f.kind, list: db.itemsByFeed.value[f.id] || [], feed: f };
   }
   return { title: 'Latest', icon: 'mdi:playlist-star', kind: 'feed', list: db.latestArticles.value };
 });
