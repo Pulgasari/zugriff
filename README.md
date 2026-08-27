@@ -1,3 +1,5 @@
+![Logo](/logo.svg)
+
 # zugriff
 
 client-side mini-PWAs. static files only — no build step, no bundler, no node
