@@ -5,19 +5,6 @@
 // is the wrong way round — loop, forced aspect, crop-to-fill, reverse, mirror,
 // rotate. the file never leaves the page (a local object url), and the chrome
 // gets out of the way on a double-tap.
-//
-// layout (mobile):
-//   ┌───────────────────────────┐
-//   │ title            ⚙ settings│  topbar
-//   ├───────────────────────────┤
-//   │                           │
-//   │        the video          │  stage — double-tap here toggles the chrome
-//   │                           │
-//   ├───────────────────────────┤
-//   │  ⏪  ⏮  ▶  ⏭  ⏩          │  controls, top row: transport
-//   │  ───────●───────────      │  progress
-//   │  loop aspect crop rev …    │  controls, bottom row: transforms
-//   └───────────────────────────┘
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -202,7 +189,7 @@ function Taplet ({ icon, size, title, onClick }) {
 }
 */
 
-const setBoolSignal = (signal, value) => typeof !== 'undefined' && signal.value = Boolean(value);
+const setBoolSignal = (signal, value) => typeof signal !== 'undefined' && signal.value = Boolean(value);
 
 function SettingsTaplet () {
   return html`<${Taplet} icon='settings' title='Settings' onClick=${() => settingsOpen.value = true} />`;    
