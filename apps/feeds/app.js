@@ -9,8 +9,6 @@
 // YouTube gets its own department: a channel url / @handle is resolved to its
 // RSS feed, and those entries render as video cards in a separate section
 // instead of article rows.
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -22,7 +20,8 @@ import { boot, config } from './../../shared/js/app.js?slug=feeds';
 import { stored }       from './../../shared/js/lib/signals.js';
 import { appGroup }     from './../../shared/js/lib/settings.js';
 import {
-  Icon, 
+  Icon,
+  Image,
   SettingsGroups
 } from './../../shared/js/components/index.js';
 
@@ -141,7 +140,7 @@ function NavItem ({ name, id, icon, label, count }) {
   const active = r.name === name && r.id === id;
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => go(name, id)} title=${label}>
-      <${Icon} name=${icon} size=${17} />
+      <${Icon} name=${icon} />
       <span class="nav-label">${label}</span>
       ${count > 0 && html`<span class="nav-count">${count}</span>`}
     </button>`;
@@ -156,12 +155,12 @@ function FeedItem ({ feed: f }) {
     <div class=${'feed-row' + (active ? ' active' : '')}>
       <button class="feed-open" onClick=${() => go('feed', f.id)} title=${f.title}>
         <span class="feed-ic">
-          ${spin ? html`<${Icon} name="loading" size=${15} />`
+          ${spin ? html`<${Icon} name="loading" />`
                  : f.image ? html`<img src=${f.image} alt="" loading="lazy" onError=${e => e.target.style.display = 'none'} />`
-                           : html`<${Icon} name=${f.kind === 'youtube' ? 'youtube' : 'rss'} size=${15} />`}
+                           : html`<${Icon} name=${f.kind === 'youtube' ? 'youtube' : 'rss'} />`}
         </span>
         <span class="feed-name">${f.title}</span>
-        ${f.error ? html`<${Icon} name="alert" size=${14} className="feed-err" />`
+        ${f.error ? html`<${Icon} name="alert" className="feed-err" />`
                   : unread > 0 && html`<span class="nav-count">${unread}</span>`}
       </button>
       <button class="feed-x" title="Unfollow" onClick=${() => removeFeed(f)}>
@@ -210,7 +209,7 @@ function Sidebar () {
         <button class="foot-btn" onClick=${refreshCurrent} disabled=${!!busy.value || !db.feeds.value.length}>
           <${Icon} name="refresh" /> Refresh</button>
         <button class="foot-btn" onClick=${() => dialog.value = 'settings'}>
-          <${Icon} name="mdi:cog-outline" /> Settings</button>
+          <${Icon} name="settings" /> Settings</button>
       </div>
     </aside>`;
 }
@@ -247,8 +246,8 @@ function VideoCard ({ item }) {
       >
       <div class="vid-thumb">
         ${item.image
-          ? html`<img src=${item.image} alt="" loading="lazy" />`
-          : html`<div class="vid-noimg"><${Icon} name="mdi:youtube" size=${34} /></div>`}
+          ? html`<${Image} src=${item.image} />`
+          : html`<div class="vid-noimg"><${Icon} name="youtube" size=${32} /></div>`}
         ${unread && html`<span class="vid-new">new</span>`}
       </div>
       <div class="vid-title">${item.title}</div>
@@ -266,15 +265,13 @@ function Body () {
         <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} size=${56} />
         <p>${hasFeeds ? 'Nothing here yet — try Refresh.' : 'Follow a feed to see the latest here.'}</p>
         ${!hasFeeds && html`<button class="cta" onClick=${() => { addVal.value = ''; dialog.value = 'add'; }}>
-          <${Icon} name="plus" size=${17} /> Add your first feed</button>`}
+          <${Icon} name="plus" /> Add your first feed</button>`}
       </div>`;
   }
 
-  if (v.kind === 'youtube') return html`
-    <div class="videos">${v.list.map(it => html`<${VideoCard} key=${it.key} item=${it} />`)}</div>`;
+  if (v.kind === 'youtube') return html`<div class="videos">${v.list.map(it => html`<${VideoCard} key=${it.key} item=${it} />`)}</div>`;
 
-  return html`
-    <div class="posts">${v.list.map(it => html`<${ArticleRow} key=${it.key} item=${it} />`)}</div>`;
+  return html`<div class="posts">${v.list.map(it => html`<${ArticleRow} key=${it.key} item=${it} />`)}</div>`;
 }
 
 function Header () {
@@ -282,18 +279,18 @@ function Header () {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}>
-        <${Icon} name="menu" size=${20} /></button>
-      <${Icon} name=${v.icon} size=${20} className="topbar-ic" />
+        <${Icon} name="menu" /></button>
+      <${Icon} name=${v.icon} className="topbar-ic" />
       <h1 class="topbar-title" title=${v.title}>${v.title}</h1>
       ${v.feed?.link && html`<a class="ibtn" href=${v.feed.link} target="_blank" rel="noopener noreferrer" title="Open site">
-        <${Icon} name="mdi:open-in-new" size=${17} /></a>`}
+        <${Icon} name="mdi:open-in-new" /></a>`}
       <span class="topbar-spacer"></span>
-      ${busy.value && html`<span class="topbar-busy"><${Icon} name="svg-spinners:bars-scale-middle" size=${14} /> ${busy.value}</span>`}
+      ${busy.value && html`<span class="topbar-busy"><${Icon} name="loading" size=${14} /> ${busy.value}</span>`}
       ${v.list.length > 0 && html`
         <button class="ibtn" title="Mark all read" onClick=${markAllRead}>
-          <${Icon} name="mdi:check-all" size=${18} /></button>`}
+          <${Icon} name="mdi:check-all" /></button>`}
       <button class="ibtn" title="Refresh" onClick=${refreshCurrent} disabled=${!!busy.value}>
-        <${Icon} name="refresh" size=${18} /></button>
+        <${Icon} name="refresh" /></button>
     </header>`;
 }
 
@@ -313,8 +310,8 @@ function AddDialog () {
                onInput=${e => addVal.value = e.target.value}
                onKeyDown=${e => { if (e.key === 'Enter') submitAdd(); }} />
         <div class="modal-actions">
-          <button class="btn ghost" onClick=${() => dialog.value = null}>Cancel</button>
-          <button class="btn primary" disabled=${!!busy.value} onClick=${submitAdd}>
+          <button class="ghost" onClick=${() => dialog.value = null}>Cancel</button>
+          <button class="primary" disabled=${!!busy.value} onClick=${submitAdd}>
             ${busy.value ? 'Adding…' : 'Add'}</button>
         </div>
       </div>
@@ -341,7 +338,7 @@ function SettingsDialog () {
         </label>
         <${SettingsGroups} groups=${[appGroup]} />
         <div class="modal-actions">
-          <button class="btn primary" onClick=${() => { dialog.value = null; flash('Settings saved'); }}>Done</button>
+          <button class="primary" onClick=${() => { dialog.value = null; flash('Settings saved'); }}>Done</button>
         </div>
       </div>
     </div>`;
