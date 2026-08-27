@@ -10,14 +10,14 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 ## apps
 - [audio manager](https://zugriff.dev/apps/audio-manager/)
 - [ebooks](https://zugriff.dev/apps/ebooks/)
-- [file explorer](https://zugriff.dev/apps/files/)
+- [feeds](https://zugriff.dev/apps/feeds/)
+- [files](https://zugriff.dev/apps/files/)
 - [gifmaker](https://zugriff.dev/apps/gifmaker/)
 - [icons](https://zugriff.dev/apps/icons/)
 - [image editor](https://zugriff.dev/apps/image-editor/)
 - [image viewer](https://zugriff.dev/apps/image-viewer/)
 - [notes](https://zugriff.dev/apps/notes/)
 - [podcasts](https://zugriff.dev/apps/podcasts/)
-- [rss reader](https://zugriff.dev/apps/feeds/)
 - [videoplayer](https://zugriff.dev/apps/videoplayer/)
 
 ---
