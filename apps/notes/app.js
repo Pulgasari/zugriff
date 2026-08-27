@@ -19,7 +19,7 @@ import { renderMD } from '@aufbau/import';
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=notes';
-import { Icon }   from './../../shared/js/components/index.js';
+import { Icon, AppSettings } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
 import * as pwa   from './../../shared/js/lib/pwa.js';
@@ -380,6 +380,8 @@ function ReaderBody ({ note, bodyRef, onClick }) {
                   <span class=${i === segs.length - 1 ? 'crumb last' : 'crumb'}>${seg}</span></span>`)}
             </nav>`
           : html`<span class="crumb head-brand">Notes</span>`}
+        <span class="spacer"></span>
+        <${AppSettings} />
       </header>
 
       ${note

@@ -20,7 +20,7 @@ import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot, config }  from './../../shared/js/app.js?slug=files';
-import { Icon, FileExplorer } from './../../shared/js/components/index.js';
+import { Icon, FileExplorer, AppSettings } from './../../shared/js/components/index.js';
 import * as fs   from './../../shared/js/lib/fsaccess.js';
 import * as pwa  from './../../shared/js/lib/pwa.js';
 
@@ -154,6 +154,7 @@ function Sidebar () {
           <a href="./../"><${Icon} name="mdi:view-grid-outline" size="14" /> apps</a>
           <a href="./../../"><${Icon} name="mdi:home-outline" size="14" /> launcher</a>
           <a href="./../../cli/"><${Icon} name="mdi:console" size="14" /> cli</a>
+          <${AppSettings} />
         </div>
       </div>
     </aside>`;

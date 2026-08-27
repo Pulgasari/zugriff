@@ -12,7 +12,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=audio-manager';
-import { Icon }   from './../../shared/js/components/index.js';
+import { Icon, AppSettings } from './../../shared/js/components/index.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
 import * as pwa   from './../../shared/js/lib/pwa.js';
 
@@ -349,6 +349,7 @@ function TopBar () {
         <input type="search" placeholder="Search…" value=${search.value} onInput=${e => search.value = e.target.value} />
       </div>
       <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" size=${18} /></button>
+      <${AppSettings} />
     </header>`;
 }
 

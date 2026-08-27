@@ -12,7 +12,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=gifmaker';
-import { Icon, Slider } from './../../shared/js/components/index.js';
+import { Icon, Slider, AppSettings } from './../../shared/js/components/index.js';
 import { stored }       from './../../shared/js/lib/signals.js';
 
 // ::: local
@@ -299,6 +299,7 @@ function Toolbar ({ onAdd, onImport }) {
       <button class="btn primary" onClick=${exportGif} disabled=${!n || busy.value}>
         <${Icon} name="mdi:file-gif-box" size="16" /> Export GIF
       </button>
+      <${AppSettings} />
     </div>`;
 }
 

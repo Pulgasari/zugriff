@@ -7,7 +7,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=ebooks';
-import { Icon }   from './../../shared/js/components/index.js';
+import { Icon, AppSettings } from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 import * as fs    from './../../shared/js/lib/fsaccess.js';
 import * as pwa   from './../../shared/js/lib/pwa.js';
@@ -200,6 +200,7 @@ function Library () {
           <${IconBtn} icon="mdi:refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
           <button class="btn primary" onClick=${addFolder}>
             <${Icon} name="mdi:folder-plus-outline" size=${16} /> Add folder</button>
+          <${AppSettings} />
         </div>
       </header>
 

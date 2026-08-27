@@ -19,8 +19,10 @@ export { copy }               from './CopyIcon.js';
 export { icons, resolveIcon } from './../data/icons.js';
 export { toEntry }            from './Dropzone.js';
 
-export { 
-  SettingsButton, 
-  settingsOpen, 
+export {
+  SettingsButton,
+  SettingsGroups,
+  AppSettings,
+  settingsOpen,
   toggleSettings,
 } from './Settings.js';
