@@ -1,3 +1,4 @@
+// shared/js/vfs.js
 // Virtual File System wrapper using Origin Private File System (OPFS)
 
 export class VFS {
@@ -28,27 +29,28 @@ export class VFS {
   }
 
   // Write a file buffer to OPFS
-  async writeFile(filename, data) {
+  async writeFile (filename, data) {
     if (!this.root) await this.init();
     const fileHandle = await this.root.getFileHandle(filename, { create: true });
-    const writable = await fileHandle.createWritable();
+    const writable   = await fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
   }
 
   // Read a file from OPFS as ArrayBuffer
-  async readFile(filename) {
+  async readFile (filename) {
     if (!this.root) await this.init();
-    const fileHandle = await this.root.getFileHandle(filename);
-    const file = await fileHandle.getFile();
-    return await file.arrayBuffer();
+    const handle = await this.root.getFileHandle(filename);
+    const file   = await handle.getFile();
+    return         await file.arrayBuffer();
   }
 
   // Remove a file from OPFS
-  async removeFile(filename) {
+  async removeFile (filename) {
     if (!this.root) await this.init();
     await this.root.removeEntry(filename);
   }
 }
 
-export const vfs = new VFS();
+export const   vfs = new VFS;
+export default vfs;
