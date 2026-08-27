@@ -123,6 +123,20 @@ jobs:
           APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-twa-manifest.mjs "$DIR/twa-manifest.json"
           cd "$DIR"
           bubblewrap update --skipVersionUpgrade    # scaffold the Android project from twa-manifest.json
+
+          # Pre-build the release artifacts with Gradle directly, before handing
+          # off to `bubblewrap build`. Bubblewrap (core 1.25.0) shells out to
+          # gradle through child_process.exec/execFile WITHOUT a maxBuffer, so on a
+          # cold build gradle's stdout+stderr blows past Node's 1 MB default and the
+          # CLI dies with "stderr maxBuffer length exceeded" before it can sign —
+          # and that error hides whatever gradle actually said. Running the release
+          # tasks here sends gradle's output straight to the (unbounded) CI log, so
+          # a real failure is visible, every download + cache is warmed, and
+          # bubblewrap's own gradle run below comes back UP-TO-DATE — a few lines,
+          # safely under the cap — leaving it only the signing to do.
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease --stacktrace --console=plain --no-daemon
+
           bubblewrap build --skipPwaValidation      # -> app-release-signed.apk + app-release-bundle.aab
 
       - name: Upload APK + AAB for ${{ matrix.app }}
