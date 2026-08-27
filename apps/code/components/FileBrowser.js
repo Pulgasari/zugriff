@@ -4,8 +4,11 @@
 import { html, signal, useEffect } from '@aufbau/kits/preact-htm';
 import state    from './../state.js';
 import fs       from './../fs.js';
+import * as fsops from './../fsops.js';
+import { clipboard, version, bump, ask, validName } from './../treeops.js';
 import Modal    from './Modal.js';
 import Icon     from './Icon.js';
+import RowMenu  from './RowMenu.js';
 import TreeNode from './TreeNode.js';
 
 export const filesSignal = signal([]);
@@ -75,6 +78,33 @@ export default function FileBrowser () {
     }
   };
 
+  // re-read the root listing whenever anything in the local tree changes
+  useEffect(() => {
+    const root = state.currentDirHandle;
+    if (root && statusSignal.peek() === 'ready') fs.readDir(root).then(e => { filesSignal.value = e; }).catch(() => {});
+  }, [version.local.value]);
+
+  // ── root-level actions ─────────────────────────────────────────────────
+  const rootNewFile = async () => {
+    const root = state.currentDirHandle; if (!root) return;
+    const name = await ask('New file'); if (!validName(name) || await fsops.exists(root, name)) return;
+    await fsops.createFile(root, name); bump('local');
+  };
+  const rootNewFolder = async () => {
+    const root = state.currentDirHandle; if (!root) return;
+    const name = await ask('New folder'); if (!validName(name) || await fsops.exists(root, name)) return;
+    await fsops.createDir(root, name); bump('local');
+  };
+  const rootPaste = async () => {
+    const root = state.currentDirHandle, cb = clipboard.value;
+    if (!root || !cb || cb.source !== 'local') return;
+    let name = cb.name;
+    if (await fsops.exists(root, name)) { name = await ask('Name exists — new name', name); if (!validName(name)) return; }
+    if (cb.mode === 'copy') await fsops.copyInto(cb.ctx.entry, root, name);
+    else { await fsops.moveInto(cb.ctx.entry, cb.ctx.parent, root); clipboard.value = null; state.closeById(cb.ctx.entry); }
+    bump('local');
+  };
+
   const restoreDirectory = async () => {
     const handle = savedHandleSignal.peek();
     if (!handle) return;
@@ -127,11 +157,17 @@ export default function FileBrowser () {
             <${Icon} name="material-symbols:lock-outline" size="24" /><br/>
             Reconnect <strong>${savedHandle?.name}</strong> to continue.
           </div>`}
+        ${status === 'ready' && html`
+          <div class="tree-rootbar">
+            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><${Icon} name="material-symbols:note-add-outline" size="18" /></button>
+            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><${Icon} name="material-symbols:create-new-folder-outline" size="18" /></button>
+            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><${Icon} name="paste" size="18" /></button>`}
+          </div>`}
         ${(status === 'ready' || status === 'idle') && html`
           ${files.length === 0
             ? html`<div class="none"><${Icon} name="material-symbols:info" size="24" /><br/>No folder loaded.</div>`
             : html`<ul class="tree-root">
-                ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} depth=${0} />`)}
+                ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} parent=${state.currentDirHandle} depth=${0} />`)}
               </ul>`}
         `}
       </div>

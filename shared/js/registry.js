@@ -61,7 +61,7 @@ const entries = [
     name        : 'Code',
     short_name  : 'Code',
     icon        : 'mdi:code-braces',
-    description : 'A mobile-first code editor — grant a folder and edit its files with Monaco, a code keyboard and a command palette, all on device.',
+    description : 'A mobile-first code editor — edit a local folder or your GitHub repos with Monaco, a code keyboard and a command palette.',
     categories  : ['code', 'files'],
   },
   {

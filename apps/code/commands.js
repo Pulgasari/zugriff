@@ -11,10 +11,38 @@
 
 import state  from './state.js';
 import editor from './editor.js';
+import { openPrompt } from './../../shared/js/components/index.js';
+
+// a promise-returning commit-message prompt (default = the auto message)
+const askCommitMessage = (path) => new Promise(resolve => openPrompt({
+  title: 'Commit message',
+  placeholder: `Update ${path}`,
+  value: `Update ${path}`,
+  onConfirm: msg => resolve(msg || `Update ${path}`),
+  onCancel: () => resolve(null),
+}));
 
 // helpers
 const monacoAction  = id => state.monaco?.getAction(id)?.run();
 const monacoTrigger = id => state.monaco?.trigger('keyboard', id, null);
+
+// save one file, surfacing a failed GitHub commit in the GitHub modal rather
+// than throwing into the void (a local save that fails just returns false)
+const save = async (file) => {
+  if (!file || file.readOnly) return;
+  try {
+    if (file.source === 'github' && state.config.commitPrompt.value) {
+      const message = await askCommitMessage(file.gh.path);
+      if (message == null) return;            // cancelled
+      await state.saveActiveFile({ message });
+    } else {
+      await state.saveActiveFile();
+    }
+  } catch (e) {
+    if (file.source === 'github') { state.github.error.value = e.message; state.openModal('github'); }
+    else console.error('[code] save failed:', e);
+  }
+};
 
 const commands = new Map([
   // ── UI ──────────────────────────────────────────────────────────────────
@@ -23,6 +51,7 @@ const commands = new Map([
   ['toolbar:toggle'     , { name: 'Toggle Toolbar'     , exec: () => state.toggleSignal(state.config.showToolbar)   }],
   ['statusbar:toggle'   , { name: 'Toggle Statusbar'   , exec: () => state.toggleSignal(state.config.showStatusbar) }],
   ['filebrowser:toggle' , { name: 'Toggle File Browser', exec: () => state.toggleModal('filebrowser') }],
+  ['github:toggle'      , { name: 'Toggle GitHub'      , exec: () => state.toggleModal('github')      }],
   ['commands:toggle'    , { name: 'Toggle Commands'    , exec: () => state.toggleModal('commands')    }],
   ['plugins:toggle'     , { name: 'Toggle Plugins'     , exec: () => state.toggleModal('plugins')     }],
   ['settings:toggle'    , { name: 'Toggle Settings'    , exec: () => state.toggleModal('settings')    }],
@@ -30,10 +59,10 @@ const commands = new Map([
 
   // ── File ────────────────────────────────────────────────────────────────
   ['file:close'   , { name: 'Close File' , exec: () => { const f = state.activeFile.value; if (f) state.closeFile(f); } }],
-  ['file:save'    , { name: 'Save File'  , exec: () => state.saveActiveFile() }],
+  ['file:save'    , { name: 'Save File'  , exec: () => save(state.activeFile.value) }],
   ['file:saveAll' , { name: 'Save All'   , exec: async () => {
-    for (const f of state.openFiles.value) {
-      if (f.isDirty) { state.activeFile.value = f; await state.saveActiveFile(); }
+    for (const f of [...state.openFiles.value]) {
+      if (f.isDirty) { state.activeFile.value = f; await save(f); }
     }
   } }],
 

@@ -32,6 +32,11 @@ export default function Statusbar () {
 
   return html`
     <div id="statusbar">
+      ${file?.source === 'github' && html`
+        <span class="sb-item sb-github" title=${`${file.gh.owner}/${file.gh.name}@${file.gh.branch}`}>
+          ${file.gh.owner}/${file.gh.name}@${file.gh.branch}
+        </span>
+        <span class="sb-sep">·</span>`}
       ${file ? html`
         <span class="sb-item sb-language">${file.language}</span>
         <span class="sb-sep">·</span>

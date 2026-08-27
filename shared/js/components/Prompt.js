@@ -8,8 +8,8 @@ import GhostButton from './GhostButton.js';
 
 const promptState = signal(null);
 
-export function openPrompt ({ title, placeholder = '', type = 'text', onConfirm, onCancel }) {
-  promptState.value = { title, placeholder, type, value: '', onConfirm, onCancel };
+export function openPrompt ({ title, placeholder = '', type = 'text', value = '', onConfirm, onCancel }) {
+  promptState.value = { title, placeholder, type, value, onConfirm, onCancel };
 }
 
 export function Prompt () {
