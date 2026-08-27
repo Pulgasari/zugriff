@@ -145,6 +145,7 @@ state.closeFile = (file) => {
 
 state.toolbar = {
   items: signal([
+    { cmd: 'file:save'           , icon: 'save'            },
     { cmd: 'editor:copy'         , icon: 'copy'            },
     { cmd: 'editor:cut'          , icon: 'cut'             },
     { cmd: 'editor:paste'        , icon: 'paste'           },

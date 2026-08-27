@@ -16,6 +16,17 @@ import editor from './editor.js';
 const monacoAction  = id => state.monaco?.getAction(id)?.run();
 const monacoTrigger = id => state.monaco?.trigger('keyboard', id, null);
 
+// save one file, surfacing a failed GitHub commit in the GitHub modal rather
+// than throwing into the void (a local save that fails just returns false)
+const save = async (file) => {
+  if (!file) return;
+  try { await state.saveActiveFile(); }
+  catch (e) {
+    if (file.source === 'github') { state.github.error.value = e.message; state.openModal('github'); }
+    else console.error('[code] save failed:', e);
+  }
+};
+
 const commands = new Map([
   // ── UI ──────────────────────────────────────────────────────────────────
   ['browser:toggle'     , { name: 'Toggle Browser'     , exec: () => state.toggleSignal(state.config.showBrowser)   }],
@@ -31,10 +42,10 @@ const commands = new Map([
 
   // ── File ────────────────────────────────────────────────────────────────
   ['file:close'   , { name: 'Close File' , exec: () => { const f = state.activeFile.value; if (f) state.closeFile(f); } }],
-  ['file:save'    , { name: 'Save File'  , exec: () => state.saveActiveFile() }],
+  ['file:save'    , { name: 'Save File'  , exec: () => save(state.activeFile.value) }],
   ['file:saveAll' , { name: 'Save All'   , exec: async () => {
-    for (const f of state.openFiles.value) {
-      if (f.isDirty) { state.activeFile.value = f; await state.saveActiveFile(); }
+    for (const f of [...state.openFiles.value]) {
+      if (f.isDirty) { state.activeFile.value = f; await save(f); }
     }
   } }],
 
