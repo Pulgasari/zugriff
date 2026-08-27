@@ -57,6 +57,15 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'code',
+    name        : 'Code',
+    short_name  : 'Code',
+    icon        : 'mdi:code-braces',
+    description : 'A mobile-first code editor — grant a folder and edit its files with Monaco, a code keyboard and a command palette, all on device.',
+    categories  : ['code', 'files'],
+  },
+  {
+    type        : 'app',
     slug        : 'image-editor',
     name        : 'Image Editor',
     short_name  : 'Editor',
