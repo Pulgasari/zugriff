@@ -2,7 +2,7 @@
 
 export const icons = {
   'add'               : 'material-symbols:add',
-  'remove'            : 'material-symbols:remove',
+  'alert'             : 'mdi:alert-circle-outline',
   'arrow-down'        : 'material-symbols:arrow-downward',
   'arrow-left'        : 'material-symbols:arrow-back',
   'arrow-right'       : 'material-symbols:arrow-forward',
@@ -24,11 +24,15 @@ export const icons = {
   'join-lines'        : 'material-symbols:join-outline',
   'lineheight'        : 'material-symbols:format-line-spacing',
   'loading'           : 'svg-spinners:bars-scale-middle',
+  'menu'              : 'mdi:menu',
   'paste'             : 'material-symbols:content-paste',
+  'plus'              : 'mdi:plus',
   'previewer'         : 'material-symbols:preview',
   'redo'              : 'bx:redo',
   'refresh'           : 'mdi:refresh',
+  'remove'            : 'material-symbols:remove',
   'reset'             : 'mdi:restore',
+  'rss'               : 'mdi:rss',
   'save'              : 'material-symbols:file-save',
   'search'            : 'material-symbols:search',
   'select-all'        : 'material-symbols:select-all',
@@ -41,6 +45,7 @@ export const icons = {
   'toolbar'           : 'material-symbols:widgets',
   'undo'              : 'bx:undo',
   'workspaces'        : 'grommet-icons:projects',
+  'youtube'           : 'mdi:youtube',
 };
 
 export const 
