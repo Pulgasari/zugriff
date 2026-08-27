@@ -1,30 +1,28 @@
 // apps/image-viewer/app.js
-//
-// a plain image viewer. its point is the *entry* path: an installed copy
-// registers as a file handler (see the manifest's file_handlers, generated from
-// the registry entry), so on Android — and desktop — you can "open with →
-// Viewer" straight from a gallery or a file manager. those files arrive through
-// the File Handling API's launchQueue as FileSystemFileHandles; the same viewer
-// also takes files from a picker (showOpenFilePicker / <input>) and from drag
-// and drop.
-//
-// nothing is uploaded or stored — the images live only as object URLs for the
-// lifetime of the tab.
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORT
 
 // ::: vendors
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=image-viewer';
+import { boot, config }      from './../../shared/js/app.js?slug=image-viewer';
 import { Icon, AppSettings } from './../../shared/js/components/index.js';
-import * as pwa from './../../shared/js/lib/pwa.js';
-import { useGesture } from '@aufbau/gestures/preact';
+import * as pwa              from './../../shared/js/lib/pwa.js';
+import { useGesture }        from '@aufbau/gestures/preact';
 
-// :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
+// gehört raus
+
+function IconBtn ({ icon, label, onClick, disabled, active, size = 20 }) {
+  return html`
+    <button class=${'iv-btn' + (active ? ' active' : '')} title=${label} aria-label=${label}
+            disabled=${disabled} onClick=${onClick}>
+      <${Icon} name=${icon} size=${size} />
+    </button>`;
+}
+
+
+// :::::: STATE
 
 const shots   = signal([]);       // [{ name, size, type, url }]
 const idx     = signal(0);        // index of the shown image
@@ -37,10 +35,10 @@ const error   = signal('');
 const current = computed(() => shots.value[idx.value] ?? null);
 const many    = computed(() => shots.value.length > 1);
 
-const IMAGE_RE = /\.(png|jpe?g|jfif|gif|webp|avif|bmp|svg|ico|heic|heif|tiff?)$/i;
+const IMAGE_RE    = /\.(png|jpe?g|jfif|gif|webp|avif|bmp|svg|ico|heic|heif|tiff?)$/i;
 const isImageFile = f => f && (f.type?.startsWith('image/') || IMAGE_RE.test(f.name || ''));
 
-// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: HELPERS
 
 const UNITS = ['B', 'KB', 'MB', 'GB'];
 function fmtSize (bytes = 0) {
@@ -49,10 +47,7 @@ function fmtSize (bytes = 0) {
   return `${(bytes / 1024 ** i).toFixed(i ? 1 : 0)} ${UNITS[i]}`;
 }
 
-function revokeAll () {
-  for (const s of shots.value) URL.revokeObjectURL(s.url);
-}
-
+function revokeAll () { for (const s of shots.value) URL.revokeObjectURL(s.url); }
 function resetView () { zoom.value = 1; pan.value = { x: 0, y: 0 }; }
 
 /** replace the shown set with these File objects (images only) */
@@ -144,7 +139,7 @@ function toggleFullscreen () {
 
 let fallbackInput = null;   // the hidden <input type=file> for no-picker browsers
 
-// :::::: FILE HANDLING API :::::::::::::::::::::::::::::::::
+// :::::: FILE HANDLING API
 // files opened via the OS "open with" arrive here on launch
 
 function wireLaunchQueue () {
@@ -160,32 +155,24 @@ function wireLaunchQueue () {
   });
 }
 
-// :::::: COMPONENTS ::::::::::::::::::::::::::::::::::::::::
-
-function IconBtn ({ icon, label, onClick, disabled, active, size = 20 }) {
-  return html`
-    <button class=${'iv-btn' + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
-    </button>`;
-}
+// :::::: COMPONENTS
 
 function TopBar () {
   const s = current.value;
   return html`
     <header class="iv-top">
       <div class="iv-title">
-        <${Icon} name="mdi:image-outline" size=${18} />
+        <${Icon} name="image" size=${18} />
         <span class="iv-name" title=${s?.name}>${s?.name || 'Image Viewer'}</span>
         ${many.value && html`<span class="iv-count">${idx.value + 1} / ${shots.value.length}</span>`}
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
       </div>
       <div class="iv-actions">
-        <${IconBtn} icon="mdi:folder-open-outline" label="Open images"   onClick=${openPicker} />
-        <${IconBtn} icon="mdi:magnify-minus-outline" label="Zoom out"    onClick=${() => setZoom(zoom.value / 1.4)} disabled=${!s || zoom.value <= 1} />
-        <${IconBtn} icon="mdi:magnify-plus-outline"  label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
+        <${IconBtn} icon="mdi:folder-open-outline"   label="Open images" onClick=${openPicker} />
+        <${IconBtn} icon="zoom-out"                  label="Zoom out"    onClick=${() => setZoom(zoom.value / 1.4)} disabled=${!s || zoom.value <= 1} />
+        <${IconBtn} icon="zoom-in"                   label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
         <${IconBtn} icon="mdi:fit-to-screen-outline" label="Fit"         onClick=${resetView} disabled=${!s || (zoom.value === 1 && pan.value.x === 0 && pan.value.y === 0)} />
-        <${IconBtn} icon="mdi:download"              label="Download"    onClick=${download} disabled=${!s} />
+        <${IconBtn} icon="download"                  label="Download"    onClick=${download} disabled=${!s} />
         ${many.value && html`<${IconBtn} icon=${strip.value ? 'mdi:view-carousel-outline' : 'mdi:view-carousel'} label="Toggle thumbnails" active=${strip.value} onClick=${() => strip.value = !strip.value} />`}
         <${IconBtn} icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
         <${IconBtn} icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
@@ -210,7 +197,7 @@ function ThumbStrip () {
 function Welcome () {
   return html`
     <div class="iv-welcome">
-      <${Icon} name="mdi:image-multiple-outline" size=${64} />
+      <${Icon} name="images" size=${64} />
       <h1>View an image</h1>
       <p>Open images from your device, or just drop them here. Nothing is
          uploaded — they stay on your machine.</p>
@@ -218,10 +205,6 @@ function Welcome () {
         <${Icon} name="mdi:folder-open-outline" size=${18} /> Open images</button>
       ${error.value && html`<p class="iv-error"><${Icon} name="mdi:alert-outline" size=${16} /> ${error.value}</p>`}
       <${OpenWithTip} />
-      <div class="iv-links">
-        <a href="./../"><${Icon} name="mdi:view-grid-outline" size=${14} /> apps</a>
-        <a href="./../../"><${Icon} name="mdi:home-outline" size=${14} /> launcher</a>
-      </div>
     </div>`;
 }
 
@@ -240,7 +223,7 @@ function OpenWithTip () {
         <span>Install the app to open images from your gallery or files with it.</span>
         ${pwa.canInstall.value
           ? html`<button class="iv-cta small" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="mdi:download" size=${14} /> Install app</button>`
+              <${Icon} name="download" size=${14} /> Install app</button>`
           : html`<span class="iv-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
       </div>
     </div>`;
@@ -345,6 +328,6 @@ function App () {
     </div>`;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BOOT
 
 boot({ config, App });
