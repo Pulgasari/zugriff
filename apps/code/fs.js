@@ -9,13 +9,9 @@
 // this replaces the old js/fs.js, which spoke to the internal bunker.js build's
 // `db.workspace.*` api; here it uses the shared @bunker/db store instead.
 
-import { createDb } from '@bunker/db';
+import { db, setup } from './db.js';
 
-const db      = createDb('zugriff-code');
 const ROOT_ID = 'root-dir';
-let   ready;
-
-const setup = () => (ready ??= db.setup({ workspace: {} }));
 
 export const fs = {
   async getSavedRoot () {

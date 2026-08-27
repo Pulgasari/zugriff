@@ -51,6 +51,29 @@ the icon inside is blockified and keeps its size).
 | `app.css`                | the editor's own look |
 | `app.svg` / `manifest.json` / `assets/` | icon + pwa manifest (generated from the registry + `app.svg`) |
 
+## GitHub
+
+The app edits two kinds of source: a **local folder** (File System Access) and a
+**GitHub repo** (the dock's GitHub tap). GitHub runs entirely in the browser
+against `api.github.com` (which sends CORS headers) — the only thing a static
+page can't do is the OAuth token exchange (needs a secret / a backend), so v1
+authenticates with a **fine-grained Personal Access Token** the user pastes in
+(scope: *Contents — read and write* on the chosen repos). The token lives in
+IndexedDB (`db.js` → `auth` store) and is sent only to GitHub.
+
+- `github.js` — the API client + connection signals (token, user, repos, repo,
+  branch). Tree is fetched one level at a time (`git/trees/{sha}`, non-recursive)
+  so huge repos stay cheap; blobs are read via `git/blobs`, binary blobs open
+  read-only.
+- `components/GitHub.js` / `GitHubTree.js` — the connect + browse modal.
+- files carry a `source` (`'local'` | `'github'`) and a stable `id` (the FS
+  handle, or `gh:owner/repo@branch:path`) so the tabs/editor match records
+  regardless of source. **Save** dispatches on `source`: local → a FS writable,
+  GitHub → a `PUT contents` commit (`state.saveActiveFile`).
+
+A one-click OAuth login can be added later with a tiny CORS relay (device flow);
+the app side wouldn't change.
+
 ## still stubbed
 
 `Browser` (a preview pane), `Plugins` and `Workspaces` are placeholders, exactly

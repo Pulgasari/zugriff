@@ -23,6 +23,7 @@ const commands = new Map([
   ['toolbar:toggle'     , { name: 'Toggle Toolbar'     , exec: () => state.toggleSignal(state.config.showToolbar)   }],
   ['statusbar:toggle'   , { name: 'Toggle Statusbar'   , exec: () => state.toggleSignal(state.config.showStatusbar) }],
   ['filebrowser:toggle' , { name: 'Toggle File Browser', exec: () => state.toggleModal('filebrowser') }],
+  ['github:toggle'      , { name: 'Toggle GitHub'      , exec: () => state.toggleModal('github')      }],
   ['commands:toggle'    , { name: 'Toggle Commands'    , exec: () => state.toggleModal('commands')    }],
   ['plugins:toggle'     , { name: 'Toggle Plugins'     , exec: () => state.toggleModal('plugins')     }],
   ['settings:toggle'    , { name: 'Toggle Settings'    , exec: () => state.toggleModal('settings')    }],

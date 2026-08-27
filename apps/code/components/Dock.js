@@ -16,7 +16,7 @@ export default function Dock () {
         <${Tap} cmd="settings:toggle"    icon="settings"          className=${modal === 'settings'    ? 'active' : ''} />
         <${Tap} cmd="plugins:toggle"     icon="gridicons:plugins" className=${modal === 'plugins'     ? 'active' : ''} />
         <${Tap} cmd="filebrowser:toggle" icon="mdi:file-tree"     className=${modal === 'filebrowser' ? 'active' : ''} />
-        <${Tap} cmd="workspaces:toggle"  icon="workspaces"        className=${modal === 'workspaces'  ? 'active' : ''} />
+        <${Tap} cmd="github:toggle"      icon="mdi:github"        className=${modal === 'github'      ? 'active' : ''} />
       </div>
       <div class="section">
         <${Tap} cmd="editor:undo"     icon="bx:undo" />

@@ -10,9 +10,10 @@
 import { signal } from '@aufbau/kits/preact-htm';
 import { stored } from './../../shared/js/lib/signals.js';
 
-import commands from './commands.js';
-import editor   from './editor.js';
-import fs       from './fs.js';
+import commands   from './commands.js';
+import editor     from './editor.js';
+import fs         from './fs.js';
+import * as github from './github.js';
 
 // ── methods ──────────────────────────────────────────────────────────────────
 
@@ -23,7 +24,7 @@ const methods = {
   toggleSignal : sig => (sig.value = !sig.value),
 };
 
-const state = { commands, editor, fs, ...methods };
+const state = { commands, editor, fs, github, ...methods };
 
 // ── UI configuration / panel state (persisted) ───────────────────────────────
 
@@ -60,34 +61,72 @@ const LANG_BY_EXT = {
 };
 export const languageOf = name => LANG_BY_EXT[name.split('.').pop().toLowerCase()] ?? 'plaintext';
 
-/** open a file from its handle (or activate it if already open) */
-state.openFile = async (handle) => {
-  const existing = state.openFiles.value.find(f => f.handle === handle);
-  if (existing) { state.activeFile.value = existing; return existing; }
-
-  const file    = await handle.getFile();
-  const content = await file.text();
-  const fileObj = { handle, name: handle.name, content, language: languageOf(handle.name), isDirty: false };
-
+// every open file carries a stable `id` so the list/editor can match records
+// regardless of source: for a local file the id is the FileSystemHandle itself
+// (object identity), for a GitHub file it is a string — the two never collide.
+const openById = id => state.openFiles.value.find(f => f.id === id);
+const activate = fileObj => {
   state.openFiles.value  = [...state.openFiles.value, fileObj];
   state.activeFile.value = fileObj;
   return fileObj;
 };
 
+/** open a local file from its handle (or activate it if already open) */
+state.openFile = async (handle) => {
+  const existing = openById(handle);
+  if (existing) { state.activeFile.value = existing; return existing; }
+
+  const file    = await handle.getFile();
+  const content = await file.text();
+  return activate({
+    id: handle, source: 'local', handle,
+    name: handle.name, content, language: languageOf(handle.name), isDirty: false,
+  });
+};
+
+/** open a GitHub file. `meta` = { owner, name, branch, path, sha, content } */
+state.openGithubFile = (meta) => {
+  const id = `gh:${meta.owner}/${meta.name}@${meta.branch}:${meta.path}`;
+  const existing = openById(id);
+  if (existing) { state.activeFile.value = existing; return existing; }
+
+  return activate({
+    id, source: 'github',
+    name: meta.path.split('/').pop(),
+    content: meta.content,
+    language: languageOf(meta.path),
+    isDirty: false,
+    readOnly: !!meta.binary,
+    gh: { owner: meta.owner, name: meta.name, branch: meta.branch, path: meta.path, sha: meta.sha },
+  });
+};
+
 /** replace the record for a file in the open list (keeps activeFile in sync) */
 state.patchFile = (file, patch) => {
   const next = { ...file, ...patch };
-  state.openFiles.value = state.openFiles.value.map(f => f.handle === file.handle ? next : f);
-  if (state.activeFile.value?.handle === file.handle) state.activeFile.value = next;
+  state.openFiles.value = state.openFiles.value.map(f => f.id === file.id ? next : f);
+  if (state.activeFile.value?.id === file.id) state.activeFile.value = next;
   return next;
 };
 
-/** write the active file back to disk (needs write permission on its handle) */
+/** save the active file back to its source (local disk, or a GitHub commit) */
 state.saveActiveFile = async () => {
   const file = state.activeFile.value;
-  if (!file?.handle?.createWritable) return false;
-  const ok = await state.fs.ensureWritePermission(file.handle);
-  if (!ok) return false;
+  if (!file || file.readOnly) return false;
+
+  if (file.source === 'github') {
+    const gh = file.gh;
+    const newSha = await state.github.commitFile({
+      owner: gh.owner, name: gh.name, path: gh.path, branch: gh.branch,
+      message: `Update ${gh.path}`, content: file.content, sha: gh.sha,
+    });
+    state.patchFile(file, { isDirty: false, gh: { ...gh, sha: newSha } });
+    return true;
+  }
+
+  // local
+  if (!file.handle?.createWritable) return false;
+  if (!(await state.fs.ensureWritePermission(file.handle))) return false;
   const writable = await file.handle.createWritable();
   await writable.write(file.content);
   await writable.close();
@@ -97,9 +136,9 @@ state.saveActiveFile = async () => {
 
 /** close a file (activates the previous tab, or none) */
 state.closeFile = (file) => {
-  const rest = state.openFiles.value.filter(f => f !== file);
+  const rest = state.openFiles.value.filter(f => f.id !== file.id);
   state.openFiles.value = rest;
-  if (state.activeFile.value === file) state.activeFile.value = rest.at(-1) ?? null;
+  if (state.activeFile.value?.id === file.id) state.activeFile.value = rest.at(-1) ?? null;
 };
 
 // ── toolbar ──────────────────────────────────────────────────────────────────

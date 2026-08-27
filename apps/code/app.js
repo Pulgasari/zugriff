@@ -28,10 +28,13 @@ import Dock        from './components/Dock.js';
 import Browser     from './components/Browser.js';
 import Commands    from './components/Commands.js';
 import FileBrowser from './components/FileBrowser.js';
+import GitHub      from './components/GitHub.js';
 import Plugins     from './components/Plugins.js';
 import Settings    from './components/Settings.js';
 import Workspace   from './components/Workspace.js';
 import Keyboard, { disableAndroidKeyboard, enableAndroidKeyboard } from './components/Keyboard.js';
+
+import * as github from './github.js';
 
 // :::::: EFFECTS ::::::::::::::::::::::::::::::::::::::::::::
 
@@ -51,6 +54,9 @@ effect(() => {
   (forceDisable || keyboardShown) ? disableAndroidKeyboard() : enableAndroidKeyboard();
 });
 
+// restore a stored GitHub token (and last repo/branch) in the background
+github.load().catch(() => {});
+
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
@@ -67,6 +73,7 @@ function App () {
 
       ${modal === 'commands'    && html`<${Commands} />`}
       ${modal === 'filebrowser' && html`<${FileBrowser} />`}
+      ${modal === 'github'      && html`<${GitHub} />`}
       ${modal === 'plugins'     && html`<${Plugins} />`}
       ${modal === 'settings'    && html`<${Settings} />`}
       ${modal === 'workspaces'  && html`<${Workspace} />`}

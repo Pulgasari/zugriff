@@ -61,6 +61,8 @@ export default function Editor () {
       programmatic.current = false;
     }
     monaco.editor.setModelLanguage(editorRef.current.getModel(), activeFile.language);
+    // binary GitHub blobs open read-only; a normal file follows the config
+    editorRef.current.updateOptions({ readOnly: !!activeFile.readOnly || !!state.editor.config.value.readOnly });
   }, [activeFile]);
 
   // apply option changes (theme is driven separately through updateTheme)

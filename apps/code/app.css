@@ -402,6 +402,96 @@ select {
 .tree-name          { font-size: 0.9em; overflow: hidden; text-overflow: ellipsis; }
 .tree-empty         { padding-left: 38px; font-size: 0.8em; opacity: 0.5; padding-block: 2px; }
 
+/* ── github ─────────────────────────────────────────────────────────────── */
+
+.gh-connect { display: flex; flex-direction: column; gap: 0.75rem; }
+.gh-hint    { font-size: 0.85em; line-height: 1.5; opacity: 0.8; }
+.gh-link    { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent); text-decoration: none; font-size: 0.85em; }
+.gh-input {
+  width         : 100%;
+  padding       : 0.5rem;
+  background    : none;
+  color         : var(--fg);
+  border        : 2px solid var(--line);
+  border-radius : var(--radius);
+}
+.gh-input:focus { outline: none; border-color: var(--accent); }
+.gh-error {
+  display     : flex;
+  align-items : center;
+  gap         : 0.4rem;
+  color       : var(--c-null, #e06c75);
+  font-size   : 0.85em;
+}
+.gh-connect .btn-primary {
+  display       : inline-flex;
+  align-items   : center;
+  justify-content: center;
+  padding       : 0.5rem 0.75rem;
+  border        : none;
+  border-radius : var(--radius);
+  background    : var(--accent);
+  color         : #fff;
+  font          : inherit;
+  font-weight   : bold;
+  cursor        : pointer;
+}
+.gh-connect .btn-primary:disabled { opacity: 0.5; cursor: default; }
+
+.gh-head {
+  display         : flex;
+  align-items     : center;
+  justify-content : space-between;
+  margin-bottom   : 0.75rem;
+}
+.gh-user    { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: bold; }
+.gh-textbtn { background: none; border: none; color: var(--accent); cursor: pointer; font: inherit; padding: 0.25rem; }
+.gh-busy    { font-size: 0.8em; opacity: 0.6; padding: 0.25rem 0; }
+
+.gh-repopick { display: flex; flex-direction: column; gap: 0.5rem; }
+.gh-repopick .search-row { display: flex; align-items: center; gap: 0.4rem; }
+.gh-repolist { list-style: none; margin: 0; padding: 0; max-height: 55vh; overflow: auto; }
+.gh-repolist li {
+  display     : flex;
+  align-items : center;
+  gap         : 0.4rem;
+  padding     : 0.5rem 0.25rem;
+  cursor      : pointer;
+  white-space : nowrap;
+  overflow    : hidden;
+}
+.gh-repolist li:nth-child(2n+1) { background: var(--zebra); }
+.gh-reponame { overflow: hidden; text-overflow: ellipsis; }
+
+.gh-repobar {
+  display      : flex;
+  align-items  : center;
+  gap          : 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap    : wrap;
+}
+.gh-repochip {
+  display       : inline-flex;
+  align-items   : center;
+  gap           : 0.4rem;
+  padding       : 0.35rem 0.6rem;
+  border        : 1px solid var(--line);
+  border-radius : var(--radius);
+  background    : var(--panel-2, transparent);
+  color         : var(--fg);
+  cursor        : pointer;
+  font          : inherit;
+}
+.gh-branch {
+  background : none;
+  border     : 2px solid var(--line);
+  color      : currentcolor;
+  padding    : 0.25rem;
+  max-width  : 45%;
+}
+
+.sb-github { color: var(--accent); opacity: 0.85; }
+
 /* ── welcome ────────────────────────────────────────────────────────────── */
 
 #welcome {
