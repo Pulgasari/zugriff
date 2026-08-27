@@ -15,16 +15,26 @@ a file tree — everything runs on device, nothing is uploaded.
 | `preact-x` `deepSignalWithStorage` (editor config) | one `stored()` object + immutable update helpers    |
 | internal `bunker.js` build (`db.workspace.*`)      | `@bunker/db` `createDb` (`fs.js`)                    |
 | `iconify-icon` custom element                      | shared `<Icon>` (`aufbau-icon`) via a local alias map|
-| Monaco from esm.sh                                  | unchanged — imported by full URL (see below)        |
+| Monaco from esm.sh                                  | Monaco via its AMD loader on a CDN (see below)      |
 
 ## Monaco
 
-Monaco is a large, self-contained bundle with its own (preact-free) world, so it
-is imported straight from esm.sh by full URL in `components/Editor.js` rather than
-through the shared import map (which pins the app's single preact copy). Its
-stylesheet is linked from `index.html`. Editor themes are the
-[monaco-themes](https://github.com/brijeshb42/monaco-themes) set, fetched on
-demand and cached.
+Monaco is loaded through `monaco.js` — its own AMD loader from a versioned CDN,
+**not** the shared import map. esm.sh's `monaco-editor@x/…?worker` builds are
+broken (`QE is not a function` in ts.worker) and the shared service worker chokes
+on esm.sh's streaming responses ("body is locked"); the `min/vs` AMD layout ships
+plain worker scripts that cache cleanly. Workers are wired through a same-origin
+blob that `importScripts` the CDN worker (workers can't be cross-origin). The
+loader also injects Monaco's stylesheet, so `index.html` links none. Editor themes
+are the [monaco-themes](https://github.com/brijeshb42/monaco-themes) set, fetched
+on demand and cached.
+
+## icons
+
+Never put a `display` rule on `.icon`: `<aufbau-icon>` is a masked box that sizes
+itself from `inline-size`/`block-size`, and forcing `display: inline` makes it
+ignore both and collapse to nothing (the Tap wrappers are `inline-flex` boxes so
+the icon inside is blockified and keeps its size).
 
 ## files
 

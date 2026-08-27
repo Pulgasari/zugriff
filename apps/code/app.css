@@ -15,7 +15,18 @@
 #app, #app * { font-family: var(--mono, ui-monospace, monospace); }
 #app { font-size: var(--fontSize); }
 
-.icon { display: inline; }
+/* NB: never set `display` on .icon — <aufbau-icon> is a masked box that takes
+   its size from inline-size/block-size, and `display: inline` makes it ignore
+   both and collapse to nothing. (the old ratcode css could do it because
+   <iconify-icon> sized itself off font-size.) so the Tap wrappers below are
+   made real inline-flex boxes instead, which also blockifies the icon. */
+#dock .section > div,
+#toolbar > div {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  cursor         : pointer;
+}
 
 /* ── frame ──────────────────────────────────────────────────────────────── */
 
