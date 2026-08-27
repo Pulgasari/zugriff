@@ -1,4 +1,4 @@
-/* apps/file-explorer/app.css — the app's own chrome.
+/* apps/files/app.css — the app's own chrome.
 
    the reset, theme tokens and #app frame come from ./../base.css; the explorer
    surface itself (toolbar, listing, details, …) is the shared FileExplorer

@@ -1,4 +1,4 @@
-// apps/rss-reader/db.js
+// apps/feeds/db.js
 //
 // storage for the reader — three @bunker/db stores:
 //
@@ -15,7 +15,7 @@ import { signal, computed } from '@aufbau/kits/preact-htm';
 import { createDb } from '@bunker/db';
 import * as feed from './feed.js';
 
-const db  = createDb('zugriff-rss');
+const db  = createDb('zugriff-feeds');
 const SEP = '\n';
 const keyOf = (feedId, guid) => feedId + SEP + guid;
 

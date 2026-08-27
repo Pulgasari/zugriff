@@ -7,7 +7,7 @@
 //
 // it is deliberately backend-agnostic. anything that can hand back a
 // FileSystemDirectoryHandle root works: the private OPFS (opfsBackend, in
-// dirfs.js) or a folder the user grants off their disk (what the file-explorer
+// dirfs.js) or a folder the user grants off their disk (what the files app
 // app builds). the component itself knows nothing about *where* the tree lives.
 //
 //   import { FileExplorer } from './../../shared/js/components/index.js';
@@ -43,7 +43,7 @@ const menu     = signal(null);    // { x, y, entry }
 const dragging = signal(false);
 const busy     = signal(false);   // a write is in flight
 
-const view = stored('list', 'file-explorer:view');   // 'list' | 'grid'
+const view = stored('list', 'files:view');   // 'list' | 'grid'
 
 const writable = computed(() => !!backend.value?.writable);
 

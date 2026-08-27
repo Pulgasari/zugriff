@@ -13,7 +13,9 @@
 // keys are shown verbatim in the ui — no label mapping, on purpose.
 
 import { effect } from '@aufbau/kits/preact-htm';
+import { apply as applyWebfont, load as loadWebfont, fonts } from '@aufbau/webfonts';
 import { stored } from './signals.js';
+import { appSettingsSchema } from './../registry.js';
 import { themes, themeNames, DEFAULT_THEME, COLOR_KEYS } from './../data/themes.js';
 
 export const TYPES = ['boolean', 'enum', 'color'];
@@ -88,3 +90,37 @@ export const launcher = defineSettings('zugriff:launcher', {
 
 /** what an app shows while it has no settings of its own */
 export const themeGroup = { title: 'theme', settings: theme };
+
+// ── app (font + direction) ───────────────────────────────────────────────────
+// the schema is predefined in the registry; the font enum's values come from the
+// @aufbau/webfonts catalog, folded in here so registry.js stays import-free. like
+// theme, this is one shared namespace — picking a font in one app picks it
+// everywhere. the font face is fetched on demand and pointed at zugriff's --font.
+
+const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
+
+function applyFont (id) {
+  if (!id) return;   // '' → keep the theme/default font
+  loadWebfont(id).then(ok => { if (ok) applyWebfont({ name: id, target: '--font' }); });
+}
+
+function applyDir (value) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.dir = value || 'ltr';
+}
+
+export const app = defineSettings('zugriff:app', {
+  ...appSettingsSchema,
+  font : { ...appSettingsSchema.font, values: fontValues },
+}, {
+  onSet (key, value) {
+    if (key === 'font') applyFont(value);
+    if (key === 'dir')  applyDir(value);
+  },
+});
+
+// apply whatever was persisted, on load
+applyFont(app.value('font'));
+applyDir(app.value('dir'));
+
+export const appGroup = { title: 'app', settings: app };

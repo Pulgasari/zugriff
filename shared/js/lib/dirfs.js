@@ -6,9 +6,9 @@
 // set of helpers drives both. only *where the root comes from* differs, and
 // that is what a `backend` (below) captures.
 //
-// this is the generalised descendant of the old apps/file-explorer/fs.js:
+// this is the generalised descendant of the old apps/file-explorer/fs.js (now apps/files):
 // shared/js/vfs.js stays flat (root only, all the cli needs); anything that
-// walks a tree — the FileExplorer component, and through it the file-explorer
+// walks a tree — the FileExplorer component, and through it the files
 // app — uses this.
 //
 // a "path" throughout is an array of segment names, e.g. ['projects', 'src'].
@@ -147,7 +147,7 @@ export async function readFile (root, path, name) {
 //   getRoot   () => Promise<FileSystemDirectoryHandle>
 //   usage     optional () => Promise<{ usage, quota }> for a storage meter
 //
-// the file-explorer app builds its own on-disk backend around a granted handle;
+// the files app builds its own on-disk backend around a granted handle;
 // the OPFS one every app can reach for is right here.
 
 /** { usage, quota } in bytes for the origin's storage, best-effort */

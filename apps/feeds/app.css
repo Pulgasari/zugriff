@@ -1,4 +1,4 @@
-/* apps/rss-reader/app.css — the reader's own chrome.
+/* apps/feeds/app.css — the reader's own chrome.
 
    reset, theme tokens and the #app frame come from ./../base.css. layout is a
    sidebar (feeds + sections) and a scrolling main column; on narrow screens the

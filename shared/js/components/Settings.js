@@ -1,61 +1,70 @@
 // shared/js/components/Settings.js
 //
-// renders whatever a settings group describes. it knows the three types, not
-// the settings themselves — a new entry in a schema shows up here by itself.
+// renders whatever a settings group describes. the fields themselves are built
+// by aufbau.gui (@aufbau/runtime/gui.js): each group's schema is handed to
+// gui.controls(), which turns it into <aufbau-*> controls, and the DOM it
+// returns is mounted into the preact tree through a ref. this component only
+// owns the chrome around them — the open/close toggle, the per-group header and
+// its reset button — so a new entry in a schema shows up here by itself.
 //
 //   <${Settings} groups=${[{ title: 'theme', settings: theme }]} />
-//
-// TODO:should use `aufbau.gui` (@aufbau/runtime/gui.js)
 
 // :::::: IMPORT
 
-import { html, signal } from '@aufbau/kits/preact-htm';
-import Icon   from './Icon.js';
-import Taplet from './Taplet.js';
-
-import Picker from './Picker.js';
-import Toggle from './Toggle.js';
+import { html, signal, useRef, useEffect, useState } from '@aufbau/kits/preact-htm';
+import * as gui from '@aufbau/runtime/gui.js';
+import Icon from './Icon.js';
 
 // :::::: STATE + HELPERS
 
-const LOOK_THRESHOLD = 4;
-const lookFor        = entry => entry.look ?? (entry.values.length > LOOK_THRESHOLD ? 'combobox' : 'segments');
 const settingsOpen   = signal(false);
 const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
-//const toggleSettings = () => toggleSignal(settingsOpen);
 
 // :::::: COMPONENTS
 
-function Field ({ group, name }) {
-  const entry = group.schema[name];
-  const value = group.signals[name].value;
-  const set   = next => group.set(name, next);
-  
-  const control = entry.type === 'boolean' ? html`<${Toggle} value=${value} onChange=${set} />`
-                : entry.type === 'enum'    ? html`<${Picker} look=${lookFor(entry)} options=${entry.values} value=${value} onChange=${set} />`     
-                : entry.type === 'color'   ? html`<div class="setting-options"><input type="color" value=${value} onInput=${event => set(event.target.value)} /><code class="setting-value">${value}</code></div>`     
-                : html`<code class="setting-value">${String(value)}</code>`;
+// mounts one group's fields as aufbau controls. gui.controls() builds a detached
+// DOM subtree from the schema and, given onChange, reports the changed field back
+// so we can write it into the group's signal (which runs the group's onSet hook).
+// `nonce` bumps on reset to rebuild the controls from the freshly defaulted values.
+function GuiFields ({ settings, nonce }) {
+  const ref = useRef(null);
 
-  return html`
-    <div class=${'setting setting-' + entry.type}>
-      <code class="setting-key">${name}</code>
-      ${control}
-    </div>`;
+  useEffect(() => {
+    const host = ref.current;
+    if (!host) return;
+
+    const values = Object.fromEntries(settings.keys.map(key => [key, settings.value(key)]));
+    const fields = gui.controls(settings.schema, {
+      values,
+      wrap : 'div',
+      onChange (vals, name) {
+        if (name && name in settings.schema) settings.set(name, vals[name]);
+      },
+    });
+
+    host.replaceChildren(fields);
+    return () => host.replaceChildren();
+  }, [settings, nonce]);
+
+  return html`<div class="settings-fields" ref=${ref}></div>`;
 }
-
 
 function Group ({ group }) {
   const { title, settings } = group;
+  const [nonce, setNonce] = useState(0);
+
+  // reset defaults the signals, then rebuilds the controls so they show it
+  const reset = () => { settings.reset(); setNonce(n => n + 1); };
 
   return html`
     <section>
       <header>
         <code class="settings-title">${title}</code>
-        <button class="ghost-btn" onClick=${settings.reset} title="back to defaults">
+        <button class="ghost-btn" onClick=${reset} title="back to defaults">
           <${Icon} name="reset" /> reset
         </button>
       </header>
-      ${settings.keys.map(name => html`<${Field} key=${name} group=${settings} name=${name} />`)}
+      <${GuiFields} settings=${settings} nonce=${nonce} />
     </section>`;
 }
 

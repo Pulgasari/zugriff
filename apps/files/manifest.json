@@ -1,8 +1,8 @@
 {
-  "id": "rss_reader",
-  "name": "RSS Reader",
-  "short_name": "Feeds",
-  "description": "Follow RSS/Atom feeds, skim the latest across all of them, and jump to the original — YouTube channels get their own section.",
+  "id": "files",
+  "name": "File Explorer",
+  "short_name": "Files",
+  "description": "Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
@@ -10,7 +10,7 @@
   "display": "standalone",
   "orientation": "any",
   "categories": [
-    "media"
+    "files"
   ],
   "background_color": "#282a36",
   "theme_color": "#282a36",

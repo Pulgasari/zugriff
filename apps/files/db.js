@@ -1,6 +1,6 @@
-// apps/file-explorer/db.js
+// apps/files/db.js
 //
-// the file-explorer's only durable state is the one folder the user grants as
+// the files app's only durable state is the one folder the user grants as
 // the explorer's root. a FileSystemDirectoryHandle is structured-cloneable, so
 // it round-trips through one @bunker/db store and we re-ask for permission next
 // visit instead of re-picking. nothing on disk is ever copied — the app is a
@@ -10,7 +10,7 @@ import { signal } from '@aufbau/kits/preact-htm';
 import { createDb } from '@bunker/db';
 import * as fs from './../../shared/js/lib/fsaccess.js';
 
-const db  = createDb('zugriff-file-explorer');
+const db  = createDb('zugriff-files');
 const KEY = 'root';                                 // a single granted root
 
 // ── signals ────────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ export async function load () {
  * straight from a click (showDirectoryPicker needs the user gesture).
  */
 export async function grant () {
-  const handle = await fs.pickDirectory({ id: 'zugriff-file-explorer', mode: 'read' });
+  const handle = await fs.pickDirectory({ id: 'zugriff-files', mode: 'read' });
   if (!handle) return null;
   const rec = { name: handle.name, handle, addedAt: Date.now() };
   await db.set('root', KEY, rec);

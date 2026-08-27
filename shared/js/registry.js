@@ -22,9 +22,19 @@ const defaults = {
   aufbau      : { elements: { mode: 'auto' } },
 };
 
+// settings every app carries, predefined here so the shared Settings panel can
+// render them for any app without the app spelling them out. `font` is an enum
+// whose values are filled from @aufbau/webfonts at runtime — this module stays
+// import-free so the node asset generator can read it, so the catalog is folded
+// in on the browser side (shared/js/lib/settings.js), not here.
+export const appSettingsSchema = {
+  font : { type: 'enum', look: 'combobox', source: 'webfonts', values: [], default: '' },
+  dir  : { type: 'enum', values: ['ltr', 'rtl'], default: 'ltr' },
+};
+
 // defaults that differ by kind
 const typeDefaults = {
-  app  : { base: 'apps', orientation: 'any'      },   // apps aren't locked to portrait
+  app  : { base: 'apps', orientation: 'any',     settings: appSettingsSchema },   // apps aren't locked to portrait
   tool : {               orientation: 'portrait' },
 };
 
@@ -38,7 +48,7 @@ const entries = [
   // ── apps ────────────────────────────────────────────────────────────────
   {
     type        : 'app',
-    slug        : 'file-explorer',
+    slug        : 'files',
     name        : 'File Explorer',
     short_name  : 'Files',
     icon        : 'mdi:folder-outline',
@@ -103,7 +113,7 @@ const entries = [
   },
   {
     type        : 'app',
-    slug        : 'rss-reader',
+    slug        : 'feeds',
     name        : 'RSS Reader',
     short_name  : 'Feeds',
     icon        : 'mdi:rss',

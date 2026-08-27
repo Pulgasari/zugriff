@@ -1,4 +1,4 @@
-// apps/rss-reader/app.js
+// apps/feeds/app.js
 //
 // a feed reader that runs entirely on the device. subscriptions, entries and
 // read-state live in IndexedDB via @bunker/db (db.js); feeds are fetched and
@@ -18,7 +18,7 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=rss-reader';
+import { boot, config } from './../../shared/js/app.js?slug=feeds';
 import { Icon }   from './../../shared/js/components/index.js';
 import { stored } from './../../shared/js/lib/signals.js';
 
@@ -28,7 +28,7 @@ import { DEFAULT_PROXY } from './feed.js';
 
 // :::::: SETTINGS + UI STATE :::::::::::::::::::::::::::::::
 
-const proxy   = stored(DEFAULT_PROXY, 'rss:proxy');
+const proxy   = stored(DEFAULT_PROXY, 'feeds:proxy');
 const route   = signal({ name: 'latest' });   // { name:'latest'|'youtube'|'feed', id? }
 const dialog  = signal(null);                  // 'add' | 'settings' | null
 const addVal  = signal('');

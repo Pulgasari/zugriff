@@ -10,13 +10,13 @@ import { registry } from './../shared/js/registry.js';
 import Icon         from './../shared/js/components/Icon.js';
 import Nav          from './../shared/js/components/Nav.js';
 import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
-import { launcher, themeGroup } from './../shared/js/lib/settings.js';
+import { launcher, appGroup, themeGroup } from './../shared/js/lib/settings.js';
 
 // :::::: CONFIG
 
 const categories = registry.categories('app');
 const config     = { slug: 'apps', name: 'zugriff apps', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
-const groups     = [ { title: 'launcher', settings: launcher }, themeGroup ];
+const groups     = [ { title: 'launcher', settings: launcher }, appGroup, themeGroup ];
 
 // :::::: STATES
 

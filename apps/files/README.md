@@ -1,4 +1,4 @@
-# apps/file-explorer
+# apps/files
 
 A file explorer over a folder from your **own disk**. You grant one folder with
 the [File System Access API](./../../shared/js/lib/fsaccess.js) and it becomes

@@ -10,14 +10,14 @@ or deno. ESM in the browser, served straight off GitHub Pages.
 ## apps
 - [audio manager](https://zugriff.dev/apps/audio-manager/)
 - [ebooks](https://zugriff.dev/apps/ebooks/)
-- [file explorer](https://zugriff.dev/apps/file-explorer/)
+- [file explorer](https://zugriff.dev/apps/files/)
 - [gifmaker](https://zugriff.dev/apps/gifmaker/)
 - [icons](https://zugriff.dev/apps/icons/)
 - [image editor](https://zugriff.dev/apps/image-editor/)
 - [image viewer](https://zugriff.dev/apps/image-viewer/)
 - [notes](https://zugriff.dev/apps/notes/)
 - [podcasts](https://zugriff.dev/apps/podcasts/)
-- [rss reader](https://zugriff.dev/apps/rss-reader/)
+- [rss reader](https://zugriff.dev/apps/feeds/)
 - [videoplayer](https://zugriff.dev/apps/videoplayer/)
 
 ---
@@ -109,7 +109,7 @@ three places: `cli`, `tools`, `apps`. each app's own worker owns its files,
 exactly like a tool's does.
 
 the apps so far:
-[apps/file-explorer](./apps/file-explorer/) — grant a folder off your disk and
+[apps/files](./apps/files/) — grant a folder off your disk and
 browse it as the root, built on the shared
 [`FileExplorer`](./shared/js/components/FileExplorer.js) component (which, over
 `dirfs.js`'s `opfsBackend`, also browses the private OPFS the cli uses);
@@ -120,7 +120,7 @@ with zoom/pan and multi-image nav; [apps/gifmaker](./apps/gifmaker/) — sequenc
 images into an animation and export a GIF or a project zip;
 [apps/podcasts](./apps/podcasts/) — subscribe by RSS, play episodes and track
 progress, backed by `@bunker/db`;
-[apps/rss-reader](./apps/rss-reader/) — follow RSS/Atom feeds, skim the latest
+[apps/feeds](./apps/feeds/) — follow RSS/Atom feeds, skim the latest
 across all of them and click through to the original, with YouTube channels in
 their own section;
 [apps/audio-manager](./apps/audio-manager/) — grant your music folders and browse
@@ -135,7 +135,7 @@ foldered notebook, the directory tree becoming the outline; and
 library with covers, search and a remembered reading position. The last two
 share [`shared/js/lib/fsaccess.js`](./shared/js/lib/fsaccess.js), the File System
 Access wrapper that grants a real on-disk folder (the counterpart to the private
-OPFS the file-explorer uses).
+OPFS the files app uses).
 
 ## adding an app
 

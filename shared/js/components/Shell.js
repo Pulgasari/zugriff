@@ -7,9 +7,9 @@
 import { html } from '@aufbau/kits/preact-htm';
 import Icon from './Icon.js';
 import Settings, { SettingsButton } from './Settings.js';
-import { themeGroup } from './../lib/settings.js';
+import { appGroup, themeGroup } from './../lib/settings.js';
 
-export default function Shell ({ app = {}, actions, groups = [themeGroup], children }) {
+export default function Shell ({ app = {}, actions, groups = [appGroup, themeGroup], children }) {
   return html`
     <div id='app-head'>
       <div id='app-logo'>

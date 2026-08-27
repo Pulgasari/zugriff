@@ -1,4 +1,4 @@
-// apps/rss-reader/feed.js
+// apps/feeds/feed.js
 //
 // fetching and parsing feeds in the browser — the article-flavoured cousin of
 // apps/podcasts/feed.js. same CORS reality: almost no feed sends CORS headers,
