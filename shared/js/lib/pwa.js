@@ -9,8 +9,8 @@
 //
 //   import { canInstall, installed, promptInstall } from '.../lib/pwa.js';
 //
-// `canInstall` — the browser fired beforeinstallprompt and we can show a button.
-// `installed`  — running as an installed/standalone app already.
+// `canInstall`      — the browser fired beforeinstallprompt and we can show a button.
+// `installed`       — running as an installed/standalone app already.
 // `promptInstall()` — show the native install prompt (needs a user gesture).
 
 import { signal } from '@aufbau/kits/preact-htm';
@@ -22,7 +22,7 @@ const standalone = () =>
     window.navigator?.standalone === true));
 
 export const canInstall = signal(false);
-export const installed   = signal(standalone());
+export const installed  = signal(standalone());
 
 let deferred = null;
 
@@ -36,7 +36,7 @@ if (typeof window !== 'undefined') {
   });
 
   window.addEventListener('appinstalled', () => {
-    installed.value = true;
+    installed.value  = true;
     canInstall.value = false;
     deferred = null;
   });
