@@ -21,6 +21,9 @@ export const icons = {
   'folder'            : 'material-symbols:folder',
   'folder-open'       : 'material-symbols:folder-open',
   'fontsize'          : 'material-symbols:format-size',
+  'image'             : 'mdi:image-outline',
+  'images'            : 'mdi:image-multiple-outline',
+  'info'              : 'mdi:information-outline',
   'join-lines'        : 'material-symbols:join-outline',
   'lineheight'        : 'material-symbols:format-line-spacing',
   'loading'           : 'svg-spinners:bars-scale-middle',
@@ -46,6 +49,8 @@ export const icons = {
   'undo'              : 'bx:undo',
   'workspaces'        : 'grommet-icons:projects',
   'youtube'           : 'mdi:youtube',
+  'zoom-in'           : 'mdi:magnify-plus-outline',
+  'zoom-out'          : 'mdi:magnify-minus-outline',
 };
 
 export const 
