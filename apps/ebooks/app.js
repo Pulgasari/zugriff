@@ -1,13 +1,4 @@
 // apps/ebooks/app.js
-//
-// a library + reader for the EPUB and PDF files in folders you grant off your
-// own disk. folders come in through the File System Access API (shared/js/lib/
-// fsaccess.js); each is scanned for books, covers and metadata are pulled in
-// the background (library.js) and cached, and a book opens in an in-app reader
-// (reader.js) that remembers where you left off. nothing is uploaded; only the
-// folder handles, the extracted metadata and your reading position are stored.
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
