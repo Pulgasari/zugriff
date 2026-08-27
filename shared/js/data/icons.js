@@ -1,8 +1,4 @@
 // shared/js/data/icons.js
-//
-// short names for the icons the apps reach for often, so a call site can say
-// 'close' instead of 'fa:close'. anything containing a ':' is passed straight
-// through to iconify, so this map never has to be complete.
 
 export const icons = {
   'add'               : 'material-symbols:add',
@@ -11,7 +7,7 @@ export const icons = {
   'arrow-left'        : 'material-symbols:arrow-back',
   'arrow-right'       : 'material-symbols:arrow-forward',
   'arrow-up'          : 'material-symbols:arrow-upward',
-  'close'             : 'fa:close',
+  'close'             : 'mdi:close',
   'commands'          : 'material-symbols:keyboard-command-key',
   'copy'              : 'bx:copy',
   'copy-all'          : 'material-symbols:copy-all',
@@ -31,7 +27,7 @@ export const icons = {
   'paste'             : 'material-symbols:content-paste',
   'previewer'         : 'material-symbols:preview',
   'redo'              : 'bx:redo',
-  'refresh'           : 'material-symbols:refresh',
+  'refresh'           : 'mdi:refresh',
   'reset'             : 'mdi:restore',
   'save'              : 'material-symbols:file-save',
   'search'            : 'material-symbols:search',
