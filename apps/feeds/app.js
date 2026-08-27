@@ -19,12 +19,15 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from './../../shared/js/app.js?slug=feeds';
-import { Icon, SettingsGroups } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
-import { appGroup } from './../../shared/js/lib/settings.js';
+import { stored }       from './../../shared/js/lib/signals.js';
+import { appGroup }     from './../../shared/js/lib/settings.js';
+import {
+  Icon, 
+  SettingsGroups
+} from './../../shared/js/components/index.js';
 
 // ::: local
-import * as db from './db.js';
+import * as db           from './db.js';
 import { DEFAULT_PROXY } from './feed.js';
 
 // :::::: SETTINGS + UI STATE :::::::::::::::::::::::::::::::
@@ -153,16 +156,16 @@ function FeedItem ({ feed: f }) {
     <div class=${'feed-row' + (active ? ' active' : '')}>
       <button class="feed-open" onClick=${() => go('feed', f.id)} title=${f.title}>
         <span class="feed-ic">
-          ${spin ? html`<${Icon} name="svg-spinners:bars-scale-middle" size=${15} />`
+          ${spin ? html`<${Icon} name="loading" size=${15} />`
                  : f.image ? html`<img src=${f.image} alt="" loading="lazy" onError=${e => e.target.style.display = 'none'} />`
-                           : html`<${Icon} name=${f.kind === 'youtube' ? 'mdi:youtube' : 'mdi:rss'} size=${15} />`}
+                           : html`<${Icon} name=${f.kind === 'youtube' ? 'youtube' : 'rss'} size=${15} />`}
         </span>
         <span class="feed-name">${f.title}</span>
-        ${f.error ? html`<${Icon} name="mdi:alert-circle-outline" size=${14} className="feed-err" />`
+        ${f.error ? html`<${Icon} name="alert" size=${14} className="feed-err" />`
                   : unread > 0 && html`<span class="nav-count">${unread}</span>`}
       </button>
       <button class="feed-x" title="Unfollow" onClick=${() => removeFeed(f)}>
-        <${Icon} name="mdi:close" size=${14} /></button>
+        <${Icon} name="close" /></button>
     </div>`;
 }
 
@@ -171,20 +174,20 @@ function Sidebar () {
   return html`
     <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
       <div class="brand">
-        <${Icon} name="mdi:rss" size=${22} /> <span>Feeds</span>
+        <${Icon} name="rss"/> <span>Feeds</span>
         <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}>
-          <${Icon} name="mdi:close" size=${18} /></button>
+          <${Icon} name="close"/></button>
       </div>
 
       <button class="add-btn" onClick=${() => { addVal.value = ''; dialog.value = 'add'; }}>
-        <${Icon} name="mdi:plus" size=${17} /> Add feed</button>
+        <${Icon} name="plus" /> Add feed</button>
 
       <div class="nav-scroll">
         <div class="nav-group">
           <${NavItem} name="latest" icon="mdi:playlist-star" label="Latest"
                       count=${db.unreadIn(db.latestArticles.value)} />
           ${tubes.length > 0 && html`
-            <${NavItem} name="youtube" icon="mdi:youtube" label="YouTube"
+            <${NavItem} name="youtube" icon="youtube" label="YouTube"
                         count=${db.unreadIn(db.latestVideos.value)} />`}
         </div>
 
@@ -196,7 +199,7 @@ function Sidebar () {
 
         ${tubes.length > 0 && html`
           <div class="nav-group">
-            <div class="nav-title"><${Icon} name="mdi:youtube" size=${13} /> YouTube</div>
+            <div class="nav-title"><${Icon} name="youtube" /> YouTube</div>
             ${tubes.map(f => html`<${FeedItem} key=${f.id} feed=${f} />`)}
           </div>`}
 
@@ -205,13 +208,9 @@ function Sidebar () {
 
       <div class="side-foot">
         <button class="foot-btn" onClick=${refreshCurrent} disabled=${!!busy.value || !db.feeds.value.length}>
-          <${Icon} name="mdi:refresh" size=${16} /> Refresh</button>
+          <${Icon} name="refresh" /> Refresh</button>
         <button class="foot-btn" onClick=${() => dialog.value = 'settings'}>
-          <${Icon} name="mdi:cog-outline" size=${16} /> Settings</button>
-        <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" size=${14} /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" size=${14} /> launcher</a>
-        </div>
+          <${Icon} name="mdi:cog-outline" /> Settings</button>
       </div>
     </aside>`;
 }
@@ -242,8 +241,10 @@ function ArticleRow ({ item }) {
 function VideoCard ({ item }) {
   const unread = !db.isRead(item.key);
   return html`
-    <a class=${'vid' + (unread ? '' : ' read')} href=${item.link} target="_blank" rel="noopener noreferrer"
-       onClick=${() => db.markRead(item.key)}>
+    <a class=${'vid' + (unread ? '' : ' read')} 
+      href=${item.link} target="_blank" rel="noopener noreferrer"
+      onClick=${() => db.markRead(item.key)}
+      >
       <div class="vid-thumb">
         ${item.image
           ? html`<img src=${item.image} alt="" loading="lazy" />`
@@ -262,10 +263,10 @@ function Body () {
     const hasFeeds = db.feeds.value.length > 0;
     return html`
       <div class="empty">
-        <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'mdi:rss'} size=${56} />
+        <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} size=${56} />
         <p>${hasFeeds ? 'Nothing here yet — try Refresh.' : 'Follow a feed to see the latest here.'}</p>
         ${!hasFeeds && html`<button class="cta" onClick=${() => { addVal.value = ''; dialog.value = 'add'; }}>
-          <${Icon} name="mdi:plus" size=${17} /> Add your first feed</button>`}
+          <${Icon} name="plus" size=${17} /> Add your first feed</button>`}
       </div>`;
   }
 
@@ -281,7 +282,7 @@ function Header () {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}>
-        <${Icon} name="mdi:menu" size=${20} /></button>
+        <${Icon} name="menu" size=${20} /></button>
       <${Icon} name=${v.icon} size=${20} className="topbar-ic" />
       <h1 class="topbar-title" title=${v.title}>${v.title}</h1>
       ${v.feed?.link && html`<a class="ibtn" href=${v.feed.link} target="_blank" rel="noopener noreferrer" title="Open site">
@@ -292,7 +293,7 @@ function Header () {
         <button class="ibtn" title="Mark all read" onClick=${markAllRead}>
           <${Icon} name="mdi:check-all" size=${18} /></button>`}
       <button class="ibtn" title="Refresh" onClick=${refreshCurrent} disabled=${!!busy.value}>
-        <${Icon} name="mdi:refresh" size=${18} /></button>
+        <${Icon} name="refresh" size=${18} /></button>
     </header>`;
 }
 
