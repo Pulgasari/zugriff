@@ -1,18 +1,16 @@
 // apps/videoplayer/app.js
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORT
 
 // ::: vendors
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=videoplayer';
+import { boot, config }                 from './../../shared/js/app.js?slug=videoplayer';
 import { Icon, Taplet, SettingsGroups } from './../../shared/js/components/index.js';
-import { appGroup } from './../../shared/js/lib/settings.js';
+import { appGroup }                     from './../../shared/js/lib/settings.js';
 
-// ::: local
-
-// :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
+// :::::: STATE
 
 const
 src      = signal(null),      // object url of the loaded file, or null
@@ -37,7 +35,7 @@ settingsOpen = signal(false); // stub for now — the panel is only prepared
 const ASPECTS = [null, '9 / 16', '16 / 9', '1 / 1', '4 / 3'];
 const FPS_GUESS = 30;   // frame stepping has no real fps from <video>; assume 30
 
-// :::::: PLAYBACK ::::::::::::::::::::::::::::::::::::::::::
+// :::::: PLAYBACK
 
 // a single <video>, kept for the app's lifetime. imperative control (play,
 // seek, step) reads it straight off this ref rather than through the signals.
