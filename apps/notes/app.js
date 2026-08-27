@@ -1,33 +1,58 @@
 // apps/notes/app.js
-//
-// a markdown notebook that reads a folder off the user's own disk. the user
-// grants one or more folders (File System Access API, see shared/js/lib/
-// fsaccess.js); each is walked recursively and its folder tree becomes the
-// outline in the sidebar. selecting a `.md` file reads it straight from disk
-// and renders it through @aufbau/import's markdown pipeline — relative images
-// and note-to-note links are resolved back against the same granted folder, so
-// an Obsidian-style vault just works. nothing is copied; only the directory
-// handles are persisted, and only so we can re-ask for them next time.
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORT
 
 // ::: vendors
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 import { renderMD } from '@aufbau/import';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=notes';
+import { boot, config }      from './../../shared/js/app.js?slug=notes';
 import { Icon, AppSettings } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
-import * as fs    from './../../shared/js/lib/fsaccess.js';
-import * as pwa   from './../../shared/js/lib/pwa.js';
+import { stored }            from './../../shared/js/lib/signals.js';
+import * as fs               from './../../shared/js/lib/fsaccess.js';
+import * as pwa              from './../../shared/js/lib/pwa.js';
 
 // ::: local
-import * as db     from './db.js';
+import * as db from './db.js';
 
-// :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::
+// gehört raus
+
+const slugify = text => text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 64) || 'section';
+
+function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className = '' }) {
+  return html`
+    <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
+            disabled=${disabled} onClick=${onClick}>
+      <${Icon} name=${icon} size=${size} />
+    </button>`;
+}
+
+// the one real cure for re-granting every visit: install the app, so the
+// browser persists folder permissions ("Allow on every visit"). only shown
+// while folders are in use and the app isn't installed yet.
+function InstallTip () {
+  if (pwa.installed.value || !db.sources.value.length) return null;
+  return html`
+    <div class="install-tip">
+      <${Icon} name="info" size=${15} />
+      <div class="install-tip-body">
+        <span>Install the app so your folders stay connected between visits — no reconnecting.</span>
+        ${pwa.canInstall.value
+          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
+              <${Icon} name="download"/> Install app</button>`
+          : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
+      </div>
+    </div>`;
+}
+
+function Toast () {
+  const t = toast.value;
+  if (!t) return null;
+  return html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>`;
+}
+
+// :::::: STATE
 
 // the open note, addressed by folder + path so it survives a rescan (the tree
 // node object is replaced, the path is not)
@@ -45,7 +70,7 @@ function flash (text, kind = 'ok') {
   toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 2500);
 }
 
-const keyOf = (sourceId, path) => `${sourceId}:${path}`;
+const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
 function toggleExpand (sourceId, path) {
   const k = keyOf(sourceId, path);
@@ -59,7 +84,7 @@ function openNote (sourceId, node) {
   navOpen.value = false;
 }
 
-// :::::: TREE HELPERS ::::::::::::::::::::::::::::::::::::::::
+// :::::: TREE HELPERS
 
 function findByPath (node, path) {
   if (!node) return null;
@@ -78,21 +103,11 @@ function filterTree (node, q) {
   return kids.length ? { ...node, children: kids } : null;
 }
 
-const slugify = text => text.toLowerCase().trim()
-  .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 64) || 'section';
 
 // derive a note's display title: its first H1, else the filename without .md
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
-// :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
-
-function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className = '' }) {
-  return html`
-    <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
-    </button>`;
-}
+// :::::: SHARED BITS
 
 function Empty ({ icon, title, hint, action }) {
   return html`
@@ -104,7 +119,7 @@ function Empty ({ icon, title, hint, action }) {
     </div>`;
 }
 
-// :::::: SIDEBAR TREE :::::::::::::::::::::::::::::::::::::::
+// :::::: SIDEBAR TREE
 
 function TreeItem ({ sourceId, node, depth, forceOpen }) {
   const pad = { paddingLeft: `${0.4 + depth * 0.85}rem` };
@@ -210,12 +225,12 @@ function Sidebar () {
       </div>
 
       <div class="tree-filter">
-        <${Icon} name="mdi:magnify" size=${16} />
+        <${Icon} name="search" size=${16} />
         <input type="search" placeholder="Filter notes…" value=${filter.value}
                onInput=${e => filter.value = e.target.value} />
         ${filter.value && html`
           <button class="ibtn" aria-label="Clear" onClick=${() => filter.value = ''}>
-            <${Icon} name="mdi:close" size=${14} /></button>`}
+            <${Icon} name="close" size=${14} /></button>`}
       </div>
 
       <div class="tree">
@@ -228,33 +243,13 @@ function Sidebar () {
         <${InstallTip} />
         <button class="btn small primary" onClick=${addFolder}>
           <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>
-        <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" size=${14} /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" size=${14} /> launcher</a>
-        </div>
       </div>
     </aside>`;
 }
 
-// the one real cure for re-granting every visit: install the app, so the
-// browser persists folder permissions ("Allow on every visit"). only shown
-// while folders are in use and the app isn't installed yet.
-function InstallTip () {
-  if (pwa.installed.value || !db.sources.value.length) return null;
-  return html`
-    <div class="install-tip">
-      <${Icon} name="mdi:information-outline" size=${15} />
-      <div class="install-tip-body">
-        <span>Install the app so your folders stay connected between visits — no reconnecting.</span>
-        ${pwa.canInstall.value
-          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="mdi:download" size=${14} /> Install app</button>`
-          : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
-      </div>
-    </div>`;
-}
 
-// :::::: READER ::::::::::::::::::::::::::::::::::::::::::::
+
+// :::::: READER
 
 // resolve the note the router points at, against the freshest scan
 const currentNote = computed(() => {
@@ -429,7 +424,7 @@ function navigateRelative (from, href) {
   else flash('Linked note not found', 'err');
 }
 
-// :::::: ACTIONS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: ACTIONS
 
 async function addFolder () {
   if (!fs.supported()) { flash('This browser can’t open folders — try Chrome, Edge or another Chromium browser.', 'err'); return; }
@@ -439,15 +434,7 @@ async function addFolder () {
   } catch (err) { flash(err.message, 'err'); }
 }
 
-// :::::: TOAST :::::::::::::::::::::::::::::::::::::::::::::
-
-function Toast () {
-  const t = toast.value;
-  if (!t) return null;
-  return html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>`;
-}
-
-// :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: APP
 
 function App () {
   useEffect(() => {
@@ -467,6 +454,6 @@ function App () {
     </div>`;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BOOT
 
 boot({ config, App });
