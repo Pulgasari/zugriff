@@ -37,7 +37,7 @@ export const icons = {
   'reset'             : 'mdi:restore',
   'rss'               : 'mdi:rss',
   'save'              : 'material-symbols:file-save',
-  'search'            : 'material-symbols:search',
+  'search'            : 'mdi:magnify',
   'select-all'        : 'material-symbols:select-all',
   'settings'          : 'material-symbols:settings',
   'space'             : 'material-symbols:space-bar',
