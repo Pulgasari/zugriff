@@ -66,3 +66,94 @@ body {
 a { color: var(--accent); }
 
 ::selection { background: var(--accent-25); }
+
+/*/////////////   /////////////*/
+
+.btn, aufbau-button, button {
+  display      : inline-flex;
+  align-items  : center;
+  gap          : 0.50rem;
+  padding      : 0.5rem 0.85rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg);
+  font         : inherit;
+  font-size    : 0.85rem;
+  cursor       : pointer;
+
+   &:hover:not(:disabled) { border-color: var(--accent-50); }
+   &:disabled             { opacity: 0.4; cursor: default; }
+
+   &.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }      
+   &.ghost   { background: transparent; }
+   &.small   { font-size: 0.75rem; padding: 0.25rem 0.50rem; }
+}
+
+/* ────────── dialogs ────────── */
+
+.scrim {
+  position       : fixed;
+  inset          : 0;
+  z-index        : 60;
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  padding        : 1rem;
+  background     : rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width        : min(460px, 100%);
+  padding      : 1.2rem;
+  border       : 1px solid var(--line);
+  border-radius: calc(var(--radius) + 4px);
+  background   : var(--panel);
+  box-shadow   : 0 12px 40px rgb(0 0 0 / 0.45);
+
+   h2 { font-size: 1.1rem; margin-bottom: 0.6rem; }
+} 
+.modal-hint { font-size: 0.82rem; color: var(--fg-75); line-height: 1.5; margin-bottom: 0.75rem; }
+.modal-hint code, .field-hint code { font-family: var(--mono); background: var(--panel-2); padding: 0.05rem 0.3rem; border-radius: 4px; }
+.modal-input {
+  width        : 100%;
+  padding      : 0.6rem 0.7rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg);
+  font         : inherit;
+
+   &:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+}
+.modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+
+.field       { display: flex; flex-direction: column; gap: 0.5rem; }
+.field-label { font-weight: 600; }
+.field-hint  { font-size: 0.75rem; color: var(--fg-50); line-height: 1.5; }
+.field-row   { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
+
+
+
+/* ────────── toast ────────── */
+
+.toasts { position: fixed; left: 0; right: 0; bottom: 1.1rem; display: flex; justify-content: center; pointer-events: none; z-index: 80; }
+.toast {
+  padding       : 1rem 1rem;
+  border-radius : 999px;
+  background    : var(--panel);
+  border        : 1px solid var(--line);
+  box-shadow    : 0 8px 24px rgb(0 0 0 / 0.35);
+  font-size     : 0.85rem;
+
+   &.err { border-color: color-mix(in oklch, var(--c-null, #e06c75) 55%, var(--line)); color: var(--c-null, #e06c75); }
+}
+
+
+
+
+
+
+
+
