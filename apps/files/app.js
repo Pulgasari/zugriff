@@ -1,19 +1,6 @@
 // apps/files/app.js
-//
-// a file explorer over a folder from the user's own disk. the user grants one
-// folder (File System Access API, see shared/js/lib/fsaccess.js) and it becomes
-// the root of the explorer — browse the tree, preview files, download them out.
-// nothing is uploaded or copied; only the directory handle is persisted, and
-// only so we can re-ask for it next time.
-//
-// the browsing itself is the shared `<${FileExplorer} />` component (over a
-// backend built here around the granted folder). the very same component, over
-// dirfs.js's opfsBackend, browses the private OPFS — so a future app that needs
-// an on-device file browser reaches for the component instead of rebuilding it.
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORTS
 
 // ::: vendors
 import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
@@ -27,7 +14,7 @@ import * as pwa  from './../../shared/js/lib/pwa.js';
 // ::: local
 import * as db   from './db.js';
 
-// :::::: BACKEND :::::::::::::::::::::::::::::::::::::::::::
+// :::::: BACKEND
 
 // the granted folder, described for the FileExplorer component. read-only for
 // now (the folder is picked with mode:'read') — you browse, preview and
@@ -45,7 +32,7 @@ const backend = computed(() => {
   };
 });
 
-// :::::: ACTIONS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: ACTIONS
 
 async function chooseFolder () {
   if (!fs.supported()) return;
@@ -63,7 +50,7 @@ async function closeFolder () {
   await db.forget();
 }
 
-// :::::: SCREENS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: SCREENS
 
 // no File System Access at all in this browser
 function Unsupported () {
@@ -150,17 +137,11 @@ function Sidebar () {
 
       <div class="fe-side-foot">
         <${InstallTip} />
-        <div class="fe-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" size="14" /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" size="14" /> launcher</a>
-          <a href="./../../cli/"><${Icon} name="mdi:console" size="14" /> cli</a>
-          <${AppSettings} />
-        </div>
       </div>
     </aside>`;
 }
 
-// :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: APP
 
 function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
@@ -179,7 +160,6 @@ function App () {
     </div>`;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BOOT
 
-// the app draws its own chrome, so it skips the tools Shell
 boot({ config, App });
