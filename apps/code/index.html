@@ -21,10 +21,9 @@
   <meta name="apple-mobile-web-app-title" content="Code">
 
   <!-- apps link the apps base (reset + theme tokens + #app frame) and their own
-       sheet. the code editor additionally needs Monaco's own stylesheet, which
-       is not an es module and so is loaded here rather than imported. -->
+       sheet. Monaco's stylesheet is injected by its AMD loader (see monaco.js),
+       so it is not linked here. -->
   <link rel="stylesheet" href="./../base.css">
-  <link rel="stylesheet" href="https://esm.sh/monaco-editor@0.50.0?css" id="monaco-css">
   <link rel="stylesheet" href="./app.css">
 
   <script src="./../../shared/js/theme-boot.js"></script>
