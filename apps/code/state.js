@@ -40,6 +40,7 @@ state.config = {
   showKeyboard           : stored(true,               'code:showKeyboard'),
   showStatusbar          : stored(true,               'code:showStatusbar'),
   showToolbar            : stored(true,               'code:showToolbar'),
+  commitPrompt           : stored(false,              'code:commitPrompt'),  // ask for a commit message on GitHub saves
 };
 
 // ── open files ───────────────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ state.patchFile = (file, patch) => {
 };
 
 /** save the active file back to its source (local disk, or a GitHub commit) */
-state.saveActiveFile = async () => {
+state.saveActiveFile = async ({ message } = {}) => {
   const file = state.activeFile.value;
   if (!file || file.readOnly) return false;
 
@@ -118,7 +119,7 @@ state.saveActiveFile = async () => {
     const gh = file.gh;
     const newSha = await state.github.commitFile({
       owner: gh.owner, name: gh.name, path: gh.path, branch: gh.branch,
-      message: `Update ${gh.path}`, content: file.content, sha: gh.sha,
+      message: message || `Update ${gh.path}`, content: file.content, sha: gh.sha,
     });
     state.patchFile(file, { isDirty: false, gh: { ...gh, sha: newSha } });
     return true;
@@ -133,6 +134,15 @@ state.saveActiveFile = async () => {
   state.patchFile(file, { isDirty: false });
   return true;
 };
+
+/** close any open tab matching an id (a local handle, or a gh:… string) */
+state.closeById = (id) => {
+  const f = state.openFiles.value.find(x => x.id === id);
+  if (f) state.closeFile(f);
+};
+
+/** the gh id string for a repo path (to find/close an open GitHub tab) */
+state.githubId = (owner, name, branch, path) => `gh:${owner}/${name}@${branch}:${path}`;
 
 /** close a file (activates the previous tab, or none) */
 state.closeFile = (file) => {

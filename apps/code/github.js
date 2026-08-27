@@ -151,7 +151,7 @@ async function persistSelection () {
 /** the root tree sha + head commit sha of the selected branch */
 export async function branchHead () {
   const r = repo.value, b = branch.value;
-  const info = await api(`/repos/${r.owner}/${r.name}/branches/${encodeURIComponent(b)}`);
+  const info = await api(`/repos/${r.owner}/${r.name}/branches/${b}`);
   return { commit: info.commit.sha, tree: info.commit.commit.tree.sha };
 }
 
@@ -179,13 +179,90 @@ export async function readBlob (blobSha) {
   }
 }
 
+const encPath = path => path.split('/').map(encodeURIComponent).join('/');
+
 /** commit a single file's new content back to the branch; returns the new sha */
 export async function commitFile ({ owner, name, path, branch: br, message, content, sha }) {
-  const res = await api(`/repos/${owner}/${name}/contents/${path.split('/').map(encodeURIComponent).join('/')}`, {
+  const res = await api(`/repos/${owner}/${name}/contents/${encPath(path)}`, {
     method: 'PUT',
     body: { message, content: fromText(content), sha, branch: br },
   });
   return res.content.sha;
+}
+
+// ── file / folder operations (single commit via the Git Data API) ────────────
+
+const R = () => `/repos/${repo.value.owner}/${repo.value.name}`;
+
+/** head commit sha + its root tree sha for the selected branch */
+async function refState () {
+  const ref    = await api(`${R()}/git/ref/heads/${branch.value}`);
+  const commit = await api(`${R()}/git/commits/${ref.object.sha}`);
+  return { commit: ref.object.sha, tree: commit.tree.sha };
+}
+
+/** every blob under a folder prefix ('src/' etc), for recursive moves/deletes */
+async function blobsUnder (prefix, rootTree) {
+  const data = await api(`${R()}/git/trees/${rootTree}?recursive=1`);
+  const under = (data.tree || []).filter(e => e.type === 'blob' && e.path.startsWith(prefix));
+  return { under, truncated: !!data.truncated };
+}
+
+/** apply a set of tree changes as one commit on the branch */
+async function commitChanges (changes, message) {
+  const { commit, tree } = await refState();
+  const newTree   = await api(`${R()}/git/trees`,   { method: 'POST', body: { base_tree: tree, tree: changes } });
+  const newCommit = await api(`${R()}/git/commits`, { method: 'POST', body: { message, tree: newTree.sha, parents: [commit] } });
+  await api(`${R()}/git/refs/heads/${branch.value}`, { method: 'PATCH', body: { sha: newCommit.sha } });
+  return newCommit.sha;
+}
+
+/** create a new (empty or seeded) file — PUT contents, no sha */
+export const createFileAt = (path, content = '', message) =>
+  api(`${R()}/contents/${encPath(path)}`, { method: 'PUT', body: { message: message || `Create ${path}`, content: fromText(content), branch: branch.value } });
+
+/** git has no empty folders — a new folder is a .gitkeep */
+export const createFolderAt = (path, message) =>
+  createFileAt(`${path}/.gitkeep`, '', message || `Create ${path}/`);
+
+/** delete a file (needs its blob sha) or a whole folder (one commit) */
+export async function deletePath (path, { isDir, sha }, message) {
+  if (!isDir) {
+    return api(`${R()}/contents/${encPath(path)}`, { method: 'DELETE', body: { message: message || `Delete ${path}`, sha, branch: branch.value } });
+  }
+  const { tree } = await refState();
+  const { under } = await blobsUnder(path + '/', tree);
+  return commitChanges(under.map(e => ({ path: e.path, mode: e.mode, type: 'blob', sha: null })), message || `Delete ${path}/`);
+}
+
+/** rename/move a file or folder to a new path (one commit) */
+export async function renamePath (from, to, { isDir, sha, mode = '100644' }, message) {
+  if (!isDir) {
+    return commitChanges([
+      { path: to,   mode, type: 'blob', sha },
+      { path: from, mode, type: 'blob', sha: null },
+    ], message || `Rename ${from} → ${to}`);
+  }
+  const { tree } = await refState();
+  const { under } = await blobsUnder(from + '/', tree);
+  const changes = under.flatMap(e => {
+    const dest = to + e.path.slice(from.length);
+    return [
+      { path: dest,   mode: e.mode, type: 'blob', sha: e.sha },
+      { path: e.path, mode: e.mode, type: 'blob', sha: null },
+    ];
+  });
+  return commitChanges(changes, message || `Rename ${from}/ → ${to}/`);
+}
+
+/** copy a file or folder to a new path (one commit, reuses blob shas) */
+export async function copyPath (from, to, { isDir, sha, mode = '100644' }, message) {
+  if (!isDir) {
+    return commitChanges([{ path: to, mode, type: 'blob', sha }], message || `Copy ${from} → ${to}`);
+  }
+  const { tree } = await refState();
+  const { under } = await blobsUnder(from + '/', tree);
+  return commitChanges(under.map(e => ({ path: to + e.path.slice(from.length), mode: e.mode, type: 'blob', sha: e.sha })), message || `Copy ${from}/ → ${to}/`);
 }
 
 export { toText, fromText };

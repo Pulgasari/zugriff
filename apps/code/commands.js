@@ -11,6 +11,16 @@
 
 import state  from './state.js';
 import editor from './editor.js';
+import { openPrompt } from './../../shared/js/components/index.js';
+
+// a promise-returning commit-message prompt (default = the auto message)
+const askCommitMessage = (path) => new Promise(resolve => openPrompt({
+  title: 'Commit message',
+  placeholder: `Update ${path}`,
+  value: `Update ${path}`,
+  onConfirm: msg => resolve(msg || `Update ${path}`),
+  onCancel: () => resolve(null),
+}));
 
 // helpers
 const monacoAction  = id => state.monaco?.getAction(id)?.run();
@@ -19,9 +29,16 @@ const monacoTrigger = id => state.monaco?.trigger('keyboard', id, null);
 // save one file, surfacing a failed GitHub commit in the GitHub modal rather
 // than throwing into the void (a local save that fails just returns false)
 const save = async (file) => {
-  if (!file) return;
-  try { await state.saveActiveFile(); }
-  catch (e) {
+  if (!file || file.readOnly) return;
+  try {
+    if (file.source === 'github' && state.config.commitPrompt.value) {
+      const message = await askCommitMessage(file.gh.path);
+      if (message == null) return;            // cancelled
+      await state.saveActiveFile({ message });
+    } else {
+      await state.saveActiveFile();
+    }
+  } catch (e) {
     if (file.source === 'github') { state.github.error.value = e.message; state.openModal('github'); }
     else console.error('[code] save failed:', e);
   }

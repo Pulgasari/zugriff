@@ -71,8 +71,28 @@ IndexedDB (`db.js` → `auth` store) and is sent only to GitHub.
   regardless of source. **Save** dispatches on `source`: local → a FS writable,
   GitHub → a `PUT contents` commit (`state.saveActiveFile`).
 
-A one-click OAuth login can be added later with a tiny CORS relay (device flow);
-the app side wouldn't change.
+Saving a GitHub file commits it. By default the commit message is `Update <path>`;
+turn on **Settings → GitHub → Prompt for commit message** to be asked each time
+(shared `openPrompt`). A one-click OAuth login can be added later with a tiny CORS
+relay (device flow); the app side wouldn't change.
+
+## file & folder operations
+
+Both trees carry a `⋯` row menu (and a root toolbar) with **New File / New Folder
+/ Rename / Delete / Cut / Copy / Paste** — see `RowMenu.js` and the per-source
+ops:
+
+- local (`fsops.js`): File System Access; rename/move use the native
+  `FileSystemHandle.move()` where present, else a recursive copy + delete.
+- GitHub (`github.js`): each change is a **single commit** through the Git Data
+  API — rename/move/copy reuse the existing blob shas, folder delete/rename walk
+  the recursive tree. New folders are a `.gitkeep`.
+
+`treeops.js` holds the shared bits: a one-slot cut/copy **clipboard** (same-source,
+and for GitHub same-repo+branch) and a per-source **version** signal that bumps
+after every change so the tree refreshes (local reloads in place; GitHub reloads
+from the branch head, since a commit moves the tree shas). Renaming or deleting an
+open file closes its now-stale tab.
 
 ## still stubbed
 

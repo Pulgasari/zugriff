@@ -34,6 +34,7 @@ import Settings    from './components/Settings.js';
 import Workspace   from './components/Workspace.js';
 import Keyboard, { disableAndroidKeyboard, enableAndroidKeyboard } from './components/Keyboard.js';
 
+import { Prompt } from './../../shared/js/components/index.js';
 import * as github from './github.js';
 
 // :::::: EFFECTS ::::::::::::::::::::::::::::::::::::::::::::
@@ -83,6 +84,8 @@ function App () {
       ${cfg.showKeyboard.value && html`<${Keyboard} />`}
       <${Dock} />
     </div>
+
+    <${Prompt} />
   `;
 }
 

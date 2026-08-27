@@ -69,6 +69,14 @@ export default function Settings () {
         ${uiPickers.map(UiPickerField)}
       </div>
       <div class="section">
+        <h3>GitHub</h3>
+        <${Toggle}
+          label="Prompt for commit message"
+          value=${state.config.commitPrompt.value}
+          onChange=${() => (state.config.commitPrompt.value = !state.config.commitPrompt.value)}
+        />
+      </div>
+      <div class="section">
         <h3>Editor</h3>
         <${Dropdown}
           options=${state.editor.themes}

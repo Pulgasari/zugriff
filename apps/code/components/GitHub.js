@@ -4,6 +4,8 @@
 
 import { html, useState, useEffect } from '@aufbau/kits/preact-htm';
 import * as github from './../github.js';
+import { clipboard, version, bump, ask, validName } from './../treeops.js';
+import state from './../state.js';
 import Modal from './Modal.js';
 import Icon from './Icon.js';
 import GitHubTree from './GitHubTree.js';
@@ -48,12 +50,25 @@ export default function GitHub () {
       finally { if (!stop) setLoadingTree(false); }
     })();
     return () => { stop = true; };
-  }, [user, repo && repo.full, branch]);
+  }, [user, repo && repo.full, branch, version.github.value]);
 
   const doConnect = async () => {
     try { await github.connect(pat); setPat(''); }
     catch (e) { github.error.value = e.message; }
   };
+
+  // root-level (repo top) actions
+  const runRoot = fn => async () => { try { await fn(); bump('github'); } catch (e) { if (e) github.error.value = e.message; } };
+  const rootNewFile   = runRoot(async () => { const n = await ask('New file');   if (!validName(n)) return; await github.createFileAt(n, ''); });
+  const rootNewFolder = runRoot(async () => { const n = await ask('New folder'); if (!validName(n)) return; await github.createFolderAt(n); });
+  const rootPaste = runRoot(async () => {
+    const cb = clipboard.value;
+    if (!cb || cb.source !== 'github') return;
+    if (cb.ctx.repo.owner !== repo.owner || cb.ctx.repo.name !== repo.name || cb.ctx.branch !== branch) throw new Error('Paste must stay in the same repo and branch.');
+    const m = { isDir: cb.isDir, sha: cb.ctx.sha, mode: cb.ctx.mode };
+    if (cb.mode === 'copy') await github.copyPath(cb.ctx.path, cb.name, m);
+    else { await github.renamePath(cb.ctx.path, cb.name, m); clipboard.value = null; if (!cb.isDir) state.closeById(state.githubId(repo.owner, repo.name, branch, cb.ctx.path)); }
+  });
 
   const filtered = query
     ? repos.filter(r => r.full.toLowerCase().includes(query.toLowerCase()))
@@ -128,6 +143,12 @@ export default function GitHub () {
           <select class="gh-branch" value=${branch} onChange=${e => github.selectBranch(e.target.value)}>
             ${(branches ?? [branch]).map(b => html`<option value=${b}>${b}</option>`)}
           </select>
+        </div>
+
+        <div class="tree-rootbar">
+          <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><${Icon} name="material-symbols:note-add-outline" size="18" /></button>
+          <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><${Icon} name="material-symbols:create-new-folder-outline" size="18" /></button>
+          ${clipboard.value?.source === 'github' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><${Icon} name="paste" size="18" /></button>`}
         </div>
 
         <div class="filebrowser-body">
