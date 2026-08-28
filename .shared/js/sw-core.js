@@ -13,8 +13,6 @@ import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
 // ::::::
 
-// the app slug is the last path segment of the registration scope, so nothing
-// has to be templated into this file
 const SCOPE   = self.registration.scope;
 const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
 const VERSION = 'v2';
