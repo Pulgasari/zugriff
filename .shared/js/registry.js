@@ -1,10 +1,9 @@
 // shared/js/registry.js
 // ---------------------
-// registry.get('ebooks')       -> the resolved entry, or null
-// registry.getAll('tool')      -> every tool entry (omit the arg for all)
-// registry.categories('app')   -> sorted, de-duped categories for that kind
+// registry.get('ebooks')     -> the resolved entry, or null
+// registry.getAll('tool')    -> every tool entry (omit the arg for all)
+// registry.categories('app') -> sorted, de-duped categories for that kind
 
-// defaults shared by every entry
 const defaults = {
   lang        : 'en',
   theme       : 'dracula',
@@ -31,14 +30,10 @@ const typeDefaults = {
   tool : {               orientation: 'portrait' },
 };
 
-// ── the entries ──────────────────────────────────────────────────────────────
-// adding one: copy the matching template/, add an entry here with its `type`,
-// drop in an app.svg, done. everything user-facing lives here so the launcher,
-// the page and the manifest can never drift apart.
-
+// ── the entries ────────────────────────────────
 const entries = [
 
-  // ── apps ────────────────────────────────────────────────────────────────
+  // ── apps
   {
     type        : 'app',
     slug        : 'files',
