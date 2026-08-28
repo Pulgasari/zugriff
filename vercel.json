@@ -6,7 +6,7 @@
       "destination" : "/index.html"
     },
     {
-      "source"      : "/:appname(code|files|gifmaker|notes)(/)?",
+      "source"      : "/:appname(audio-manager|code|files|gifmaker|notes)(/)?",
       "destination" : "/app.html?app=:appname"
     },
     {
