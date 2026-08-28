@@ -6,10 +6,10 @@
 // signals the ui binds to.
 
 import { signal } from '@aufbau/kits/preact-htm';
-import { stored } from './../../shared/js/lib/signals.js';
+import { stored } from '/.shared/js/lib/signals.js';
 import { fileAt } from './db.js';
 
-const audio = new Audio();
+const audio = new Audio;
 audio.preload = 'metadata';
 
 export const
