@@ -1,26 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "(?<appname>(?!www)[^.]+)\\.zugriff\\.dev"
-        }
-      ],
-      "destination": "/apps/:appname/index.html"
-    },
-    {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "(?<appname>(?!www)[^.]+)\\.zugriff\\.dev"
-        }
-      ],
-      "destination": "/apps/:appname/:path*"
-    },
-    {
       "source"      : "/:kind(apps2|tools2)(/)?",
       "destination" : "/index.html?kind=:kind"
     },
