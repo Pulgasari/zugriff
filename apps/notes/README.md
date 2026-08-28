@@ -1,5 +1,7 @@
 # apps/notes
 
+web: https://zugriff.dev/apps/notes
+
 A Markdown notebook that reads a folder straight off your disk. You grant one
 or more folders with the browser's **File System Access API**; each folder is
 walked recursively and its **folder structure becomes the outline** in the
