@@ -5,20 +5,20 @@
       "has": [
         {
           "type": "host",
-          "value": "(?<app>(?!www)[^.]+)\\.zugriff\\.dev"
+          "value": "(?<appname>(?!www)[^.]+)\\.zugriff\\.dev"
         }
       ],
-      "destination": "/apps/:app/index.html"
+      "destination": "/apps/:appname/index.html"
     },
     {
       "source": "/:path*",
       "has": [
         {
           "type": "host",
-          "value": "(?<app>(?!www)[^.]+)\\.zugriff\\.dev"
+          "value": "(?<appname>(?!www)[^.]+)\\.zugriff\\.dev"
         }
       ],
-      "destination": "/apps/:app/:path*"
+      "destination": "/apps/:appname/:path*"
     },
     {
       "source"      :      "/:appname/",
