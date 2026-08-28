@@ -36,13 +36,10 @@ import Settings, { SettingsButton }       from '/shared/js/components/Settings.j
 import { launcher, appGroup, themeGroup } from '/shared/js/lib/settings.js';
 
 //const registry = zugriff.registry;
-  
+const kind = window.location.pathname.split('/')[1];
 
 //aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
-
-const kind = window.location.pathname.split('/')[1];
-alert(kind);
 
 let site;
 
@@ -102,12 +99,12 @@ else {
 
   const page = {};
   
-  if (kind === 'apps2') {
+  if (kind === 'apps') {
     page.cat = 'app';
     page.name = 'zugriff apps';
 	  page.slug = 'apps';
   } 
-  else if (kind === 'tools2') {
+  else if (kind === 'tools') {
     page.cat = 'tool';
     page.name = 'zugriff tools';
     page.slug = 'tools';
