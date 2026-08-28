@@ -5,12 +5,8 @@
       "destination" : "/index.html?kind=:kind"
     },
     {
-      "source"      :      "/:appname/",
-      "destination" : "/apps/:appname/index.html"
-    },
-    {
-      "source"      :      "/:appname",
-      "destination" : "/apps/:appname/index.html"
+      "source"      : "/:appname(/)?",
+      "destination" : "/app.html?app=:appname"
     },
     {
       "source"      :      "/:appname/:path*",
