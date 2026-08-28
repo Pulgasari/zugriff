@@ -1,15 +1,8 @@
 // shared/js/registry.js
-//
-// the one registry for everything zugriff renders — apps and tools alike. each
-// entry declares its `type` ('app' | 'tool'); the shared defaults (including the
-// aufbau runtime config) are folded in once, with a couple of per-type defaults
-// on top. this is the single source of truth the launchers, shared/js/app.js
-// (which turns ?slug=… into a booted config) and .github/scripts/gen-app-assets.mjs all
-// read.
-//
-//   registry.get('ebooks')       -> the resolved entry, or null
-//   registry.getAll('tool')      -> every tool entry (omit the arg for all)
-//   registry.categories('app')   -> sorted, de-duped categories for that kind
+// ---------------------
+// registry.get('ebooks')       -> the resolved entry, or null
+// registry.getAll('tool')      -> every tool entry (omit the arg for all)
+// registry.categories('app')   -> sorted, de-duped categories for that kind
 
 // defaults shared by every entry
 const defaults = {
