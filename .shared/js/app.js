@@ -33,7 +33,7 @@ export function applyUrlProps (search = location.search) {
 
 // ── service worker ─────────────────────────────────────────────────────────
 
-export function registerServiceWorker (url = './sw.js') {
+export function registerServiceWorker (url = '/sw.js') {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol === 'file:') return;
 
