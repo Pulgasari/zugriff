@@ -67,7 +67,7 @@ function Filter () {
 
   return html`
     <div class=${['search-row launcher-search', sticky && 'sticky', position].filter(Boolean).join(' ')}>
-      <${Icon} name="mdi:magnify" className="search-icon" />
+      <${Icon} name="search" className="search-icon" />
       <input
         ref=${ref}
         class="search-input"
