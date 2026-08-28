@@ -81,6 +81,7 @@ a { color: var(--accent); }
 
 /* ────────── dialogs ────────── */
 
+/*
 .scrim {
   position       : fixed;
   inset          : 0;
@@ -117,6 +118,7 @@ a { color: var(--accent); }
    &:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 }
 .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+*/
 
 .field       { display: flex; flex-direction: column; gap: 0.5rem; }
 .field-label { font-weight: 600; }
