@@ -22,7 +22,7 @@
     },
     {
       "source"      : "/:kind(apps|tools)/?",
-      "destination" : "/index.html?kind=:kind"
+      "destination" : "/:kind.html"
     },
     {
       "source"      :      "/:appname/",
