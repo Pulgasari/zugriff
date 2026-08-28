@@ -2,11 +2,11 @@
   "trailingSlash": true,
   "rewrites": [
     {
-      "source"      : "/:kind(apps|tools)(/)?",
+      "source"      : "/(apps|tools)(/)?",
       "destination" : "/index.html"
     },
     {
-      "source"      : "/:appname(audio-manager|code|files|gifmaker|notes)(/)?",
+      "source"      : "/:appname(/)?",
       "destination" : "/app.html?app=:appname"
     },
     {
