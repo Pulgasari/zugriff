@@ -50,6 +50,14 @@
   	aufbau.init({ css: { theme: 'oled', layout: 'landing' }});
 	//aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
     applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
+
+	const params = new URLSearchParams(window.location.search);
+	const kind = params.get('kind') ?? null; // 'apps' oder 'tools'
+
+       if (kind === 'apps') {}
+  else if (kind === 'tools') {}
+  else {}
+
   </script>
 
 </body>
