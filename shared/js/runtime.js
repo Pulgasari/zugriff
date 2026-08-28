@@ -3,7 +3,7 @@
 
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
-import { opfs }.         from './filesystem/opfs.js';
+import { opfs }          from './filesystem/opfs.js';
 
 export const zugriff = {
   opfs,
