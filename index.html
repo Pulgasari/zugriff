@@ -116,15 +116,18 @@ function HomePageMain () {
 
 function HomePage () {
   return html`
-    <${preact.Fragment}>
+    <div id='app'>
       <${HomePageHead}/>
       <${HomePageMain}/>
       <${HomePageFoot}/>
-    </${preact.Fragment}>
+    </div>
   `;
 }
   
-preact.render(html`<${HomePage}/>`, document.body);
+preact.render(
+	html`<${HomePage}/>`, 
+  document.body
+);
 </script>
 
 </body>
