@@ -12,9 +12,9 @@
 // tags is stored — audio is streamed from disk on play (see player.js).
 
 import { signal, computed } from '@aufbau/kits/preact-htm';
-import { zugriff } from './../../shared/js/runtime.js';
-import { syncSource, MetaQueue } from './../../shared/js/filesystem/scan.js';
-import * as fs from './../../shared/js/filesystem/fsaccess.js';
+import { zugriff }                         from '/.shared/js/runtime.js';
+import { syncSource, MetaQueue }           from '/.shared/js/filesystem/scan.js';
+import * as fs                             from '/.shared/js/filesystem/fsaccess.js';
 import { accept, prettyName, extractMeta } from './library.js';
 
 const keyOf = (sourceId, path) => sourceId + '\n' + path;
@@ -39,9 +39,9 @@ export const displayTitle  = t => t.title  || prettyName(t.name);
 // ── the library ──────────────────────────────────────────────────────────
 
 const lib = new zugriff.fs.FolderLibrary({
-  db:       'zugriff-audio',
-  pickerId: 'zugriff-audio',
-  stores:   { sources: {}, tracks: {} },
+  db       : 'zugriff-audio',
+  pickerId : 'zugriff-audio',
+  stores   : { sources: {}, tracks: {} },
 
   onLoad: async (db) => {
     tracks.value = Object.values(await db.getAll('tracks'));
