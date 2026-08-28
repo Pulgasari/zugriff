@@ -6,9 +6,9 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }                 from './../../shared/js/app.js?slug=videoplayer';
-import { Icon, Taplet, SettingsGroups } from './../../shared/js/components/index.js';
-import { appGroup }                     from './../../shared/js/lib/settings.js';
+import { boot, config }                 from '/.shared/js/app.js?slug=videoplayer';
+import { Icon, Taplet, SettingsGroups } from '/.shared/js/components/index.js';
+import { appGroup }                     from '/.shared/js/lib/settings.js';
 
 // :::::: STATE
 
@@ -167,7 +167,7 @@ const videoTransform = computed(() => {
   return parts.join(' ') || 'none';
 });
 
-// :::::: COMPONENTS ::::::::::::::::::::::::::::::::::::::::
+// :::::: COMPONENTS
 
 /*
 function Taplet ({ icon, size, title, onClick }) {
@@ -346,6 +346,6 @@ function App () {
     </div>`;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BOOT
 
 boot({ config, App });
