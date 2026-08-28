@@ -1,24 +1,17 @@
 // apps/code/app.js
-//
-// the code editor — a mobile-first IDE. this is the port of ratcode (a PHP +
-// Preact app) onto zugriff's static app shell: the PHP template became the
-// index.html + shared boot, the server's auto-import service worker became plain
-// es-module imports, and preact-x's cookie/storage signals + the internal
-// bunker build became the shared `stored()` and `@bunker/db`. Monaco, the code
-// keyboard, the command palette and the File System Access workspace all carry
-// over. what's still stubbed upstream (Browser / Plugins / Workspaces) stays a
-// stub here.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORTS
 
 // ::: vendors
 import { html, effect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=code';
+import { boot, config } from '/.shared/js/app.js?slug=code';
+import { Prompt }       from '/.shared/js/components/index.js';
 
 // ::: local — state first (it wires commands/editor/fs together)
-import state from './state.js';
+import * as github from './github.js';
+import state       from './state.js';
 
 import Statusbar   from './components/Statusbar.js';
 import FileList    from './components/FileList.js';
@@ -34,10 +27,7 @@ import Settings    from './components/Settings.js';
 import Workspace   from './components/Workspace.js';
 import Keyboard, { disableAndroidKeyboard, enableAndroidKeyboard } from './components/Keyboard.js';
 
-import { Prompt } from './../../shared/js/components/index.js';
-import * as github from './github.js';
-
-// :::::: EFFECTS ::::::::::::::::::::::::::::::::::::::::::::
+// :::::: EFFECTS
 
 const $root = document.documentElement;
 
@@ -47,8 +37,8 @@ effect(() => $root.style.setProperty('--fontSize', `${state.config.fontSize.valu
 // app theme — one of the shared presets; overrides the boot default
 effect(() => { $root.dataset.theme = state.config.theme.value; });
 
-// native (Android) keyboard: hidden while the code keyboard is up, or when the
-// user has forced it off in settings
+// native (Android) keyboard: hidden while the code keyboard is up,
+// or when the user has forced it off in settings
 effect(() => {
   const forceDisable  = state.config.disableAndroidKeyboard.value;
   const keyboardShown = state.config.showKeyboard.value;
@@ -58,7 +48,7 @@ effect(() => {
 // restore a stored GitHub token (and last repo/branch) in the background
 github.load().catch(() => {});
 
-// :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: APP
 
 function App () {
   const cfg   = state.config;
@@ -89,6 +79,5 @@ function App () {
   `;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
-
+// :::::: BOOT
 boot({ config, App });
