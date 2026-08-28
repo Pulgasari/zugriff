@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source"      : "/:kind(apps|tools)(/)?",
-      "destination" : "/index.html?kind=:kind"
+      "destination" : "/index.html"
     },
     {
       "source"      : "/:appname(code|files|gifmaker|notes)(/)?",
