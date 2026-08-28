@@ -1,13 +1,4 @@
 // shared/js/sw-core.js
-//
-// the shared service worker body. every app ships a one-line sw.js that pulls
-// this in — this is what sw.js.php used to generate per request.
-//
-//   import './../../shared/js/sw-core.js';
-//
-// it is a MODULE service worker, because import maps do not apply inside a
-// worker: @bunker is imported by its full url here, not by bare specifier.
-// everything bunker pulls in is relative to that url, so one entry is enough.
 
 import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
@@ -71,38 +62,20 @@ self.addEventListener('activate', event => {
 
 // ── fetch ──────────────────────────────────────────────────────────────────
 
-
 self.addEventListener('fetch', event => {
-  const { request } = event;
+  const { request } = event; if (request.method !== 'GET') return;
+  if (!request.url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
+  if (isNested(request.url))           return;
+  if (!isVendor(request.url) && !isSameOrigin(request.url)) return;
+  const store = isVendor(request.url) ? vendor : app;
 
-  if (request.method !== 'GET') return;
-
-  const url = request.url;
-
-  
-  if (!url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
-  if (isNested(url))           return;
-
-  const versioned = isVendor(url);
-
-  // anything else on a foreign origin is left to the browser. revalidating it
-  // would mean adding If-None-Match / If-Modified-Since, and that turns a
-  // simple request into a preflighted one — api.iconify.design does not allow
-  // those headers, so the icons would start failing on the second load
-  if (!versioned && !isSameOrigin(url)) return;
-
-  const store = versioned ? vendor : app;
-
-  // keepAlive hands the background revalidation to the event, so the worker is
-  // not killed mid-refresh — without it a revalidation started on the last
-  // request of a session is simply lost
   event.respondWith(
     store.staleWhileRevalidate(request, {
-      ttl       : versioned ? IMMUTABLE_TTL : 0,
+      ttl       : isVendor(request.url) ? IMMUTABLE_TTL : 0,
       keepAlive : pending => event.waitUntil(pending),
     }).catch(async error => {
       // offline and never cached: let the failure be the real network failure
-      console.warn('[sw] miss', url, error);
+      console.warn('[sw] miss', request.url, error);
       return fetch(request);
     })
   );
