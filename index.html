@@ -32,7 +32,8 @@ aufbau.init({ css: { theme: 'oled', layout: 'landing' }});
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
 
 const params = new URLSearchParams(window.location.search);
-const kind = params.get('kind') ?? null; // 'apps' oder 'tools'
+const kind = params.get('kind') ?? 'home';
+let page;
 
      if (kind === 'apps') {}
 else if (kind === 'tools') {}
@@ -74,9 +75,10 @@ function HomePage () {
     </div>
   `;
 }
+page = html`<${HomePage}/>`;
   
 preact.render(
-	html`<${HomePage}/>`, 
+	page, 
   document.body
 );
 </script>
