@@ -1,15 +1,5 @@
-/* apps/base.css — the shared foundation for /apps. */
-
-@import url('./../shared/css/theme.css');
-@import url('./../shared/css/settings.css');
-
-/*
-*, *::before, *::after {
-  box-sizing : border-box;
-  margin     : 0;
-  padding    : 0;
-}
-*/
+@import url('./theme.css');
+@import url('./settings.css');
 
 :root {
   /*
@@ -33,7 +23,7 @@ body {
   font-size          : 14px;
   background         : var(--bg);
   color              : var(--fg);
-  overflow           : hidden;         /* apps own their scroll regions */
+  overflow           : hidden;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
