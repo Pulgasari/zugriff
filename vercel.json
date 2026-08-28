@@ -1,12 +1,8 @@
 {
   "rewrites": [
     {
-      "source"      : "/:kind(apps2|tools2)(/)?",
-      "destination" : "/index.html?kind=:kind"
-    },
-    {
       "source"      : "/:kind(apps|tools)(/)?",
-      "destination" : "/:kind.html"
+      "destination" : "/index.html?kind=:kind"
     },
     {
       "source"      :      "/:appname/",
