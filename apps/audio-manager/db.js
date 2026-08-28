@@ -31,10 +31,10 @@ export const trackByKey = key => tracks.value.find(t => t.key === key) ?? null;
 
 const cmp = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 
-// display helpers used across the ui
-export const displayArtist = t => t.artist || 'Unknown Artist';
-export const displayAlbum  = t => t.album  || 'Unknown Album';
-export const displayTitle  = t => t.title  || prettyName(t.name);
+export const // display helpers used across the ui
+displayArtist = track => track.artist || 'Unknown Artist',
+displayAlbum  = track => track.album  || 'Unknown Album',
+displayTitle  = track => track.title  || prettyName(t.name);
 
 // ── the library ──────────────────────────────────────────────────────────
 
@@ -112,7 +112,7 @@ export async function fileAt (track) {
 const albumKey = t => `${displayAlbum(t)}\n${t.albumArtist || displayArtist(t)}`;
 
 export const albums = computed(() => {
-  const map = new Map();
+  const map = new Map;
   for (const t of tracks.value) {
     const key = albumKey(t);
     let a = map.get(key);
@@ -127,7 +127,7 @@ export const albums = computed(() => {
 });
 
 export const artists = computed(() => {
-  const map = new Map();
+  const map = new Map;
   for (const t of tracks.value) {
     const name = displayArtist(t);
     let a = map.get(name);
