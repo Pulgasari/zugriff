@@ -41,12 +41,10 @@ import { launcher, appGroup, themeGroup } from '/shared/js/lib/settings.js';
 //aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
 
-const params = new URLSearchParams(window.location.search);
-const kind = params.get('kind') ?? 'home';
-let site;
-
+const kind = window.location.pathname.split('/')[1];
 alert(kind);
-alert(params.get('kind'));
+
+let site;
 
 // :::::: RENDER
 
