@@ -25,7 +25,6 @@
 <script type="module">
 import { applyFilter } from '@aufbau/filters';
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
-const { effect, signal  } = preact;
   
 aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
 //aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
@@ -39,6 +38,7 @@ let page;
 else if (kind === 'tools') {}
 else {}
 
+if (kind === 'home') {
 function HomePage () {
   return html`
     <div id='app'>
@@ -47,7 +47,6 @@ function HomePage () {
           <a href="/cli">CLI</a>
           <a href="/apps">Apps</a>
           <a href="/tools">Tools</a>
-          <a href="https://github.com/pulgasari/zugriff/">@GitHub</a>
 	      </nav>
 	    </header>
       
@@ -81,12 +80,10 @@ function HomePage () {
     </div>
   `;
 }
-page = html`<${HomePage}/>`;
+  page = html`<${HomePage}/>`;
+}
   
-preact.render(
-	page, 
-  document.body
-);
+preact.render(page, document.body);
 </script>
 
 </body>
