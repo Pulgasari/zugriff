@@ -11,6 +11,17 @@
     {
       "source"      :      "/:appname/:path*",
       "destination" : "/apps/:appname/:path*"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<app>[^.]+)\\.mydomain\\.tld"
+        }
+      ],
+      // Forwards app1.mydomain.tld/path to /apps/app1/path
+      "destination": "/apps/:app/:path*"
     }
   ]
 }
