@@ -37,7 +37,7 @@ import { launcher, appGroup, themeGroup } from '/shared/js/lib/settings.js';
 
 //const registry = zugriff.registry;
   
-aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
+
 //aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
 
@@ -50,6 +50,7 @@ else if (kind === 'tools') {}
 else {}
 
 if (kind === 'home') {
+  aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
 function HomePage () {
   return html`
     <div id='app'>
