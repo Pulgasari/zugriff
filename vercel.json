@@ -12,15 +12,25 @@
       "source"      :      "/:appname/:path*",
       "destination" : "/apps/:appname/:path*"
     },
+     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?<app>(?!www)[^.]+)\\.zugriff\\.dev"
+        }
+      ],
+      "destination": "/apps/:app/index.html"
+    },
     {
       "source": "/:path*",
       "has": [
         {
           "type": "host",
-          "value": "(?<app>[^.]+)\\.zugriff\\.dev"
+          "value": "(?<app>(?!www)[^.]+)\\.zugriff\\.dev"
         }
       ],
       "destination": "/apps/:app/:path*"
-    }
+    },
   ]
 }
