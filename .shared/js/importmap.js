@@ -1,5 +1,8 @@
 (() => {
 
+const PREACT = '10.20.1';
+const HLJS   = '11.10.0';
+const pkg    = 'https://code.pulgasari.dev';
 
 const createElement = (tag, props) => Object.assign(document.createElement(tag), props);    
 
@@ -9,12 +12,6 @@ const PRELOAD_CRITICAL = [
   '@domina/core',
   'preact',
 ];
-
-const pkg = 'https://code.pulgasari.dev';
-
-// pinned once so every dependent entry below refers to the same version
-const PREACT = '10.20.1';
-const HLJS   = '11.10.0';
 
 const map = { imports: {
   "@aufbau/builders/docs"   : `${pkg}/aufbau/builders/docs/index.js`,
