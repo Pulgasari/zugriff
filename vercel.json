@@ -17,10 +17,9 @@
       "has": [
         {
           "type": "host",
-          "value": "(?<app>[^.]+)\\.mydomain\\.tld"
+          "value": "(?<app>[^.]+)\\.zugriff\\.dev"
         }
       ],
-      // Forwards app1.mydomain.tld/path to /apps/app1/path
       "destination": "/apps/:app/:path*"
     }
   ]
