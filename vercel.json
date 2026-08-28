@@ -6,7 +6,7 @@
       "destination" : "/index.html"
     },
     {
-      "source"      : "/:appname(audio-manager|code|ebooks|feeds|files|gifmaker|icons|notes|podcasts)(/)?",      
+      "source"      : "/:appname(audio-manager|code|ebooks|feeds|files|gifmaker|image-editor|image-viewer|icons|notes|podcasts|videoplayer)(/)?",      
       "destination" : "/app.html?app=:appname"
     },
     {
