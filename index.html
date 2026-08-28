@@ -23,20 +23,22 @@
 </div>
 
 <script type="module">
+const route = window.location.pathname.split('/')[1];
+
 // :::::: IMPORTS
 import { applyFilter } from '@aufbau/filters';
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
 const { computed, signal, useEffect, useRef } = preact;
 
-import { boot }     from '/shared/js/app.js';
-import { registry } from '/shared/js/registry.js';
-import Icon         from '/shared/js/components/Icon.js';
-import Nav          from '/shared/js/components/Nav.js';
-import Settings, { SettingsButton }       from '/shared/js/components/Settings.js';
-import { launcher, appGroup, themeGroup } from '/shared/js/lib/settings.js';
+import { boot }     from '/.shared/js/app.js';
+import { registry } from '/.shared/js/registry.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import Nav          from '/.shared/js/components/Nav.js';
+import Settings, { SettingsButton }       from '/.shared/js/components/Settings.js';
+import { launcher, appGroup, themeGroup } from '/.shared/js/lib/settings.js';
 
 //const registry = zugriff.registry;
-const kind = window.location.pathname.split('/')[1];
+
 
 //aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
@@ -47,7 +49,7 @@ let site;
 
 // ::: Page: Home
 
-if (kind === 'home') {
+if (route === 'home') {
   aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
 function HomePage () {
   return html`
@@ -99,12 +101,12 @@ else {
 
   const page = {};
   
-  if (kind === 'apps') {
+  if (route === 'apps') {
     page.cat = 'app';
     page.name = 'zugriff apps';
 	  page.slug = 'apps';
   } 
-  else if (kind === 'tools') {
+  else if (route === 'tools') {
     page.cat = 'tool';
     page.name = 'zugriff tools';
     page.slug = 'tools';
