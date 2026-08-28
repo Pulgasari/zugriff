@@ -49,6 +49,10 @@ let site;
 else if (kind === 'tools') {}
 else {}
 
+// :::::: RENDER
+
+// ::: Page: Home
+
 if (kind === 'home') {
   aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
 function HomePage () {
@@ -94,7 +98,10 @@ function HomePage () {
 }
   site = html`<${HomePage}/>`;
   preact.render(site, document.body);
-} else {
+} 
+
+// ::: Page: Apps | Tools
+else {
 
   const page = {};
   
