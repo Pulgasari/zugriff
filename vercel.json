@@ -5,7 +5,7 @@
       "destination" : "/index.html?kind=:kind"
     },
     {
-      "source"      : "/:appname(/)?",
+      "source"      : "/:appname(code|gifmaker|notes)(/)?",
       "destination" : "/app.html?app=:appname"
     },
     {
