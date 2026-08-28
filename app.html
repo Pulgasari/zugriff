@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dracula">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -26,30 +27,25 @@
 </head>
 <body>
   
-  <div id="app">
-    <div id="app-loading">
-      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-      	<path d="M0 0h24v24H0z" fill="none" />
-      	<circle cx="4" cy="12" r="3" fill="currentColor">
-      		<animate id="SVG7x14Dcom" fill="freeze" attributeName="opacity" begin="0;SVGqSjG0dUp.end-0.25s" dur="0.75s" values="1;.2" />
-      	</circle>
-      	<circle cx="12" cy="12" r="3" fill="currentColor" opacity=".4">
-      		<animate fill="freeze" attributeName="opacity" begin="SVG7x14Dcom.begin+0.15s" dur="0.75s" values="1;.2" />
-      	</circle>
-      	<circle cx="20" cy="12" r="3" fill="currentColor" opacity=".3">
-      		<animate id="SVGqSjG0dUp" fill="freeze" attributeName="opacity" begin="SVG7x14Dcom.begin+0.3s" dur="0.75s" values="1;.2" />
-      	</circle>
-      </svg>
-    </div>
+<div id="app">
+  <div id="app-loading">
+    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+      <path d="M0 0h24v24H0z" fill="none" />
+      <circle cx="4" cy="12" r="3" fill="currentColor"><animate id="SVG7x14Dcom" fill="freeze" attributeName="opacity" begin="0;SVGqSjG0dUp.end-0.25s" dur="0.75s" values="1;.2" /></circle>
+      <circle cx="12" cy="12" r="3" fill="currentColor" opacity=".4"><animate fill="freeze" attributeName="opacity" begin="SVG7x14Dcom.begin+0.15s" dur="0.75s" values="1;.2" /></circle>
+      <circle cx="20" cy="12" r="3" fill="currentColor" opacity=".3"><animate id="SVGqSjG0dUp" fill="freeze" attributeName="opacity" begin="SVG7x14Dcom.begin+0.3s" dur="0.75s" values="1;.2" /></circle>
+    </svg>
   </div>
+</div>
 
-  <script type='module'>
-    const route = window.location.pathname.split('/')[1];
-    alert(route);
-    //if (route === 'icons')
-    import "https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js";
-  </script>
-  <script type="module" src="./app.js"></script>
+<script type='module'>
+const route = window.location.pathname.split('/')[1];
+alert(route);
+//if (route === 'icons')
+import "https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js";
+</script>
+  
+<script type="module" src="./app.js"></script>
   
 </body>
 </html>
