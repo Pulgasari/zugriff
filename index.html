@@ -115,8 +115,18 @@ function HomePageMain () {
     </div>
   `;
 }
-  
 
+function HomePage () {
+  return html`
+    <${preact.Fragment}>
+      <${HomePageHead}/>
+      <${HomePageMain}/>
+      <${HomePageFoot}/>
+    </${preact.Fragment}>
+  `;
+}
+  
+preact.render(HomePage, document.body);
 </script>
 
 </body>
