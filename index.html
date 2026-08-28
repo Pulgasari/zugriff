@@ -106,17 +106,19 @@ else {
   if (kind === 'apps2') {
     page.cat = 'app';
     page.name = 'zugriff apps';
+	  page.slug = 'apps';
   } 
   else if (kind === 'tools2') {
     page.cat = 'tool';
     page.name = 'zugriff tools';
+    page.slug = 'tools';
   }
      
 
 // :::::: CONFIG
 
 const categories = registry.categories(page.cat);
-const config     = { slug: 'apps', name: page.name, theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
+const config     = { slug: page.slug, name: page.name, theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
 const groups     = [ { title: 'launcher', settings: launcher }, appGroup, themeGroup ];
 
 // :::::: STATES
