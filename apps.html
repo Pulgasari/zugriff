@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#282a36">
   <title>zugriff apps</title>
-  <link rel="icon" href="./icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./shared/css/index.css">
-  <link rel="stylesheet" href="./shared/css/launcher.css">
-  <script src="./shared/js/theme-boot.js"></script>
-  <script src="./shared/js/importmap.js"></script>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/shared/css/index.css">
+  <link rel="stylesheet" href="/shared/css/launcher.css">
+  <script src="/shared/js/theme-boot.js"></script>
+  <script src="/shared/js/importmap.js"></script>
 </head>
 <body>
   
@@ -24,12 +24,12 @@
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
-import { boot }     from './shared/js/app.js';
-import { registry } from './shared/js/registry.js';
-import Icon         from './shared/js/components/Icon.js';
-import Nav          from './shared/js/components/Nav.js';
-import Settings, { SettingsButton } from './shared/js/components/Settings.js';
-import { launcher, appGroup, themeGroup } from './shared/js/lib/settings.js';
+import { boot }     from '/shared/js/app.js';
+import { registry } from '/shared/js/registry.js';
+import Icon         from '/shared/js/components/Icon.js';
+import Nav          from '/shared/js/components/Nav.js';
+import Settings, { SettingsButton } from '/shared/js/components/Settings.js';
+import { launcher, appGroup, themeGroup } from '/shared/js/lib/settings.js';
 
 //const registry = zugriff.registry;
 
