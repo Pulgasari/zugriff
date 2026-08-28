@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#282a36">
+  <title>zugriff tools</title>
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/shared/css/index.css">
+  <link rel="stylesheet" href="/shared/css/launcher.css">
+  <script src="/shared/js/theme-boot.js"></script>
+  <script src="/shared/js/importmap.js"></script>
+</head>
+<body>
+  
+<div id="app">
+  <div id="app-body">
+    <div id="app-loading">…</div>
+  </div>
+</div>
+  
+<script type="module">
+import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+
+import { boot }     from '/shared/js/app.js';
+import { registry } from '/shared/js/registry.js';
+import Icon         from '/shared/js/components/Icon.js';
+import Nav          from '/shared/js/components/Nav.js';
+import Settings, { SettingsButton } from '/shared/js/components/Settings.js';
+import { launcher, themeGroup }     from '/shared/js/lib/settings.js';
+
+// the overview page is not a registry entry, so it carries its own flat config
+const config = { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };
+
+const categories = registry.categories('tool');
+
+const groups = [
+  { title: 'launcher', settings: launcher },
+  themeGroup,
+];
+
+const query    = signal('');
+const category = signal('');
+
+const visible = computed(() => {
+  const q = query.value.trim().toLowerCase();
+  const c = category.value;
+
+  return registry.getAll('tool').filter(app =>
+    (!c || app.categories?.includes(c)) &&
+    (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
+  );
+});
+
+function Filter () {
+  const ref      = useRef(null);
+  const sticky   = launcher.value('filter-sticky');
+  const position = launcher.value('filter-position');
+
+  useEffect(() => {
+    if (launcher.value('filter-autofocus')) ref.current?.focus();
+  }, []);
+
+  return html`
+    <div class=${['search-row launcher-search', sticky && 'sticky', position].filter(Boolean).join(' ')}>
+      <${Icon} name="mdi:magnify" className="search-icon" />
+      <input
+        ref=${ref}
+        class="search-input"
+        type="search"
+        placeholder="Filter tools…"
+        value=${query.value}
+        onInput=${event => query.value = event.target.value}
+      />
+      ${query.value && html`
+        <button class="act-btn" onClick=${() => query.value = ''}>
+          <${Icon} name="mdi:close" />
+        </button>`}
+    </div>`;
+}
+
+function AppList () {
+  const list = visible.value;
+  const top  = launcher.value('filter-position') === 'top';
+
+  return html`
+    <div id="app-body">
+
+      ${top && html`<${Filter} />`}
+
+      <div class="launcher-categories">
+        <button class=${'chip' + (category.value === '' ? ' active' : '')}
+                onClick=${() => category.value = ''}>all</button>
+        ${categories.map(name => html`
+          <button class=${'chip' + (category.value === name ? ' active' : '')}
+                  onClick=${() => category.value = name}>${name}</button>`)}
+      </div>
+
+      <ul id="tools">
+        ${list.map(app => html`
+          <li key=${app.slug}>
+            <a href=${`./${app.slug}/`}>
+              <span class="title">
+                <span class="name">${app.name}</span>
+                ${app.description && html`<span class="desc">${app.description}</span>`}
+              </span>
+              <span class="logo"><${Icon} name=${app.icon} /></span>
+            </a>
+          </li>`)}
+      </ul>
+
+      ${!list.length && html`<p class="launcher-empty">nothing matches “${query.value}”.</p>`}
+
+      ${!top && html`<${Filter} />`}
+
+    </div>`;
+}
+
+function Launcher () {
+  return html`
+    <div id="app-head">
+      <div id="app-logo"><strong>zugriff</strong> tools</div>
+      <div class="actions">
+        <${Nav} here='tools' base='./' />
+        <${SettingsButton} />
+      </div>
+    </div>
+
+    <${Settings} groups=${groups} />
+
+    <${AppList} />
+  `;
+}
+
+// the launcher draws its own header, so it skips the app shell
+boot({ config, App: Launcher, shell: false });
+</script>
+  
+</body>
+</html>
