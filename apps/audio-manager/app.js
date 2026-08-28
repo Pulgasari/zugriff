@@ -1,25 +1,21 @@
 // apps/audio-manager/app.js
-//
-// a music library over folders on the user's disk. grant a folder (File System
-// Access), the files are scanned and their tags + cover art read on device
-// (db.js / library.js), and the library is browsed by song, album or artist.
-// playback is one shared <audio> streaming straight off disk (player.js).
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
+
+// :::::: IMPORTS
 
 // ::: vendors
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=audio-manager';
-import { Icon, AppSettings } from './../../shared/js/components/index.js';
-import * as fs    from './../../shared/js/filesystem/fsaccess.js';
-import * as pwa   from './../../shared/js/lib/pwa.js';
+import { boot, config }      from '/.shared/js/app.js?slug=audio-manager';
+import { Icon, AppSettings } from '/.shared/js/components/index.js';
+import * as fs               from '/.shared/js/filesystem/fsaccess.js';
+import * as pwa              from '/.shared/js/lib/pwa.js';
 
 // ::: local
 import * as db     from './db.js';
 import * as player from './player.js';
-import { displayTitle, displayArtist, displayAlbum } from './db.js';
+//import { displayTitle, displayArtist, displayAlbum } from './db.js';
+const { displayTitle, displayArtist, displayAlbum } = db;
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -436,8 +432,8 @@ function Welcome () {
 function App () {
   useEffect(() => { db.load().catch(err => flash('Could not open the library: ' + err.message, 'err')); return dropCovers; }, []);
 
-  if (!fs.supported())  return html`<div class="am-app centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)  return html`<div class="am-app centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div></div>`;
+  if (!fs.supported())          return html`<div class="am-app centered"><${Unsupported} /></div>`;
+  if (!db.ready.value)          return html`<div class="am-app centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div></div>`;
   if (!db.sources.value.length) return html`<div class="am-app centered"><${Welcome} /></div>`;
 
   return html`
