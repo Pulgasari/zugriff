@@ -1,28 +1,9 @@
 // shared/js/app.js
 
-/*
-the app shell. this is what the php template used to do on the server:
-- set up the document, 
-- boot the runtime,
-- register the service worker
-- and mount the app.
-
-a page pulls its own registry entry in through the module url
-— each distinct ?slug=… is its own module instance, 
-so `config` below is this page's entry:
-
-import { boot, config } from './../../shared/js/app.js?slug=ebooks';
-boot({ config, App });
-
-`config` is the resolved registry entry (name, icon, theme, aufbau options …).
-whether the tools Shell wraps the app is decided from the entry's `type`
-('tool' gets the shell, 'app' draws its own chrome) unless boot is given an explicit `shell`.   
-*/
-
 import aufbau, { html, render } from '@aufbau/kits/preact-htm';
 import Shell        from './components/Shell.js';
 import { registry } from './registry.js';
-import './runtime.js';   // establishes globalThis.zugriff (fs / opfs) once per page
+import './runtime.js'; // enable globalThis.zugriff
 
 const $root = document.documentElement;
 
@@ -77,12 +58,9 @@ export async function boot ({
   serviceWorker = true,
   shell, // undefined → decide from the entry's type
 } = {}) {
-  const app = cfg ?? {};
+  const app          = cfg ?? {};
   const aufbauConfig = app.aufbau ?? {};
-
-  // tools live inside the shared Shell; apps draw their own chrome. an explicit
-  // `shell` still wins (the launchers pass shell:false for their overview page).
-  const useShell = shell ?? (app.type !== 'app');
+  const useShell     = shell ?? (app.type !== 'app');
 
   if (app.name)  document.title      = app.title ?? app.name;
   if (app.theme) $root.dataset.theme = app.theme;
