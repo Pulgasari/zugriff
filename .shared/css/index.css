@@ -1,0 +1,9 @@
+/* shared/css/index.css
+   the base every app links. panes.css, inspector.css and hljs.css are opt-in —
+   apps that need them add their own <link> after this one. */
+
+@import url('./reset.css');
+@import url('./theme.css');
+@import url('./typo.css');
+@import url('./layout.css');
+@import url('./components.css');
