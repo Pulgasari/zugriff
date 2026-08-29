@@ -5,8 +5,8 @@ import { computed, effect, html, signal, useEffect, useRef, useState } from '@au
 import { BunkerDB } from '@bunker/db';
 
 // ::: shared
-import { boot, config } from './../../.shared/js/app.js?slug=prompts';
-import { Icon, Picker } from './../../.shared/js/components/index.js';
+import { boot, config } from '/.shared/js/app.js?slug=prompts';
+import { Icon, Picker } from '/.shared/js/components/index.js';
 
 // ::: local
 

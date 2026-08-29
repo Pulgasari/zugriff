@@ -2,7 +2,7 @@
 // the command palette — search every command, star favourites, run one.
 
 import { html, useState } from '@aufbau/kits/preact-htm';
-import { stored } from './../../../.shared/js/lib/signals.js';
+import { stored } from '/.shared/js/lib/signals.js';
 import state from './../state.js';
 import Modal from './Modal.js';
 import Icon  from './Icon.js';

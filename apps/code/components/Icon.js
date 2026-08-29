@@ -5,7 +5,7 @@
 // other prop (size, color, class …) is forwarded untouched.
 
 import { html } from '@aufbau/kits/preact-htm';
-import { Icon as BaseIcon } from './../../../.shared/js/components/index.js';
+import { Icon as BaseIcon } from '/.shared/js/components/index.js';
 import { resolve } from './../icons.js';
 
 export default function Icon ({ name, ...rest }) {

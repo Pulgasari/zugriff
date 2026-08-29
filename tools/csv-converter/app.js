@@ -1,8 +1,8 @@
 // tools/csv-converter/app.js
 
-import { boot, config } from './../../.shared/js/app.js?slug=csv-converter';
-import { CodeConverterApp } from './../../.shared/js/patterns/index.js';
-import { convert } from './../../.shared/js/lib/data-converters.js';
+import { boot, config } from '/.shared/js/app.js?slug=csv-converter';
+import { CodeConverterApp } from '/.shared/js/patterns/index.js';
+import { convert } from '/.shared/js/lib/data-converters.js';
 
 const App = CodeConverterApp({
   appID       : 'csv-converter',

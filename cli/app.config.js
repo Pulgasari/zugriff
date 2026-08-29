@@ -1,6 +1,6 @@
 // cli/app.config.js
 
-import { themeColors, fontFamily } from './../.shared/js/lib/theme.js';
+import { themeColors, fontFamily } from '/.shared/js/lib/theme.js';
 
 export const app = {
   slug  : 'cli',

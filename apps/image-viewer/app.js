@@ -6,9 +6,9 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }      from './../../.shared/js/app.js?slug=image-viewer';
-import { Icon, AppSettings } from './../../.shared/js/components/index.js';
-import * as pwa              from './../../.shared/js/lib/pwa.js';
+import { boot, config }      from '/.shared/js/app.js?slug=image-viewer';
+import { Icon, AppSettings } from '/.shared/js/components/index.js';
+import * as pwa              from '/.shared/js/lib/pwa.js';
 import { useGesture }        from '@aufbau/gestures/preact';
 
 // gehört raus
