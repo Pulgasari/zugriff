@@ -7,11 +7,11 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 import { renderMD } from '@aufbau/import';
 
 // ::: shared
-import { boot, config }      from './../../shared/js/app.js?slug=notes';
-import { Icon, AppSettings } from './../../shared/js/components/index.js';
-import { stored }            from './../../shared/js/lib/signals.js';
-import * as fs               from './../../shared/js/filesystem/fsaccess.js';
-import * as pwa              from './../../shared/js/lib/pwa.js';
+import { boot, config }      from '/.shared/js/app.js?slug=notes';
+import { Icon, AppSettings } from '/.shared/js/components/index.js';
+import { stored }            from '/.shared/js/lib/signals.js';
+import * as fs               from '/.shared/js/filesystem/fsaccess.js';
+import * as pwa              from '/.shared/js/lib/pwa.js';
 
 // ::: local
 import * as db from './db.js';
