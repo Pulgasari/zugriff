@@ -1,16 +1,6 @@
 // apps/podcasts/app.js
-//
-// a podcast client that runs entirely on the device. subscriptions, episodes
-// and listening state live in IndexedDB via @bunker/db (see db.js); feeds are
-// fetched and parsed in the browser (feed.js); one shared <audio> element plays
-// them and writes the position back as it goes (player.js).
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
-// the layout is a menu bar, a scrolling main column and a docked player; the
-// menu (top/bottom/left/right) and the player (top/bottom) positions are
-// user-set and driven by data-menu / data-player on the root.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORTS
 
 // ::: vendors
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
@@ -18,15 +8,15 @@ import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 const { computed, signal, useEffect, useRef, useSignal } = preact;
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=podcasts';
-import { Icon, SettingsGroups } from './../../shared/js/components/index.js';
-import { stored }           from './../../shared/js/lib/signals.js';
-import { appGroup }         from './../../shared/js/lib/settings.js';
-import { createThumbCache } from './../../shared/js/lib/thumbs.js';
+import { boot, config }         from '/.shared/js/app.js?slug=podcasts';
+import { Icon, SettingsGroups } from '/.shared/js/components/index.js';
+import { stored }               from '/.shared/js/lib/signals.js';
+import { appGroup }             from '/.shared/js/lib/settings.js';
+import { createThumbCache }     from '/.shared/js/lib/thumbs.js';
 
 // ::: local
-import * as db     from './db.js';
-import * as player from './player.js';
+import * as db           from './db.js';
+import * as player       from './player.js';
 import { DEFAULT_PROXY } from './feed.js';
 
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
