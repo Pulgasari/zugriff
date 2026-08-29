@@ -25,6 +25,47 @@
 //
 // it hangs off the runtime as the constructor `zugriff.fs.FolderLibrary`.
 
+/*
+function deleteKeyFromSignalObject(signal, key) {
+  const { [key]: _, ...rest } = signal.value;  // destructuring + rest
+  signal.value = rest;
+}
+
+// oder explizit mit delete (wie im Original)
+function deleteKeyFromSignalObject(signal, key) {
+  const copy = { ...signal.value };
+  delete copy[key];
+  signal.value = copy;
+}
+
+function setSignalObject(signal, key, value) {
+  signal.value = { ...signal.value, [key]: value };
+}
+
+// Verwendung:
+setSignalObject(this._perms, id, 'granted');
+setSignalObject(this._scanning, id, true);
+
+function removeFromSignalObjectListByPredicate(signal, predicate) {
+  signal.value = signal.value.filter(item => !predicate(item));
+}
+
+// Entfernt Elemente, bei denen ALLE Kriterien erfüllt sind (AND)
+function removeFromSignalObjectListByCriteria(signal, criteria) {
+  signal.value = signal.value.filter(item =>
+    !Object.keys(criteria).every(key => item[key] === criteria[key])
+  );
+}
+
+// Entfernt Elemente, bei denen MINDESTENS EIN Kriterium erfüllt ist (OR)
+function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
+  signal.value = signal.value.filter(item =>
+    !Object.keys(criteria).some(key => item[key] === criteria[key])
+  );
+}
+*/
+
+
 import { signal } from '@aufbau/kits/preact-htm';
 import { createDb } from '@bunker/db';
 import * as fs from './fsaccess.js';
