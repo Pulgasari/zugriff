@@ -900,3 +900,19 @@ canvas.view {
 .im-fx-note   { font-size: 0.75rem; color: var(--fg-50); line-height: 1.4; }
 
 select.im-task-input { cursor: pointer; }
+
+/* viewer live-effect select (view mode top bar) */
+.iv-fx-select {
+  flex         : none;
+  max-width    : 8.5rem;
+  padding      : 0.3rem 0.4rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg);
+  font         : inherit;
+  font-size    : 0.78rem;
+  cursor       : pointer;
+}
+.iv-fx-select:hover { border-color: var(--accent-50); }
+@media (max-width: 620px) { .iv-fx-select { display: none; } }

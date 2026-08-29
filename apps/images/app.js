@@ -93,6 +93,7 @@ const pan    = signal({ x: 0, y: 0 });
 const bare   = signal(false);          // immersive: chrome hidden
 const strip  = signal(true);           // show the thumbnail strip
 const vError = signal('');
+const vEffect = signal('none');   // a live, view-only css effect (non-destructive)
 
 function resetView () { zoom.value = 1; pan.value = { x: 0, y: 0 }; }
 
@@ -209,6 +210,12 @@ function ViewTopBar () {
         <${IconBtn} icon="zoom-in"                   label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
         <${IconBtn} icon="mdi:fit-to-screen-outline" label="Fit"         onClick=${resetView} disabled=${!s || (zoom.value === 1 && pan.value.x === 0 && pan.value.y === 0)} />
         <${IconBtn} icon="download"                  label="Download"    onClick=${downloadCurrent} disabled=${!s} />
+        ${s && html`
+          <select class="iv-fx-select" title="Live effect (view only, not saved)" aria-label="Effect"
+                  value=${vEffect.value} onChange=${e => vEffect.value = e.target.value}>
+            ${fx.EFFECTS.filter(x => x.cssBacked).map(x => html`
+              <option value=${x.id}>${x.id === 'none' ? 'No effect' : x.name}</option>`)}
+          </select>`}
         ${many.value && html`<${IconBtn} icon=${strip.value ? 'mdi:view-carousel-outline' : 'mdi:view-carousel'} label="Toggle thumbnails" active=${strip.value} onClick=${() => strip.value = !strip.value} />`}
         <${IconBtn} icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
         <${IconBtn} icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
@@ -335,7 +342,8 @@ function ViewMode () {
            onClick=${() => { if (bare.value) bare.value = false; }}>
         ${s
           ? html`<img class="iv-image" ref=${imageRef} src=${s.url} alt=${s.name} draggable="false"
-                      style=${`transform: translate(${pan.value.x}px, ${pan.value.y}px) scale(${zoom.value})`} />`
+                      style=${`transform: translate(${pan.value.x}px, ${pan.value.y}px) scale(${zoom.value})`
+                        + (fx.cssValue(vEffect.value) ? `; filter: ${fx.cssValue(vEffect.value)}` : '')} />`
           : html`<${Welcome} />`}
 
         ${many.value && !bare.value && html`
