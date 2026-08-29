@@ -6,9 +6,9 @@
 // bit is the scanned tree per source — everything shown on screen (the tree, a
 // note's text) is read straight from disk on demand and never copied into the db.
 
-import { signal } from '@aufbau/kits/preact-htm';
-import { zugriff } from './../../shared/js/runtime.js';
-import * as fs from './../../shared/js/filesystem/fsaccess.js';
+import { signal }  from '@aufbau/kits/preact-htm';
+import { zugriff } from '/.shared/js/runtime.js';
+import * as fs     from '/.shared/js/filesystem/fsaccess.js';
 
 // what counts as a note. markdown and its usual spellings; a folder full of
 // anything else simply scans to nothing.
