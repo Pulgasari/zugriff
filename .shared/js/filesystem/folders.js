@@ -1,4 +1,5 @@
 // shared/js/filesystem/folders.js
+// zugriff.fs.FolderLibrary
 //
 // FolderLibrary — the shared lifecycle around folders the user grants us off
 // their real disk with the File System Access API. every app that is a live
@@ -172,11 +173,9 @@ export class FolderLibrary {
    * by path, so covers/metadata/progress survive the swap.
    */
   async repick (id) {
-    const s = this.sourceById(id);
-    if (!s) return false;
-    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' });
-    if (!handle) return false;
-    const rec = { ...s, name: handle.name, handle };
+    const source = this.sourceById(id); if (!source) return false;
+    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
+    const rec = { ...source, name: handle.name, handle };
     await this.db.set('sources', id, rec);
     this.sources.value = this.sources.value.map(x => x.id === id ? rec : x);
     this.perms.value   = { ...this.perms.value, [id]: 'granted' };
@@ -202,6 +201,8 @@ export class FolderLibrary {
       if (this._scan) await this._scan(s, { db: this.db, lib: this });
     } finally {
       this.scanning.value = { ...this.scanning.value, [id]: false };
+      //updateSignalObj(this.scanning, id, false);
+      //this.scanning[id] = false;
     }
   }
 
