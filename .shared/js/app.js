@@ -33,7 +33,18 @@ export function applyUrlProps (search = location.search) {
 
 // ── service worker ─────────────────────────────────────────────────────────
 
-export function registerServiceWorker (url = '/sw.js') {
+// which worker owns this page?
+//  · a nested app under /apps/<slug>/ or /tools/<slug>/ ships its own sw.js next
+//    to its index.html — register that (the per-folder model).
+//  · a root-served app (/<slug>/) and the launcher itself are owned by the one
+//    root /sw.js (the new model, served through app.html).
+// the site is mid-migration between the two, so the default is derived per page
+// instead of hardcoded; an app can still pass an explicit url.
+function ownServiceWorker () {
+  return /^\/(apps|tools)\/[^/]+\//.test(location.pathname) ? './sw.js' : '/sw.js';
+}
+
+export function registerServiceWorker (url = ownServiceWorker()) {
   if (!('serviceWorker' in navigator)) return;
   if (location.protocol === 'file:') return;
 

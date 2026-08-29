@@ -1,7 +1,7 @@
 // tools/css-minifyer/app.js
 
-import { boot, config } from './../../shared/js/app.js?slug=css-minifyer';
-import { CodeTransformerApp } from './../../shared/js/patterns/index.js';
+import { boot, config } from '/.shared/js/app.js?slug=css-minifyer';
+import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
 import { minify } from 'csso';
 
 const App = CodeTransformerApp({

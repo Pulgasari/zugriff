@@ -4,9 +4,9 @@
 import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=image-converter';
-import { Button, Dropzone, Icon, Picker, Slider } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot, config } from '/.shared/js/app.js?slug=image-converter';
+import { Button, Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
+import { stored } from '/.shared/js/lib/signals.js';
 
 // ::: local
 

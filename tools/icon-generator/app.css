@@ -1,5 +1,5 @@
 /* icon-generator — app specific css.
-   shared rules live in ./../../shared/css/ */
+   shared rules live in /.shared/css/ */
 
 #app-body { max-width: 720px; }
 

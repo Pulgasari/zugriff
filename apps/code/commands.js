@@ -11,7 +11,7 @@
 
 import state  from './state.js';
 import editor from './editor.js';
-import { openPrompt } from './../../shared/js/components/index.js';
+import { openPrompt } from '/.shared/js/components/index.js';
 
 // a promise-returning commit-message prompt (default = the auto message)
 const askCommitMessage = (path) => new Promise(resolve => openPrompt({

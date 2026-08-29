@@ -10,8 +10,8 @@ import { html } from '@aufbau/kits/preact-htm';
 // slug to yours after adding a `{ type: 'tool', slug: '<slug>', … }` entry to
 // shared/js/registry.js. `config` is that entry; boot reads the title, theme and
 // aufbau options off it, and wraps a tool in the shared Shell from its type.
-import { boot, config } from './../../shared/js/app.js?slug=template';
-import { Icon } from './../../shared/js/components/index.js';
+import { boot, config } from '/.shared/js/app.js?slug=template';
+import { Icon } from '/.shared/js/components/index.js';
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 

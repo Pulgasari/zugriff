@@ -5,9 +5,9 @@ import { effect, html, signal, useRef, useState } from '@aufbau/kits/preact-htm'
 import UPNG from 'upng-js';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=pixel-art-creator';
-import { Icon, Picker } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot, config } from '/.shared/js/app.js?slug=pixel-art-creator';
+import { Icon, Picker } from '/.shared/js/components/index.js';
+import { stored } from '/.shared/js/lib/signals.js';
 
 // ::: local
 

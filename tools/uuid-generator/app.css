@@ -1,5 +1,5 @@
 /* uuid-generator — app specific css.
-   shared rules live in ./../../shared/css/ */
+   shared rules live in /.shared/css/ */
 
 .controls { display: flex; flex-direction: column; gap: .65rem; }
 

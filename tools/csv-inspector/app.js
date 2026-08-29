@@ -1,8 +1,8 @@
 // tools/csv-inspector/app.js
 
-import { boot, config } from './../../shared/js/app.js?slug=csv-inspector';
-import { DataInspectorApp } from './../../shared/js/patterns/index.js';
-import { csvParse } from './../../shared/js/lib/data-converters.js';
+import { boot, config } from '/.shared/js/app.js?slug=csv-inspector';
+import { DataInspectorApp } from '/.shared/js/patterns/index.js';
+import { csvParse } from '/.shared/js/lib/data-converters.js';
 
 const App = DataInspectorApp({
   appID       : 'csv-inspector',

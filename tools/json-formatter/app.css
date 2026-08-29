@@ -1,5 +1,5 @@
 /* json-formatter — app specific css.
-   shared rules live in ./../../shared/css/ */
+   shared rules live in /.shared/css/ */
 
 .indent-picker {
   display     : flex;

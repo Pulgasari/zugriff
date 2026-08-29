@@ -6,7 +6,7 @@
 // shape of the shared FolderLibrary (shared/js/filesystem/folders.js). nothing
 // on disk is ever copied; the app is a live view onto the granted folder.
 
-import { zugriff } from './../../shared/js/runtime.js';
+import { zugriff } from '/.shared/js/runtime.js';
 
 const lib = new zugriff.fs.FolderLibrary({
   db:       'zugriff-files',

@@ -4,9 +4,9 @@
 import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=image-batch-processor';
-import { Dropzone, GhostButton, Icon } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot, config } from '/.shared/js/app.js?slug=image-batch-processor';
+import { Dropzone, GhostButton, Icon } from '/.shared/js/components/index.js';
+import { stored } from '/.shared/js/lib/signals.js';
 
 // ── state ────────────────────────────────────────────────────────────
 let files = signal([]);

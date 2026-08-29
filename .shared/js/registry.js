@@ -101,6 +101,44 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'images',
+    name        : 'Images',
+    short_name  : 'Images',
+    icon        : 'mdi:image-multiple-outline',
+    description : 'View, edit, convert and batch-process images, and browse image folders — all on your device.',
+    categories  : ['image'],
+    // one app, several modes switched by ?mode= (a query param, not a subpath —
+    // the launcher rewrite only serves the shell for /images/). it registers as
+    // an image handler, like the viewer, so the OS "open with" sends files here;
+    // the shortcuts deep-link a mode.
+    manifest    : {
+      launch_handler : { client_mode: ['focus-existing', 'auto'] },
+      file_handlers  : [{
+        action : './',
+        accept : {
+          'image/png'    : ['.png'],
+          'image/jpeg'   : ['.jpg', '.jpeg', '.jfif'],
+          'image/gif'    : ['.gif'],
+          'image/webp'   : ['.webp'],
+          'image/avif'   : ['.avif'],
+          'image/bmp'    : ['.bmp'],
+          'image/svg+xml': ['.svg'],
+          'image/x-icon' : ['.ico'],
+          'image/heic'   : ['.heic'],
+          'image/heif'   : ['.heif'],
+          'image/tiff'   : ['.tif', '.tiff'],
+        },
+      }],
+      shortcuts : [
+        { name: 'Library', short_name: 'Library', url: './?mode=library' },
+        { name: 'Edit',    short_name: 'Edit',    url: './?mode=edit'    },
+        { name: 'Convert', short_name: 'Convert', url: './?mode=convert' },
+        { name: 'Batch',   short_name: 'Batch',   url: './?mode=batch'   },
+      ],
+    },
+  },
+  {
+    type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
     icon        : 'mdi:podcast',
@@ -160,6 +198,15 @@ const entries = [
     icon        : 'mdi:play-circle-outline',
     description : 'Open a video off your device and play it — frame-stepping, loop, crop, mirror, rotate and reverse, tuned for the phone.',
     categories  : ['media'],
+  },
+  {
+    type        : 'app',
+    slug        : 'prompts',
+    name        : 'Prompt Manager',
+    short_name  : 'Prompts',
+    icon        : 'mingcute:ai-fill',
+    description : 'Keep, tag and search your prompts — stored on this device.',
+    categories  : ['tool'],
   },
 
   // ── tools ───────────────────────────────────────────────────────────────
@@ -342,14 +389,6 @@ const entries = [
     icon        : 'mdi:grid',
     description : 'Draw pixel art on a grid and export it as SVG or PNG.',
     categories  : ['design'],
-  },
-  {
-    type        : 'tool',
-    slug        : 'prompt-manager',
-    name        : 'Prompt Manager',
-    icon        : 'mingcute:ai-fill',
-    description : 'Keep, tag and search your prompts — stored on this device.',
-    categories  : ['tool'],
   },
   {
     type        : 'tool',

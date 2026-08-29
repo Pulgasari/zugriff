@@ -1,5 +1,5 @@
 /* pixel-art-creator — app specific css.
-   shared rules live in ./../../shared/css/
+   shared rules live in /.shared/css/
    (pixel.css — toolbar + palette chrome — is opt-in, linked from index.html) */
 
 .preset-btn {
