@@ -1,26 +1,18 @@
 // app.js — the launcher
-//
-// renders the tool list from shared/js/registry.js (type: 'tool'). this replaces
-// index.php, which used to scan the directory and build the list server-side.
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
-import { boot } from './../shared/js/app.js';
-import { registry } from './../shared/js/registry.js';
-import Icon from './../shared/js/components/Icon.js';
-import Nav  from './../shared/js/components/Nav.js';
-import Settings, { SettingsButton } from './../shared/js/components/Settings.js';
-import { launcher, themeGroup } from './../shared/js/lib/settings.js';
+import { boot }     from '/.shared/js/app.js';
+import { registry } from '/.shared/js/registry.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import Nav          from '/.shared/js/components/Nav.js';
+import Settings, { SettingsButton } from '/.shared/js/components/Settings.js';
+import { launcher, themeGroup }     from '/.shared/js/lib/settings.js';
 
 // the overview page is not a registry entry, so it carries its own flat config
-const config = { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };
-
+const config     = { slug: 'zugriff', name: 'zugriff tools', theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };     
 const categories = registry.categories('tool');
-
-const groups = [
-  { title: 'launcher', settings: launcher },
-  themeGroup,
-];
+const groups     = [ { title: 'launcher', settings: launcher }, themeGroup ];
 
 const query    = signal('');
 const category = signal('');
