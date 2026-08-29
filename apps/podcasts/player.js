@@ -9,7 +9,7 @@
 //   • re-opening an episode resumes from the saved position
 
 import { signal } from '@aufbau/kits/preact-htm';
-import { stored } from './../../shared/js/lib/signals.js';
+import { stored } from '/.shared/js/lib/signals.js';
 
 import { stateOf, setProgress, markDone } from './db.js';
 
