@@ -102,12 +102,14 @@ else {
   const page = {};
   
   if (route === 'apps') {
-    page.cat = 'app';
+    page.basePath = '';
+    page.cat  = 'app';
     page.name = 'zugriff apps';
 	  page.slug = 'apps';
   } 
   else if (route === 'tools') {
-    page.cat = 'tool';
+	  page.basePath = '/tools';
+    page.cat  = 'tool';
     page.name = 'zugriff tools';
     page.slug = 'tools';
   }
@@ -173,17 +175,14 @@ function AppList () {
       ${top && html`<${Filter} />`}
 
       <div class="launcher-categories">
-        <button class=${'chip' + (category.value === '' ? ' active' : '')}
-                onClick=${() => category.value = ''}>all</button>
-        ${categories.map(name => html`
-          <button class=${'chip' + (category.value === name ? ' active' : '')}
-                  onClick=${() => category.value = name}>${name}</button>`)}
+        <button class=${'chip' + (category.value === '' ? ' active' : '')} onClick=${() => category.value = ''}>all</button>
+        ${categories.map(name => html`<button class=${'chip' + (category.value === name ? ' active' : '')} onClick=${() => category.value = name}>${name}</button>`)}
       </div>
 
       <ul id="tools">
         ${list.map(app => html`
           <li key=${app.slug}>
-            <a href=${`./${app.slug}/`}>
+            <a href=${`${page.basePath}/${app.slug}/`}>
               <span class="title">
                 <span class="name">${app.name}</span>
                 ${app.description && html`<span class="desc">${app.description}</span>`}
