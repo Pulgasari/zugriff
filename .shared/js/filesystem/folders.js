@@ -143,6 +143,19 @@ export class FolderLibrary {
     await this.scan(rec.id);
     return rec;
   }
+  /*
+  async addFolder() {
+    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' })
+    
+    if (!handle) return null;
+    if (!this.single && this._entries.value.some(s => s.handle.isSameEntry?.(handle))) throw new Error('...');
+    
+    const rec = await this.#addEntry(handle);
+    await this.scan(rec.id);
+    
+    return rec;
+  }
+  */
 
   /**
    * fast path: re-grant a folder from an earlier session via the stored handle.
@@ -175,10 +188,13 @@ export class FolderLibrary {
   async repick (id) {
     const source = this.sourceById(id); if (!source) return false;
     const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
-    const rec = { ...source, name: handle.name, handle };
+    const rec    = { ...source, name: handle.name, handle };
+    
     await this.db.set('sources', id, rec);
+    
     this.sources.value = this.sources.value.map(x => x.id === id ? rec : x);
     this.perms.value   = { ...this.perms.value, [id]: 'granted' };
+    
     await this.scan(id);
     return true;
   }
@@ -188,7 +204,9 @@ export class FolderLibrary {
     if (this._cascade) await this._cascade(id, this.db);
     await this.db.delete('sources', id);
     this.sources.value = this.sources.value.filter(s => s.id !== id);
-    const pm = { ...this.perms.value }; delete pm[id]; this.perms.value = pm;
+    const pm = { ...this.perms.value };
+    delete pm[id]; 
+    this.perms.value = pm;
   }
 
   // ── scanning ───────────────────────────────────────────────────────────────
@@ -228,6 +246,20 @@ export class FolderLibrary {
   async fileAt (source, path) {
     return (await this.fileHandle(source, path)).getFile();
   }
+
+  /*
+  async #addEntry (handle) {
+    const id  = this.single ? 'root' : crypto.randomUUID();
+    const rec = { handle, id, name: handle.name, addedAt: Date.now() };
+    
+    await this.db.set(this.single ? 'root' : 'sources', id, rec);
+    
+    this._entries.value = [...this._entries.value, rec];
+    this._perms.value   = { ...this._perms.value, [id]: 'granted' };
+    
+    return rec;
+  }
+  */
 }
 
 export default FolderLibrary;
