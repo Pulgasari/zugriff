@@ -9,18 +9,19 @@
 //
 // a "path" here is a forward-slash string relative to the granted root, e.g.
 // "journal/2026/entry.md". the root itself has path "".
+//
+// picking + platform support are delegated to platform.js, so a Capacitor build
+// transparently gets the native SAF picker and its handle shim; on the web this
+// is exactly showDirectoryPicker as before. everything below (permissions, the
+// recursive walk) is the shared handle interface both platforms implement.
 
-export const supported = () => typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function';
+import * as platform from './platform.js';
+
+export const supported = () => platform.supported();
 
 /** open the OS folder picker. resolves to a handle, or null if the user cancels. */
 export async function pickDirectory ({ id, mode = 'read', startIn } = {}) {
-  if (!supported()) throw new Error('This browser cannot open a folder — try a Chromium-based one.');
-  try {
-    return await window.showDirectoryPicker({ id, mode, startIn });
-  } catch (err) {
-    if (err?.name === 'AbortError') return null;   // the user dismissed the picker
-    throw err;
-  }
+  return platform.pick({ id, mode, startIn });
 }
 
 /** the current permission state without prompting: 'granted' | 'prompt' | 'denied' */

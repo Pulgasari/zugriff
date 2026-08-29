@@ -19,6 +19,53 @@ möglich. Nutzt `@bubblewrap/core`'s `TwaManifest.fromWebManifest()` (holt das
 live Web-App-Manifest der App) und überschreibt nur `packageId` und den Signing-
 Key. Wird vom Workflow pro App aufgerufen.
 
+## `get-capacitor-apps.js`
+
+Gibt ein JSON-Array der App-Slugs aus, die in `shared/js/registry.js` mit
+`capacitor: true` markiert sind — die Matrix des **Capacitor**-Builds. Bewusst
+getrennt von `autopack` (dem TWA-Flag), sodass eine App als TWA, als
+Capacitor-App, als beides oder als keins gepackt werden kann. Aktuell: `files`,
+`notes` (Testumfang).
+
+## `gen-capacitor-config.mjs`
+
+Das Capacitor-Gegenstück zu `gen-twa-manifest.mjs`: schreibt für **eine** App
+ein `capacitor.config.json` (+ ein `www/index.html` als Offline-Fallback, weil
+Capacitor ein nicht-leeres `webDir` verlangt) — deterministisch und ohne
+interaktives `cap init`. Wie die TWA wird die App um ihre **Live-URL** gewickelt
+(`server.url = https://zugriff.dev/apps/<slug>/`) statt ihre Dateien zu bundlen;
+Capacitor injiziert seine native Bridge trotzdem in die Remote-Seite, sodass
+`@capacitor/filesystem` funktioniert. `appId` ist `dev.zugriff.<slug>` — identisch
+zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
+
+---
+
+## Capacitor-Build: `.github/workflows/build-capacitor.yml`
+
+Das Gegenstück zu `build-android.yml`. Verpackt die als `capacitor: true`
+markierten PWAs als Android-Apps (**APK + AAB**) — ein Matrix-Job pro App.
+
+**Warum zusätzlich zur TWA:** Eine TWA ist nur Chrome, also gilt dort die
+Browser-**File System Access API** — und die lässt Android bei jedem Besuch jeden
+freigegebenen Ordner neu bestätigen, was das „Ordner einmal freigeben und
+browsen"-Modell der Folder-Apps kaputt macht. Ein Capacitor-Wrapper bringt
+stattdessen eine native Filesystem-Bridge (`@capacitor/filesystem`) mit, deren
+**SAF-Freigabe persistiert** wird. Die geteilte Filesystem-Ebene
+(`.shared/js/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt automatisch
+das native FS (siehe `platform.js` + `cap-fs.js`).
+
+**Ablauf** (pro App): JDK 17 + Android SDK → Wegwerf-Keystore → Capacitor-Projekt
+scaffolden (`gen-capacitor-config.mjs` → `npm i @capacitor/{core,cli,android,
+filesystem}` + `@capawesome/capacitor-file-picker` → `cap add android` →
+`cap sync`) → `gradlew bundleRelease assembleRelease` → APK/AAB **signieren**
+(Capacitor baut unsigniert: `zipalign`+`apksigner` für die APK, `jarsigner` für
+die AAB) → als Artefakt hochladen. Ausgelöst per `workflow_dispatch` und bei Push
+auf `main`, wenn Registry/Filesystem-Ebene/Build-Skripte sich ändern.
+
+Der **stabile Signing-Key**-TODO aus `build-android.yml` gilt hier genauso — die
+`appId`s folgen `dev.zugriff.<slug>`, teilen sich also die Root-Datei
+`/.well-known/assetlinks.json` mit den TWA-Builds.
+
 ---
 
 ## Android-Build: `.github/workflows/build-android.yml`

@@ -120,6 +120,13 @@ const map = { imports: {
 
   // ::: color
   "culori" : "https://esm.sh/culori@3.3.0",
+
+  // ::: vision / on-device ml (looksmaxx)
+  // MediaPipe Tasks Vision — ImageSegmenter (hair mask) + FaceLandmarker. the JS
+  // is pulled here; its wasm + the .tflite/.task models are fetched at runtime
+  // from the same pinned version on jsdelivr / storage.googleapis.com (see
+  // apps/looksmaxx/vision.js), foreign origins the service worker leaves alone.
+  "@mediapipe/tasks-vision" : "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm",
 }};
 
 const mapURL = document.currentScript?.src;

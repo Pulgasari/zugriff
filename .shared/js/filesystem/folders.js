@@ -69,6 +69,14 @@ function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
 import { signal } from '@aufbau/kits/preact-htm';
 import { createDb } from '@bunker/db';
 import * as fs from './fsaccess.js';
+import * as platform from './platform.js';
+
+// a granted root is kept live (a directory handle) in the signals, but persisted
+// as whatever survives IndexedDB: on the web that is the handle itself (identity),
+// on a Capacitor build a plain { uri } descriptor. dehydrate at every db.set,
+// hydrate at every read — so the in-memory `handle` is always a live handle.
+const persist  = rec => ({ ...rec, handle: platform.dehydrate(rec.handle) });
+const rehydrate = rec => rec && ({ ...rec, handle: platform.hydrate(rec.handle) });
 
 export class FolderLibrary {
   /**
@@ -116,7 +124,7 @@ export class FolderLibrary {
 
   async #loadSingle () {
     await this.db.setup(this.stores);
-    const rec = await this.db.get('root', FolderLibrary.#ROOT);
+    const rec = rehydrate(await this.db.get('root', FolderLibrary.#ROOT));
     if (rec) {
       this.folder.value = rec;
       this.perm.value   = await fs.queryPermission(rec.handle, 'read');   // never prompts
@@ -129,7 +137,7 @@ export class FolderLibrary {
     const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
     const rec = { name: handle.name, handle, addedAt: Date.now() };
-    await this.db.set('root', FolderLibrary.#ROOT, rec);
+    await this.db.set('root', FolderLibrary.#ROOT, persist(rec));
     this.folder.value = rec;
     this.perm.value   = 'granted';
     return rec;
@@ -152,7 +160,7 @@ export class FolderLibrary {
       this.db.getAll('sources'),
       this._onLoad ? this._onLoad(this.db) : null,   // hydrate app-owned stores
     ]);
-    this.sources.value = Object.values(srcRows).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
+    this.sources.value = Object.values(srcRows).map(rehydrate).sort((a, b) => (a.addedAt || 0) - (b.addedAt || 0));
 
     // resolve permissions first (fast, never prompts) so the ui never flashes a
     // spurious "reconnect", reveal it, then rescan granted folders in the background
@@ -178,7 +186,7 @@ export class FolderLibrary {
       if (await s.handle.isSameEntry?.(handle)) throw new Error('That folder is already in your library.');
     }
     const rec = { id: crypto.randomUUID(), name: handle.name, handle, addedAt: Date.now() };
-    await this.db.set('sources', rec.id, rec);
+    await this.db.set('sources', rec.id, persist(rec));
     this.sources.value = [...this.sources.value, rec];
     this.perms.value   = { ...this.perms.value, [rec.id]: 'granted' };
     await this.scan(rec.id);
@@ -230,9 +238,9 @@ export class FolderLibrary {
     const source = this.sourceById(id); if (!source) return false;
     const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
     const rec    = { ...source, name: handle.name, handle };
-    
-    await this.db.set('sources', id, rec);
-    
+
+    await this.db.set('sources', id, persist(rec));
+
     this.sources.value = this.sources.value.map(x => x.id === id ? rec : x);
     this.perms.value   = { ...this.perms.value, [id]: 'granted' };
     

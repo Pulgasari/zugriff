@@ -4,6 +4,7 @@
 import { html, signal, useEffect } from '@aufbau/kits/preact-htm';
 import state    from './../state.js';
 import fs       from './../fs.js';
+import * as fsaccess from '/.shared/js/filesystem/fsaccess.js';   // picks via the platform seam (browser picker or native SAF)
 import * as fsops from './../fsops.js';
 import { clipboard, version, bump, ask, validName } from './../treeops.js';
 import Modal    from './Modal.js';
@@ -67,7 +68,8 @@ export default function FileBrowser () {
   const openDirectory = async () => {
     errorSignal.value = null;
     try {
-      const dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+      const dirHandle = await fsaccess.pickDirectory({ id: 'zugriff-code', mode: 'readwrite' });
+      if (!dirHandle) return;   // cancelled
       await fs.setRoot(dirHandle);
       applyDirectory(dirHandle, await fs.readDir(dirHandle));
     } catch (e) {
@@ -113,7 +115,8 @@ export default function FileBrowser () {
       return;
     }
     try {
-      const newHandle = await window.showDirectoryPicker({ startIn: handle });
+      const newHandle = await fsaccess.pickDirectory({ id: 'zugriff-code', mode: 'readwrite', startIn: handle });
+      if (!newHandle) return;   // cancelled
       await fs.setRoot(newHandle);
       applyDirectory(newHandle, await fs.readDir(newHandle));
     } catch (e) {
