@@ -1,12 +1,4 @@
 // apps/podcasts/player.js
-//
-// one <audio> element for the whole app, lifted out of the component tree so it
-// keeps playing across route changes. its state is mirrored into signals the ui
-// reads, and it writes the listening position back to the db as it goes:
-//
-//   • position is saved every few seconds and on every pause/stop
-//   • an episode is auto-marked done once it is ~95% played (or on `ended`)
-//   • re-opening an episode resumes from the saved position
 
 import { signal } from '@aufbau/kits/preact-htm';
 import { stored } from '/.shared/js/lib/signals.js';
