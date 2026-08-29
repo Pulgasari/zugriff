@@ -5,8 +5,8 @@ import { html, signal, useEffect, useRef } from '@aufbau/kits/preact-htm';
 import { PDFDocument } from 'pdf-lib';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=svg-converter';
-import { Dropzone, Icon, Slider } from './../../shared/js/components/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=svg-converter';
+import { Dropzone, Icon, Slider } from './../../.shared/js/components/index.js';
 
 // ::: local
 

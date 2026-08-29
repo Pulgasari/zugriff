@@ -4,8 +4,8 @@
 import { html, signal } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=downloader';
-import { Icon } from './../../shared/js/components/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=downloader';
+import { Icon } from './../../.shared/js/components/index.js';
 
 // ::: local
 

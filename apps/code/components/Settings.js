@@ -3,7 +3,7 @@
 // section (Monaco theme + construction options).
 
 import { html } from '@aufbau/kits/preact-htm';
-import { themeNames } from './../../../shared/js/data/themes.js';
+import { themeNames } from './../../../.shared/js/data/themes.js';
 import state from './../state.js';
 import Modal from './Modal.js';
 import Picker from './Picker.js';

@@ -1,6 +1,6 @@
 name: Build Android packages
 
-# Packages the PWAs flagged `autopack: true` in shared/js/registry.js into Android
+# Packages the PWAs flagged `autopack: true` in .shared/js/registry.js into Android
 # apps (APK + AAB), one matrix job per app. Each app is wrapped as a Trusted Web
 # Activity pointing at its live deployment with Bubblewrap — Google's official TWA
 # tool, the same engine PWABuilder uses under the hood.
@@ -28,7 +28,7 @@ on:
   push:
     branches: [main]
     paths:                  # only when something that affects a package changes
-      - 'shared/js/registry.js'
+      - '.shared/js/registry.js'
       - 'apps/**/manifest.json'
       - '.github/scripts/gen-twa-manifest.mjs'
       - '.github/scripts/get-autopack-apps.js'

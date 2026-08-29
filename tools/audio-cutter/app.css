@@ -1,5 +1,5 @@
 /* audio-cutter — app specific css.
-   shared rules live in ./../../shared/css/
+   shared rules live in ./../../.shared/css/
    (waveform.css is opt-in and linked from index.html) */
 
 h1 { font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; gap: .4rem; }

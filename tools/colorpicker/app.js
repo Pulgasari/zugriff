@@ -5,9 +5,9 @@ import { html, signal, useState } from '@aufbau/kits/preact-htm';
 import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb, modeOklab, modeOklch, modeRgb, parse, useMode } from 'culori';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=colorpicker';
-import { Icon, Picker } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot, config } from './../../.shared/js/app.js?slug=colorpicker';
+import { Icon, Picker } from './../../.shared/js/components/index.js';
+import { stored } from './../../.shared/js/lib/signals.js';
 
 // ::: local
 

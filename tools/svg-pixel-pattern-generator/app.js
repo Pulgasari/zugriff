@@ -4,9 +4,9 @@
 import { effect, html, signal, useState } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=svg-pixel-pattern-generator';
-import { Icon } from './../../shared/js/components/index.js';
-import { stored } from './../../shared/js/lib/signals.js';
+import { boot, config } from './../../.shared/js/app.js?slug=svg-pixel-pattern-generator';
+import { Icon } from './../../.shared/js/components/index.js';
+import { stored } from './../../.shared/js/lib/signals.js';
 
 // ::: local
 

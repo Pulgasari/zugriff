@@ -11,8 +11,8 @@ import { html } from '@aufbau/kits/preact-htm';
 // shared/js/registry.js. `config` is that entry; boot reads the title, theme and
 // aufbau options off it. an app has `type: 'app'`, so boot skips the tools Shell
 // and this component owns the whole #app frame.
-import { boot, config } from './../../shared/js/app.js?slug=template';
-import { Icon } from './../../shared/js/components/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=template';
+import { Icon } from './../../.shared/js/components/index.js';
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 

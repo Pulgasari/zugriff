@@ -9,7 +9,7 @@
 // https://microsoft.github.io/monaco-editor/docs.html
 // https://github.com/brijeshb42/monaco-themes
 
-import { stored } from './../../shared/js/lib/signals.js';
+import { stored } from './../../.shared/js/lib/signals.js';
 
 // ── Monaco theme catalogue ───────────────────────────────────────────────────
 

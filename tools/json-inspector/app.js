@@ -1,7 +1,7 @@
 // tools/json-inspector/app.js
 
-import { boot, config } from './../../shared/js/app.js?slug=json-inspector';
-import { DataInspectorApp } from './../../shared/js/patterns/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=json-inspector';
+import { DataInspectorApp } from './../../.shared/js/patterns/index.js';
 
 const App = DataInspectorApp({
   appID       : 'json-inspector',

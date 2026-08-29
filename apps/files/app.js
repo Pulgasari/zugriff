@@ -6,10 +6,10 @@
 import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }  from './../../shared/js/app.js?slug=files';
-import { Icon, FileExplorer, AppSettings } from './../../shared/js/components/index.js';
-import * as fs   from './../../shared/js/filesystem/fsaccess.js';
-import * as pwa  from './../../shared/js/lib/pwa.js';
+import { boot, config }  from './../../.shared/js/app.js?slug=files';
+import { Icon, FileExplorer, AppSettings } from './../../.shared/js/components/index.js';
+import * as fs   from './../../.shared/js/filesystem/fsaccess.js';
+import * as pwa  from './../../.shared/js/lib/pwa.js';
 
 // ::: local
 import * as db   from './db.js';

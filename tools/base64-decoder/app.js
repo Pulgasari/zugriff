@@ -1,7 +1,7 @@
 // tools/base64-decoder/app.js
 
-import { boot, config } from './../../shared/js/app.js?slug=base64-decoder';
-import { CodeTransformerApp } from './../../shared/js/patterns/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=base64-decoder';
+import { CodeTransformerApp } from './../../.shared/js/patterns/index.js';
 
 const App = CodeTransformerApp({
   appID       : 'base64-decoder',

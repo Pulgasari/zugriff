@@ -5,7 +5,7 @@
 // per source that bumps after any change so open folders reload.
 
 import { signal } from '@aufbau/kits/preact-htm';
-import { openPrompt } from './../../shared/js/components/index.js';
+import { openPrompt } from './../../.shared/js/components/index.js';
 
 /** a promise-returning single-value prompt; resolves null on cancel */
 export const ask = (title, value = '') => new Promise(resolve => openPrompt({

@@ -6,8 +6,8 @@ import { PDFDocument } from 'pdf-lib';
 import * as PDFJS from 'pdfjs';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=pdf-extractor';
-import { Dropzone, Icon, Picker, Slider } from './../../shared/js/components/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=pdf-extractor';
+import { Dropzone, Icon, Picker, Slider } from './../../.shared/js/components/index.js';
 
 // ::: local
 

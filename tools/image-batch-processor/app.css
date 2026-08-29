@@ -1,5 +1,5 @@
 /* image-batch-processor — app specific css.
-   shared rules live in ./../../shared/css/ */
+   shared rules live in ./../../.shared/css/ */
 
 /* file list — tighter than the shared .file-item default */
 .file-list { gap: .4rem; }

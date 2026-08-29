@@ -1,7 +1,7 @@
 name: app assets
 
 # Regenerate every app's icons (assets/icon-192.png, icon-512.png, icon.svg)
-# and manifest.json from the single source of truth — shared/js/registry.js + each
+# and manifest.json from the single source of truth — .shared/js/registry.js + each
 # app's app.svg — and commit the result. Runs whenever a source that feeds them
 # changes, so the derived files never drift or go missing.
 
@@ -9,7 +9,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'shared/js/registry.js'
+      - '.shared/js/registry.js'
       - 'apps/**/app.svg'
       - '.github/scripts/gen-app-assets.mjs'
       - 'package.json'

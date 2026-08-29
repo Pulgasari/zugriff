@@ -5,9 +5,9 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 import { fetchFile } from '@ffmpeg/util';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=audio-converter';
-import { loadFFmpeg } from './../../shared/js/lib/ffmpeg.js';
-import { Dropzone, Icon, Picker } from './../../shared/js/components/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=audio-converter';
+import { loadFFmpeg } from './../../.shared/js/lib/ffmpeg.js';
+import { Dropzone, Icon, Picker } from './../../.shared/js/components/index.js';
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let files     = signal([]);

@@ -8,7 +8,7 @@
 // toolbar layout, and the command dispatcher.
 
 import { signal } from '@aufbau/kits/preact-htm';
-import { stored } from './../../shared/js/lib/signals.js';
+import { stored } from './../../.shared/js/lib/signals.js';
 
 import commands   from './commands.js';
 import editor     from './editor.js';
