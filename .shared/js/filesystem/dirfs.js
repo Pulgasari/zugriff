@@ -116,7 +116,8 @@ export async function rename (root, path, from, to, kind) {
     const dst = await dir.getDirectoryHandle(to, { create: true });
     await copyDirInto(src, dst);
   } else {
-    const file     = await (await dir.getFileHandle(from)).getFile();
+    const handle   = await dir.getFileHandle(from);
+    const file     = await handle.getFile();
     const dst      = await dir.getFileHandle(to, { create: true });
     const writable = await dst.createWritable();
     await writable.write(await file.arrayBuffer());
