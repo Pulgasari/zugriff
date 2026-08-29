@@ -1,9 +1,4 @@
 // apps/gifmaker/app.js
-//
-// a frame-sequence animator. load a stack of images, reorder / remove / add
-// them, nudge each frame's position by a few pixels, then play it back and
-// export it — as an animated GIF, or as a project zip (the images plus a
-// manifest) that can be imported again. everything runs on the device.
 
 // :::::: IMPORTS
 
