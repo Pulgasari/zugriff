@@ -23,7 +23,7 @@
 </div>
 
 <script type="module">
-const route = window.location.pathname.split('/')[1];
+const route = window.location.pathname.split('/')[1] ?? 'home';
 
 // :::::: IMPORTS
 import { applyFilter } from '@aufbau/filters';
