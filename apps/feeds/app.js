@@ -1,43 +1,33 @@
 // apps/feeds/app.js
-//
-// a feed reader that runs entirely on the device. subscriptions, entries and
-// read-state live in IndexedDB via @bunker/db (db.js); feeds are fetched and
-// parsed in the browser (feed.js), direct first and then through a CORS proxy
-// the user sets in settings. reading means opening the original — nothing is
-// embedded or reader-mode'd here.
-//
-// YouTube gets its own department: a channel url / @handle is resolved to its
-// RSS feed, and those entries render as video cards in a separate section
-// instead of article rows.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORT
 
 // ::: vendors
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=feeds';
-import { stored }       from './../../shared/js/lib/signals.js';
-import { appGroup }     from './../../shared/js/lib/settings.js';
+import { boot, config } from '/.shared/js/app.js?slug=feeds';
+import { stored }       from '/.shared/js/lib/signals.js';
+import { appGroup }     from '/.shared/js/lib/settings.js';
 import {
   Icon,
   Image,
   SettingsGroups
-} from './../../shared/js/components/index.js';
+} from '/.shared/js/components/index.js';
 
 // ::: local
 import * as db           from './db.js';
 import { DEFAULT_PROXY } from './feed.js';
 
-// :::::: SETTINGS + UI STATE :::::::::::::::::::::::::::::::
+// :::::: SETTINGS + UI STATE
 
 const proxy   = stored(DEFAULT_PROXY, 'feeds:proxy');
-const route   = signal({ name: 'latest' });   // { name:'latest'|'youtube'|'feed', id? }
-const dialog  = signal(null);                  // 'add' | 'settings' | null
+const route   = signal({ name: 'latest' }); // { name:'latest'|'youtube'|'feed', id? }
+const dialog  = signal(null);  // 'add' | 'settings' | null
 const addVal  = signal('');
-const navOpen = signal(false);                 // mobile drawer
-const toast   = signal(null);                  // { text, kind }
-const busy    = signal('');                    // a label while a long task runs
+const navOpen = signal(false); // mobile drawer
+const toast   = signal(null);  // { text, kind }
+const busy    = signal('');    // a label while a long task runs
 
 let toastTimer = null;
 function flash (text, kind = 'ok') {
@@ -48,7 +38,7 @@ function flash (text, kind = 'ok') {
 
 const go = (name, id) => { route.value = { name, id }; navOpen.value = false; };
 
-// :::::: DERIVED :::::::::::::::::::::::::::::::::::::::::::
+// :::::: DERIVED
 
 const articleFeeds = computed(() => db.feeds.value.filter(f => f.kind !== 'youtube'));
 const youtubeFeeds = computed(() => db.feeds.value.filter(f => f.kind === 'youtube'));
@@ -65,7 +55,7 @@ const currentView = computed(() => {
   return { title: 'Latest', icon: 'mdi:playlist-star', kind: 'feed', list: db.latestArticles.value };
 });
 
-// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: HELPERS
 
 function fmtWhen (ms) {
   if (!ms) return '';
@@ -88,7 +78,7 @@ function openItem (it) {
   if (it.link) window.open(it.link, '_blank', 'noopener,noreferrer');
 }
 
-// :::::: ACTIONS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: ACTIONS
 
 async function submitAdd () {
   const input = addVal.value.trim();
@@ -133,7 +123,7 @@ function markAllRead () {
   flash(`Marked ${list.length} read`);
 }
 
-// :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
+// :::::: SIDEBAR
 
 function NavItem ({ name, id, icon, label, count }) {
   const r = route.value;
@@ -214,7 +204,7 @@ function Sidebar () {
     </aside>`;
 }
 
-// :::::: ITEM VIEWS ::::::::::::::::::::::::::::::::::::::::
+// :::::: ITEM VIEWS
 
 function ArticleRow ({ item }) {
   const unread = !db.isRead(item.key);
@@ -294,7 +284,7 @@ function Header () {
     </header>`;
 }
 
-// :::::: DIALOGS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: DIALOGS
 
 function AddDialog () {
   const ref = useRef(null);
@@ -350,7 +340,7 @@ function Toast () {
   return html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>`;
 }
 
-// :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: APP
 
 function App () {
   useEffect(() => {
@@ -377,6 +367,6 @@ function App () {
     </div>`;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BOOT
 
 boot({ config, App });
