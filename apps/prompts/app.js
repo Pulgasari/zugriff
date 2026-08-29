@@ -1,12 +1,12 @@
-// tools/prompt-manager/app.js
+// apps/prompts/app.js
 
 // ::: vendors
 import { computed, effect, html, signal, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
 import { BunkerDB } from '@bunker/db';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=prompt-manager';
-import { Icon, Picker } from './../../shared/js/components/index.js';
+import { boot, config } from './../../.shared/js/app.js?slug=prompts';
+import { Icon, Picker } from './../../.shared/js/components/index.js';
 
 // ::: local
 

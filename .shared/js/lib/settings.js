@@ -67,7 +67,7 @@ const launcher = defineSettings('zugriff:launcher', {
 });
 
 // ── app (font + direction) ───────────────────────────
-const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
+const fontValues = [['', 'default'], ...aufbau.webfonts.fonts.map(f => [f.id, f.name])];
 
 function applyFont (id) {
   if (!id) return;

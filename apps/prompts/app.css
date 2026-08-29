@@ -1,7 +1,7 @@
-/* prompt-manager — app specific css.
-   shared rules live in ./../../shared/css/ */
-
-/* prompt-manager/app.css */
+/* prompts — app specific css.
+   the app links .shared/css/base.css (reset + theme tokens + #app frame); it
+   does NOT get the tools shell, so the search + zebra rules it used to inherit
+   from components.css / layout.css are inlined at the bottom of this file. */
 
 /*
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -238,4 +238,33 @@
   .mobile-only { display: flex; }
 
   .detail-view, .detail-edit { padding: .85rem; }
+}
+
+/* ── inherited-from-shell rules ──────────────────────────────────────────────
+   as a tool this app got these from shared/css/components.css + layout.css.
+   an app links only base.css, so they are inlined here to stay self-contained. */
+
+.search-row {
+  display       : flex;
+  align-items   : center;
+  gap           : 0.4rem;
+  flex-shrink   : 0;
+  background    : color-mix(in srgb, var(--fg) 6%, transparent);
+  border-radius : 0.4rem;
+  padding       : 0.3rem 0.5rem;
+}
+.search-icon { opacity: 0.4; }
+.search-input {
+  flex       : 1;
+  background : transparent;
+  border     : none;
+  outline    : none;
+  color      : var(--fg);
+  font-size  : 0.85rem;
+}
+.search-input::placeholder { opacity: 0.35; }
+
+.zebra > * {
+  border-radius: 0.25rem;
+  &:nth-child(2n+1) { background: var(--zebra); }
 }

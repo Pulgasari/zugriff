@@ -161,6 +161,15 @@ const entries = [
     description : 'Open a video off your device and play it — frame-stepping, loop, crop, mirror, rotate and reverse, tuned for the phone.',
     categories  : ['media'],
   },
+  {
+    type        : 'app',
+    slug        : 'prompts',
+    name        : 'Prompt Manager',
+    short_name  : 'Prompts',
+    icon        : 'mingcute:ai-fill',
+    description : 'Keep, tag and search your prompts — stored on this device.',
+    categories  : ['tool'],
+  },
 
   // ── tools ───────────────────────────────────────────────────────────────
   {
@@ -342,14 +351,6 @@ const entries = [
     icon        : 'mdi:grid',
     description : 'Draw pixel art on a grid and export it as SVG or PNG.',
     categories  : ['design'],
-  },
-  {
-    type        : 'tool',
-    slug        : 'prompt-manager',
-    name        : 'Prompt Manager',
-    icon        : 'mingcute:ai-fill',
-    description : 'Keep, tag and search your prompts — stored on this device.',
-    categories  : ['tool'],
   },
   {
     type        : 'tool',

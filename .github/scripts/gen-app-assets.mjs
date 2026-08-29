@@ -117,7 +117,7 @@ async function processApp (app) {
 
 // ── main ─────────────────────────────────────────────────────────────────────
 
-const { registry } = await import(new URL('../../shared/js/registry.js', import.meta.url));
+const { registry } = await import(new URL('../../.shared/js/registry.js', import.meta.url));
 let apps = registry.getAll('app');
 if (only.length) apps = apps.filter(a => only.includes(a.slug));
 if (!apps.length) { console.error(`[gen-app-assets] no apps matched ${only.join(', ')}`); process.exit(1); }
