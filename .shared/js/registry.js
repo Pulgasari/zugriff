@@ -132,6 +132,8 @@ const entries = [
       shortcuts : [
         { name: 'Library', short_name: 'Library', url: './?mode=library' },
         { name: 'Edit',    short_name: 'Edit',    url: './?mode=edit'    },
+        { name: 'Convert', short_name: 'Convert', url: './?mode=convert' },
+        { name: 'Batch',   short_name: 'Batch',   url: './?mode=batch'   },
       ],
     },
   },
