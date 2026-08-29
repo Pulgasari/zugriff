@@ -1,0 +1,163 @@
+/* apps/looksmaxx/app.css — the app's own look.
+   reset + theme tokens + the #app frame come from /.shared/css/base.css. */
+
+/* ── top bar ─────────────────────────────────────────────────────────────── */
+.topbar {
+  display      : flex;
+  align-items  : center;
+  gap          : 0.5rem;
+  padding      : 0 0.75rem;
+  height       : 3rem;
+  flex         : none;
+  border-bottom: 1px solid var(--line);
+  background   : var(--panel);
+}
+.topbar strong { font-size: 0.95rem; }
+.spacer { flex: 1 1 auto; }
+
+/* icon buttons (reset the base button chrome) */
+.ibtn {
+  display      : inline-flex;
+  align-items  : center;
+  justify-content: center;
+  width        : 2rem;
+  height       : 2rem;
+  padding      : 0;
+  border       : 1px solid transparent;
+  border-radius: var(--radius);
+  background   : transparent;
+  color        : var(--fg);
+  cursor       : pointer;
+}
+.ibtn:hover:not(:disabled) { background: var(--hover); border-color: var(--line); }
+
+/* ── stage ───────────────────────────────────────────────────────────────── */
+.stage {
+  flex    : 1 1 auto;
+  display : grid;
+  place-items: center;
+  padding : 1rem;
+  overflow: auto;
+  min-height: 0;
+}
+
+.canvas-wrap { position: relative; display: inline-block; max-width: 100%; }
+.canvas-wrap canvas {
+  max-width : 100%;
+  max-height: 100%;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.35);
+  display   : block;
+}
+
+.overlay-status {
+  position   : absolute;
+  inset      : 0;
+  display    : flex;
+  align-items: center;
+  justify-content: center;
+  gap        : 0.6rem;
+  border-radius: var(--radius);
+  background : color-mix(in oklch, var(--bg) 55%, transparent);
+  backdrop-filter: blur(2px);
+  font-size  : 0.85rem;
+}
+.spin {
+  width : 1.1rem; height: 1.1rem;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── dropzone (empty state) ──────────────────────────────────────────────── */
+.drop {
+  display    : flex;
+  flex-direction: column;
+  align-items: center;
+  gap        : 0.6rem;
+  max-width  : 24rem;
+  padding    : 2.5rem 2rem;
+  border     : 2px dashed var(--line);
+  border-radius: calc(var(--radius) + 6px);
+  background : var(--panel);
+  color      : var(--fg);
+  text-align : center;
+  cursor     : pointer;
+}
+.drop:hover { border-color: var(--accent-50); }
+.drop strong { font-size: 1rem; }
+.drop span { font-size: 0.8rem; color: var(--fg-75); line-height: 1.5; }
+
+/* ── controls ────────────────────────────────────────────────────────────── */
+.controls {
+  flex      : none;
+  border-top: 1px solid var(--line);
+  background : var(--panel);
+  padding   : 0.75rem;
+  display   : flex;
+  flex-direction: column;
+  gap       : 0.9rem;
+  max-height: 46dvh;
+  overflow  : auto;
+}
+.msg { font-size: 0.8rem; color: color-mix(in oklch, var(--fg) 70%, var(--accent)); }
+
+.group { display: flex; flex-direction: column; gap: 0.55rem; }
+.group-head {
+  display    : flex;
+  align-items: baseline;
+  gap        : 0.5rem;
+  font-size  : 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color      : var(--fg-50);
+}
+.link {
+  padding: 0; border: none; background: none; color: var(--accent);
+  font-size: 0.75rem; text-transform: none; letter-spacing: 0; cursor: pointer;
+}
+
+/* swatches */
+.swatches { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.swatch {
+  width : 2rem; height: 2rem; padding: 0;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.swatch.on { border-color: var(--fg); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
+.swatch.custom {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--panel-2); color: var(--fg); position: relative; overflow: hidden;
+}
+.swatch.custom input[type=color] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+/* hairstyles */
+.styles { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; }
+.style {
+  flex   : 0 0 auto;
+  width  : 4.5rem;
+  height : 5rem;
+  padding: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap    : 0.25rem;
+  border : 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  color  : var(--fg);
+  cursor : pointer;
+}
+.style.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.style img { width: 3rem; height: 3rem; object-fit: contain; }
+.style span { font-size: 0.65rem; color: var(--fg-75); text-align: center; line-height: 1.1; }
+.style.none, .style.upload { color: var(--fg-50); }
+
+/* sliders */
+.slider { display: flex; align-items: center; gap: 0.6rem; font-size: 0.75rem; color: var(--fg-75); }
+.slider span { flex: 0 0 3.5rem; }
+.slider input[type=range] { flex: 1 1 auto; accent-color: var(--accent); }

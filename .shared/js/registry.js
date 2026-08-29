@@ -42,6 +42,7 @@ const entries = [
     icon        : 'mdi:folder-outline',
     description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
     categories  : ['files'],
+    capacitor   : true,   // wrapped as a Capacitor Android app (native fs) by build-capacitor
   },
   {
     type        : 'app',
@@ -181,6 +182,7 @@ const entries = [
     description : 'Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline.',
     categories  : ['files', 'docs'],
     autopack    : true,   // built into an Android package by the build-android workflow
+    capacitor   : true,   // also wrapped as a Capacitor Android app (native fs) by build-capacitor
   },
   {
     type        : 'app',
@@ -198,6 +200,16 @@ const entries = [
     icon        : 'mdi:play-circle-outline',
     description : 'Open a video off your device and play it — frame-stepping, loop, crop, mirror, rotate and reverse, tuned for the phone.',
     categories  : ['media'],
+  },
+  {
+    type        : 'app',
+    slug        : 'looksmaxx',
+    name        : 'Looksmaxx',
+    short_name  : 'Looksmaxx',
+    icon        : 'mdi:face-woman-shimmer',
+    description : 'Load a photo and try on hair colours and hairstyles — MediaPipe hair segmentation, all on your device.',
+    categories  : ['image'],
+    color       : '#1e1b2e',
   },
   {
     type        : 'app',

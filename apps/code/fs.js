@@ -10,18 +10,20 @@
 // `db.workspace.*` api; here it uses the shared @bunker/db store instead.
 
 import { db, setup } from './db.js';
+import * as platform from '/.shared/js/filesystem/platform.js';
 
 const ROOT_ID = 'root-dir';
 
 export const fs = {
   async getSavedRoot () {
     await setup();
-    return (await db.get('workspace', ROOT_ID)) ?? null;
+    const rec = await db.get('workspace', ROOT_ID);
+    return rec ? platform.hydrate(rec) : null;   // web: identity · capacitor: rebuild the shim
   },
 
   async setRoot (handle) {
     await setup();
-    await db.set('workspace', ROOT_ID, handle);
+    await db.set('workspace', ROOT_ID, platform.dehydrate(handle));   // a shim isn't cloneable — store its descriptor
     return handle;
   },
 

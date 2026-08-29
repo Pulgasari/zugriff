@@ -1,0 +1,165 @@
+name: Build Capacitor packages
+
+# Packages the PWAs flagged `capacitor: true` in .shared/js/registry.js into
+# Android apps (APK + AAB), one matrix job per app — the Capacitor counterpart to
+# build-android.yml (which does the same with Bubblewrap/TWA).
+#
+# Why both exist: a TWA is just Chrome, so an app wrapped that way is stuck with
+# the browser File System Access API — and on Android that API re-confirms every
+# granted folder on each visit, which breaks the "grant a folder once and browse
+# it" model the folder apps rely on. A Capacitor wrapper instead injects a native
+# filesystem bridge (@capacitor/filesystem) whose Storage Access Framework grant
+# is *persisted*, so re-granting is silent. The shared filesystem layer
+# (.shared/js/filesystem/) detects the Capacitor runtime and routes through that
+# native fs automatically (see platform.js + cap-fs.js).
+#
+# Like the TWA build, each app is wrapped around its LIVE deployment URL
+# (server.url = https://zugriff.dev/apps/<slug>/) rather than bundling its files —
+# Capacitor still injects its bridge into that remote page, so the plugins work.
+#
+# ── TEST-ONLY SIGNING ────────────────────────────────────────────────────────
+# Every run generates a THROWAWAY keystore, so the outputs only prove "does it
+# build / does it install to test". They are NOT Play-Store-uploadable and NOT
+# stable: the app identity changes every run and Digital Asset Links can't be set
+# up against an ephemeral key.
+#
+# TODO(stable key): same as build-android.yml — one keystore per app (or shared),
+#   stored base64 + passwords as repo secrets, decoded here; then add each app's
+#   SHA-256 to /.well-known/assetlinks.json (appIds follow dev.zugriff.<slug>, the
+#   same as the TWA package ids, so the file is shared).
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  workflow_dispatch:        # run it on demand — the main way to use this for now
+  push:
+    branches: [main]
+    paths:                  # only when something that affects a package changes
+      - '.shared/js/registry.js'
+      - '.shared/js/filesystem/**'
+      - '.github/scripts/gen-capacitor-config.mjs'
+      - '.github/scripts/get-capacitor-apps.js'
+      - '.github/workflows/build-capacitor.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-capacitor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Job 1 — read the registry, emit the list of capacitor app slugs as JSON
+  discover-apps:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.parse.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Extract capacitor apps
+        id: parse
+        run: node .github/scripts/get-capacitor-apps.js
+
+  # Job 2 — one parallel build per app slug
+  build-capacitor:
+    needs: discover-apps
+    if: ${{ needs.discover-apps.outputs.apps != '[]' && needs.discover-apps.outputs.apps != '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
+    env:
+      SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
+      BUILD_TOOLS: '34.0.0'
+      KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
+      KEY_ALIAS: android
+      # TEST-ONLY password for the throwaway keystore. Replace with secrets when a
+      # stable key lands.
+      STORE_PASS: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up the Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;${BUILD_TOOLS}" > /dev/null
+          # put zipalign + apksigner (used to sign the release artifacts) on PATH
+          echo "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/build-tools/${BUILD_TOOLS}" >> "$GITHUB_PATH"
+
+      - name: Generate a throwaway signing key (TEST ONLY)
+        run: |
+          keytool -genkeypair -v \
+            -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
+            -keyalg RSA -keysize 2048 -validity 3650 \
+            -storepass "$STORE_PASS" -keypass "$STORE_PASS" \
+            -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
+
+      - name: Scaffold the Capacitor project for ${{ matrix.app }}
+        run: |
+          DIR="build/${{ matrix.app }}"
+          mkdir -p "$DIR"
+          # capacitor.config.json (server.url -> live app) + www/ offline fallback
+          APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-config.mjs "$DIR"
+
+          cd "$DIR"
+          npm init -y > /dev/null
+          # Capacitor 6 line + the native filesystem plugin and the SAF directory
+          # picker the shim (cap-fs.js) talks to
+          npm install --no-audit --no-fund \
+            @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 \
+            @capacitor/filesystem@6 @capawesome/capacitor-file-picker@6
+
+          npx cap add android
+          npx cap sync android
+
+      - name: Build ${{ matrix.app }} (Gradle)
+        run: |
+          cd "build/${{ matrix.app }}/android"
+          chmod +x gradlew
+          ./gradlew bundleRelease assembleRelease --stacktrace --console=plain --no-daemon
+
+      - name: Sign the APK + AAB (TEST key)
+        run: |
+          cd "build/${{ matrix.app }}/android"
+          OUT="app/build/outputs"
+          APK_IN="$OUT/apk/release/app-release-unsigned.apk"
+          AAB_IN="$OUT/bundle/release/app-release.aab"
+          SLUG="${{ matrix.app }}"
+
+          # APK: zipalign then apksigner
+          zipalign -f 4 "$APK_IN" "aligned.apk"
+          apksigner sign \
+            --ks "$KEYSTORE_PATH" --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$STORE_PASS" --key-pass "pass:$STORE_PASS" \
+            --out "${SLUG}-release.apk" "aligned.apk"
+
+          # AAB: jarsigner (bundles are signed with the same test key here)
+          jarsigner -keystore "$KEYSTORE_PATH" \
+            -storepass "$STORE_PASS" -keypass "$STORE_PASS" \
+            -signedjar "${SLUG}-release.aab" "$AAB_IN" "$KEY_ALIAS"
+
+      - name: Upload APK + AAB for ${{ matrix.app }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: capacitor-${{ matrix.app }}
+          path: |
+            build/${{ matrix.app }}/android/${{ matrix.app }}-release.apk
+            build/${{ matrix.app }}/android/${{ matrix.app }}-release.aab
+          if-no-files-found: error
+          retention-days: 14
