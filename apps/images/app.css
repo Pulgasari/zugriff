@@ -1,0 +1,638 @@
+/* apps/images/app.css — the unified images app.
+
+   base.css (linked by the shell) brings the reset, theme tokens and the #app
+   frame. this file is the app-level mode bar (.im-*) plus the two modes' own
+   chrome, ported wholesale from the old image-viewer (.iv-*) and image-editor
+   (.toolbar/.stage/.panel/…). the two mode stylesheets use disjoint class
+   names, so they simply coexist here. */
+
+/* ── shell: mode bar ─────────────────────────────────────────────────────── */
+
+.im-app {
+  flex          : 1 1 auto;
+  display       : flex;
+  flex-direction: column;
+  min-height    : 0;
+  min-width     : 0;
+}
+
+.im-modebar {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.5rem;
+  padding     : 0.35rem 0.6rem;
+  min-height  : 44px;
+  background  : var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.im-brand {
+  display    : inline-flex;
+  align-items: center;
+  gap        : 0.4rem;
+  font-weight: 700;
+  color      : var(--fg);
+}
+.im-brand > :first-child { color: var(--accent); }
+
+.im-modes { display: flex; gap: 0.15rem; margin-left: 0.4rem; }
+.im-mode {
+  display      : inline-flex;
+  align-items  : center;
+  gap          : 0.35rem;
+  padding      : 0.35rem 0.6rem;
+  border       : 1px solid transparent;
+  border-radius: var(--radius);
+  background   : transparent;
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.82rem;
+  cursor       : pointer;
+}
+.im-mode:hover  { background: var(--hover); color: var(--fg); }
+.im-mode.active { background: var(--accent-25); color: var(--accent); font-weight: 600; }
+
+.im-modebar-actions { margin-left: auto; display: flex; align-items: center; }
+
+.im-body { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; }
+
+@media (max-width: 620px) {
+  .im-brand span { display: none; }
+  .im-mode span  { display: none; }
+}
+
+
+/* ══ VIEW MODE (ex image-viewer) ═══════════════════════════════════════════ */
+
+.iv-app {
+  flex          : 1 1 auto;
+  display       : flex;
+  flex-direction: column;
+  min-height    : 0;
+  min-width     : 0;
+  background    : var(--bg);
+}
+
+.iv-top {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.75rem;
+  padding     : 0.4rem 0.6rem;
+  min-height  : 48px;
+  background  : var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+.iv-title {
+  display    : flex;
+  align-items: center;
+  gap        : 0.5rem;
+  min-width  : 0;
+  color      : var(--fg-75);
+}
+.iv-title > :first-child { color: var(--accent); flex: none; }
+.iv-name {
+  font-weight  : 600;
+  color        : var(--fg);
+  overflow     : hidden;
+  text-overflow: ellipsis;
+  white-space  : nowrap;
+}
+.iv-count {
+  flex          : none;
+  font-size     : 0.75rem;
+  padding       : 0.1rem 0.45rem;
+  border-radius : 999px;
+  background    : var(--accent-25);
+  color         : var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.iv-meta {
+  flex      : none;
+  font-size : 0.74rem;
+  color     : var(--fg-50);
+  white-space: nowrap;
+}
+@media (max-width: 620px) { .iv-meta { display: none; } }
+
+.iv-actions {
+  margin-left: auto;
+  display    : flex;
+  align-items: center;
+  gap        : 0.15rem;
+  flex       : none;
+}
+
+.iv-btn {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 36px;
+  height         : 36px;
+  border         : 1px solid transparent;
+  border-radius  : var(--radius);
+  background     : transparent;
+  color          : var(--fg);
+  cursor         : pointer;
+}
+.iv-btn:hover:not(:disabled) { background: var(--hover); }
+.iv-btn.active   { background: var(--accent-25); color: var(--accent); }
+.iv-btn:disabled { opacity: 0.3; cursor: default; }
+
+.iv-stage {
+  position  : relative;
+  flex      : 1 1 auto;
+  min-height: 0;
+  display   : flex;
+  align-items: center;
+  justify-content: center;
+  overflow  : hidden;
+  background: color-mix(in oklch, var(--bg) 82%, #000);
+  touch-action: none;
+  user-select: none;
+}
+.iv-stage.grab { cursor: grab; }
+.iv-stage.grab:active { cursor: grabbing; }
+
+.iv-image {
+  max-width : 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transform-origin: center center;
+  will-change: transform;
+  -webkit-user-drag: none;
+}
+
+.iv-nav {
+  position       : absolute;
+  top            : 50%;
+  transform      : translateY(-50%);
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 48px;
+  height         : 64px;
+  border         : 0;
+  border-radius  : var(--radius);
+  background      : color-mix(in oklch, var(--bg) 55%, transparent);
+  color          : var(--fg);
+  cursor         : pointer;
+  opacity        : 0.55;
+  transition     : opacity 0.15s ease;
+}
+.iv-nav:hover { opacity: 1; background: color-mix(in oklch, var(--bg) 75%, transparent); }
+.iv-nav.prev { left: 0.5rem; }
+.iv-nav.next { right: 0.5rem; }
+
+.iv-strip {
+  flex       : none;
+  display    : flex;
+  gap        : 0.4rem;
+  padding    : 0.45rem 0.5rem;
+  overflow-x : auto;
+  background  : var(--panel);
+  border-top  : 1px solid var(--line);
+}
+.iv-thumb {
+  flex         : none;
+  width        : 64px;
+  height       : 48px;
+  padding      : 0;
+  border       : 2px solid transparent;
+  border-radius: var(--radius);
+  overflow     : hidden;
+  background   : var(--panel-2);
+  cursor       : pointer;
+}
+.iv-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.iv-thumb.active { border-color: var(--accent); }
+
+.iv-app.bare .iv-stage { background: #000; }
+
+.iv-welcome {
+  max-width     : 30rem;
+  margin        : auto;
+  padding       : 2rem 1.5rem;
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  gap           : 0.9rem;
+  text-align    : center;
+  color         : var(--fg-75);
+}
+.iv-welcome > :first-child { color: var(--accent); }
+.iv-welcome h1 { font-size: 1.4rem; color: var(--fg); }
+.iv-welcome p  { line-height: 1.55; }
+
+.iv-cta {
+  display        : inline-flex;
+  align-items    : center;
+  gap            : 0.45rem;
+  padding        : 0.6rem 1.1rem;
+  border         : 1px solid var(--accent);
+  border-radius  : var(--radius);
+  background     : var(--accent);
+  color          : #1a1a1a;
+  font           : inherit;
+  font-weight    : 600;
+  cursor         : pointer;
+}
+.iv-cta.small { padding: 0.35rem 0.7rem; font-size: 0.8rem; margin-top: 0.4rem; }
+.iv-cta:hover { filter: brightness(1.05); }
+
+.iv-error {
+  display    : inline-flex;
+  align-items: center;
+  gap        : 0.35rem;
+  color      : var(--c-null, #e06c75);
+  font-size  : 0.85rem;
+}
+
+.iv-tip {
+  display      : flex;
+  gap          : 0.5rem;
+  align-items  : flex-start;
+  padding      : 0.6rem 0.75rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel);
+  font-size    : 0.8rem;
+  color        : var(--fg-75);
+  text-align   : left;
+}
+.iv-tip > :first-child { color: var(--accent); flex: none; margin-top: 0.1rem; }
+.iv-tip.install > div { display: flex; flex-direction: column; gap: 0.4rem; }
+.iv-tip-hint { opacity: 0.75; }
+
+
+/* ══ EDIT MODE (ex image-editor) ═══════════════════════════════════════════ */
+
+.ed {
+  flex          : 1 1 auto;
+  display       : flex;
+  flex-direction: column;
+  min-height    : 0;
+  min-width     : 0;
+}
+
+.toolbar {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.35rem;
+  padding     : 0.5rem 0.75rem;
+  min-height  : 52px;
+  background  : var(--panel);
+  border-bottom: 1px solid var(--line);
+  flex-wrap   : wrap;
+}
+.toolbar .spacer { flex: 1 1 auto; }
+
+.tbtn {
+  display        : inline-flex;
+  align-items    : center;
+  justify-content: center;
+  width          : 34px;
+  height         : 34px;
+  border         : 1px solid transparent;
+  border-radius  : var(--radius);
+  background     : transparent;
+  color          : var(--fg);
+  cursor         : pointer;
+}
+.tbtn:hover:not(:disabled) { background: var(--hover); }
+.tbtn.active   { background: var(--accent-25); color: var(--accent); }
+.tbtn:disabled { opacity: 0.3; cursor: default; }
+
+.tsep { width: 1px; align-self: stretch; margin: 0.25rem 0.15rem; background: var(--line); }
+
+.crop-size {
+  font-variant-numeric: tabular-nums;
+  font-size : 0.8rem;
+  color     : var(--fg-75);
+  padding   : 0 0.4rem;
+}
+
+.cropbar {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.5rem;
+  padding     : 0.4rem 0.75rem;
+  background  : var(--panel-2);
+  border-bottom: 1px solid var(--line);
+  flex-wrap   : wrap;
+}
+.cropbar .spacer { flex: 1 1 auto; }
+.cb-label {
+  font-size     : 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color         : var(--fg-50);
+  font-weight   : 700;
+}
+.cb-presets { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.chip {
+  padding      : 0.3rem 0.6rem;
+  border       : 1px solid var(--line);
+  border-radius: 999px;
+  background   : transparent;
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.76rem;
+  cursor       : pointer;
+  white-space  : nowrap;
+}
+.chip:hover  { border-color: var(--accent-50); color: var(--fg); }
+.chip.active { background: var(--accent-25); border-color: var(--accent-50); color: var(--accent); font-weight: 600; }
+
+.body {
+  flex      : 1 1 auto;
+  display   : flex;
+  min-height: 0;
+  min-width : 0;
+}
+
+.stage {
+  flex        : 1 1 auto;
+  min-width   : 0;
+  position    : relative;
+  display     : flex;
+  align-items : center;
+  justify-content: center;
+  padding     : 1rem;
+  overflow    : hidden;
+  background  : var(--panel-2);
+}
+
+.canvas-wrap {
+  position    : relative;
+  line-height : 0;
+  max-width   : 100%;
+  max-height  : 100%;
+  box-shadow  : 0 6px 24px rgb(0 0 0 / 0.4);
+  --check     : color-mix(in oklch, var(--fg) 8%, transparent);
+  background-color: color-mix(in oklch, var(--bg) 70%, black);
+  background-image:
+    linear-gradient(45deg,  var(--check) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--check) 25%, transparent 25%),
+    linear-gradient(45deg,  transparent 75%, var(--check) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--check) 75%);
+  background-size    : 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+canvas.view {
+  display   : block;
+  max-width : 100%;
+  /* viewport minus the mode bar (44) + toolbar (52) + status (30) + padding */
+  max-height: calc(100dvh - 44px - 52px - 30px - 2rem);
+  width     : auto;
+  height    : auto;
+}
+
+.empty {
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  justify-content: center;
+  gap            : 0.5rem;
+  padding        : 3rem;
+  border         : 2px dashed var(--line);
+  border-radius  : var(--radius);
+  background     : transparent;
+  color          : var(--fg-50);
+  cursor         : pointer;
+  font           : inherit;
+  text-align     : center;
+}
+.empty:hover { border-color: var(--accent-50); color: var(--fg-75); }
+.empty .sub  { font-size: 0.8rem; opacity: 0.7; }
+
+.drop-hint {
+  position       : absolute;
+  inset          : 0.75rem;
+  display        : none;
+  flex-direction : column;
+  align-items    : center;
+  justify-content: center;
+  gap            : 0.5rem;
+  border         : 2px dashed var(--accent);
+  border-radius  : var(--radius);
+  background     : color-mix(in oklch, var(--accent) 14%, var(--bg));
+  color          : var(--accent);
+  font-weight    : 600;
+  pointer-events : none;
+  z-index        : 5;
+}
+.stage.dropping .drop-hint { display: flex; }
+
+.crop-layer {
+  position: absolute;
+  inset   : 0;
+  overflow: hidden;
+  z-index : 3;
+}
+.crop-box {
+  position     : absolute;
+  border       : 1px solid var(--accent);
+  box-shadow   : 0 0 0 100vmax rgb(0 0 0 / 0.55);
+  cursor       : move;
+  touch-action : none;
+}
+.crop-grid {
+  position: absolute;
+  inset   : 0;
+  background-image:
+    linear-gradient(to right,  transparent calc(33.33% - 1px), var(--accent-50) 33.33%, transparent calc(33.33% + 1px)),
+    linear-gradient(to right,  transparent calc(66.66% - 1px), var(--accent-50) 66.66%, transparent calc(66.66% + 1px)),
+    linear-gradient(to bottom, transparent calc(33.33% - 1px), var(--accent-50) 33.33%, transparent calc(33.33% + 1px)),
+    linear-gradient(to bottom, transparent calc(66.66% - 1px), var(--accent-50) 66.66%, transparent calc(66.66% + 1px));
+  pointer-events: none;
+}
+.crop-box .h {
+  position     : absolute;
+  width        : 12px;
+  height       : 12px;
+  background   : var(--accent);
+  border       : 2px solid var(--bg);
+  border-radius: 2px;
+  touch-action : none;
+}
+.h-nw { left: -6px;  top: -6px;    cursor: nwse-resize; }
+.h-ne { right: -6px; top: -6px;    cursor: nesw-resize; }
+.h-se { right: -6px; bottom: -6px; cursor: nwse-resize; }
+.h-sw { left: -6px;  bottom: -6px; cursor: nesw-resize; }
+.h-n  { left: 50%;   top: -6px;    transform: translateX(-50%); cursor: ns-resize; }
+.h-s  { left: 50%;   bottom: -6px; transform: translateX(-50%); cursor: ns-resize; }
+.h-e  { right: -6px; top: 50%;     transform: translateY(-50%); cursor: ew-resize; }
+.h-w  { left: -6px;  top: 50%;     transform: translateY(-50%); cursor: ew-resize; }
+
+.panel {
+  width       : 280px;
+  flex        : none;
+  overflow-y  : auto;
+  background  : var(--panel);
+  border-left : 1px solid var(--line);
+  display     : flex;
+  flex-direction: column;
+}
+.empty-panel { align-items: center; justify-content: center; color: var(--fg-50); font-size: 0.85rem; }
+
+.tabs {
+  flex        : none;
+  display     : flex;
+  gap         : 2px;
+  padding     : 0.4rem;
+  background  : var(--panel-2);
+  border-bottom: 1px solid var(--line);
+  position    : sticky;
+  top         : 0;
+  z-index     : 1;
+}
+.tab {
+  flex         : 1;
+  display      : inline-flex;
+  align-items  : center;
+  justify-content: center;
+  gap          : 0.3rem;
+  padding      : 0.45rem 0.4rem;
+  border       : 0;
+  border-radius: var(--radius);
+  background   : transparent;
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.78rem;
+  cursor       : pointer;
+}
+.tab:hover  { background: var(--hover); }
+.tab.active { background: var(--accent-25); color: var(--accent); font-weight: 600; }
+
+.tab-body { display: flex; flex-direction: column; }
+
+.panel-sec {
+  padding      : 0.9rem;
+  display      : flex;
+  flex-direction: column;
+  gap          : 0.7rem;
+}
+
+.slider { display: flex; flex-direction: column; gap: 0.3rem; }
+.s-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+.s-val {
+  border      : 0;
+  background  : transparent;
+  color       : var(--fg-50);
+  font        : inherit;
+  font-variant-numeric: tabular-nums;
+  cursor      : pointer;
+  padding     : 0 0.2rem;
+  border-radius: 0.2rem;
+}
+.s-val:hover { color: var(--accent); background: var(--hover); }
+.slider input[type=range] { width: 100%; accent-color: var(--accent); }
+
+.field {
+  display    : flex;
+  align-items: center;
+  gap        : 0.4rem;
+  font-size  : 0.8rem;
+}
+.field > span { color: var(--fg-50); min-width: 1rem; }
+.field em    { color: var(--fg-50); font-style: normal; }
+.field input {
+  flex         : 1 1 auto;
+  min-width    : 0;
+  padding      : 0.4rem 0.5rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg);
+  font         : inherit;
+}
+.field input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+.dim-row { display: flex; align-items: center; gap: 0.4rem; }
+.dim-row .field { flex: 1; }
+.lock {
+  width        : 32px; height: 32px;
+  flex         : none;
+  display      : inline-flex; align-items: center; justify-content: center;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg-50);
+  cursor       : pointer;
+}
+.lock.on { color: var(--accent); border-color: var(--accent-50); }
+
+.seg {
+  display      : inline-flex;
+  gap          : 2px;
+  padding      : 2px;
+  border-radius: calc(var(--radius) + 2px);
+  background   : var(--panel-2);
+}
+.seg.wide { display: flex; }
+.seg-btn {
+  flex         : 1;
+  padding      : 0.4rem 0.5rem;
+  border       : 0;
+  border-radius: var(--radius);
+  background   : transparent;
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.78rem;
+  cursor       : pointer;
+}
+.seg-btn.active { background: var(--accent-25); color: var(--accent); font-weight: 600; }
+
+.btn {
+  display      : inline-flex;
+  align-items  : center;
+  justify-content: center;
+  gap          : 0.35rem;
+  padding      : 0.5rem 0.7rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg);
+  font         : inherit;
+  font-size    : 0.8rem;
+  cursor       : pointer;
+}
+.btn.wide    { width: 100%; }
+.btn:hover:not(:disabled) { border-color: var(--accent-50); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #1a1a1a; font-weight: 600; }
+.btn.ghost   { background: transparent; }
+
+.statusbar {
+  flex        : none;
+  display     : flex;
+  align-items : center;
+  gap         : 0.5rem;
+  padding     : 0.3rem 0.85rem;
+  min-height  : 30px;
+  font-size   : 0.74rem;
+  color       : var(--fg-50);
+  background  : var(--panel);
+  border-top  : 1px solid var(--line);
+}
+.statusbar .spacer  { flex: 1 1 auto; }
+.statusbar .err     { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--c-null, #e06c75); }
+.statusbar .working { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent); }
+.statusbar .edited  { color: var(--accent); }
+
+@media (max-width: 760px) {
+  .body { flex-direction: column; }
+  .panel {
+    width      : 100%;
+    flex       : none;
+    max-height : 48%;
+    border-left: 0;
+    border-top : 1px solid var(--line);
+  }
+  canvas.view { max-height: 100%; }
+}

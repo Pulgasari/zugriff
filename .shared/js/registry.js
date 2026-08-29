@@ -101,6 +101,41 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'images',
+    name        : 'Images',
+    short_name  : 'Images',
+    icon        : 'mdi:image-multiple-outline',
+    description : 'View, edit, convert and batch-process images, and browse image folders — all on your device.',
+    categories  : ['image'],
+    // one app, several modes switched by ?mode= (a query param, not a subpath —
+    // the launcher rewrite only serves the shell for /images/). it registers as
+    // an image handler, like the viewer, so the OS "open with" sends files here;
+    // the shortcuts deep-link a mode.
+    manifest    : {
+      launch_handler : { client_mode: ['focus-existing', 'auto'] },
+      file_handlers  : [{
+        action : './',
+        accept : {
+          'image/png'    : ['.png'],
+          'image/jpeg'   : ['.jpg', '.jpeg', '.jfif'],
+          'image/gif'    : ['.gif'],
+          'image/webp'   : ['.webp'],
+          'image/avif'   : ['.avif'],
+          'image/bmp'    : ['.bmp'],
+          'image/svg+xml': ['.svg'],
+          'image/x-icon' : ['.ico'],
+          'image/heic'   : ['.heic'],
+          'image/heif'   : ['.heif'],
+          'image/tiff'   : ['.tif', '.tiff'],
+        },
+      }],
+      shortcuts : [
+        { name: 'Edit', short_name: 'Edit', url: './?mode=edit' },
+      ],
+    },
+  },
+  {
+    type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
     icon        : 'mdi:podcast',
