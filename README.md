@@ -16,7 +16,7 @@ client-side mini-PWAs. static files only — no build step, no bundler, no node 
 - [feeds](https://zugriff.dev/feeds/)
 - [files](https://zugriff.dev/files/)
 - [icons](https://zugriff.dev/icons/)
-- [images](https://zugriff.dev/images/) — view · edit · convert · batch · library, unified
+- [images](https://zugriff.dev/images/)
 - [notes](https://zugriff.dev/notes/)
 - [podcasts](https://zugriff.dev/podcasts/)
 - [prompts](https://zugriff.dev/prompts/)
