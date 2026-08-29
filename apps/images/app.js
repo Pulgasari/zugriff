@@ -20,6 +20,7 @@ import * as pwa              from '/.shared/js/lib/pwa.js';
 
 // ::: local
 import * as edit    from './edit.js';
+import * as fx      from './filters.js';
 import * as library from './library.js';
 
 
@@ -374,13 +375,22 @@ const lockAR   = signal(true);
 
 const exportFmt = stored('image/png', 'images:edit:format');
 const quality   = stored(92, 'images:edit:quality');
-const panelTab  = stored('adjust', 'images:edit:tab'); // 'adjust' | 'resize' | 'export'
+const panelTab  = stored('adjust', 'images:edit:tab'); // 'adjust' | 'effects' | 'resize' | 'export'
+
+const effect    = stored('none', 'images:edit:effect'); // an @aufbau/filters id, or 'none'
+const effectAmt = signal(1);                             // the effect's `amount`, when it has one
+
+function selectEffect (id) {
+  effect.value = id;
+  const e = fx.effectById(id);
+  effectAmt.value = e?.amount ? e.amount.default : 1;
+}
 
 const HISTORY  = 30;
 const MIN_CROP = 8; // px
 
 const dims  = computed(() => work.value ? { w: work.value.width, h: work.value.height } : null);
-const dirty = computed(() => undo.value.length > 0 || !edit.isIdentity(filters.value));
+const dirty = computed(() => undo.value.length > 0 || !edit.isIdentity(filters.value) || effect.value !== 'none');
 
 let edLoadedFrom = null; // the File last decoded into the editor
 
@@ -405,9 +415,10 @@ const CROP_PRESETS = [
 ];
 
 const TABS = [
-  { id: 'adjust', label: 'Adjust', icon: 'mdi:tune-variant' },
-  { id: 'resize', label: 'Resize', icon: 'mdi:resize' },
-  { id: 'export', label: 'Export', icon: 'mdi:export-variant' },
+  { id: 'adjust',  label: 'Adjust',  icon: 'mdi:tune-variant' },
+  { id: 'effects', label: 'Effects', icon: 'mdi:auto-fix' },
+  { id: 'resize',  label: 'Resize',  icon: 'mdi:resize' },
+  { id: 'export',  label: 'Export',  icon: 'mdi:export-variant' },
 ];
 
 function screenAR () {
@@ -444,6 +455,8 @@ async function loadFile (file) {
     original.value = canvas;
     work.value     = canvas;
     filters.value  = { ...edit.IDENTITY };
+    effect.value   = 'none';
+    effectAmt.value = 1;
     undo.value = [];
     redo.value = [];
     cropMode.value = 'idle';
@@ -492,6 +505,8 @@ function resetEdit () {
   if (work.value !== original.value) pushHistory(work.value);
   work.value = original.value;
   filters.value = { ...edit.IDENTITY };
+  effect.value = 'none';
+  effectAmt.value = 1;
   cropMode.value = 'idle';
   cropRect.value = null;
   syncResize();
@@ -617,6 +632,7 @@ async function exportImage () {
   busy.value = true;
   try {
     const flat = edit.applyFilter(w, filters.value);
+    fx.bake(flat, effect.value, { amount: effectAmt.value });
     const fmt  = fmtOf(exportFmt.value);
     const blob = await edit.toBlob(flat, fmt.type, quality.value / 100);
     const url  = URL.createObjectURL(blob);
@@ -733,6 +749,9 @@ function CropOverlay () {
 function EditStage ({ onPick }) {
   const w = work.value;
   const ref = useRef(null);
+  const wrapRef = useRef(null);
+  const eff = effect.value;      // subscribe so the preview effect re-runs on change
+  const amt = effectAmt.value;
 
   useEffect(() => {
     if (!w || !ref.current) return;
@@ -740,6 +759,11 @@ function EditStage ({ onPick }) {
     c.width = w.width; c.height = w.height;
     c.getContext('2d').drawImage(w, 0, 0);
   }, [w]);
+
+  // the aufbau effect is a live, non-destructive layer on the canvas wrapper; the
+  // brightness/contrast adjustments stay a css filter on the canvas itself, so the
+  // two compose. both are baked into the pixels on export (exportImage).
+  useEffect(() => { fx.preview(wrapRef.current, eff, { amount: amt }); }, [eff, amt, w]);
 
   const onDrop = e => {
     e.preventDefault(); edDrag.value = false;
@@ -754,7 +778,7 @@ function EditStage ({ onPick }) {
          onDragLeave=${e => { if (e.target === e.currentTarget) edDrag.value = false; }}
          onDrop=${onDrop}>
       ${w ? html`
-        <div class="canvas-wrap">
+        <div class="canvas-wrap" ref=${wrapRef}>
           <canvas ref=${ref} class="view" style=${`filter:${edit.filterString(filters.value)}`}></canvas>
           ${cropMode.value === 'crop' && html`<${CropOverlay} />`}
         </div>`
@@ -768,16 +792,38 @@ function EditStage ({ onPick }) {
     </div>`;
 }
 
-function EdSlider ({ label, value, min, max, onInput, suffix = '%', reset }) {
+function EdSlider ({ label, value, min, max, onInput, suffix = '%', reset, step = 1 }) {
   return html`
     <label class="slider">
       <span class="s-head">
         <span>${label}</span>
         <button class="s-val" onClick=${reset} title="Reset">${value}${suffix}</button>
       </span>
-      <input type="range" min=${min} max=${max} value=${value}
+      <input type="range" min=${min} max=${max} step=${step} value=${value}
              onInput=${e => onInput(+e.target.value)} />
     </label>`;
+}
+
+function EffectsPanel () {
+  const cur = effect.value;
+  const e   = fx.effectById(cur);
+  return html`
+    <section class="panel-sec">
+      <div class="im-fx-grid">
+        ${fx.EFFECTS.map(x => html`
+          <button class=${'im-fx' + (cur === x.id ? ' active' : '')} key=${x.id}
+                  title=${!x.previewable && x.id !== 'none' ? 'Applied on export (no live preview)' : x.name}
+                  onClick=${() => selectEffect(x.id)}>
+            ${x.name}${!x.previewable && x.id !== 'none' ? ' *' : ''}
+          </button>`)}
+      </div>
+      ${cur !== 'none' && e?.amount && html`
+        <${EdSlider} label="Amount" suffix="" value=${effectAmt.value}
+          min=${e.amount.min} max=${e.amount.max} step=${e.amount.step ?? 0.05}
+          onInput=${v => effectAmt.value = v} reset=${() => effectAmt.value = e.amount.default} />`}
+      ${cur !== 'none' && e && !e.previewable && html`
+        <p class="im-fx-note">* No live preview for this effect — it’s applied when you export.</p>`}
+    </section>`;
 }
 
 function Adjustments () {
@@ -852,9 +898,10 @@ function EditPanel () {
           </button>`)}
       </nav>
       <div class="tab-body">
-        ${tab === 'adjust' && html`<${Adjustments} />`}
-        ${tab === 'resize' && html`<${ResizePanel} />`}
-        ${tab === 'export' && html`<${ExportPanel} />`}
+        ${tab === 'adjust'  && html`<${Adjustments} />`}
+        ${tab === 'effects' && html`<${EffectsPanel} />`}
+        ${tab === 'resize'  && html`<${ResizePanel} />`}
+        ${tab === 'export'  && html`<${ExportPanel} />`}
       </div>
     </aside>`;
 }
@@ -1228,6 +1275,7 @@ const BP_TASK_TYPES = {
   contrast   : { label: 'Contrast',   icon: 'mdi:contrast-circle',    defaults: { value: 0 } },
   convert    : { label: 'Convert',    icon: 'mdi:image-sync-outline', defaults: { fmt: 'webp' } },
   crop       : { label: 'Crop',       icon: 'mdi:crop',               defaults: { x: 0, y: 0, w: 800, h: 600 } },
+  filter     : { label: 'Filter',     icon: 'mdi:auto-fix',           defaults: { id: 'sepia', amount: 1 } },
   flip       : { label: 'Flip',       icon: 'mdi:flip-horizontal',    defaults: { axis: 'h' } },
   grayscale  : { label: 'Grayscale',  icon: 'mdi:contrast',           defaults: {} },
   quality    : { label: 'Quality',    icon: 'mdi:image-filter-hdr',   defaults: { value: 85 } },
@@ -1326,6 +1374,10 @@ async function bpProcessOne (file) {
         d[i] = d[i+1] = d[i+2] = g;
       }
       ctx.putImageData(id, 0, 0);
+    }
+    else if (task.type === 'filter') {
+      fx.bake(canvas, p.id, { amount: +p.amount });
+      ctx = canvas.getContext('2d');   // fx.bake redraws through a scratch canvas
     }
     else if (task.type === 'blur') {
       const tmp = document.createElement('canvas');
@@ -1462,10 +1514,24 @@ const WatermarkTaskPane = props => { const { id, params: p } = props.task;
       ${POS.map(([v, l]) => html`<button class=${'chip' + (p.pos === v ? ' active' : '')} onClick=${() => bpUpdateTask(id, { pos: v })} title=${l}>${v.toUpperCase()}</button>`)}
     </${TaskPane}>`; };
 
+const FilterTaskPane = props => { const { id, params: p } = props.task;
+  const e = fx.effectById(p.id);
+  return html`
+    <${TaskPane} ...${props}>
+      <select class="im-task-input grow" value=${p.id} onChange=${ev => bpUpdateTask(id, { id: ev.target.value })}>
+        ${fx.EFFECTS.filter(x => x.id !== 'none').map(x => html`<option value=${x.id}>${x.name}</option>`)}
+      </select>
+      ${e?.amount && html`
+        <span class="im-task-label">Amt</span>
+        <input type="range" min=${e.amount.min} max=${e.amount.max} step=${e.amount.step ?? 0.05} value=${p.amount}
+               onInput=${ev => bpUpdateTask(id, { amount: +ev.target.value })} style="width:90px;accent-color:var(--accent)" />
+        <span class="im-task-val">${p.amount}</span>`}
+    </${TaskPane}>`; };
+
 const BP_TASK_PANE = {
   blur: BlurTaskPane, brightness: BrightnessTaskPane, contrast: ContrastTaskPane, convert: ConvertTaskPane,
-  crop: CropTaskPane, flip: FlipTaskPane, grayscale: GrayscaleTaskPane, quality: QualityTaskPane,
-  resize: ResizeTaskPane, rotate: RotateTaskPane, watermark: WatermarkTaskPane,
+  crop: CropTaskPane, filter: FilterTaskPane, flip: FlipTaskPane, grayscale: GrayscaleTaskPane,
+  quality: QualityTaskPane, resize: ResizeTaskPane, rotate: RotateTaskPane, watermark: WatermarkTaskPane,
 };
 
 function TaskAdder () {

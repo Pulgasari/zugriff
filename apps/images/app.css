@@ -876,3 +876,27 @@ canvas.view {
 
 @keyframes im-spin { to { transform: rotate(360deg); } }
 .spin { animation: im-spin 1s linear infinite; }
+
+
+/* ══ FILTERS (effects tab + batch filter task) ═════════════════════════════ */
+
+.im-fx-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+.im-fx {
+  padding      : 0.4rem 0.5rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel-2);
+  color        : var(--fg-75);
+  font         : inherit;
+  font-size    : 0.78rem;
+  cursor       : pointer;
+  text-align   : left;
+  overflow     : hidden;
+  text-overflow: ellipsis;
+  white-space  : nowrap;
+}
+.im-fx:hover  { border-color: var(--accent-50); color: var(--fg); }
+.im-fx.active { background: var(--accent-25); border-color: var(--accent-50); color: var(--accent); font-weight: 600; }
+.im-fx-note   { font-size: 0.75rem; color: var(--fg-50); line-height: 1.4; }
+
+select.im-task-input { cursor: pointer; }
