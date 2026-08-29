@@ -2,28 +2,26 @@
 
 # zugriff
 
-client-side mini-PWAs. static files only — no build step, no bundler, no node
-or deno. ESM in the browser, served straight off GitHub Pages.
+client-side mini-PWAs. static files only — no build step, no bundler, no node or deno. ESM in the browser, served straight off GitHub Pages.
 
-- https://zugriff.dev/code/
-
+- https://zugriff.dev/
 - [zugriff/cli](https://zugriff.dev/cli/)
 - [apps](https://zugriff.dev/apps/)
 - [tools](https://zugriff.dev/tools/)
 
 ## apps
-- [audio manager](https://zugriff.dev/apps/audio-manager/)
-- [code](https://zugriff.dev/apps/code/)
-- [ebooks](https://zugriff.dev/apps/ebooks/)
-- [feeds](https://zugriff.dev/apps/feeds/)
-- [files](https://zugriff.dev/apps/files/)
-- [gifmaker](https://zugriff.dev/apps/gifmaker/)
-- [icons](https://zugriff.dev/apps/icons/)
-- [image editor](https://zugriff.dev/apps/image-editor/)
-- [image viewer](https://zugriff.dev/apps/image-viewer/)
-- [notes](https://zugriff.dev/apps/notes/)
-- [podcasts](https://zugriff.dev/apps/podcasts/)
-- [videoplayer](https://zugriff.dev/apps/videoplayer/)
+- [audio manager](https://zugriff.dev/audio-manager/)
+- [code](https://zugriff.dev/code/)
+- [ebooks](https://zugriff.dev/ebooks/)
+- [feeds](https://zugriff.dev/feeds/)
+- [files](https://zugriff.dev/files/)
+- [gifmaker](https://zugriff.dev/gifmaker/)
+- [icons](https://zugriff.dev/icons/)
+- [image editor](https://zugriff.dev/image-editor/)
+- [image viewer](https://zugriff.dev/image-viewer/)
+- [notes](https://zugriff.dev/notes/)
+- [podcasts](https://zugriff.dev/podcasts/)
+- [videoplayer](https://zugriff.dev/videoplayer/)
 
 ---
 
