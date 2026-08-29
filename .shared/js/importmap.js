@@ -34,6 +34,7 @@ const map = { imports: {
   "@aufbau/svg/"            : `${pkg}/aufbau/svg/`,
   "@aufbau/utils"           : `${pkg}/aufbau/js/index.js`,
   "@aufbau/webfonts"        : `${pkg}/aufbau/webfonts/index.js`,
+  "@aufbau/webfonts/"       : `${pkg}/aufbau/webfonts/`,
   "@aufbau/webfonts/google" : `${pkg}/aufbau/webfonts/google.js`,
 
   "@bunker/cache"   : `${pkg}/bunker/cache/index.js`,
