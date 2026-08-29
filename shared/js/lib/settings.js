@@ -12,9 +12,8 @@
 //
 // keys are shown verbatim in the ui — no label mapping, on purpose.
 
-import { effect } from '@aufbau/kits/preact-htm';
-import { apply as applyWebfont, load as loadWebfont, fonts } from '@aufbau/webfonts';
-import { stored } from './signals.js';
+import aufbau, { effect }    from '@aufbau/kits/preact-htm';
+import { stored }            from './signals.js';
 import { appSettingsSchema } from './../registry.js';
 import { themes, themeNames, DEFAULT_THEME, COLOR_KEYS } from './../data/themes.js';
 
@@ -97,11 +96,11 @@ export const themeGroup = { title: 'theme', settings: theme };
 // theme, this is one shared namespace — picking a font in one app picks it
 // everywhere. the font face is fetched on demand and pointed at zugriff's --font.
 
-const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
+const fontValues = [['', 'default'], ...aufbau.webfonts.fonts.map(font => [font.id, font.name])];
 
 function applyFont (id) {
   if (!id) return;   // '' → keep the theme/default font
-  loadWebfont(id).then(ok => { if (ok) applyWebfont({ name: id, target: '--font' }); });
+  aufbau.webfonts.load(id).then(ok => { if (ok) aufbau.webfonts.apply({ name: id, target: '--font' }); });
 }
 
 function applyDir (value) {
