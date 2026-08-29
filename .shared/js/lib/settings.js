@@ -1,26 +1,13 @@
 // shared/js/lib/settings.js
-//
-// a setting is a persisted signal plus enough description for the panel to
-// render it without knowing what it means. adding one is a single entry:
-//
-//   const s = defineSettings('my-app', {
-//     'show-preview' : { type: 'boolean', default: true },
-//     'layout'       : { type: 'enum', values: ['grid', 'list'], default: 'grid' },
-//   });
-//   s.value('layout');        // read
-//   s.set('layout', 'list');  // write, runs the group's onSet hook
-//
-// keys are shown verbatim in the ui — no label mapping, on purpose.
 
-import { effect } from '@aufbau/kits/preact-htm';
-import { apply as applyWebfont, load as loadWebfont, fonts } from '@aufbau/webfonts';
-import { stored } from './signals.js';
+import aufbau, { effect }    from '@aufbau/kits/preact-htm';
+import { stored }            from './signals.js';
 import { appSettingsSchema } from './../registry.js';
 import { themes, themeNames, DEFAULT_THEME, COLOR_KEYS } from './../data/themes.js';
 
-export const TYPES = ['boolean', 'enum', 'color'];
+const TYPES = ['boolean', 'enum', 'color'];
 
-export function defineSettings (namespace, schema, { onSet } = {}) {
+function defineSettings (namespace, schema, { onSet } = {}) {
   const signals = {};
 
   for (const [key, entry] of Object.entries(schema)) {
@@ -33,23 +20,16 @@ export function defineSettings (namespace, schema, { onSet } = {}) {
     signals,
     keys  : Object.keys(schema),
     value : key => signals[key].value,
-    set   : (key, value) => {
-      signals[key].value = value;
-      onSet?.(key, value, group);
-    },
-    reset : () => {
-      for (const [key, entry] of Object.entries(schema)) signals[key].value = entry.default;
-    },
+    set   : (key, value) => { signals[key].value = value; onSet?.(key, value, group); },
+    reset : () => { for (const [key, entry] of Object.entries(schema)) signals[key].value = entry.default; },
   };
 
   return group;
 }
 
-// ── theme ──────────────────────────────────────────────────────────────────
-// shared by the launcher and every app: the namespace carries no slug, so
-// picking an accent in one app picks it everywhere.
+// ── theme ─────────────────────────────────────────────
 
-export const theme = defineSettings('zugriff:theme', {
+const theme = defineSettings('zugriff:theme', {
   preset : { type: 'enum', look: 'combobox', values: [...themeNames, 'custom'], default: DEFAULT_THEME },
   bg     : { type: 'color', default: themes[DEFAULT_THEME].bg },
   fg     : { type: 'color', default: themes[DEFAULT_THEME].fg },
@@ -72,8 +52,6 @@ export const theme = defineSettings('zugriff:theme', {
 
 let applying = false;
 
-// the three base tokens go onto :root — everything else in theme.css derives
-// from them, so one write repaints the whole palette
 effect(() => {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
@@ -82,26 +60,18 @@ effect(() => {
 
 // ── launcher ───────────────────────────────────────────────────────────────
 
-export const launcher = defineSettings('zugriff:launcher', {
+const launcher = defineSettings('zugriff:launcher', {
   'filter-position'  : { type: 'enum', values: ['top', 'bottom'], default: 'bottom' },
   'filter-sticky'    : { type: 'boolean', default: true },
   'filter-autofocus' : { type: 'boolean', default: false },
 });
 
-/** what an app shows while it has no settings of its own */
-export const themeGroup = { title: 'theme', settings: theme };
-
-// ── app (font + direction) ───────────────────────────────────────────────────
-// the schema is predefined in the registry; the font enum's values come from the
-// @aufbau/webfonts catalog, folded in here so registry.js stays import-free. like
-// theme, this is one shared namespace — picking a font in one app picks it
-// everywhere. the font face is fetched on demand and pointed at zugriff's --font.
-
+// ── app (font + direction) ───────────────────────────
 const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
 
 function applyFont (id) {
-  if (!id) return;   // '' → keep the theme/default font
-  loadWebfont(id).then(ok => { if (ok) applyWebfont({ name: id, target: '--font' }); });
+  if (!id) return;
+  aufbau.webfonts.load(id).then(ok => { if (ok) aufbau.webfonts.apply({ name: id, target: '--font' }); });
 }
 
 function applyDir (value) {
@@ -109,7 +79,7 @@ function applyDir (value) {
   document.documentElement.dir = value || 'ltr';
 }
 
-export const app = defineSettings('zugriff:app', {
+const app = defineSettings('zugriff:app', {
   ...appSettingsSchema,
   font : { ...appSettingsSchema.font, values: fontValues },
 }, {
@@ -123,4 +93,17 @@ export const app = defineSettings('zugriff:app', {
 applyFont(app.value('font'));
 applyDir(app.value('dir'));
 
-export const appGroup = { title: 'app', settings: app };
+const appGroup   = { title: 'app', settings: app };
+const themeGroup = { title: 'theme', settings: theme };
+
+// :::::: EXPORT
+
+export {
+  app,
+  appGroup,
+  defineSettings,
+  launcher,
+  theme,
+  themeGroup,
+  TYPES,
+}
