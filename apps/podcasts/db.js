@@ -16,8 +16,8 @@
 // truth the components read; every mutation writes IndexedDB *and* updates the
 // signal, so a change shows up everywhere at once and survives a reload.
 
-import { signal, computed } from '@aufbau/kits/preact-htm';
-import { createDb } from '@bunker/db';
+import { signal, computed }     from '@aufbau/kits/preact-htm';
+import { createDb }             from '@bunker/db';
 import { fetchFeed, parseFeed } from './feed.js';
 
 const db = createDb ('zugriff-podcasts');
