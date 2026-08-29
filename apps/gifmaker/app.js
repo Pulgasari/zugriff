@@ -5,20 +5,20 @@
 // export it — as an animated GIF, or as a project zip (the images plus a
 // manifest) that can be imported again. everything runs on the device.
 
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: IMPORTS
 
 // ::: vendors
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from './../../shared/js/app.js?slug=gifmaker';
-import { Icon, Slider, AppSettings } from './../../shared/js/components/index.js';
-import { stored }       from './../../shared/js/lib/signals.js';
+import { boot, config }              from '/.shared/js/app.js?slug=gifmaker';
+import { Icon, Slider, AppSettings } from '/.shared/js/components/index.js';
+import { stored }                    from '/.shared/js/lib/signals.js';
 
 // ::: local
 import { zipStore, unzip } from './zip.js';
 
-// :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
+// :::::: STATE
 
 // a frame: { id, name, canvas, w, h, dx, dy, delay }
 const frames   = signal([]);
@@ -54,7 +54,7 @@ const canvasSize = computed(() => {
 const selected = computed(() => frames.value[cursor.value] ?? null);
 const totalMs  = computed(() => frames.value.reduce((s, f) => s + (f.delay || 0), 0));
 
-// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
+// :::::: HELPERS 
 
 function loadImage (blob) {
   return createImageBitmap(blob).then(bm => {
@@ -574,7 +574,5 @@ function App () {
     </div>`;
 }
 
-// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
-
-// the app draws its own chrome, so it skips the tools Shell
+// :::::: BOOT
 boot({ config, App });
