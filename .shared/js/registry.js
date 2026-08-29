@@ -130,7 +130,8 @@ const entries = [
         },
       }],
       shortcuts : [
-        { name: 'Edit', short_name: 'Edit', url: './?mode=edit' },
+        { name: 'Library', short_name: 'Library', url: './?mode=library' },
+        { name: 'Edit',    short_name: 'Edit',    url: './?mode=edit'    },
       ],
     },
   },
