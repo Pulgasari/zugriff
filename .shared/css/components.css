@@ -21,6 +21,7 @@
   &.secondary { background: var(--button-primary-bg); color: var(--bg); }
   &.ghost     { background: transparent; border: none; color: var(--fg); opacity: 0.50; }
   &.small     { font-size: 0.75rem; padding: 0.25rem 0.50rem; }
+  &.big       { font-size: 1.50rem; padding: 0.50rem 1.00rem; }
 }
 
 .icon-btn,
