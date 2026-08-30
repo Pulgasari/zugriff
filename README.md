@@ -22,6 +22,10 @@ client-side mini-PWAs. static files only — no build step, no bundler, no node 
 - [prompts](https://zugriff.dev/prompts/)
 - [videoplayer](https://zugriff.dev/videoplayer/)
 
+## tools
+[audio-converter](https://zugriff.dev/audio-converter/)
+[audio-cutter](https://zugriff.dev/audio-cutter/)
+
 ### deprecated
 - [gifmaker](https://zugriff.dev/gifmaker/)
 - [image editor](https://zugriff.dev/image-editor/)
