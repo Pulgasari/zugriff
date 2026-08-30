@@ -7,7 +7,7 @@ import { html } from '@aufbau/kits/preact-htm';
 
 const isObject = v => typeof v === 'object' && v !== null;
 
-export const normalize = opt => isObject(opt)
+const normalize = opt => isObject(opt)
   ? {
       value : opt.value,
       label : opt.label ?? (opt.icon ? '' : String(opt.value)),
@@ -16,7 +16,7 @@ export const normalize = opt => isObject(opt)
     }
   : { value: opt, label: String(opt), icon: null, title: String(opt) };
 
-export default function Picker ({ options = [], sig, value, onChange, look = 'segments', multiple }) {
+function Picker ({ options = [], sig, value, onChange, look = 'segments', multiple }) {
   const current = sig ? sig.value : value;
 
   const change = event => {
@@ -37,3 +37,6 @@ export default function Picker ({ options = [], sig, value, onChange, look = 'se
         ></aufbau-option>`)}
     </aufbau-picker>`;
 }
+
+export       { Picker, normalize };
+export default Picker;
