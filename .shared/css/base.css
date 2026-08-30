@@ -65,7 +65,7 @@ a { color: var(--accent); }
    &:disabled             { opacity: 0.4; cursor: default; }
 
    &.primary { background: var(--accent); border-color: var(--accent); font-weight: 600; }      
-   &.ghost   { background: transparent; }
+   &.ghost   { background: transparent; border: none; }
    &.small   { font-size: 0.75rem; padding: 0.25rem 0.50rem; }
 }
 
