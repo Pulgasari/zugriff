@@ -42,49 +42,7 @@
 .pc-app[data-player="bottom"] .pc-body { order: 0; }
 .pc-app[data-player="bottom"] .player  { order: 1; }
 
-/* ── shared controls ─────────────────────────────────────────────────────── */
-
-.btn {
-  display    : inline-flex;
-  align-items: center;
-  gap        : 0.4rem;
-  padding    : 0.5rem 0.85rem;
-  border     : 1px solid var(--line);
-  border-radius: var(--radius);
-  background : var(--panel-2);
-  color      : var(--fg);
-  font       : inherit;
-  font-size  : 0.85rem;
-  cursor     : pointer;
-  white-space: nowrap;
-  transition : background 0.12s, border-color 0.12s;
-}
-.btn:hover:not(:disabled) { background: var(--hover); }
-.btn:disabled { opacity: 0.5; cursor: default; }
-.btn.primary { background: var(--accent); border-color: transparent; color: #fff; }
-.btn.primary:hover:not(:disabled) { filter: brightness(1.08); background: var(--accent); }
-.btn.ghost   { background: transparent; }
-.btn.danger  { color: var(--c-null, #e06c75); }
-.btn.danger:hover:not(:disabled) { background: color-mix(in oklch, var(--c-null, #e06c75) 15%, transparent); }
-.btn.small   { padding: 0.35rem 0.6rem; font-size: 0.78rem; }
-
-.ibtn {
-  display    : inline-flex;
-  align-items: center;
-  justify-content: center;
-  width      : 2rem;
-  height     : 2rem;
-  border     : none;
-  border-radius: var(--radius);
-  background : transparent;
-  color      : var(--fg-75, var(--fg));
-  cursor     : pointer;
-  text-decoration: none;
-  transition : background 0.12s, color 0.12s;
-}
-.ibtn:hover:not(:disabled) { background: var(--hover); color: var(--fg); }
-.ibtn:disabled { opacity: 0.4; cursor: default; }
-.ibtn.active { color: var(--accent); }
+/* ── shared controls ─────────────────────────────── */
 
 .seg {
   display   : inline-flex;
