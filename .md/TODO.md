@@ -20,7 +20,7 @@
 - [ ] neuen boot-mechanismus (`.shared/js/boot2.js`) fertigstellen. ersetzt dann `importmap.js`, `theme-boot.js`
 
 ### components
-- [ ] Warum `WaveForm.js` nicht `<aufbau-waveform>` (`aufbau/elements/AufbaueWaveform'? Muss AufbauWaveform evtl. erweitert werden?
+- [ ] Warum nutzt `.shared/js/components/WaveForm.js` nicht `<aufbau-waveform>` (`aufbau/elements/AufbaueWaveform'? Muss AufbauWaveform evtl. erweitert werden?
 
 ### settings component
 
