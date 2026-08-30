@@ -5,7 +5,7 @@ import Waveform from './Waveform.js';
 
 const fmtT = s => Math.floor(s / 60) + ':' + (s % 60).toFixed(1).padStart(4, '0');
 
-export default function WaveformWithHandles ({ peaks, start, end, duration, playPos, onChange }) {
+function WaveformWithHandles ({ peaks, start, end, duration, playPos, onChange }) {
   const wrapRef = useRef(null);
 
   const xToTime = clientX => {
@@ -46,3 +46,6 @@ export default function WaveformWithHandles ({ peaks, start, end, duration, play
 
     </div>`;
 }
+
+export       { WaveformWithHandles };
+export default WaveformWithHandles;
