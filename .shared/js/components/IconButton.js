@@ -15,3 +15,6 @@ function IconButton ({ icon, label, onClick, disabled, active }) {
     </button>
   `;
 }
+
+export       { IconButton };
+export default IconButton;
