@@ -14,7 +14,9 @@ import { opfs }          from './filesystem/opfs.js';
 const zugriff = { components, opfs, registry };
 
 zugriff.fs = Object.assign({ FolderLibrary }, fsaccess);
-zugriff.openPrompt = components.openPrompt;
+
+zugriff.openPrompt     = components.openPrompt;
+zugriff.toggleSettings = components.toggleSettings;
 
 if (typeof globalThis !== 'undefined') globalThis.zugriff = zugriff;
 
