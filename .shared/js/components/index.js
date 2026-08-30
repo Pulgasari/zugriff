@@ -14,7 +14,8 @@ export * from './Shell.js';
 export * from './Slider.js';
 export * from './Taplet.js';
 export * from './Toggle.js';
-
+export * from './Waveform.js';
+export * from './WaveformWithHandles.js';
 
 export { icons, resolveIcon } from './../data/icons.js';
 
