@@ -7,7 +7,7 @@
 - [x] rename `apps/file-explorer` to `apps/files`.
 - [x] rename `apps/rss-reader` to `apps/feeds`
 
-### code
+### `apps/code`
 
 - [ ] connection to (s)ftp
 - [ ] connection to cloud-services
@@ -31,10 +31,10 @@
 
 ## workflow
 
-- [ ] bundle-workflows (gh actions) of bubblewrap or capacitor should not run on any commit, only the associated app changed
+- [ ] bundle-workflows (gh actions) of bubblewrap or capacitor should not run on any commit
 
 ---
 
 ## misc
 
-- [ ] urls der der apps/tools direkt als unterpfad der domain ohne sie aus den `apps`- bzw. `tools`-ordnern eine ebene höher schieben zu müssen. also z.b `zugriff.dev/code` statt `zugriff.dev/apps/code`. (theoretisch wären subdomains noch nicer, aber das macht vermutlich caching, resourcen-sharing usw wieder übertrieben komplizierter)
+- [x] urls der der apps/tools direkt als unterpfad der domain ohne sie aus den `apps`- bzw. `tools`-ordnern eine ebene höher schieben zu müssen. also z.b `zugriff.dev/code` statt `zugriff.dev/apps/code`. (theoretisch wären subdomains noch nicer, aber das macht vermutlich caching, resourcen-sharing usw wieder übertrieben komplizierter)
