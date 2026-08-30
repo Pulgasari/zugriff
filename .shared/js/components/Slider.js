@@ -13,7 +13,7 @@ import { html } from '@aufbau/kits/preact-htm';
 
 const single = value => Array.isArray(value) ? value[0] : Number(value);
 
-export default function Slider ({
+function Slider ({
   label,
   value,
   min  = 0,
@@ -30,7 +30,7 @@ export default function Slider ({
   const clamp    = v => Math.min(max, Math.max(min, v));
   const disp     = isFloat ? +Number(value).toFixed(decimals) : Math.round(value);
 
-  const set   = v => onChange?.(clamp(v));
+  const set   = v     => onChange?.(clamp(v));
   const input = event => set(single(event.detail?.value ?? event.target?.value));
 
   return html`
@@ -52,3 +52,6 @@ export default function Slider ({
       </div>
     </div>`;
 }
+
+export       { Slider };
+export default Slider;
