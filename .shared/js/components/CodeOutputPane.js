@@ -2,7 +2,7 @@
 
 import { html, useEffect, useRef } from '@aufbau/kits/preact-htm';
 import GhostButton from './GhostButton.js';
-import Icon from './Icon.js';
+import Icon        from './Icon.js';
 import { hljs, ensureLang } from './hljs.js';
 
 function Highlighted ({ code, lang, innerRef }) {
@@ -34,7 +34,7 @@ function Highlighted ({ code, lang, innerRef }) {
     ></code></pre>`;
 }
 
-export default function CodeOutputPane ({
+function CodeOutputPane ({
   sig, status, errorMessage, filename, stats,
   lang        = 'javascript',
   title       = 'Output',
@@ -99,3 +99,6 @@ export default function CodeOutputPane ({
 
     </div>`;
 }
+
+export       { CodeOutputPane };
+export default CodeOutputPane;
