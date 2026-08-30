@@ -53,7 +53,7 @@ image) and your reading position — never a copy of the book.
 Folder picking, permissions and the recursive walk are shared with the Notes
 app via [`shared/js/lib/fsaccess.js`](../../shared/js/lib/fsaccess.js). EPUB and
 PDF rendering come from `epubjs` and `pdfjs`, both already in the shared
-[`importmap`](../../shared/js/importmap.js).
+[`importmap`](../../shared/js/boot.js).
 
 ## Browser support
 

@@ -67,8 +67,7 @@ zugriff/
       explorer.css              opt-in: the FileExplorer component
       hljs.css                  opt-in: syntax highlighting theme
     js/
-      theme-boot.js             puts the saved theme on :root before the first paint
-      importmap.js              injects the import map, classic script in <head>
+      boot.js                   theme on :root + import map, one classic script in <head>
       app.js                    boot(): document setup, runtime, sw, mount
       sw-core.js                the shared service worker body
       vfs.js                    flat OPFS wrapper (used by the cli)
@@ -252,7 +251,7 @@ for dom manipulation stuff we gonna use [@domina](https://github.com/pulgasari/d
 ## vendors
 
 everything else comes off a cdn through the import map in
-`shared/js/importmap.js` — yaml, smol-toml, csso, terser,
+`shared/js/boot.js` — yaml, smol-toml, csso, terser,
 html-minifier-terser, culori, pdf-lib, pdfjs, highlight.js, ffmpeg, upng-js.
 nothing is vendored into this repo; the ffmpeg core wasm alone is 32 mb and is
 fetched on first use, then kept by the service worker.

@@ -24,15 +24,7 @@ name: Build Android packages
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
-  workflow_dispatch:        # run it on demand — the main way to use this for now
-  push:
-    branches: [main]
-    paths:                  # only when something that affects a package changes
-      - '.shared/js/registry.js'
-      - 'apps/**/manifest.json'
-      - '.github/scripts/gen-twa-manifest.mjs'
-      - '.github/scripts/get-autopack-apps.js'
-      - '.github/workflows/build-android.yml'
+  workflow_dispatch:        # manual only — packaging never runs on a commit
 
 permissions:
   contents: read

@@ -17,6 +17,7 @@ zugriff.fs = Object.assign({ FolderLibrary }, fsaccess);
 
 zugriff.openPrompt     = components.openPrompt;
 zugriff.toggleSettings = components.toggleSettings;
+zugriff.toast          = components.toast;
 
 if (typeof globalThis !== 'undefined') globalThis.zugriff = zugriff;
 

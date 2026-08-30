@@ -1,8 +1,10 @@
 // components/Waveform.js
-// stays a canvas of its own rather than wrapping <aufbau-waveform>: that
-// element decodes its own audio from a `src` and paints a plain progress bar,
-// while the audio apps here hand in peaks they already computed and need a
-// selection range plus a playhead drawn on top.
+// stays a canvas of its own rather than wrapping <aufbau-waveform>. that element
+// now takes precomputed `peaks` too (so the shared decode gap is closed), but it
+// paints DOM bars for a single progress value — this view needs a selection
+// range and a playhead drawn over the bars, which is a canvas overlay job. so
+// the split is the rendering model, not the data: reach for <aufbau-waveform>
+// for a plain progress waveform, this for the trim/seek editors.
 
 import { html, useRef, useEffect } from '@aufbau/kits/preact-htm';
 

@@ -15,7 +15,7 @@ const VERSIONED     = /(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\/.*@\d+\.\d+\.\
 
 const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
 const OWN    = ['./', './app.js', './app.css', './manifest.json'];
-const SHARED = ['./../css/index.css', './importmap.js', './app.js'];
+const SHARED = ['./../css/index.css', './boot.js', './app.js'];
 
 const onError = ({ operation, key, error }) => console.warn(`[sw] vendor ${operation} failed for ${key}`, error);    
 const app     = createCache ({ onError, name: CACHE_APP    }); // stale while revalidate

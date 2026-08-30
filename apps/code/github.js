@@ -15,20 +15,26 @@ import { db, setup } from './db.js';
 const API      = 'https://api.github.com';
 const TOKEN_ID = 'github-token';
 const SEL_ID   = 'github-selection';
+const PUB_ID   = 'github-public-repos';
 
 // ── state ────────────────────────────────────────────────────────────────────
 
 export const
-token   = signal(null),        // the PAT string, or null
-user    = signal(null),        // { login, avatar_url, … } once validated
-repos   = signal([]),          // the user's repositories
-repo    = signal(null),        // the selected repo { owner, name, default_branch }
-branch  = signal(null),        // the selected branch name
-busy    = signal(''),          // a label while a request is in flight
-error   = signal(null),        // last error message
-ready   = signal(false);       // token load + (maybe) validation done
+token       = signal(null),    // the PAT string, or null
+user        = signal(null),    // { login, avatar_url, … } once validated
+repos       = signal([]),      // the user's (writable) repositories
+publicRepos = signal([]),      // read-only public repos the user pinned to inspect
+repo        = signal(null),    // the selected repo { owner, name, default_branch, readOnly }
+branch      = signal(null),    // the selected branch name
+busy        = signal(''),      // a label while a request is in flight
+error       = signal(null),    // last error message
+ready       = signal(false);   // token load + (maybe) validation done
 
 export const connected = () => !!user.value;
+
+// a repo is editable only when a token is connected AND it isn't a read-only
+// public pin — everything else (add/rename/delete/commit) is browse-only
+export const canWrite = () => !!user.value && !repo.value?.readOnly;
 
 // ── low-level request ────────────────────────────────────────────────────────
 
@@ -36,7 +42,9 @@ async function api (path, { method = 'GET', body, raw = false } = {}) {
   const res = await fetch(path.startsWith('http') ? path : API + path, {
     method,
     headers: {
-      'Authorization' : `Bearer ${token.value}`,
+      // public repos work unauthenticated (lower rate limit), so the token is
+      // sent only when one is connected
+      ...(token.value ? { 'Authorization': `Bearer ${token.value}` } : {}),
       'Accept'        : 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
       ...(body ? { 'Content-Type': 'application/json' } : {}),
@@ -67,6 +75,9 @@ function fromText (text) {
 
 export async function load () {
   await setup();
+  const pub = await db.get('auth', PUB_ID);
+  if (Array.isArray(pub)) publicRepos.value = pub;
+
   const saved = await db.get('auth', TOKEN_ID);
   if (saved) {
     token.value = saved;
@@ -120,8 +131,53 @@ export async function loadRepos () {
     repos.value = [...a, ...b].map(r => ({
       owner: r.owner.login, name: r.name, full: r.full_name,
       default_branch: r.default_branch, private: r.private, updated: r.updated_at,
+      readOnly: false,
     }));
   } finally { busy.value = ''; }
+}
+
+// ── public repos (read-only inspection) ──────────────────────────────────────
+// any public repo can be pinned by owner/name (or a github url) and browsed
+// read-only through the same tree — no token required, though a connected token
+// raises the rate limit and reaches private repos too.
+
+const REPO_SPEC = /(?:github\.com\/)?([^/\s]+)\/([^/\s#?]+?)(?:\.git)?(?:[/#?].*)?$/i;
+
+export function parseRepoSpec (input) {
+  const m = REPO_SPEC.exec((input || '').trim());
+  return m ? { owner: m[1], name: m[2] } : null;
+}
+
+export async function addPublicRepo (input) {
+  const spec = parseRepoSpec(input);
+  if (!spec) throw new Error('Enter a repository as owner/name or a GitHub URL.');
+  const full = `${spec.owner}/${spec.name}`;
+  if (publicRepos.value.some(r => r.full.toLowerCase() === full.toLowerCase()))
+    throw new Error('That repository is already in the list.');
+
+  busy.value = 'Adding repo…'; error.value = null;
+  try {
+    const r = await api(`/repos/${spec.owner}/${spec.name}`);
+    const entry = {
+      owner: r.owner.login, name: r.name, full: r.full_name,
+      default_branch: r.default_branch, private: r.private, updated: r.updated_at,
+      readOnly: true,
+    };
+    publicRepos.value = [entry, ...publicRepos.value];
+    await persistPublic();
+    return entry;
+  } finally { busy.value = ''; }
+}
+
+export async function removePublicRepo (full) {
+  publicRepos.value = publicRepos.value.filter(r => r.full !== full);
+  await persistPublic();
+  if (repo.value?.full === full) { repo.value = null; branch.value = null; await persistSelection(); }
+}
+
+async function persistPublic () {
+  await setup();
+  await db.set('auth', PUB_ID, publicRepos.value);
 }
 
 export async function selectRepo (r) {
