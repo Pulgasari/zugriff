@@ -2,11 +2,11 @@
   "trailingSlash": true,
   "rewrites": [
     {
-      "source"      : "/(apps|tools)(/)?",
+      "source"      : "/(apps|tools)/",
       "destination" : "/index.html"
     },
     {
-      "source"      : "/:appname([a-z0-9-]+)(/)?",
+      "source"      : "/:appname([a-z0-9-]+)/",
       "destination" : "/app.html?app=:appname"
     },
     {
