@@ -19,6 +19,9 @@
 
 - [ ] neuen boot-mechanismus (`.shared/js/boot2.js`) fertigstellen. ersetzt dann `importmap.js`, `theme-boot.js`
 
+### components
+- [ ] Warum `WaveForm.js` nicht `<aufbau-waveform>` (`aufbau/elements/AufbaueWaveform'? Muss AufbauWaveform evtl. erweitert werden?
+
 ### settings component
 
 - [x] `shared/js/components/Settings.js` sollte `aufbau.gui` (`aufbau/runtime/gui.js`) nutzen
