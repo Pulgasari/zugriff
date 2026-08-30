@@ -7,6 +7,12 @@
 - [x] rename `apps/file-explorer` to `apps/files`
 - [x] rename `apps/rss-reader` to `apps/feeds`
 
+### code
+
+- [ ] connection to (s)ftp
+- [ ] connection to cloud-services
+- [ ] add mechanism to github-panel to add public repos to read/inspect
+
 ---
 
 ## shared
@@ -15,6 +21,12 @@
 
 - [x] `shared/js/components/Settings.js` sollte `aufbau.gui` (`aufbau/runtime/gui.js`) nutzen
 - [x] in der `shared/js/registry.js` bekommen die apps settings-option für font, dir vorgegeben fonts kommen aus `aufbau/webfonts`usw
+
+---
+
+## workflow
+
+- [ ] bundle-workflows (gh actions) of bubblewrap or capacitor should not run on any commit, only the associated app changed
 
 ---
 
