@@ -1,21 +1,13 @@
 // shared/js/components/Nav.js
-//
-// the three places that are not a single app: the terminal, the tools list and
-// the apps list. `here` marks which one is showing. `base` is the path back up
-// to the site root — the tools list lives there, so it *is* the base.
-//
-//   <${Nav} here='cli'   base='./../' />   from /cli/
-//   <${Nav} here='tools' base='./'    />   from /       (the root)
-//   <${Nav} here='apps'  base='./../' />   from /apps/
 
 import { html } from '@aufbau/kits/preact-htm';
 import Icon from './Icon.js';
 
-export default function Nav ({ here, base = './' }) {
+function Nav ({ here, base = './' }) {
   const links = [
-    { id: 'cli',   label: 'cli',   icon: 'mdi:console',         href: here === 'cli'   ? './' : `${base}cli/`   },
-    { id: 'tools', label: 'tools', icon: 'mdi:apps',            href: here === 'tools' ? './' : `${base}tools/` },    
-    { id: 'apps',  label: 'apps',  icon: 'mdi:widgets-outline', href: here === 'apps'  ? './' : `${base}apps/`  },
+    { id: 'cli',   label: 'cli',   icon: 'mdi:console',         href: 'https://zugriff.dev/cli/'   },
+    { id: 'apps',  label: 'apps',  icon: 'mdi:widgets-outline', href: 'https://zugriff.dev/apps'   },
+    { id: 'tools', label: 'tools', icon: 'mdi:apps',            href: 'https://zugriff.dev/tools/' },    
   ];
 
   return html`
@@ -23,7 +15,7 @@ export default function Nav ({ here, base = './' }) {
       ${links.map(link => html`
         <a
           key=${link.id}
-          class=${'ghost-btn' + (here === link.id ? ' active' : '')}
+          class=${'btn ghost' + (here === link.id ? ' active' : '')}
           href=${link.href}
           aria-current=${here === link.id ? 'page' : null}
         >
@@ -31,3 +23,6 @@ export default function Nav ({ here, base = './' }) {
         </a>`)}
     </nav>`;
 }
+
+export       { Nav };
+export default Nav;
