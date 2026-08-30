@@ -32,12 +32,15 @@ const { computed, signal, useEffect, useRef } = preact;
 
 import { boot }     from '/.shared/js/app.js';
 import { registry } from '/.shared/js/registry.js';
+import Button       from '/.shared/js/components/Button.js';
+import GhostButton  from '/.shared/js/components/GhostButton.js';
 import Icon         from '/.shared/js/components/Icon.js';
 import Nav          from '/.shared/js/components/Nav.js';
 import Settings, { SettingsButton }       from '/.shared/js/components/Settings.js';
 import { launcher, appGroup, themeGroup } from '/.shared/js/lib/settings.js';
 
 //const registry = zugriff.registry;
+//const { Button, GhostButton, Icon, Nav } = zugriff.components;
 
 
 //aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: "2s" });
@@ -158,10 +161,7 @@ function Filter () {
         value=${query.value}
         onInput=${event => query.value = event.target.value}
       />
-      ${query.value && html`
-        <button class="act-btn" onClick=${() => query.value = ''}>
-          <${Icon} name="close" />
-        </button>`}
+      ${query.value && html`<${Button} icon="close" onClick=${() => query.value = ''}>`}
     </div>`;
 }
 
