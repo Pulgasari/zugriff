@@ -1,5 +1,4 @@
-// shared/js/components/Waveform.js
-//
+// components/Waveform.js
 // stays a canvas of its own rather than wrapping <aufbau-waveform>: that
 // element decodes its own audio from a `src` and paints a plain progress bar,
 // while the audio apps here hand in peaks they already computed and need a
