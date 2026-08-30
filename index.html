@@ -112,7 +112,7 @@ function HomePage () {
   const fg  = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
   const bg  = Object.assign(document.createElement('div'), { className: 'bg-grid' });
   document.body.appendChild(bg);
-  animatePattern(bg, 'grid', { motion: 'down', speed: '22s', size: 44, width: 1, fg, bg: 'transparent' });
+  animatePattern(bg, 'grid', { motion: 'up', speed: '1s', size: 44, width: 1, fg, bg: 'transparent' });
 }
 
 // ::: Page: Apps | Tools
