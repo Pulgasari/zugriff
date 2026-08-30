@@ -46,7 +46,7 @@ function setCursor (el, pos) {
 
 // ── component ──────────────────────────────────────────────────────────────
 
-export default function CodeInputPane ({
+function CodeInputPane ({
   filename, sig,
   placeholder   = 'Paste code here …',
   lang          = 'javascript',
@@ -198,3 +198,6 @@ export default function CodeInputPane ({
 
     </div>`;
 }
+
+export       { CodeInputPane };
+export default CodeInputPane;
