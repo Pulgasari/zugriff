@@ -30,7 +30,7 @@
       'preact'
     ],
     // Base framework importmap (can be extended/overridden via userConfig.imports)
-    imports: Object.assign(getFrameworkImportMap(), userConfig.imports || {})
+    imports: Object.assign(getImportMap(), userConfig.imports || {})
   };
   const { preload, sw, theme } = config;
 
@@ -99,7 +99,7 @@
 
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
-  function getFrameworkImportMap () {
+  function getImportMap () {
     const pkg    = 'https://code.pulgasari.dev';
     const PREACT = '10.20.1';
     const HLJS   = '11.10.0';
