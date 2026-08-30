@@ -508,3 +508,36 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
   color       : #f66;
   font-size   : 0.85rem;
 }
+
+
+
+
+
+.field       { display: flex; flex-direction: column; gap: 0.5rem; }
+.field-label { font-weight: 600; }
+.field-hint  { font-size: 0.75rem; color: var(--fg-50); line-height: 1.5; }
+.field-row   { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
+
+
+
+/* ────────── toast ────────── */
+
+.toasts { position: fixed; left: 0; right: 0; bottom: 1.1rem; display: flex; justify-content: center; pointer-events: none; z-index: 80; }
+.toast {
+  padding       : 1rem 1rem;
+  border-radius : 999px;
+  background    : var(--panel);
+  border        : 1px solid var(--line);
+  box-shadow    : 0 8px 24px rgb(0 0 0 / 0.35);
+  font-size     : 0.85rem;
+
+   &.err { border-color: color-mix(in oklch, var(--c-null, #e06c75) 55%, var(--line)); color: var(--c-null, #e06c75); }
+}
+
+
+
+
+
+
+
+
