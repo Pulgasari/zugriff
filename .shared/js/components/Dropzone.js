@@ -9,7 +9,7 @@ import { html, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 let nextId = 0;
 
-export function toEntry (file) {
+function toEntry (file) {
   return {
     file,
     id         : nextId++,
@@ -21,7 +21,7 @@ export function toEntry (file) {
   };
 }
 
-export default function Dropzone ({
+function Dropzone ({
   accept   = '*/*',
   multiple = true,
   sig,
@@ -61,3 +61,6 @@ export default function Dropzone ({
       text=${text ?? `drop ${what} here or click to browse`}
     ></aufbau-upload>`;
 }
+
+export       { Dropzone, toEntry };
+export default Dropzone;
