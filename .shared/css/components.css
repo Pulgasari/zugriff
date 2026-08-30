@@ -46,6 +46,17 @@
   gap         : 0.25rem;
 }
 
+.ibtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border: none; border-radius: var(--radius);
+  background: transparent; color: var(--fg-75, var(--fg)); cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.ibtn:hover:not(:disabled) { background: var(--hover); color: var(--fg); }
+.ibtn:disabled { opacity: 0.4; cursor: default; }
+.ibtn.active { color: var(--accent); background: var(--accent-25); }
+
+
 /* ── button modifiers ───────────────────────────────────────────────────── */
 /* base `button, .btn` is defined at the top of this file — these are the
    modifiers the apps kept redefining locally. */
