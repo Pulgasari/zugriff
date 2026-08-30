@@ -10,10 +10,9 @@ import { opfs }          from './filesystem/opfs.js';
 
 // :::::: BUNDLE
 
-const zugriff = {
-  opfs,
-  fs: Object.assign({ FolderLibrary }, fsaccess),
-};
+const zugriff = { opfs, registry };
+
+zugriff.fs = Object.assign({ FolderLibrary }, fsaccess);
 
 if (typeof globalThis !== 'undefined') globalThis.zugriff = zugriff;
 
