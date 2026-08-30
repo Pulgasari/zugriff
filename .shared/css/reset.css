@@ -1,5 +1,6 @@
 /* shared/css/reset.css */
 
+/*
 *, *::before, *::after {
   box-sizing : border-box;
   margin     : 0;
@@ -17,3 +18,4 @@ body {
 a {
   color: var(--accent);
 }
+*/
