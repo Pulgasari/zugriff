@@ -18,27 +18,10 @@
   &:disabled             { opacity: 0.25; cursor: default; cursor: not-allowed; }
 
   &.primary   { background: var(--accent); border-color: var(--accent); font-weight: 600; }      
-  &.secondary { background : var(--button-primary-bg); color: var(--bg); }
-  &.ghost     { background: transparent; border: none; }
+  &.secondary { background: var(--button-primary-bg); color: var(--bg); }
+  &.ghost     { background: transparent; border: none; color: var(--fg); opacity: 0.50; }
   &.small     { font-size: 0.75rem; padding: 0.25rem 0.50rem; }
 }
-
-.ghost-btn {
-  display       : flex;
-  align-items   : center;
-  gap           : 0.3rem;
-  background    : transparent;
-  border        : none;
-  color         : var(--fg);
-  cursor        : pointer;
-  font-size     : 0.75rem;
-  opacity       : 0.45;
-  padding       : 0.15rem 0.3rem;
-  border-radius : 0.3rem;
-  transition    : opacity 0.15s;
-  margin-left   : auto;
-}
-.ghost-btn:hover { opacity: 1; }
 
 .icon-btn,
 .act-btn {
