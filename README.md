@@ -37,21 +37,10 @@ client-side mini-PWAs. static files only — no build step, no bundler, no node 
 [icon-generator](https://zugriff.dev/tools/icon-generator/) •
 [](https://zugriff.dev/tools//) •
 
+---
+
 ### deprecated
 - [gifmaker](https://zugriff.dev/gifmaker/)
 - [image-batch-processor](https://zugriff.dev/tools/image-batch-processor/)
 - [image editor](https://zugriff.dev/image-editor/)
 - [image viewer](https://zugriff.dev/image-viewer/)
-
----
-
-## about
-
-- `/cli` basically is zugriff itself or the main app so to speak.
-- `/tools` small single-purpose pages, rendered inside the shared tools shell
-- `/apps` the ones meant to feel like real apps — own chrome, own css
-- `/shared` stuff used by all/multiple apps
-
-every app is its own PWA: own manifest, own service worker scope, installable
-on its own. tools share the shell, the components and the css; apps deliberately
-do not — see [apps vs tools](#apps-vs-tools) below.
