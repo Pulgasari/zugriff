@@ -11,7 +11,7 @@ export function copy (str, time = 1500) {
   setTimeout(() => { if (copied.value === str) copied.value = null; }, time);
 }
 
-export default function CopyIcon ({ content }) {
+function CopyIcon ({ content }) {
   const isCopied = copied.value === content;
   return html`
     <${Icon}
@@ -20,3 +20,6 @@ export default function CopyIcon ({ content }) {
       title='Copy to Clipboard'
     />`;
 }
+
+export       { CopyIcon };
+export default CopyIcon;
