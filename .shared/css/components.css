@@ -121,35 +121,37 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 
 /* ── picker (<aufbau-picker>) ───────────────────────────────────────────── */
 
-.picker {
+aufbau-picker, .picker {
   --radius : 0.25rem;
+  display  : inline-flex;
+  color    : var(--fg);
 
-  display : inline-flex;
-  color   : var(--fg);
-}
+  .picker-group {
+    display : flex;
+    gap     : 1px;
+  }
 
-/* segments: one row of buttons, joined into a single control */
+  &[look="segments"] {
+    .picker-option {
+      background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
+      color         : var(--fg);
+      border        : none;
+      border-radius : 0;
+      padding       : 0.25rem 0.5rem;
+      cursor        : pointer;
 
-.picker .picker-group {
-  display : flex;
-  gap     : 1px;
-}
+      &[aria-checked="true"] {
+        background : var(--accent);
+        color      : var(--bg);
+      }
 
-.picker[look="segments"] .picker-option {
-  background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
-  color         : var(--fg);
-  border        : none;
-  border-radius : 0;
-  padding       : 0.25rem 0.5rem;
-  cursor        : pointer;
+      &:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+      &:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+      .picker-mark { display: none; }
+    }
+  }
+
 }
-.picker[look="segments"] .picker-option[aria-checked="true"] {
-  background : var(--accent);
-  color      : var(--bg);
-}
-.picker[look="segments"] .picker-option:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-.picker[look="segments"] .picker-option:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
-.picker[look="segments"] .picker-mark { display: none; }
 
 /* combobox: a field that opens a list in the top layer. the list is a popover,
    so it gets no colours from the page — it has to bring its own. */
