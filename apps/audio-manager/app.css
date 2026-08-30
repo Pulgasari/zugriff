@@ -212,10 +212,10 @@
 .vol { width: 110px; }
 
 @media (max-width: 720px) {
-  .player { grid-template-columns: 1fr auto; }
-  .extra { display: none; }
+  .player   { grid-template-columns: 1fr auto; }
+  .extra    { display: none; }
   .controls { width: auto; }
-  .seek { display: none; }
+  .seek     { display: none; }
 }
 
 /* ── toast + mobile drawer ───────────────────────────────────────────────── */
