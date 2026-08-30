@@ -480,8 +480,9 @@ aufbau-picker, .picker {
   align-items : center;
   gap         : 0.65rem;
   font-size   : 0.85rem;
+
+  label { opacity: 0.6; flex-shrink: 0; }
 }
-.setting-row label { opacity: 0.6; flex-shrink: 0; }
 
 .copy-icon { opacity: 0.35; flex-shrink: 0; transition: opacity 0.12s; }
 
@@ -501,15 +502,16 @@ aufbau-picker, .picker {
   border     : 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
   background : color-mix(in srgb, var(--fg) 5%, transparent);
   color      : var(--fg);
-}
-.field:focus { outline: none; border-color: var(--accent); }
+  display    : flex; 
+  flex-flow  : column; 
+  gap        : 0.5rem;
 
-.field       { display: flex; flex-direction: column; gap: 0.5rem; }
+  &:focus { outline: none; border-color: var(--accent); }
+}
+
 .field-label { font-weight: 600; }
 .field-hint  { font-size: 0.75rem; color: var(--fg-50); line-height: 1.5; }
 .field-row   { display: flex; gap: 0.5rem; margin-top: 0.2rem; }
-
-
 
 /* ────────── toast ────────── */
 
