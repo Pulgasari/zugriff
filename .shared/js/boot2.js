@@ -1,4 +1,10 @@
-// shared/js/boot.js
+/* shared/js/boot.js
+
+1. apply colors of current theme to <:root>
+2. apply importmap and preloads to <head>
+3. register the service worker
+4. set up global zugriff-context singleton
+==================== */
 (() => {
   const currentScript = document.currentScript;
   if (!currentScript) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
@@ -146,7 +152,6 @@
       "preact/hooks"       : `https://esm.sh/preact@${PREACT}/hooks`,
       "preact/jsx-runtime" : `https://esm.sh/preact@${PREACT}/jsx-runtime`,
       "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact",
-
       
       "htm"              : "https://esm.sh/htm@3.1.1",
       "htm/preact"       : `https://esm.sh/htm@3.1.1/preact?deps=preact@${PREACT}`,
