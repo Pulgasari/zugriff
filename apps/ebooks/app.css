@@ -8,16 +8,6 @@
 
 /* ── shared controls (kept in step with the other apps) ───────────────────── */
 
-.ibtn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 2rem; height: 2rem; border: none; border-radius: var(--radius);
-  background: transparent; color: var(--fg-75, var(--fg)); cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-.ibtn:hover:not(:disabled) { background: var(--hover); color: var(--fg); }
-.ibtn:disabled { opacity: 0.4; cursor: default; }
-.ibtn.active { color: var(--accent); background: var(--accent-25); }
-
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--panel-2); }
 .seg-btn { border: none; background: transparent; color: var(--fg-75, var(--fg)); padding: 0.4rem 0.7rem; font: inherit; font-size: 0.8rem; cursor: pointer; white-space: nowrap; }
 .seg-btn.active { background: var(--accent-25); color: var(--fg); }
