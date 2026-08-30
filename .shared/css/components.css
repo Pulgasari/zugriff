@@ -60,9 +60,9 @@ button:hover:not(:disabled),
   align-items   : center;
   opacity       : 0.5;
   transition    : opacity 0.1s;
+
+  &:hover { opacity: 1; }
 }
-.icon-btn:hover,
-.act-btn:hover { opacity: 1; }
 
 .actions {
   display     : flex;
