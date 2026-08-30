@@ -23,6 +23,8 @@
 ### components
 - [ ] Warum nutzt `.shared/js/components/WaveForm.js` nicht `<aufbau-waveform>` (`aufbau/elements/AufbaueWaveform'? Muss AufbauWaveform evtl. erweitert werden?
 - [ ] create `Index` component, die `<aufbau-index>` benutzt, und in den `zugriff/apps` integriert wird, wo es passt. (im prinzip überall wo gleichartige items aufgelistet werden)
+- [ ] create 'InstallTip' component (wird aktuell in zig apps doppelt konstruiert)
+- [ ] create 'Sidebar' component (wird aktuell in zig apps doppelt konstruiert)
 
 ### settings component
 
