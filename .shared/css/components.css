@@ -592,3 +592,20 @@ aufbau-picker, .picker {
 .handle-e .handle-label { right: 0; left: auto; }
 
 
+.install-tip {
+  display: flex; align-items: center; flex-wrap: wrap;
+
+  background : color-mix(in oklch, var(--accent) 8%, var(--panel));
+  border     : 1px solid var(--line); border-radius: var(--radius);
+  font-size  : 0.85rem;
+  gap        : 0.5rem;
+  padding    : 0.5rem 0.5rem; 
+  
+  > .icon { color: var(--accent); flex: none; }
+
+  .install-tip-text   { flex: 1 1 16rem; }
+  .install-tip-hint   { color: var(--fg-50, var(--fg)); font-size: 0.8rem; }
+  .install-tip-hint b { color: var(--fg-75, var(--fg)); font-weight: 600; }
+}
+
+
