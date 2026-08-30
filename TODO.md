@@ -17,7 +17,7 @@
 
 ## shared
 
-- [ ] neuen boot-mechanismus (`.shared/js/boot2.js`) fertigszellen
+- [ ] neuen boot-mechanismus (`.shared/js/boot2.js`) fertigstellen. ersetzt dann `importmap.js`, `theme-boot.js`
 
 ### settings component
 
