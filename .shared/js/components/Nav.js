@@ -3,7 +3,7 @@
 import { html } from '@aufbau/kits/preact-htm';
 import Icon from './Icon.js';
 
-function Nav ({ here, base = './' }) {
+function Nav ({ here }) {
   const links = [
     { id: 'cli',   label: 'cli',   icon: 'mdi:console',         href: 'https://zugriff.dev/cli/'   },
     { id: 'apps',  label: 'apps',  icon: 'mdi:widgets-outline', href: 'https://zugriff.dev/apps'   },
