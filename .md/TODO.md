@@ -25,6 +25,7 @@
 - [ ] create `Index` component, die `<aufbau-index>` benutzt, und in den `zugriff/apps` integriert wird, wo es passt. (im prinzip überall wo gleichartige items aufgelistet werden)
 - [ ] create 'InstallTip' component (wird aktuell in zig apps doppelt konstruiert)
 - [ ] create 'Sidebar' component (wird aktuell in zig apps doppelt konstruiert)
+- [ ] create 'Toast' component (wird aktuell in zig apps doppelt konstruiert) bzw kleines Toast-System, dass wie weiter oben dann mit an `zugriff` runtime direkt hängen sollte
 
 ### settings component
 
