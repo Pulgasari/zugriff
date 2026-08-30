@@ -17,7 +17,7 @@
 
 ## shared
 
-- [ ] neuen boot-mechanismus fertigszellen
+- [ ] neuen boot-mechanismus (`.shared/js/boot2.js`) fertigszellen
 
 ### settings component
 
