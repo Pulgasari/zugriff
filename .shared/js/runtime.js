@@ -2,7 +2,8 @@
 
 // :::::: IMPORT
 
-import registry from './registry.js'
+import * as components from './components/index.js';
+import      registry   from './registry.js'
 
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
@@ -10,7 +11,7 @@ import { opfs }          from './filesystem/opfs.js';
 
 // :::::: BUNDLE
 
-const zugriff = { opfs, registry };
+const zugriff = { components, opfs, registry };
 
 zugriff.fs = Object.assign({ FolderLibrary }, fsaccess);
 
