@@ -10,7 +10,7 @@ const length = value =>
   :                                       value;
 
 // both `class` and `className` are accepted — the call sites use them mixed
-export default function Icon ({ name, size, color, className, class: klass, onClick, title, style }) {
+function Icon ({ name, size, color, className, class: klass, onClick, title, style }) {
   return html`
     <aufbau-icon
       class=${['icon', className, klass].filter(Boolean).join(' ')}
@@ -24,3 +24,7 @@ export default function Icon ({ name, size, color, className, class: klass, onCl
 }
 
 export { icons, resolveIcon } from './../data/icons.js';
+
+export       { Icon };
+export default Icon;
+
