@@ -99,13 +99,61 @@
     const HLJS   = '11.10.0';
 
     return {
-      "@aufbau/kits/preact-htm" : `${pkg}/aufbau/kits/preact-htm.js`,
+      "@aufbau/builders/docs"   : `${pkg}/aufbau/builders/docs/index.js`,
+      "@aufbau/builders/docs/"  : `${pkg}/aufbau/builders/docs/`,
       "@aufbau/elements"        : `${pkg}/aufbau/elements/index.js`,
-      "@domina/core"            : `${pkg}/domina/core/index.js`,
-      "preact"                  : `https://esm.sh/preact@${PREACT}`,
-      "preact/hooks"            : `https://esm.sh/preact@${PREACT}/hooks`,
-      "htm"                     : "https://esm.sh/htm@3.1.1",
-      "hljs"                    : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm"
+      "@aufbau/elements/"       : `${pkg}/aufbau/elements/`,
+      "@aufbau/filters"         : `${pkg}/aufbau/filters/index.js`,
+      "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
+      "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
+      "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
+      "@aufbau/js"              : `${pkg}/aufbau/js/index.js`,
+      "@aufbau/js/"             : `${pkg}/aufbau/js/`,
+      "@aufbau/kits/preact-htm" : `${pkg}/aufbau/kits/preact-htm.js`,
+      "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
+      "@aufbau/runtime"         : `${pkg}/aufbau/runtime/index.js`,
+      "@aufbau/runtime/"        : `${pkg}/aufbau/runtime/`,
+      "@aufbau/store"           : `${pkg}/aufbau/store/index.js`,
+      "@aufbau/stylesheet"      : `${pkg}/aufbau/stylesheet/index.js`,
+      "@aufbau/stylesheet/"     : `${pkg}/aufbau/stylesheet/`,
+      "@aufbau/svg/"            : `${pkg}/aufbau/svg/`,
+      "@aufbau/utils"           : `${pkg}/aufbau/js/index.js`,
+      "@aufbau/webfonts"        : `${pkg}/aufbau/webfonts/index.js`,
+      "@aufbau/webfonts/"       : `${pkg}/aufbau/webfonts/`,
+      "@aufbau/webfonts/google" : `${pkg}/aufbau/webfonts/google.js`,
+
+      "@bunker/cache"   : `${pkg}/bunker/cache/index.js`,
+      "@bunker/core"    : `${pkg}/bunker/core/index.js`,
+      "@bunker/db"      : `${pkg}/bunker/db/index.js`,
+      "@bunker/kit"     : `${pkg}/bunker/kit/index.js`,
+      "@bunker/policy"  : `${pkg}/bunker/policy/index.js`,
+      "@bunker/storage" : `${pkg}/bunker/storage/index.js`,
+      "@bunker/utils"   : `${pkg}/bunker/utils/index.js`,
+      "@bunker/utils/"  : `${pkg}/bunker/utils/`,
+      
+      "@domina/core" : `${pkg}/domina/core/index.js`,
+
+      "@pulgasari/array"  : `${pkg}/js/array.js`,
+      "@pulgasari/is"     : `${pkg}/js/is.js`,
+      "@pulgasari/logger" : `${pkg}/js/logger.js`,
+      "@pulgasari/obj"    : `${pkg}/js/obj.js`,
+      "@pulgasari/random" : `${pkg}/js/random.js`,
+      "@pulgasari/str"    : `${pkg}/js/str.js`,
+      "@pulgasari/timing" : `${pkg}/js/timing.js`,
+      "@pulgasari/url"    : `${pkg}/js/url.js`,
+
+      "preact"             : `https://esm.sh/preact@${PREACT}`,
+      "preact/hooks"       : `https://esm.sh/preact@${PREACT}/hooks`,
+      "preact/jsx-runtime" : `https://esm.sh/preact@${PREACT}/jsx-runtime`,
+      "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact",
+
+      
+      "htm"              : "https://esm.sh/htm@3.1.1",
+      "htm/preact"       : `https://esm.sh/htm@3.1.1/preact?deps=preact@${PREACT}`,
+      
+      "hljs"                    : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
+      "highlight.js"            : `https://esm.sh/highlight.js@${HLJS}/lib/core`,
+      "highlight.js/languages/" : `https://esm.sh/highlight.js@${HLJS}/lib/languages/`,
     };
   }
 })();
