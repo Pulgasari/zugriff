@@ -97,7 +97,7 @@ state.openGithubFile = (meta) => {
     content: meta.content,
     language: languageOf(meta.path),
     isDirty: false,
-    readOnly: !!meta.binary,
+    readOnly: !!meta.binary || !!meta.readOnly,
     gh: { owner: meta.owner, name: meta.name, branch: meta.branch, path: meta.path, sha: meta.sha },
   });
 };

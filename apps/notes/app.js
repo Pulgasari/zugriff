@@ -7,11 +7,10 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 import { renderMD } from '@aufbau/import';
 
 // ::: shared
-import { boot, config }      from '/.shared/js/app.js?slug=notes';
-import { Icon, AppSettings } from '/.shared/js/components/index.js';
+import { boot, config }               from '/.shared/js/app.js?slug=notes';
+import { Icon, AppSettings, InstallTip, toast } from '/.shared/js/components/index.js';
 import { stored }            from '/.shared/js/lib/signals.js';
 import * as fs               from '/.shared/js/filesystem/fsaccess.js';
-import * as pwa              from '/.shared/js/lib/pwa.js';
 
 // ::: local
 import * as db from './db.js';
@@ -28,30 +27,6 @@ function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className
     </button>`;
 }
 
-// the one real cure for re-granting every visit: install the app, so the
-// browser persists folder permissions ("Allow on every visit"). only shown
-// while folders are in use and the app isn't installed yet.
-function InstallTip () {
-  if (pwa.installed.value || !db.sources.value.length) return null;
-  return html`
-    <div class="install-tip">
-      <${Icon} name="info" size=${15} />
-      <div class="install-tip-body">
-        <span>Install the app so your folders stay connected between visits — no reconnecting.</span>
-        ${pwa.canInstall.value
-          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="download"/> Install app</button>`
-          : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
-      </div>
-    </div>`;
-}
-
-function Toast () {
-  const t = toast.value;
-  if (!t) return null;
-  return html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>`;
-}
-
 // :::::: STATE
 
 // the open note, addressed by folder + path so it survives a rescan (the tree
@@ -61,14 +36,10 @@ const filter   = signal('');                       // tree filter query
 const expanded = stored([], 'notes:expanded');     // ['sourceId:dir/path', …]
 const navOpen  = signal(false);                     // mobile: is the tree drawer showing
 const noteToc  = signal([]);                        // headings of the open note
-const toast    = signal(null);
 
-let toastTimer = null;
-function flash (text, kind = 'ok') {
-  toast.value = { text, kind };
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 2500);
-}
+// the shared toast system (zugriff.toast / <aufbau-toast>) replaces the old
+// bottom-centre pill; `flash` stays as the app's thin adapter over it
+const flash = (text, kind = 'ok') => kind === 'err' ? toast.error(text) : toast.success(text);
 
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
@@ -240,7 +211,7 @@ function Sidebar () {
       </div>
 
       <div class="side-foot">
-        <${InstallTip} />
+        <${InstallTip} show=${db.sources.value.length > 0} />
         <button class="btn small primary" onClick=${addFolder}>
           <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>
       </div>
@@ -450,7 +421,6 @@ function App () {
       <${Sidebar} />
       ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
       <main class="main"><${Reader} /></main>
-      <${Toast} />
     </div>`;
 }
 

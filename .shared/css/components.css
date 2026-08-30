@@ -611,6 +611,34 @@ aufbau-picker, .picker {
 .handle-s .handle-label { left: 0; }
 .handle-e .handle-label { right: 0; left: auto; }
 
+/* ────────── sidebar (shared shell — components/Sidebar.js) ────────── */
+/* a static column on a wide screen; a slide-in drawer with a scrim on a phone.
+   apps put their own look on the aside via the `class` prop — this only owns the
+   responsive drawer mechanics. */
+
+.z-sidebar-scrim { display: none; }
+
+@media (max-width: 720px) {
+  .z-sidebar {
+    position   : fixed;
+    inset      : 0 auto 0 0;
+    z-index    : 40;
+    max-inline-size: min(20rem, 82vw);
+    transform  : translateX(-100%);
+    transition : transform 0.2s ease;
+    overflow-y : auto;
+  }
+  .z-sidebar.is-open { transform: translateX(0); }
+
+  .z-sidebar-scrim.is-open {
+    display    : block;
+    position   : fixed;
+    inset      : 0;
+    z-index    : 39;
+    background : rgb(0 0 0 / 0.4);
+  }
+}
+
 /* ────────── .install-tip ────────── */
 
 .install-tip {

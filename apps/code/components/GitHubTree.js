@@ -24,6 +24,7 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
   const indent   = depth * 16;
   const repo     = github.repo.value;
   const branch   = github.branch.value;
+  const readOnly = !!repo?.readOnly;
 
   const fail = e => setErr(e.message || String(e));
 
@@ -42,7 +43,7 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
     setIsLoading(true); setErr(null);
     try {
       const { text, binary } = await github.readBlob(entry.sha);
-      state.openGithubFile({ owner: repo.owner, name: repo.name, branch, path: fullPath, sha: entry.sha, content: binary ? '' : text, binary });
+      state.openGithubFile({ owner: repo.owner, name: repo.name, branch, path: fullPath, sha: entry.sha, content: binary ? '' : text, binary, readOnly });
       state.closeModal();
     } catch (e) { fail(e); } finally { setIsLoading(false); }
   };
@@ -82,7 +83,7 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
     else { await github.renamePath(cb.ctx.path, dest, m); clipboard.value = null; if (!cb.isDir) state.closeById(idOf(cb.ctx.path)); }
   });
 
-  const items = [
+  const items = readOnly ? [] : [
     isDir && { label: 'New File',   icon: 'material-symbols:note-add-outline',        onClick: newFile },
     isDir && { label: 'New Folder', icon: 'material-symbols:create-new-folder-outline', onClick: newFolder },
     isDir && clipboard.value?.source === 'github' && { label: 'Paste', icon: 'paste', onClick: paste },
@@ -103,7 +104,7 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
         <${Icon} name=${isDir ? (isOpen ? 'folder-open' : 'folder') : 'file'} color=${isDir ? '#f6c744' : '#888'} size="16" />
         <span class="tree-name">${entry.path}</span>
         ${!isDir && isLoading && html`<${Icon} name="material-symbols:progress-activity" size="14" />`}
-        <${RowMenu} items=${items} />
+        ${items.length > 0 && html`<${RowMenu} items=${items} />`}
       </div>
 
       ${err && html`<div class="tree-empty" style="color:var(--c-null,#e06c75)">${err}</div>`}

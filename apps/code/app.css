@@ -553,6 +553,28 @@ select {
 .gh-repolist li:nth-child(2n+1) { background: var(--zebra); }
 .gh-reponame { overflow: hidden; text-overflow: ellipsis; }
 
+/* a repo row splits into a clickable name area + a trailing action (remove) */
+.gh-reporow {
+  display     : flex;
+  align-items : center;
+  gap         : 0.4rem;
+  flex        : 1 1 auto;
+  min-width   : 0;
+  cursor      : pointer;
+}
+.gh-ro {
+  flex        : none;
+  margin-left : auto;
+  font-size   : 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity     : 0.55;
+}
+
+.gh-public { display: flex; flex-direction: column; gap: 0.5rem; }
+.gh-public .search-row { display: flex; align-items: center; gap: 0.4rem; }
+.gh-public .search-row .gh-input { flex: 1 1 auto; }
+
 .gh-repobar {
   display      : flex;
   align-items  : center;

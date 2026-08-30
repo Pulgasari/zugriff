@@ -30,15 +30,7 @@ name: Build Capacitor packages
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
-  workflow_dispatch:        # run it on demand — the main way to use this for now
-  push:
-    branches: [main]
-    paths:                  # only when something that affects a package changes
-      - '.shared/js/registry.js'
-      - '.shared/js/filesystem/**'
-      - '.github/scripts/gen-capacitor-config.mjs'
-      - '.github/scripts/get-capacitor-apps.js'
-      - '.github/workflows/build-capacitor.yml'
+  workflow_dispatch:        # manual only — packaging never runs on a commit
 
 permissions:
   contents: read
