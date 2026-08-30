@@ -90,7 +90,7 @@
 
 /* ── cover ───────────────────────────────────────────────────────────────── */
 
-.cover { object-fit: cover; display: block; background: var(--panel-2); flex: none; }
+.cover    { object-fit: cover; display: block; background: var(--panel-2); flex: none; }
 .cover.ph { display: inline-flex; align-items: center; justify-content: center; color: var(--fg-50); }
 
 /* ── songs table ─────────────────────────────────────────────────────────── */
