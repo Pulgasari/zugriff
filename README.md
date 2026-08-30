@@ -4,8 +4,8 @@
 
 client-side mini-PWAs. static files only — no build step, no bundler, no node or deno. ESM in the browser, served straight off GitHub Pages.
 
-- https://zugriff.dev/
-- [zugriff/cli](https://zugriff.dev/cli/)
+- [zugriff.dev](https://zugriff.dev)
+- [cli](https://zugriff.dev/cli/)
 - [apps](https://zugriff.dev/apps/)
 - [tools](https://zugriff.dev/tools/)
 
