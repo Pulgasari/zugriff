@@ -43,3 +43,4 @@
 ## misc
 
 - [x] urls der der apps/tools direkt als unterpfad der domain ohne sie aus den `apps`- bzw. `tools`-ordnern eine ebene höher schieben zu müssen. also z.b `zugriff.dev/code` statt `zugriff.dev/apps/code`. (theoretisch wären subdomains noch nicer, aber das macht vermutlich caching, resourcen-sharing usw wieder übertrieben komplizierter)
+- [ ] komplettes refactoring des CSS (das mache ich. und habe damit schon angefangen bzw. bin mittendrin. also das muss dich erstmal nicht jucken wenn du irgendwo kaputtes css bemerkst, ist dann vermutlich dem noch-im-umbau-refactor-prozess)
