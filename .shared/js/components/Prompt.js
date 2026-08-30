@@ -1,5 +1,4 @@
-// shared/js/components/Prompt.js
-//
+// components/Prompt.js
 // a single overlay shared by everything that needs to ask for one value.
 // render <${Prompt} /> once per app, call openPrompt() from anywhere.
 
@@ -8,11 +7,11 @@ import GhostButton from './GhostButton.js';
 
 const promptState = signal(null);
 
-export function openPrompt ({ title, placeholder = '', type = 'text', value = '', onConfirm, onCancel }) {
+function openPrompt ({ title, placeholder = '', type = 'text', value = '', onConfirm, onCancel }) {
   promptState.value = { title, placeholder, type, value, onConfirm, onCancel };
 }
 
-export function Prompt () {
+function Prompt () {
   const state = promptState.value;
   if (!state) return null;
 
@@ -54,4 +53,6 @@ export function Prompt () {
     </div>`;
 }
 
+export       { Prompt, openPrompt };
 export default Prompt;
+
