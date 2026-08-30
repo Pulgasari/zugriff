@@ -11,6 +11,13 @@
   <link rel="stylesheet" href="/.shared/css/launcher.css">
   
   <script src="/.shared/js/boot.js"></script>
+
+  <style>
+    /* the moving grid backdrop sits behind the page content but in front of the
+       themed body background; content is lifted above it */
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12; }
+    body > #app, #welcome, header, footer { position: relative; z-index: 1; }
+  </style>
 </head>
 
 <body class="mobilefix">
@@ -25,7 +32,8 @@
 const route = window.location.pathname.split('/')[1] || 'home';
 
 // :::::: IMPORTS
-import { applyFilter } from '@aufbau/filters';
+import { applyFilter }    from '@aufbau/filters';
+import { animatePattern } from '@aufbau/patterns';
 import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
 const { computed, signal, useEffect, useRef } = preact;
 
@@ -52,7 +60,7 @@ let site;
 // ::: Page: Home
 
 if (route === 'home') {
-  aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
+  await aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
 function HomePage () {
   return html`
     <div id='app'>
@@ -96,7 +104,16 @@ function HomePage () {
 }
   site = html`<${HomePage}/>`;
   preact.render(site, document.body);
-} 
+
+  // a slow grid drifting downward behind the landing. the pattern is painted as
+  // a background, so the scroll is independent of anything else on the page; the
+  // fg is read off the resolved theme and baked in (a css var cannot resolve
+  // inside a background-image), the visible strength comes from .bg-grid opacity.
+  const fg  = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
+  const bg  = Object.assign(document.createElement('div'), { className: 'bg-grid' });
+  document.body.appendChild(bg);
+  animatePattern(bg, 'grid', { motion: 'down', speed: '22s', size: 44, width: 1, fg, bg: 'transparent' });
+}
 
 // ::: Page: Apps | Tools
 else {
