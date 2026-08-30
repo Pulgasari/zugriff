@@ -2,7 +2,10 @@
 
 import Button from './Button.js';
 
-export default function GhostButton (props) {
+function GhostButton (props) {
   props.className = 'ghost';
   return Button(props);
 }
+
+export       { GhostButton };
+export default GhostButton;
