@@ -528,6 +528,12 @@ aufbau-picker, .picker {
    &.err { border-color: color-mix(in oklch, var(--c-null, #e06c75) 55%, var(--line)); color: var(--c-null, #e06c75); }
 }
 
+.toasts { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 60;
+  display: flex; flex-direction: column; gap: 0.5rem; align-items: center; pointer-events: none; }
+.toast { background: var(--panel); border: 1px solid var(--line); border-radius: 2rem;
+  padding: 0.5rem 1rem; font-size: 0.85rem; box-shadow: var(--shadow); }
+.toast.err { border-color: var(--c-null, #e06c75); color: var(--c-null, #e06c75); }
+
 /* ────────── waveform ────────── */
 
 .waveform-wrap {
@@ -591,6 +597,7 @@ aufbau-picker, .picker {
 .handle-s .handle-label { left: 0; }
 .handle-e .handle-label { right: 0; left: auto; }
 
+/* ────────── .install-tip ────────── */
 
 .install-tip {
   display: flex; align-items: center; flex-wrap: wrap;
