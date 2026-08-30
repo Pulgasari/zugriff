@@ -7,7 +7,7 @@
 
 import { html, useRef, useEffect } from '@aufbau/kits/preact-htm';
 
-export default function Waveform ({ peaks, start, end, duration, playPos }) {
+function Waveform ({ peaks, start, end, duration, playPos }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -48,3 +48,6 @@ export default function Waveform ({ peaks, start, end, duration, playPos }) {
   if (!peaks) return null;
   return html`<canvas ref=${canvasRef} class="waveform-canvas" />`;
 }
+
+export       { Waveform };
+export default Waveform;
