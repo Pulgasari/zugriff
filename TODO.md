@@ -4,7 +4,7 @@
 
 - [x] create `apps/code`
 - [x] create `apps/icons`
-- [x] rename `apps/file-explorer` to `apps/files`
+- [x] rename `apps/file-explorer` to `apps/files`.
 - [x] rename `apps/rss-reader` to `apps/feeds`
 
 ### code
@@ -16,6 +16,8 @@
 ---
 
 ## shared
+
+- [ ] neuen boot-mechanismus fertigszellen
 
 ### settings component
 
