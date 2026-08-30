@@ -94,7 +94,7 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 
 /* ── dropzone (<aufbau-upload look='dropzone'>) ─────────────────────────── */
 
-.dropzone {
+aufbau-upload[look="dropzone"], .dropzone {
   display: block;
   width  : 100%;
 
