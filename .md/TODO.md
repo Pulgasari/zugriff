@@ -17,7 +17,8 @@
 
 ## shared
 
-- [ ] neuen boot-mechanismus (`.shared/js/boot2.js`) fertigstellen. ersetzt dann `importmap.js`, `theme-boot.js`
+- [ ] neuen boot-mechanismus (`.shared/js/boot.js`) fertigstellen. ersetzt dann `importmap.js`, `theme-boot.js` usw.
+- [ ] ich hab angefangen ne globale runtime (als `zugriff` am `window` bzw. `globalThis`) zu konstruieren, sodass components fortan in den apps via `zugriff.components` genutzt werden können, prompts via `zugriff.openPrompts` getriggert, oder settings-panel via `zugriff.toggleSettings` (wäre für Toasts bspw. ebenfalls sinnvoll das dort zu binden)
 
 ### components
 - [ ] Warum nutzt `.shared/js/components/WaveForm.js` nicht `<aufbau-waveform>` (`aufbau/elements/AufbaueWaveform'? Muss AufbauWaveform evtl. erweitert werden?
