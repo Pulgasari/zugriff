@@ -105,5 +105,5 @@ a { color: var(--accent); }
   --c-null   : #e06c75;
 }
 
-html { background : black; }
+html { background : red; }
 body { background : var(--bg); color : var(--fg); }
