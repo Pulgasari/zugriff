@@ -30,12 +30,6 @@ const noteToc  = signal([]);                        // headings of the open note
 
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
-function toggleExpand (sourceId, path) {
-  const k = keyOf(sourceId, path);
-  expanded.value = expanded.value.includes(k)
-    ? expanded.value.filter(x => x !== k)
-    : [...expanded.value, k];
-}
 
 function openNote (sourceId, node) {
   open.value = { sourceId, path: node.path };
@@ -66,42 +60,46 @@ function filterTree (node, q) {
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
 // :::::: SIDEBAR TREE
+// the tree itself is <aufbau-tree>; this maps a scanned folder into the node
+// shape it renders, and the value on each node ("f:"/"d:" + sourceId + path)
+// is what the select/toggle events hand back so we can act on it.
 
-function TreeItem ({ sourceId, node, depth, forceOpen }) {
-  const pad = { paddingLeft: `${0.4 + depth * 0.85}rem` };
+const nodeValue = (kind, sourceId, path) => `${kind}:${sourceId}:${path}`;
+function parseValue (v = '') {
+  const kind = v.slice(0, 1);
+  const rest = v.slice(2);
+  const sep  = rest.indexOf(':');
+  return { kind, sourceId: rest.slice(0, sep), path: rest.slice(sep + 1) };
+}
 
-  if (node.kind === 'file') {
-    const active = open.value?.sourceId === sourceId && open.value?.path === node.path;
-    return html`
-      <button class=${'tree-file' + (active ? ' active' : '')} style=${pad}
-              onClick=${() => openNote(sourceId, node)} title=${node.path}>
-        <${Icon} name="mdi:file-document-outline" />
-        <span class="tree-label">${titleOf(node)}</span>
-      </button>`;
-  }
+function toTreeNodes (dir, sourceId, forceOpen) {
+  return (dir.children ?? []).map(child => child.kind === 'file'
+    ? {
+        label    : titleOf(child),
+        value    : nodeValue('f', sourceId, child.path),
+        icon     : 'mdi:file-document-outline',
+        selected : open.value?.sourceId === sourceId && open.value?.path === child.path,
+      }
+    : {
+        label    : child.name,
+        value    : nodeValue('d', sourceId, child.path),
+        expanded : forceOpen || isExpanded(sourceId, child.path),
+        children : toTreeNodes(child, sourceId, forceOpen),
+      });
+}
 
-  // a directory node (root dirs render their children only, without a header row)
-  const isRoot = depth < 0;
-  const show   = isRoot || forceOpen || isExpanded(sourceId, node.path);
+function onTreeSelect (e) {
+  const { kind, sourceId, path } = parseValue(e.detail?.value);
+  if (kind === 'f') { open.value = { sourceId, path }; navOpen.value = false; }
+}
 
-  const kids = show && html`
-    <div class="tree-children">
-      ${node.children.map(child => html`
-        <${TreeItem} key=${child.path} sourceId=${sourceId} node=${child}
-                     depth=${depth + 1} forceOpen=${forceOpen} />`)}
-    </div>`;
-
-  if (isRoot) return kids || null;
-
-  return html`
-    <div class="tree-dir-wrap">
-      <button class="tree-dir" style=${pad} onClick=${() => toggleExpand(sourceId, node.path)}>
-        <${Icon} name=${show ? 'mdi:chevron-down' : 'mdi:chevron-right'} className="tree-caret" />
-        <${Icon} name=${show ? 'mdi:folder-open-outline' : 'mdi:folder-outline'} />
-        <span class="tree-label">${node.name}</span>
-      </button>
-      ${kids}
-    </div>`;
+function onTreeToggle (e) {
+  const { kind, sourceId, path } = parseValue(e.detail?.value);
+  if (kind !== 'd') return;
+  const k = keyOf(sourceId, path);
+  const has = expanded.value.includes(k);
+  if (e.detail.expanded && !has)      expanded.value = [...expanded.value, k];
+  else if (!e.detail.expanded && has) expanded.value = expanded.value.filter(x => x !== k);
 }
 
 function SourceBlock ({ source }) {
@@ -142,7 +140,9 @@ function SourceBlock ({ source }) {
   } else {
     const view = q && tree ? filterTree(tree, q) : tree;
     body = view && view.children.length
-      ? html`<${TreeItem} sourceId=${source.id} node=${view} depth=${-1} forceOpen=${!!q} />`
+      ? html`<aufbau-tree nodes=${toTreeNodes(view, source.id, !!q)}
+                          onaufbau-tree-select=${onTreeSelect}
+                          onaufbau-tree-toggle=${onTreeToggle}></aufbau-tree>`
       : html`<div class="src-empty">${q ? 'No matches' : 'No markdown files here'}</div>`;
   }
 
