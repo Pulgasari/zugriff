@@ -1,8 +1,4 @@
-.notes-app {
-  height  : 100%;
-  display : flex;
-  overflow: hidden;
-}
+#app { flex-direction: row; }
 
 /* ── shared controls (kept in step with the other apps) ───────────────────── */
 
@@ -120,7 +116,7 @@
 
 /* ── main / reader ───────────────────────────────────────────────────────── */
 
-.main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+#app-main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
 
 .empty {
   margin: auto; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;

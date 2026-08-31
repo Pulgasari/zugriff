@@ -9,7 +9,7 @@
 // like every app under /apps it draws its own chrome — there is no tools Shell.
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=icons';
@@ -330,16 +330,15 @@ function App () {
   }, []);
 
   return html`
-    <div class="icons-app">
+    <${Fragment}>
       <${Sidebar} />
       ${nav.value && html`<div class="scrim-mobile" onClick=${() => nav.value = false}></div>`}
-      <main class="main">
+      <main id="app-main">
         <${TopBar} />
         <div class="content"><${Content} /></div>
       </main>
       <${Detail} />
-
-    </div>`;
+    </${Fragment}>`;
 }
 
 boot({ config, App });

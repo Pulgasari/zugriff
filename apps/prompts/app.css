@@ -7,23 +7,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 */
-#app-body {
+/* ── layout ── */
+#app-main {
   width: 100%;
   max-width: 1200px;
-  /*
-  min-height: 0;
-  flex: 1 0 10px;
-  */
-}
-
-.panel-layout   { height: 100%; }
-
-/* ── layout ── */
-.panel-layout {
+  margin: 0 auto;
   display: grid;
   grid-template-columns: 280px 1fr;
   height: 100%;
-  width: 100%;
 }
 
 /* ── sidebar ── */
@@ -222,18 +213,18 @@
 @media (max-width: 640px) {
   body { overflow: hidden; }
 
-  .panel-layout {
+  #app-main {
     grid-template-columns : 1fr;
     grid-template-rows    : 1fr;
   }
 
   /* show sidebar by default */
-  .panel-layout .sidebar        { display: flex; }
-  .panel-layout > :nth-child(2) { display: none; }
+  #app-main .sidebar        { display: flex; }
+  #app-main > :nth-child(2) { display: none; }
 
   /* when detail active — swap visibility */
-  .panel-layout.mobile-detail .sidebar { display: none; }
-  .panel-layout.mobile-detail > :nth-child(2) { display: flex; }
+  #app-main.mobile-detail .sidebar { display: none; }
+  #app-main.mobile-detail > :nth-child(2) { display: flex; }
 
   .mobile-only { display: flex; }
 

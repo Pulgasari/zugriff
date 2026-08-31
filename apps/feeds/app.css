@@ -1,14 +1,9 @@
 /* apps/feeds/app.css */
 
-.rss-app {
-  flex      : 1 1 auto;
-  display   : flex;
-  min-height: 0;
-  min-width : 0;
-}
+#app { flex-direction: row; }
 .booting { margin: auto; color: var(--accent); }
 
-.main {
+#app-main {
   flex          : 1 1 auto;
   display       : flex;
   flex-direction: column;

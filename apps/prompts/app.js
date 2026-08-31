@@ -378,11 +378,9 @@ function Detail() {
 function App() {
   let mp = mobilePane.value;
   return html`
-    <div id="app-body">
-      <div class=${'panel-layout' + (mp === 'detail' ? ' mobile-detail' : '')}>
-        <${Sidebar} />
-        <${Detail} />
-      </div>
+    <div id="app-main" class=${mp === 'detail' ? 'mobile-detail' : ''}>
+      <${Sidebar} />
+      <${Detail} />
     </div>
   `;
 }

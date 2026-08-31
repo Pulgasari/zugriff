@@ -3,8 +3,7 @@
    the reset, the theme tokens and the #app frame come from ./../base.css.
    this app has two faces: a library grid and a full-bleed reader. */
 
-.ebooks-app { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
-.main { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+#app-main { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
 /* ── shared controls (kept in step with the other apps) ───────────────────── */
 

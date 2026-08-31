@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
+import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=files';
@@ -137,7 +137,7 @@ function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
   return html`
-    <div id="app">${
+    <${Fragment}>${
         isNotSupported() ? html`<${Unsupported} />`
       : isLoading()      ? html`<${Icon} name='loading' />`
       : isWelcome()      ? html`<${Welcome} />`
@@ -147,7 +147,7 @@ function App () {
       <main id="app-main">
         <${FileExplorer} backend=${backend.value} />
       </main>`
-    }</div>
+    }</${Fragment}>
   `;
 }
 

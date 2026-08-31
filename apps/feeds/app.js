@@ -3,7 +3,7 @@
 // :::::: IMPORT
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=feeds';
@@ -343,17 +343,16 @@ function App () {
   if (!db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   return html`
-    <div class="rss-app">
+    <${Fragment}>
       <${Sidebar} />
       ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
-      <main class="main">
+      <main id="app-main">
         <${Header} />
         <div class="body-scroll"><${Body} /></div>
       </main>
       ${dialog.value === 'add'      && html`<${AddDialog} />`}
       ${dialog.value === 'settings' && html`<${SettingsDialog} />`}
-
-    </div>`;
+    </${Fragment}>`;
 }
 
 // :::::: BOOT

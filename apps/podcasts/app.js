@@ -3,9 +3,9 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
+import aufbau, { html, preact, effect } from '@aufbau/kits/preact-htm';
 //const { signal } = aufbau;
-const { computed, signal, useEffect, useRef, useSignal } = preact;
+const { computed, signal, useEffect, useRef, useSignal, Fragment } = preact;
 
 // ::: shared
 import { boot, config }         from '/.shared/js/app.js?slug=podcasts';
@@ -37,6 +37,15 @@ function buildResizer (url, w) {
   return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
 }
 const thumbs = createThumbCache({ resizer: buildResizer });
+
+// the frame reads menu/player placement off #app's data-attributes; keep them
+// in sync so the layout responds without an extra wrapper element
+effect(() => {
+  const el = document.getElementById('app');
+  if (!el) return;
+  el.dataset.menu   = menuPos.value;
+  el.dataset.player = playerPos.value;
+});
 
 // :::::: UI STATE ::::::::::::::::::::::::::::::::::::::::::
 
@@ -757,8 +766,8 @@ function App () {
   }, []);
 
   return html`
-    <div class="pc-app" data-menu=${menuPos.value} data-player=${playerPos.value}>
-      <div class="pc-body">
+    <${Fragment}>
+      <div id="app-main">
         <${Sidebar} />
         <main class="main"><${Body} /></main>
       </div>
@@ -766,7 +775,7 @@ function App () {
       ${dialog.value === 'add'      && html`<${AddDialog} />`}
       ${dialog.value === 'settings' && html`<${SettingsDialog} />`}
       <${Busy} />
-    </div>`;
+    </${Fragment}>`;
 }
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::

@@ -397,13 +397,9 @@ function App () {
   }
 
   const r = route.value;
-  return html`
-    <div class="ebooks-app">
-      ${r.name === 'reader'
-        ? html`<${ReaderView} bookKey=${r.key} key=${r.key} />`
-        : html`<main class="main"><${Library} /></main>`}
-      
-    </div>`;
+  return r.name === 'reader'
+    ? html`<${ReaderView} bookKey=${r.key} key=${r.key} />`
+    : html`<main id="app-main"><${Library} /></main>`;
 }
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::

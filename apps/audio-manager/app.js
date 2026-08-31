@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot, config }                  from '/.shared/js/app.js?slug=audio-manager';
@@ -409,13 +409,13 @@ function Welcome () {
 function App () {
   useEffect(() => { db.load().catch(err => flash('Could not open the library: ' + err.message, 'err')); return dropCovers; }, []);
 
-  if (!fs.supported())          return html`<div class="am-app centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)          return html`<div class="am-app centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
-  if (!db.sources.value.length) return html`<div class="am-app centered"><${Welcome} /></div>`;
+  if (!fs.supported())          return html`<div class="centered"><${Unsupported} /></div>`;
+  if (!db.ready.value)          return html`<div class="centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
+  if (!db.sources.value.length) return html`<div class="centered"><${Welcome} /></div>`;
 
   return html`
-    <div class="am-app">
-      <div class="am-body">
+    <${Fragment}>
+      <div id="app-main">
         <${Sidebar} />
         ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
         <main class="main">
@@ -424,8 +424,7 @@ function App () {
         </main>
       </div>
       <${PlayerBar} />
-
-    </div>`;
+    </${Fragment}>`;
 }
 
 boot({ config, App });

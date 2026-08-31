@@ -9,7 +9,7 @@
 // (ported from image-editor); library, convert and batch land in later phases.
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
+import { html, Fragment, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
 import { useGesture } from '@aufbau/gestures/preact';
 
 // ::: shared
@@ -1593,16 +1593,16 @@ function ModeBar () {
 function App () {
   useEffect(() => { wireLaunchQueue(); return () => revokeAll(); }, []);
   return html`
-    <div class="im-app">
+    <${Fragment}>
       <${ModeBar} />
-      <div class="im-body">
+      <div id="app-main">
         ${screen.value === 'library' ? html`<${LibraryMode} />`
           : screen.value === 'edit'    ? html`<${EditMode} />`
           : screen.value === 'convert' ? html`<${ConvertMode} />`
           : screen.value === 'batch'   ? html`<${BatchMode} />`
           :                              html`<${ViewMode} />`}
       </div>
-    </div>`;
+    </${Fragment}>`;
 }
 
 // :::::: BOOT :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -4,7 +4,7 @@
    top bar, a full-bleed stage and a thumbnail strip; the stage goes edge to
    edge and the image sits on a darker ground so photos read cleanly. */
 
-.iv-app {
+#app-main {
   flex          : 1 1 auto;
   display       : flex;
   flex-direction: column;
@@ -156,7 +156,7 @@
 
 /* ── immersive (chrome hidden) ───────────────────────────────────────────── */
 
-.iv-app.bare .iv-stage { background: #000; }
+#app-main.bare .iv-stage { background: #000; }
 
 /* ── welcome / empty ─────────────────────────────────────────────────────── */
 

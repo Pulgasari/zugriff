@@ -292,7 +292,7 @@ function App () {
   const dragging = zoom.value > 1;
 
   return html`
-    <div class=${'iv-app' + (bare.value ? ' bare' : '')}
+    <div id="app-main" class=${bare.value ? 'bare' : ''}
          onDragOver=${e => e.preventDefault()} onDrop=${onDrop}>
       ${!bare.value && html`<${TopBar} />`}
 

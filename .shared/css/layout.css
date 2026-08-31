@@ -1,7 +1,9 @@
 /* shared/css/layout.css
-   the app shell: #app wraps #app-head / #app-body / #app-foot. */
+   the tools shell: #app wraps #app-head / #app-body / #app-foot. these rules
+   are scoped to pages that render the Shell (they have an #app-head); the plain
+   #app frame for the type:'app' apps lives in theme.css and stays untouched. */
 
-#app {
+#app:has(> #app-head) {
   display         : flex;
   flex-flow       : column nowrap;
   align-items     : center;

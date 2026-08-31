@@ -573,7 +573,7 @@ function App () {
   }, []);
 
   return html`
-    <div class="ed">
+    <div id="app-main">
       <${Toolbar} onOpen=${pick} />
       ${mode.value === 'crop' && html`<${CropBar} />`}
       <div class="body">
