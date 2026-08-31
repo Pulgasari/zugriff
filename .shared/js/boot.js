@@ -17,6 +17,13 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
   const currentScript = document.currentScript;
   if (!currentScript) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
 
+   const root = document.documentElement;
+   root.classList.add('is-loading');
+   window.addEventListener('load', () => {
+     root.classList.remove('is-loading');
+     root.classList.add('is-ready');
+   });
+
   // Merge options: HTML data-attributes < global window config < default options
   const ds = currentScript.dataset;
   const userConfig = window.__BOOT_CONFIG__ || {};
