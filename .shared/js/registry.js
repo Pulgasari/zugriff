@@ -108,10 +108,6 @@ const entries = [
     icon        : 'mdi:image-multiple-outline',
     description : 'View, edit, convert and batch-process images, and browse image folders — all on your device.',
     categories  : ['image'],
-    // one app, several modes switched by ?mode= (a query param, not a subpath —
-    // the launcher rewrite only serves the shell for /images/). it registers as
-    // an image handler, like the viewer, so the OS "open with" sends files here;
-    // the shortcuts deep-link a mode.
     manifest    : {
       launch_handler : { client_mode: ['focus-existing', 'auto'] },
       file_handlers  : [{
