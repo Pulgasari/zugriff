@@ -9,7 +9,7 @@ const { computed, signal, useEffect, useRef, useSignal } = preact;
 
 // ::: shared
 import { boot, config }         from '/.shared/js/app.js?slug=podcasts';
-import { Icon, SettingsGroups } from '/.shared/js/components/index.js';
+import { Icon, IconButton, Button, Empty, SettingsGroups } from '/.shared/js/components/index.js';
 import { stored }               from '/.shared/js/lib/signals.js';
 import { appGroup }             from '/.shared/js/lib/settings.js';
 import { createThumbCache }     from '/.shared/js/lib/thumbs.js';
@@ -43,15 +43,10 @@ const thumbs = createThumbCache({ resizer: buildResizer });
 const route    = signal({ name: 'latest' });   // { name, id? }
 const search   = signal('');                   // the episode filter, per view
 const dialog   = signal(null);                 // 'add' | 'settings' | null
-const toast    = signal(null);                 // { text, kind }
 const busy     = signal('');                   // a label while a long task runs
 
-let toastTimer = null;
-function flash (text, kind = 'ok') {
-  toast.value = { text, kind };
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 3000);
-}
+const flash = (text, kind = 'ok') =>
+  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
 
 // navigating always clears the current filter
 const go = (name, id) => { route.value = { name, id }; search.value = ''; };
@@ -166,13 +161,6 @@ function ProgressBar ({ state }) {
   return html`<span class="ep-progress"><span class="ep-progress-fill" style=${`width:${pct}%`}></span></span>`;
 }
 
-function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className = '' }) {
-  return html`
-    <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} />
-    </button>`;
-}
 
 // the play/pause control for one episode, reflecting the live player state
 function PlayToggle ({ episode, size = 20 }) {
@@ -211,10 +199,10 @@ function EpisodeRow ({ episode, showPodcast = false }) {
       </div>
       <div class="ep-actions">
         <${PlayToggle} episode=${episode} />
-        <${IconBtn} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
+        <${IconButton} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
                     label=${st.saved ? 'Remove from list' : 'Save for later'}
                     active=${st.saved} onClick=${() => db.toggleSaved(episode.id)} />
-        <${IconBtn} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+        <${IconButton} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
                     label=${st.done ? 'Mark unplayed' : 'Mark as done'}
                     active=${st.done} onClick=${() => db.toggleDone(episode.id)} />
         ${episode.link && html`
@@ -231,16 +219,6 @@ function SortPicker ({ value, options, onChange }) {
       ${options.map(([val, label]) => html`
         <button key=${val} class=${'seg-btn' + (value === val ? ' active' : '')}
                 onClick=${() => onChange(val)}>${label}</button>`)}
-    </div>`;
-}
-
-function Empty ({ icon, title, hint, action }) {
-  return html`
-    <div class="empty">
-      <${Icon} name=${icon} />
-      <p class="empty-title">${title}</p>
-      ${hint && html`<p class="empty-hint">${hint}</p>`}
-      ${action}
     </div>`;
 }
 
@@ -275,7 +253,7 @@ function LatestView () {
       <div class="view-head">
         <h1>Latest episodes</h1>
         <div class="view-tools">
-          <${IconBtn} icon="mdi:refresh" label="Refresh all feeds" onClick=${refreshAll} disabled=${!!busy.value} />
+          <${IconButton} icon="mdi:refresh" label="Refresh all feeds" onClick=${refreshAll} disabled=${!!busy.value} />
         </div>
       </div>
       ${!hasSubs
@@ -326,10 +304,10 @@ function PodcastsView () {
           <${SortPicker} value=${podcastSort.value} onChange=${v => podcastSort.value = v}
              options=${[['recent', 'Recently updated'], ['alpha', 'A–Z']]} />
           <div class="seg">
-            <${IconBtn} icon="mdi:view-grid" label="Grid" active=${view.value === 'grid'} onClick=${() => view.value = 'grid'} />
-            <${IconBtn} icon="mdi:view-list" label="List" active=${view.value === 'list'} onClick=${() => view.value = 'list'} />
+            <${IconButton} icon="mdi:view-grid" label="Grid" active=${view.value === 'grid'} onClick=${() => view.value = 'grid'} />
+            <${IconButton} icon="mdi:view-list" label="List" active=${view.value === 'list'} onClick=${() => view.value = 'list'} />
           </div>
-          <${IconBtn} icon="mdi:plus" label="Add podcast" onClick=${() => dialog.value = 'add'} />
+          <${IconButton} icon="mdi:plus" label="Add podcast" onClick=${() => dialog.value = 'add'} />
         </div>
       </div>
       ${!list.length
@@ -378,7 +356,7 @@ function PodcastDetailView ({ id }) {
 
   return html`
     <div class="view">
-      <button class="back" onClick=${() => go('podcasts')}><${Icon} name="mdi:arrow-left" /> Podcasts</button>
+      <${Button} class="back" icon="arrow-left" label="Podcasts" onClick=${() => go('podcasts')} />
 
       <header class="pd-head">
         <${Art} src=${podcast.image} size=${140} className="pd-art" />
@@ -415,7 +393,7 @@ function EpisodeDetailView ({ id }) {
   const episode = episodeById.value[id];
   if (!episode) return html`
     <div class="view">
-      <button class="back" onClick=${() => go('latest')}><${Icon} name="mdi:arrow-left" /> Back</button>
+      <${Button} class="back" icon="arrow-left" label="Back" onClick=${() => go('latest')} />
       <${Empty} icon="mdi:alert-outline" title="Episode not found" />
     </div>`;
 
@@ -430,9 +408,8 @@ function EpisodeDetailView ({ id }) {
 
   return html`
     <div class="view">
-      <button class="back" onClick=${() => podcast ? go('podcast', podcast.id) : go('latest')}>
-        <${Icon} name="mdi:arrow-left" /> ${podcast ? podcast.title : 'Back'}
-      </button>
+      <${Button} class="back" icon="arrow-left" label=${podcast ? podcast.title : 'Back'}
+                 onClick=${() => podcast ? go('podcast', podcast.id) : go('latest')} />
 
       <header class="ed-head">
         <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
@@ -450,10 +427,10 @@ function EpisodeDetailView ({ id }) {
               <${Icon} name=${isPlaying ? 'mdi:pause' : 'mdi:play'} />
               ${isPlaying ? 'Pause' : st.position && !st.done ? 'Resume' : 'Play'}
             </button>
-            <${IconBtn} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
+            <${IconButton} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
                         label=${st.saved ? 'Remove from list' : 'Save for later'}
                         active=${st.saved} size=${20} onClick=${() => db.toggleSaved(id)} />
-            <${IconBtn} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+            <${IconButton} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
                         label=${st.done ? 'Mark unplayed' : 'Mark as done'}
                         active=${st.done} size=${20} onClick=${() => db.toggleDone(id)} />
             ${episode.link && html`<a class="btn ghost" href=${episode.link} target="_blank" rel="noopener">
@@ -516,11 +493,11 @@ function PlayerBar () {
       </div>
 
       <div class="pl-controls">
-        <${IconBtn} icon="mdi:rewind-15" label="Back 15s" size=${22} onClick=${() => player.skip(-15)} />
+        <${IconButton} icon="mdi:rewind-15" label="Back 15s" size=${22} onClick=${() => player.skip(-15)} />
         <button class="pl-play" title=${player.playing.value ? 'Pause' : 'Play'} onClick=${player.toggle}>
           <${Icon} name=${player.waiting.value ? 'svg-spinners:bars-scale-middle' : player.playing.value ? 'mdi:pause' : 'mdi:play'} />
         </button>
-        <${IconBtn} icon="mdi:fast-forward-30" label="Forward 30s" size=${22} onClick=${() => player.skip(30)} />
+        <${IconButton} icon="mdi:fast-forward-30" label="Forward 30s" size=${22} onClick=${() => player.skip(30)} />
       </div>
 
       <div class="pl-scrub">
@@ -532,9 +509,9 @@ function PlayerBar () {
 
       <div class="pl-right">
         <button class="rate" title="Playback speed" onClick=${cycleRate}>${player.rate.value}×</button>
-        <${IconBtn} icon=${db.stateOf(ep.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+        <${IconButton} icon=${db.stateOf(ep.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
                     label="Mark as done" active=${db.stateOf(ep.id).done} onClick=${() => db.toggleDone(ep.id)} />
-        <${IconBtn} icon="mdi:close" label="Close player" onClick=${() => { player.pause(); player.current.value = null; }} />
+        <${IconButton} icon="mdi:close" label="Close player" onClick=${() => { player.pause(); player.current.value = null; }} />
       </div>
     </footer>`;
 }
@@ -721,16 +698,14 @@ function Sidebar () {
     </aside>`;
 }
 
-// :::::: TOAST :::::::::::::::::::::::::::::::::::::::::::::
+// :::::: BUSY BAR :::::::::::::::::::::::::::::::::::::::::::
 
-function Toast () {
-  const t = toast.value;
+function Busy () {
   const b = busy.value;
-  if (!t && !b) return null;
+  if (!b) return null;
   return html`
     <div class="toasts">
-      ${b && html`<div class="toast busy"><${Icon} name="svg-spinners:bars-scale-middle" /> ${b}</div>`}
-      ${t && html`<div class=${'toast ' + t.kind}>${t.text}</div>`}
+      <div class="toast busy"><${Icon} name="svg-spinners:bars-scale-middle" /> ${b}</div>
     </div>`;
 }
 
@@ -790,7 +765,7 @@ function App () {
       <${PlayerBar} />
       ${dialog.value === 'add'      && html`<${AddDialog} />`}
       ${dialog.value === 'settings' && html`<${SettingsDialog} />`}
-      <${Toast} />
+      <${Busy} />
     </div>`;
 }
 

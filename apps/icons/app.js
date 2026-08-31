@@ -13,7 +13,7 @@ import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-h
 
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=icons';
-import { Icon, AppSettings } from '/.shared/js/components/index.js';
+import { Icon, IconButton, Empty, AppSettings } from '/.shared/js/components/index.js';
 import { stored } from '/.shared/js/lib/signals.js';
 
 // ::: local
@@ -25,7 +25,6 @@ import * as store from './db.js';
 const route    = signal({ name: 'home' });   // home | sets | set | search | favorites
 const nav      = signal(false);              // mobile drawer
 const detail   = signal(null);               // selected icon name | null
-const toast    = signal(null);
 const itemSize = stored(88, 'icons:item-size');
 
 const collections = signal(null);            // [{ prefix, name, total, … }] | null
@@ -37,8 +36,7 @@ const query   = signal('');
 const results = signal([]);
 const searching = signal(false);
 
-let toastTimer = null;
-function flash (text) { toast.value = text; clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.value = null, 2000); }
+const flash = text => zugriff.toast(text);
 const go = (name, id) => { route.value = { name, id }; nav.value = false; };
 
 // :::::: DATA :::::::::::::::::::::::::::::::::::::::::::::::
@@ -130,15 +128,11 @@ function IconGrid ({ names }) {
     return () => handle?.destroy();
   }, []);
 
-  if (!names.length) return html`<${Empty} />`;
+  if (!names.length) return html`<${Empty} icon="mdi:image-search-outline" title="Nothing here." />`;
   return html`
     <div class="grid" ref=${ref} style=${`--isz:${itemSize.value}px`}>
       ${names.map(n => html`<${IconCell} key=${n} name=${n} />`)}
     </div>`;
-}
-
-function Empty () {
-  return html`<div class="empty"><${Icon} name="mdi:image-search-outline" /><p>Nothing here.</p></div>`;
 }
 
 // ── sidebar ──────────────────────────────────────────────────────────────
@@ -215,7 +209,7 @@ function SetsView () {
           <div class="set-name" title=${c.name}>${c.name}</div>
           <div class="set-meta">${nfmt(c.total)} icons${c.author ? ` · ${c.author}` : ''}</div>
         </button>`)}
-      ${!rows.length && html`<${Empty} />`}
+      ${!rows.length && html`<${Empty} icon="mdi:image-search-outline" title="Nothing here." />`}
     </div>`;
 }
 
@@ -278,7 +272,7 @@ function TopBar () {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => nav.value = true}><${Icon} name="mdi:menu" /></button>
-      ${r.name === 'set' && html`<button class="ibtn" aria-label="Back" onClick=${() => go('sets')}><${Icon} name="mdi:arrow-left" /></button>`}
+      ${r.name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => go('sets')} />`}
 
       ${r.name === 'search'
         ? html`<div class="searchbox big">
@@ -324,10 +318,6 @@ function Detail () {
     </div>`;
 }
 
-function Toast () {
-  return toast.value ? html`<div class="toasts"><div class="toast">${toast.value}</div></div>` : null;
-}
-
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
@@ -348,7 +338,7 @@ function App () {
         <div class="content"><${Content} /></div>
       </main>
       <${Detail} />
-      <${Toast} />
+
     </div>`;
 }
 

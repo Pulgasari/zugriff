@@ -13,7 +13,7 @@ import { stored }       from '/.shared/js/lib/signals.js';
 import * as fs          from '/.shared/js/filesystem/fsaccess.js';
 
 const { computed, signal, useEffect, useRef, Fragment } = preact;
-const { AppSettings, Button, Icon, IconButton, InstallTip } = zugriff.components;
+const { AppSettings, Button, Empty, Icon, IconButton, InstallTip } = zugriff.components;
 
 // ::: local
 import * as db from './db.js';
@@ -64,18 +64,6 @@ function filterTree (node, q) {
 
 // derive a note's display title: its first H1, else the filename without .md
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
-
-// :::::: SHARED BITS
-
-function Empty ({ icon, title, hint, action }) {
-  return html`
-    <div class="empty">
-      <${Icon} name=${icon} />
-      <p class="empty-title">${title}</p>
-      ${hint && html`<p class="empty-hint">${hint}</p>`}
-      ${action}
-    </div>`;
-}
 
 // :::::: SIDEBAR TREE
 
@@ -401,7 +389,7 @@ function App () {
   }
 
   return html`
-    <${Fragment>
+    <${Fragment}>
       <${Sidebar} />
       ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
       <main id="app-main"><${Reader} /></main>

@@ -26,15 +26,10 @@ const route   = signal({ name: 'latest' }); // { name:'latest'|'youtube'|'feed',
 const dialog  = signal(null);  // 'add' | 'settings' | null
 const addVal  = signal('');
 const navOpen = signal(false); // mobile drawer
-const toast   = signal(null);  // { text, kind }
 const busy    = signal('');    // a label while a long task runs
 
-let toastTimer = null;
-function flash (text, kind = 'ok') {
-  toast.value = { text, kind };
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 2800);
-}
+const flash = (text, kind = 'ok') =>
+  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
 
 const go = (name, id) => { route.value = { name, id }; navOpen.value = false; };
 
@@ -334,12 +329,6 @@ function SettingsDialog () {
     </div>`;
 }
 
-function Toast () {
-  const t = toast.value;
-  if (!t) return null;
-  return html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>`;
-}
-
 // :::::: APP
 
 function App () {
@@ -363,7 +352,7 @@ function App () {
       </main>
       ${dialog.value === 'add'      && html`<${AddDialog} />`}
       ${dialog.value === 'settings' && html`<${SettingsDialog} />`}
-      <${Toast} />
+
     </div>`;
 }
 
