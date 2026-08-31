@@ -3,8 +3,13 @@
 ## buttons
 
 ```javascript
-<${Button} class='back' onClick=${() => go('latest')} icon='arrow-left' />
-<button class="back" onClick=${() => go('latest')}><${Icon} name="mdi:arrow-left" /> Back</button>
+// aktuell oft:
+<button class="back" onClick=${() => go('latest')}>
+  <${Icon} name="mdi:arrow-left" /> Back
+</button>
+
+// besser
+<${Button} class='back' icon='arrow-left' label='Back' onClick=${() => go('latest')} />
 
 <button class="fe-btn small" onClick=${chooseFolder}>
   <${Icon} name="mdi:folder-swap-outline" /> Change
@@ -14,9 +19,13 @@
 </button>
 ```
 
-## `IconButton`
+### `IconButton`
 
 viele apps bauen ne eigene `IconBtn` component. in `zugriff/.shared/js/components/IconButton.js` liegt bereits ne fertige. daher sollten diese überall verwendet werden.
+
+### ausserdem:
+
+in `.shared/js/data/icons.js` ist schon ne liste mit standard-icons, dessen namen verwendet werden sollen möglichst. und die liste kann gern erweitert werden. wird von `.shared/js/components/Icon.js` verstanden.
 
 ## toasts
 
