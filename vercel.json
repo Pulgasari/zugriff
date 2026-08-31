@@ -1,6 +1,7 @@
 {
   "git": {
-    "ignoreCommand": "exit 0"
+    "deploymentEnabled": false,
+    "ignoreCommand": "exit 0",
   },
   "trailingSlash": true,
   "rewrites": [
