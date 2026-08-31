@@ -71,7 +71,7 @@ evtl. wäre die eineoder andere aufbau-wc auch noch etwas sinnvoll und generisch
 
 ## weitere components:
 
-ich finde ausserdem wiederholt `Empty` components, die in mehreren apps reproduziert werden.
+ich finde ausserdem wiederholt `Empty` components, die in mehreren apps reproduziert werden. oder auch `InstallTip`.
 
 ## imports
 
