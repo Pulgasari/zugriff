@@ -51,6 +51,25 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
 
   const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
 
+  // ── DEV TOOLS (?dev) ─────────────────────────────────────────────────────
+  // `?dev` on any app url loads eruda — an on-screen console/inspector, the
+  // closest thing to devtools on a phone. it sticks for the tab (sessionStorage)
+  // so in-app navigation keeps it; `?dev=off` turns it back off.
+  try {
+    const KEY = 'zugriff:devtools';
+    const dev = new URLSearchParams(location.search).get('dev');
+    if (dev !== null) {
+      if (dev === 'off' || dev === '0') sessionStorage.removeItem(KEY);
+      else sessionStorage.setItem(KEY, '1');
+    }
+    if (sessionStorage.getItem(KEY)) {
+      document.head.append(createElement('script', {
+        src    : 'https://cdn.jsdelivr.net/npm/eruda@3',
+        onload : () => { try { window.eruda?.init(); } catch {} },
+      }));
+    }
+  } catch {} // storage may be blocked (incognito) — dev tools are optional
+
   // ── 1. THEME BOOT (Synchronous - Prevents FOUC) ──────────────────────────
 
   if (theme.prefix) {
