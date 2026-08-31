@@ -9,12 +9,12 @@
 // (ported from image-editor); library, convert and batch land in later phases.
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
+import { html, Fragment, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
 import { useGesture } from '@aufbau/gestures/preact';
 
 // ::: shared
-import { boot, config }      from '/.shared/js/app.js?slug=images';
-import { Icon, AppSettings } from '/.shared/js/components/index.js';
+import { boot, config }                              from '/.shared/js/app.js?slug=images';
+import { Icon, IconButton, InstallTip, AppSettings } from '/.shared/js/components/index.js';
 import { stored }            from '/.shared/js/lib/signals.js';
 import * as pwa              from '/.shared/js/lib/pwa.js';
 
@@ -185,13 +185,6 @@ function wireLaunchQueue () {
   });
 }
 
-function IconBtn ({ icon, label, onClick, disabled, active, size = 20 }) {
-  return html`
-    <button class=${'iv-btn' + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} />
-    </button>`;
-}
 
 function ViewTopBar () {
   const s = current.value;
@@ -204,22 +197,22 @@ function ViewTopBar () {
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
       </div>
       <div class="iv-actions">
-        <${IconBtn} icon="mdi:folder-open-outline"   label="Open images" onClick=${openPicker} />
-        <${IconBtn} icon="mdi:image-edit-outline"    label="Edit this image" onClick=${editCurrent} disabled=${!s} />
-        <${IconBtn} icon="zoom-out"                  label="Zoom out"    onClick=${() => setZoom(zoom.value / 1.4)} disabled=${!s || zoom.value <= 1} />
-        <${IconBtn} icon="zoom-in"                   label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
-        <${IconBtn} icon="mdi:fit-to-screen-outline" label="Fit"         onClick=${resetView} disabled=${!s || (zoom.value === 1 && pan.value.x === 0 && pan.value.y === 0)} />
-        <${IconBtn} icon="download"                  label="Download"    onClick=${downloadCurrent} disabled=${!s} />
+        <${IconButton} className="iv-btn" icon="mdi:folder-open-outline"   label="Open images" onClick=${openPicker} />
+        <${IconButton} className="iv-btn" icon="mdi:image-edit-outline"    label="Edit this image" onClick=${editCurrent} disabled=${!s} />
+        <${IconButton} className="iv-btn" icon="zoom-out"                  label="Zoom out"    onClick=${() => setZoom(zoom.value / 1.4)} disabled=${!s || zoom.value <= 1} />
+        <${IconButton} className="iv-btn" icon="zoom-in"                   label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
+        <${IconButton} className="iv-btn" icon="mdi:fit-to-screen-outline" label="Fit"         onClick=${resetView} disabled=${!s || (zoom.value === 1 && pan.value.x === 0 && pan.value.y === 0)} />
+        <${IconButton} className="iv-btn" icon="download"                  label="Download"    onClick=${downloadCurrent} disabled=${!s} />
         ${s && html`
           <select class="iv-fx-select" title="Live effect (view only, not saved)" aria-label="Effect"
                   value=${vEffect.value} onChange=${e => vEffect.value = e.target.value}>
             ${fx.EFFECTS.filter(x => x.cssBacked).map(x => html`
               <option value=${x.id}>${x.id === 'none' ? 'No effect' : x.name}</option>`)}
           </select>`}
-        ${many.value && html`<${IconBtn} icon=${strip.value ? 'mdi:view-carousel-outline' : 'mdi:view-carousel'} label="Toggle thumbnails" active=${strip.value} onClick=${() => strip.value = !strip.value} />`}
-        <${IconBtn} icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
-        <${IconBtn} icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
-        ${s && html`<${IconBtn} icon="mdi:close" label="Close image" onClick=${removeCurrent} />`}
+        ${many.value && html`<${IconButton} className="iv-btn" icon=${strip.value ? 'mdi:view-carousel-outline' : 'mdi:view-carousel'} label="Toggle thumbnails" active=${strip.value} onClick=${() => strip.value = !strip.value} />`}
+        <${IconButton} className="iv-btn" icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
+        <${IconButton} className="iv-btn" icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
+        ${s && html`<${IconButton} className="iv-btn" icon="mdi:close" label="Close image" onClick=${removeCurrent} />`}
       </div>
     </header>`;
 }
@@ -1052,19 +1045,6 @@ function ReconnectBar () {
     </div>`;
 }
 
-function InstallTip () {
-  if (pwa.installed.value || !library.sources.value.length) return null;
-  return html`
-    <div class="im-install-tip">
-      <${Icon} name="mdi:information-outline" />
-      <span>Install the app to keep your image folders connected between visits — no reconnecting.</span>
-      ${pwa.canInstall.value
-        ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-            <${Icon} name="mdi:download" /> Install app</button>`
-        : html`<span class="im-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
-    </div>`;
-}
-
 function FolderChips () {
   const list = library.sources.value;
   if (list.length < 2) return null;
@@ -1108,7 +1088,8 @@ function LibraryMode () {
         <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><${Icon} name="mdi:close" /></button></div>`}
 
       <${ReconnectBar} />
-      <${InstallTip} />
+      <${InstallTip} show=${library.sources.value.length > 0}
+                     message="Install the app to keep your image folders connected between visits — no reconnecting." />
       <${FolderChips} />
 
       ${!hasFolders
@@ -1121,9 +1102,9 @@ function LibraryMode () {
               <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>
           </div>`
         : pics.length
-          ? html`<div class="im-scroll"><div class="im-grid">
+          ? html`<div class="im-scroll"><aufbau-index class="im-grid" viewmode="grid" item-size="140px" gap="0.6rem">
               ${pics.map(p => html`<${Thumb} key=${p.key} pic=${p} />`)}
-            </div></div>`
+            </aufbau-index></div>`
           : html`
             <div class="im-lib-empty">
               <${Icon} name=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'} />
@@ -1612,16 +1593,16 @@ function ModeBar () {
 function App () {
   useEffect(() => { wireLaunchQueue(); return () => revokeAll(); }, []);
   return html`
-    <div class="im-app">
+    <${Fragment}>
       <${ModeBar} />
-      <div class="im-body">
+      <div id="app-main">
         ${screen.value === 'library' ? html`<${LibraryMode} />`
           : screen.value === 'edit'    ? html`<${EditMode} />`
           : screen.value === 'convert' ? html`<${ConvertMode} />`
           : screen.value === 'batch'   ? html`<${BatchMode} />`
           :                              html`<${ViewMode} />`}
       </div>
-    </div>`;
+    </${Fragment}>`;
 }
 
 // :::::: BOOT :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

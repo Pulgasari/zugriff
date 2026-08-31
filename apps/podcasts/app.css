@@ -6,15 +6,8 @@
    positions are user-set, carried on data-menu / data-player on the root and
    resolved here with flex order — see the LAYOUT block. */
 
-.pc-app {
-  height  : 100%;
-  display : flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 /* the menu + main pair; player docks above or below it */
-.pc-body {
+#app-main {
   display : flex;
   flex    : 1 1 auto;
   min-height: 0;
@@ -24,23 +17,23 @@
 /* ── LAYOUT: where the menu and the player sit ────────────────────────────── */
 
 /* menu orientation drives the body axis … */
-.pc-app[data-menu="left"]  .pc-body,
-.pc-app[data-menu="right"] .pc-body { flex-direction: row; }
-.pc-app[data-menu="top"]   .pc-body,
-.pc-app[data-menu="bottom"] .pc-body { flex-direction: column; }
+#app[data-menu="left"]  #app-main,
+#app[data-menu="right"] #app-main { flex-direction: row; }
+#app[data-menu="top"]   #app-main,
+#app[data-menu="bottom"] #app-main { flex-direction: column; }
 
 /* … and the menu's order within it */
-.pc-app[data-menu="left"]  .sidebar,
-.pc-app[data-menu="top"]   .sidebar { order: 0; }
-.pc-app[data-menu="right"] .sidebar,
-.pc-app[data-menu="bottom"] .sidebar { order: 2; }
+#app[data-menu="left"]  .sidebar,
+#app[data-menu="top"]   .sidebar { order: 0; }
+#app[data-menu="right"] .sidebar,
+#app[data-menu="bottom"] .sidebar { order: 2; }
 .main { order: 1; }
 
 /* player above or below the body */
-.pc-app[data-player="top"]    .player  { order: 0; }
-.pc-app[data-player="top"]    .pc-body { order: 1; }
-.pc-app[data-player="bottom"] .pc-body { order: 0; }
-.pc-app[data-player="bottom"] .player  { order: 1; }
+#app[data-player="top"]    .player  { order: 0; }
+#app[data-player="top"]    #app-main { order: 1; }
+#app[data-player="bottom"] #app-main { order: 0; }
+#app[data-player="bottom"] .player  { order: 1; }
 
 /* ── shared controls ─────────────────────────────── */
 
@@ -95,29 +88,29 @@
 }
 
 /* vertical menu (left / right) — the classic sidebar column */
-.pc-app[data-menu="left"]  .sidebar,
-.pc-app[data-menu="right"] .sidebar { width: 240px; }
-.pc-app[data-menu="left"]  .sidebar { border-right: 1px solid var(--line); }
-.pc-app[data-menu="right"] .sidebar { border-left:  1px solid var(--line); }
+#app[data-menu="left"]  .sidebar,
+#app[data-menu="right"] .sidebar { width: 240px; }
+#app[data-menu="left"]  .sidebar { border-right: 1px solid var(--line); }
+#app[data-menu="right"] .sidebar { border-left:  1px solid var(--line); }
 
 /* horizontal menu (top / bottom) — a compact bar */
-.pc-app[data-menu="top"]    .sidebar,
-.pc-app[data-menu="bottom"] .sidebar {
+#app[data-menu="top"]    .sidebar,
+#app[data-menu="bottom"] .sidebar {
   flex-direction: row;
   align-items   : center;
   gap           : 0.5rem;
   padding       : 0.4rem 0.75rem;
 }
-.pc-app[data-menu="top"]    .sidebar { border-bottom: 1px solid var(--line); }
-.pc-app[data-menu="bottom"] .sidebar { border-top:    1px solid var(--line); }
-.pc-app[data-menu="top"]    .nav,
-.pc-app[data-menu="bottom"] .nav { flex-direction: row; margin: 0; gap: 0.25rem; flex: 1 1 auto; justify-content: center; }
-.pc-app[data-menu="top"]    .nav-item,
-.pc-app[data-menu="bottom"] .nav-item { width: auto; }
-.pc-app[data-menu="top"]    .side-foot,
-.pc-app[data-menu="bottom"] .side-foot { margin: 0; flex-direction: row; align-items: center; gap: 0.25rem; }
-.pc-app[data-menu="top"]    .side-links,
-.pc-app[data-menu="bottom"] .side-links { display: none; }
+#app[data-menu="top"]    .sidebar { border-bottom: 1px solid var(--line); }
+#app[data-menu="bottom"] .sidebar { border-top:    1px solid var(--line); }
+#app[data-menu="top"]    .nav,
+#app[data-menu="bottom"] .nav { flex-direction: row; margin: 0; gap: 0.25rem; flex: 1 1 auto; justify-content: center; }
+#app[data-menu="top"]    .nav-item,
+#app[data-menu="bottom"] .nav-item { width: auto; }
+#app[data-menu="top"]    .side-foot,
+#app[data-menu="bottom"] .side-foot { margin: 0; flex-direction: row; align-items: center; gap: 0.25rem; }
+#app[data-menu="top"]    .side-links,
+#app[data-menu="bottom"] .side-links { display: none; }
 .brand {
   display    : flex;
   align-items: center;
@@ -278,15 +271,15 @@
   overflow: hidden;
 }
 .ep-progress {
+  --progress-size: 3px;
   display: block;
-  height: 3px;
   border-radius: 2px;
   background: var(--panel-2);
   margin-top: 0.5rem;
   overflow: hidden;
   max-width: 22rem;
 }
-.ep-progress-fill { display: block; height: 100%; background: var(--accent); }
+.ep-progress .progress-bar { background: var(--accent); }
 
 .ep-actions {
   display: flex;
@@ -473,8 +466,8 @@
   padding   : 0.6rem 1rem;
   background: var(--panel);
 }
-.pc-app[data-player="bottom"] .player { border-top:    1px solid var(--line); }
-.pc-app[data-player="top"]    .player { border-bottom: 1px solid var(--line); }
+#app[data-player="bottom"] .player { border-top:    1px solid var(--line); }
+#app[data-player="top"]    .player { border-bottom: 1px solid var(--line); }
 .pl-meta { display: flex; align-items: center; gap: 0.7rem; min-width: 0; }
 .pl-meta .art { width: 52px; height: 52px; }
 .pl-info { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
@@ -600,20 +593,20 @@
 
 @media (max-width: 780px) {
   /* a vertical menu collapses to an icon rail */
-  .pc-app[data-menu="left"]  .sidebar,
-  .pc-app[data-menu="right"] .sidebar { width: 60px; padding: 0.75rem 0.4rem; }
-  .pc-app[data-menu="left"]  .brand span,
-  .pc-app[data-menu="right"] .brand span,
-  .pc-app[data-menu="left"]  .nav-item span,
-  .pc-app[data-menu="right"] .nav-item span,
-  .pc-app[data-menu="left"]  .side-links,
-  .pc-app[data-menu="right"] .side-links,
-  .pc-app[data-menu="left"]  .nav-count,
-  .pc-app[data-menu="right"] .nav-count { display: none; }
-  .pc-app[data-menu="left"]  .brand,
-  .pc-app[data-menu="right"] .brand,
-  .pc-app[data-menu="left"]  .nav-item,
-  .pc-app[data-menu="right"] .nav-item { justify-content: center; }
+  #app[data-menu="left"]  .sidebar,
+  #app[data-menu="right"] .sidebar { width: 60px; padding: 0.75rem 0.4rem; }
+  #app[data-menu="left"]  .brand span,
+  #app[data-menu="right"] .brand span,
+  #app[data-menu="left"]  .nav-item span,
+  #app[data-menu="right"] .nav-item span,
+  #app[data-menu="left"]  .side-links,
+  #app[data-menu="right"] .side-links,
+  #app[data-menu="left"]  .nav-count,
+  #app[data-menu="right"] .nav-count { display: none; }
+  #app[data-menu="left"]  .brand,
+  #app[data-menu="right"] .brand,
+  #app[data-menu="left"]  .nav-item,
+  #app[data-menu="right"] .nav-item { justify-content: center; }
 
   .player { grid-template-columns: auto auto 1fr auto; gap: 0.5rem; padding: 0.5rem; }
   .pl-info { display: none; }
@@ -622,12 +615,12 @@
 }
 @media (max-width: 560px) {
   /* a horizontal menu drops the brand + labels to fit a phone bar */
-  .pc-app[data-menu="top"]    .brand span,
-  .pc-app[data-menu="bottom"] .brand span,
-  .pc-app[data-menu="top"]    .nav-item span,
-  .pc-app[data-menu="bottom"] .nav-item span,
-  .pc-app[data-menu="top"]    .nav-count,
-  .pc-app[data-menu="bottom"] .nav-count { display: none; }
+  #app[data-menu="top"]    .brand span,
+  #app[data-menu="bottom"] .brand span,
+  #app[data-menu="top"]    .nav-item span,
+  #app[data-menu="bottom"] .nav-item span,
+  #app[data-menu="top"]    .nav-count,
+  #app[data-menu="bottom"] .nav-count { display: none; }
 }
 @media (max-width: 480px) {
   .ep-teaser { display: none; }

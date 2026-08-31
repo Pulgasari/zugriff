@@ -8,13 +8,6 @@
 
 /* ── shell: mode bar ─────────────────────────────────────────────────────── */
 
-.im-app {
-  flex          : 1 1 auto;
-  display       : flex;
-  flex-direction: column;
-  min-height    : 0;
-  min-width     : 0;
-}
 
 .im-modebar {
   flex        : none;
@@ -54,7 +47,7 @@
 
 .im-modebar-actions { margin-left: auto; display: flex; align-items: center; }
 
-.im-body { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; }
+#app-main { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; }
 
 @media (max-width: 620px) {
   .im-brand span { display: none; }
@@ -727,10 +720,7 @@ canvas.view {
 
 .im-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 .im-grid {
-  display              : grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap                  : 0.6rem;
-  padding              : 0.75rem;
+  padding              : 0.75rem;   /* grid + gap come from <aufbau-index viewmode="grid"> */
 }
 .im-thumb {
   display      : flex;

@@ -8,10 +8,11 @@ import      registry   from './registry.js'
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
+import * as pwa          from './lib/pwa.js';
 
 // :::::: BUNDLE
 
-const zugriff = { components, opfs, registry };
+const zugriff = { components, opfs, pwa, registry };
 
 zugriff.fs = Object.assign({ FolderLibrary }, fsaccess);
 

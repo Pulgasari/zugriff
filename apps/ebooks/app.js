@@ -6,11 +6,10 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }      from '/.shared/js/app.js?slug=ebooks';
-import { Icon, AppSettings } from '/.shared/js/components/index.js';
-import { stored }            from '/.shared/js/lib/signals.js';
-import * as fs               from '/.shared/js/filesystem/fsaccess.js';
-import * as pwa              from '/.shared/js/lib/pwa.js';
+import { boot, config }                                    from '/.shared/js/app.js?slug=ebooks';
+import { Icon, IconButton, Empty, InstallTip, AppSettings } from '/.shared/js/components/index.js';
+import { stored }                                          from '/.shared/js/lib/signals.js';
+import * as fs                                             from '/.shared/js/filesystem/fsaccess.js';
 
 // ::: local
 import * as db                               from './db.js';
@@ -22,14 +21,9 @@ const route  = signal({ name: 'library' });        // { name:'library' } | { nam
 const search = signal('');
 const sort   = stored('recent', 'ebooks:sort');    // recent | title | author | added
 const folder = signal('');                         // '' = all folders, else sourceId
-const toast  = signal(null);
 
-let toastTimer = null;
-function flash (text, kind = 'ok') {
-  toast.value = { text, kind };
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 2500);
-}
+const flash = (text, kind = 'ok') =>
+  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -68,22 +62,6 @@ const continueReading = computed(() =>
 
 // :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
 
-function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className = '' }) {
-  return html`
-    <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}><${Icon} name=${icon} /></button>`;
-}
-
-function Empty ({ icon, title, hint, action }) {
-  return html`
-    <div class="empty">
-      <${Icon} name=${icon} />
-      <p class="empty-title">${title}</p>
-      ${hint && html`<p class="empty-hint">${hint}</p>`}
-      ${action}
-    </div>`;
-}
-
 // a cover: the extracted image if we have it, otherwise a titled placeholder
 function Cover ({ book, className = '' }) {
   const ref = useRef(null);
@@ -117,7 +95,7 @@ function BookCard ({ book }) {
         <div class="book-title">${book.title}</div>
         ${book.author && html`<div class="book-author">${book.author}</div>`}
       </div>
-      ${p > 0 && html`<span class="book-progress"><span style=${`width:${Math.round(p * 100)}%`}></span></span>`}
+      ${p > 0 && html`<aufbau-progress class="book-progress" value=${Math.round(p * 100)}></aufbau-progress>`}
     </button>`;
 }
 
@@ -169,22 +147,6 @@ function SourceStatus () {
     </div>`;
 }
 
-// installing the app is what makes the browser persist folder permission
-// across visits — otherwise a tab drops it each session and every return needs
-// a reconnect. shown once folders are in use and the app isn't installed.
-function InstallTip () {
-  if (pwa.installed.value || !db.sources.value.length) return null;
-  return html`
-    <div class="install-tip">
-      <${Icon} name="mdi:information-outline" />
-      <span class="install-tip-text">Install the app to keep your book folders connected between visits — no reconnecting.</span>
-      ${pwa.canInstall.value
-        ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-            <${Icon} name="mdi:download" /> Install app</button>`
-        : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
-    </div>`;
-}
-
 function Library () {
   const books = visibleBooks.value;
   const cont  = continueReading.value;
@@ -197,7 +159,7 @@ function Library () {
         <div class="lib-tools">
           ${db.pending.value > 0 && html`
             <span class="scan-note"><${Icon} name="svg-spinners:bars-scale-middle" /> ${db.pending.value} left</span>`}
-          <${IconBtn} icon="mdi:refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
+          <${IconButton} icon="mdi:refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
           <button class="btn primary" onClick=${addFolder}>
             <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
           <${AppSettings} />
@@ -205,7 +167,8 @@ function Library () {
       </header>
 
       <${SourceStatus} />
-      <${InstallTip} />
+      <${InstallTip} show=${db.sources.value.length > 0}
+                     message="Install the app to keep your book folders connected between visits — no reconnecting." />
 
       ${!hasFolders
         ? html`<${Empty} icon="mdi:bookshelf" title="Your library is empty"
@@ -341,8 +304,7 @@ function ReaderView ({ bookKey }) {
   return html`
     <div class="reader">
       <header class="reader-bar">
-        <button class="ibtn" title="Back to library" aria-label="Back" onClick=${closeReader}>
-          <${Icon} name="mdi:arrow-left" /></button>
+        <${IconButton} icon="arrow-left" label="Back" title="Back to library" onClick=${closeReader} />
         <div class="reader-id">
           <span class="reader-title">${book?.title ?? 'Book'}</span>
           ${book?.author && html`<span class="reader-author">${book.author}</span>`}
@@ -350,15 +312,15 @@ function ReaderView ({ bookKey }) {
 
         <div class="reader-controls">
           ${ui.kind === 'pdf' && html`
-            <${IconBtn} icon="mdi:minus" label="Zoom out" onClick=${() => eng?.zoomOut()} />
-            <${IconBtn} icon="mdi:plus"  label="Zoom in"  onClick=${() => eng?.zoomIn()} />`}
+            <${IconButton} icon="mdi:minus" label="Zoom out" onClick=${() => eng?.zoomOut()} />
+            <${IconButton} icon="mdi:plus"  label="Zoom in"  onClick=${() => eng?.zoomIn()} />`}
           ${ui.kind === 'epub' && html`
-            <${IconBtn} icon="mdi:format-font-size-decrease" label="Smaller text" disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontDown(); readerFont.value = eng.fontSize; }} />
-            <${IconBtn} icon="mdi:format-font-size-increase" label="Larger text"  disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontUp();   readerFont.value = eng.fontSize; }} />
-            <${IconBtn} icon=${ui.flow === 'scrolled' ? 'mdi:book-open-page-variant-outline' : 'mdi:page-layout-body'}
+            <${IconButton} icon="mdi:format-font-size-decrease" label="Smaller text" disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontDown(); readerFont.value = eng.fontSize; }} />
+            <${IconButton} icon="mdi:format-font-size-increase" label="Larger text"  disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontUp();   readerFont.value = eng.fontSize; }} />
+            <${IconButton} icon=${ui.flow === 'scrolled' ? 'mdi:book-open-page-variant-outline' : 'mdi:page-layout-body'}
               label=${ui.flow === 'scrolled' ? 'Paginated' : 'Scrolled'} disabled=${!eng}
               onClick=${async () => { if (!eng) return; const f = ui.flow === 'scrolled' ? 'paginated' : 'scrolled'; readerFlow.value = f; await eng.setFlow(f); readerUi.value = { ...readerUi.value, flow: f }; }} />`}
-          <${IconBtn} icon="mdi:table-of-contents" label="Contents" active=${ui.tocOpen} onClick=${toggleToc} />
+          <${IconButton} icon="mdi:table-of-contents" label="Contents" active=${ui.tocOpen} onClick=${toggleToc} />
         </div>
       </header>
 
@@ -386,7 +348,7 @@ function ReaderView ({ bookKey }) {
             <span class="foot-label">Page ${ui.page ?? 1} / ${ui.pages}</span>
             <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-down" /></button>`
           : html`<span class="foot-label">${ui.percent != null ? Math.round((ui.percent || 0) * 100) + '%' : ''}</span>`}
-        <span class="foot-bar"><span style=${`width:${Math.round((ui.percent || 0) * 100)}%`}></span></span>
+        <aufbau-progress class="foot-bar" value=${Math.round((ui.percent || 0) * 100)}></aufbau-progress>
       </footer>
     </div>`;
 }
@@ -425,12 +387,6 @@ async function addFolder () {
 
 // :::::: TOAST + APP :::::::::::::::::::::::::::::::::::::::
 
-function Toast () {
-  const t = toast.value;
-  if (!t) return null;
-  return html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>`;
-}
-
 function App () {
   useEffect(() => {
     db.load().catch(err => flash('Could not open the library: ' + err.message, 'err'));
@@ -441,13 +397,9 @@ function App () {
   }
 
   const r = route.value;
-  return html`
-    <div class="ebooks-app">
-      ${r.name === 'reader'
-        ? html`<${ReaderView} bookKey=${r.key} key=${r.key} />`
-        : html`<main class="main"><${Library} /></main>`}
-      <${Toast} />
-    </div>`;
+  return r.name === 'reader'
+    ? html`<${ReaderView} bookKey=${r.key} key=${r.key} />`
+    : html`<main id="app-main"><${Library} /></main>`;
 }
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::

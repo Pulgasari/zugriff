@@ -545,7 +545,7 @@ function App () {
   };
 
   return html`
-    <div class=${'gm' + (immersive.value ? ' immersive' : '')}
+    <div id="app-main" class=${immersive.value ? 'immersive' : ''}
          onDragOver=${e => { e.preventDefault(); dragging.value = true; }}
          onDragLeave=${e => { if (e.target === e.currentTarget) dragging.value = false; }}
          onDrop=${onDrop}>

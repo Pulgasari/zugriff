@@ -6,7 +6,7 @@
    double-tap on the stage adds `.chrome-off`, which folds the bars away and lets
    the stage go edge to edge. */
 
-.player {
+#app-main {
   display        : flex;
   flex-direction : column;
   height         : 100%;

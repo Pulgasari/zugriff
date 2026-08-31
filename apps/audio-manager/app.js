@@ -3,13 +3,12 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }      from '/.shared/js/app.js?slug=audio-manager';
-import { Icon, AppSettings } from '/.shared/js/components/index.js';
-import * as fs               from '/.shared/js/filesystem/fsaccess.js';
-import * as pwa              from '/.shared/js/lib/pwa.js';
+import { boot, config }                  from '/.shared/js/app.js?slug=audio-manager';
+import { Icon, IconButton, InstallTip, AppSettings } from '/.shared/js/components/index.js';
+import * as fs                           from '/.shared/js/filesystem/fsaccess.js';
 
 // ::: local
 import * as db     from './db.js';
@@ -23,14 +22,9 @@ const route   = signal({ name: 'songs' });   // songs | albums | artists | album
 const search  = signal('');
 const sort    = signal({ key: 'artist', dir: 1 });
 const navOpen = signal(false);
-const toast   = signal(null);
 
-let toastTimer = null;
-function flash (text, kind = 'ok') {
-  toast.value = { text, kind };
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.value = null, kind === 'err' ? 5000 : 2600);
-}
+const flash = (text, kind = 'ok') =>
+  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
 const go = (name, id) => { route.value = { name, id }; navOpen.value = false; };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
@@ -167,7 +161,8 @@ function Sidebar () {
       ${needAuth && html`<p class="src-hint warn">Some folders need permission — click one to reconnect.</p>`}
 
       <div class="side-foot">
-        <${InstallTip} />
+        <${InstallTip} show=${db.sources.value.length > 0}
+                       message="Install the app so your folders stay connected between visits." />
         <button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
         <div class="side-links">
           <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>
@@ -177,19 +172,6 @@ function Sidebar () {
     </aside>`;
 }
 
-function InstallTip () {
-  if (pwa.installed.value || !db.sources.value.length) return null;
-  return html`
-    <div class="tip">
-      <${Icon} name="mdi:information-outline" />
-      <div>
-        <span>Install the app so your folders stay connected between visits.</span>
-        ${pwa.canInstall.value
-          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}><${Icon} name="mdi:download" /> Install</button>`
-          : html`<span class="tip-hint">Use your browser’s <b>Install</b> menu.</span>`}
-      </div>
-    </div>`;
-}
 
 // :::::: VIEWS ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -223,7 +205,7 @@ function AlbumsGrid () {
   const rows = filteredAlbums.value;
   if (!rows.length) return html`<${Empty} q=${search.value} />`;
   return html`
-    <div class="albums">
+    <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
       ${rows.map(a => html`
         <button class="album-card" key=${a.key} onClick=${() => go('album', a.key)}>
           <div class="album-art">
@@ -233,7 +215,7 @@ function AlbumsGrid () {
           <div class="album-name" title=${a.album}>${a.album}</div>
           <div class="album-artist" title=${a.artist}>${a.artist}</div>
         </button>`)}
-    </div>`;
+    </aufbau-index>`;
 }
 
 function AlbumDetail ({ id }) {
@@ -287,14 +269,14 @@ function ArtistDetail ({ id }) {
           <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><${Icon} name="mdi:play" /> Play all</button>
         </div>
       </header>
-      <div class="albums">
+      <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
         ${albums.map(al => html`
           <button class="album-card" key=${al.key} onClick=${() => go('album', al.key)}>
             <div class="album-art"><${Cover} blob=${al.cover} size=${160} radius=${10} /></div>
             <div class="album-name" title=${al.album}>${al.album}</div>
             <div class="album-artist">${al.year || ''}</div>
           </button>`)}
-      </div>
+      </aufbau-index>
     </div>`;
 }
 
@@ -336,7 +318,7 @@ function TopBar () {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}><${Icon} name="mdi:menu" /></button>
-      ${back && html`<button class="ibtn" aria-label="Back" onClick=${() => go(r.name === 'album' ? 'albums' : 'artists')}><${Icon} name="mdi:arrow-left" /></button>`}
+      ${back && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => go(r.name === 'album' ? 'albums' : 'artists')} />`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>
@@ -401,11 +383,6 @@ function PlayerBar () {
     </footer>`;
 }
 
-function Toast () {
-  const t = toast.value;
-  return t ? html`<div class="toasts"><div class=${'toast ' + t.kind}>${t.text}</div></div>` : null;
-}
-
 // :::::: SCREENS :::::::::::::::::::::::::::::::::::::::::::
 
 function Unsupported () {
@@ -432,13 +409,13 @@ function Welcome () {
 function App () {
   useEffect(() => { db.load().catch(err => flash('Could not open the library: ' + err.message, 'err')); return dropCovers; }, []);
 
-  if (!fs.supported())          return html`<div class="am-app centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)          return html`<div class="am-app centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
-  if (!db.sources.value.length) return html`<div class="am-app centered"><${Welcome} /></div>`;
+  if (!fs.supported())          return html`<div class="centered"><${Unsupported} /></div>`;
+  if (!db.ready.value)          return html`<div class="centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
+  if (!db.sources.value.length) return html`<div class="centered"><${Welcome} /></div>`;
 
   return html`
-    <div class="am-app">
-      <div class="am-body">
+    <${Fragment}>
+      <div id="app-main">
         <${Sidebar} />
         ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
         <main class="main">
@@ -447,8 +424,7 @@ function App () {
         </main>
       </div>
       <${PlayerBar} />
-      <${Toast} />
-    </div>`;
+    </${Fragment}>`;
 }
 
 boot({ config, App });

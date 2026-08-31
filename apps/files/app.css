@@ -5,12 +5,8 @@
    component, styled by shared/css/explorer.css. everything here is only what
    wraps it: the sidebar, and the welcome / reconnect / unsupported screens. */
 
-.fe-app {
-  flex      : 1 1 auto;
-  display   : flex;
-  min-height: 0;
-  min-width : 0;
-}
+#app { flex-direction: row; }
+#app-main { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; }
 .fe-app.centered { align-items: center; justify-content: center; padding: 1.5rem; }
 
 .fe-main {
@@ -112,6 +108,7 @@
 /* ── hero screens (welcome · reconnect · unsupported) ────────────────────── */
 
 .fe-hero {
+  margin        : auto;
   max-width     : 30rem;
   display       : flex;
   flex-direction: column;

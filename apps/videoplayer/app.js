@@ -338,7 +338,7 @@ function Stage () {
 
 function App () {
   return html`
-    <div class=${['player', chromeHidden.value && 'chrome-off'].filter(Boolean).join(' ')}>
+    <div id="app-main" class=${chromeHidden.value ? 'chrome-off' : ''}>
       <${TopBar} />
       <${Stage} />
       <${Controls} />

@@ -3,22 +3,13 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
+import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }  from '/.shared/js/app.js?slug=files';
-//import { Icon, FileExplorer, AppSettings } from '/.shared/js/components/index.js';
-//import * as fs   from '/.shared/js/filesystem/fsaccess.js';
-//import * as pwa  from '/.shared/js/lib/pwa.js';
+import { boot, config } from '/.shared/js/app.js?slug=files';
 
-const {
-  AppSettings,
-  Icon,
-  InstallTip,
-  FileExplorer,
-} = zugriff.components;
-
-const { fs, pwa } = zugriff;
+const { AppSettings, Icon, InstallTip, FileExplorer } = zugriff.components;
+const { fs } = zugriff;
 
 
 // ::: local
@@ -108,24 +99,6 @@ function Reconnect () {
     </div>`;
 }
 
-// the folder-perms-persist-if-installed nudge, same idea as notes/ebooks
-/*
-function InstallTip () {
-  if (pwa.installed.value) return null;
-  return html`
-    <div class="fe-tip">
-      <${Icon} name="mdi:information-outline" />
-      <div class="fe-tip-body">
-        <span>Install the app so your folder stays connected between visits.</span>
-        ${pwa.canInstall.value
-          ? html`<button class="fe-btn small primary" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="mdi:download" /> Install app</button>`
-          : html`<span class="fe-tip-hint">Use your browser's <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
-      </div>
-    </div>`;
-}
-*/
-
 function Sidebar () {
   const f = db.folder.value;
   return html`
@@ -164,7 +137,7 @@ function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
   return html`
-    <div id="app">${
+    <${Fragment}>${
         isNotSupported() ? html`<${Unsupported} />`
       : isLoading()      ? html`<${Icon} name='loading' />`
       : isWelcome()      ? html`<${Welcome} />`
@@ -174,7 +147,7 @@ function App () {
       <main id="app-main">
         <${FileExplorer} backend=${backend.value} />
       </main>`
-    }</div>
+    }</${Fragment}>
   `;
 }
 

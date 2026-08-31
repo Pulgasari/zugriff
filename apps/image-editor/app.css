@@ -3,7 +3,7 @@
    reset, theme tokens and the #app frame come from ./../base.css. everything
    here is the editor's chrome: toolbar · stage · side panel · status bar. */
 
-.ed {
+#app-main {
   flex          : 1 1 auto;
   display       : flex;
   flex-direction: column;

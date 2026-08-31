@@ -3,7 +3,7 @@
    reset, theme tokens and the #app frame come from ./../base.css. everything
    here is the gifmaker's chrome: toolbar · stage + panel · filmstrip · status. */
 
-.gm {
+#app-main {
   flex          : 1 1 auto;
   display       : flex;
   flex-direction: column;
@@ -280,13 +280,13 @@ canvas.view {
 
 /* ── immersive mode (double-tap to hide the chrome) ──────────────────────── */
 
-.gm.immersive .toolbar,
-.gm.immersive .panel,
-.gm.immersive .filmstrip,
-.gm.immersive .statusbar { display: none; }
+#app-main.immersive .toolbar,
+#app-main.immersive .panel,
+#app-main.immersive .filmstrip,
+#app-main.immersive .statusbar { display: none; }
 
-.gm.immersive .stage { padding: 0; }
-.gm.immersive canvas.view { max-height: 100dvh; }
+#app-main.immersive .stage { padding: 0; }
+#app-main.immersive canvas.view { max-height: 100dvh; }
 
 .exit-immersive {
   position       : fixed;
