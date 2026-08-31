@@ -33,9 +33,9 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
     },
     preload     : userConfig.preload || [
       '@aufbau/kits/preact-htm',
-      '@aufbau/elements',
-      '@domina/core',
-      'preact'
+      //'@aufbau/elements',
+      //'@domina/core',
+      //'preact'
     ],
     // Base framework importmap (can be extended/overridden via userConfig.imports)
     imports: Object.assign(getImportMap(), userConfig.imports || {})
