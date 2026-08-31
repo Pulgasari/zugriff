@@ -7,9 +7,19 @@ import { html, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
 import { boot, config }  from '/.shared/js/app.js?slug=files';
-import { Icon, FileExplorer, AppSettings } from '/.shared/js/components/index.js';
-import * as fs   from '/.shared/js/filesystem/fsaccess.js';
-import * as pwa  from '/.shared/js/lib/pwa.js';
+//import { Icon, FileExplorer, AppSettings } from '/.shared/js/components/index.js';
+//import * as fs   from '/.shared/js/filesystem/fsaccess.js';
+//import * as pwa  from '/.shared/js/lib/pwa.js';
+
+const {
+  AppSettings,
+  Icon,
+  InstallTip,
+  FileExplorer,
+} = zugriff.components;
+
+const { fs, pwa } = zugriff;
+
 
 // ::: local
 import * as db   from './db.js';
@@ -99,6 +109,7 @@ function Reconnect () {
 }
 
 // the folder-perms-persist-if-installed nudge, same idea as notes/ebooks
+/*
 function InstallTip () {
   if (pwa.installed.value) return null;
   return html`
@@ -113,12 +124,13 @@ function InstallTip () {
       </div>
     </div>`;
 }
+*/
 
 function Sidebar () {
   const f = db.folder.value;
   return html`
-    <aside class="fe-side">
-      <div class="fe-brand">
+    <aside class="sidebar">
+      <div class="brand">
         <${Icon} name="mdi:folder-outline" /> <span>Files</span>
       </div>
 
@@ -131,7 +143,7 @@ function Sidebar () {
           <button class="fe-btn small" onClick=${chooseFolder}>
             <${Icon} name="mdi:folder-swap-outline" /> Change</button>
           <button class="fe-btn small ghost" onClick=${closeFolder}>
-            <${Icon} name="mdi:close" /> Close</button>
+            <${Icon} name="close" /> Close</button>
         </div>
       </div>
 
@@ -143,21 +155,27 @@ function Sidebar () {
 
 // :::::: APP
 
+const isNotSupported = () => !fs.supported();
+const isLoading      = () => !db.ready.value;
+const isWelcome      = () => !db.folder.value;
+const isNotGranted   = () => db.perm.value !== 'granted';
+
 function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
-  if (!fs.supported())  return html`<div class="fe-app centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)  return html`<div class="fe-app centered"><div class="fe-booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
-  if (!db.folder.value) return html`<div class="fe-app centered"><${Welcome} /></div>`;
-  if (db.perm.value !== 'granted') return html`<div class="fe-app centered"><${Reconnect} /></div>`;
-
   return html`
-    <div class="fe-app">
+    <div id="app">${
+        isNotSupported() ? html`<${Unsupported} />`
+      : isLoading()      ? html`<${Icon} name='loading' />`
+      : isWelcome()      ? html`<${Welcome} />`
+      : isNotGranted()   ? html`<${Reconnect} />`
+      : html`
       <${Sidebar} />
-      <main class="fe-main">
+      <main id="app-main">
         <${FileExplorer} backend=${backend.value} />
-      </main>
-    </div>`;
+      </main>`
+    }</div>
+  `;
 }
 
 // :::::: BOOT
