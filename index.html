@@ -16,6 +16,32 @@
     .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12; }
     body > #app, #welcome, header, footer { position: relative; z-index: 1; }
   </style>
+  <style>
+    html {
+      opacity: 0;
+      transform: translateY(8px);
+      filter: blur(4px);
+      transition:
+        opacity 450ms ease,
+        transform 450ms cubic-bezier(.22, 1, .36, 1),
+        filter 450ms ease;
+    }
+    
+    html.is-ready {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        opacity: 1;
+        transform: none;
+        filter: none;
+        transition: none;
+      }
+    }
+  </style>
 </head>
 
 <body class="mobilefix">
@@ -26,6 +52,9 @@
   </div>
 </div>
 
+<script>
+  document.documentElement.classList.add('is-ready');
+</script>
 <script type="module">
 const route = window.location.pathname.split('/')[1] || 'home';
 
