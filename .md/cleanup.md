@@ -40,3 +40,20 @@ das soll sein:
   <div id='app-main'>...</div>
 </div>
 ```
+
+##
+
+```javascript
+import { boot, config }  from '/.shared/js/app.js?slug=files';
+import { Icon, FileExplorer, AppSettings } from '/.shared/js/components/index.js';
+import * as fs   from '/.shared/js/filesystem/fsaccess.js';
+import * as pwa  from '/.shared/js/lib/pwa.js';
+```
+
+```javascript
+const { AppSettings, FileExplorer, Icon } = zugriff.components;
+
+zugriff.fs
+zugriff.app.boot
+zugriff.app.config
+```
