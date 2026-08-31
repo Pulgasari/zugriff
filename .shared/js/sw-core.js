@@ -6,7 +6,10 @@ import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
 const SCOPE   = self.registration.scope;
 const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
-const VERSION = 'v2';
+// v3: navigations are no longer cache-answered (see fetch handler). bumping the
+// version purges any navigation documents the v2 worker stored, so returning
+// clients drop the stale un-redirected /code, /apps, … entries on activate.
+const VERSION = 'v3';
 
 const CACHE_APP     = `zugriff-${SLUG}-${VERSION}`;
 const CACHE_VENDOR  = `zugriff-vendor-${VERSION}`;
@@ -64,6 +67,18 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const { request } = event; if (request.method !== 'GET') return;
+
+  // never answer a top-level navigation from here. a document served from the
+  // cache renders at the *requested* url, not the redirected one, so:
+  //   • vercel's `trailingSlash: true` 308 (/apps → /apps/) never fires while
+  //     the sw is in control — the page stays on the un-slashed url;
+  //   • app.html then resolves its relative assets (./app.js, ./app.css) one
+  //     segment too high (/code/app.js becomes /app.js), so the app shell fails
+  //     to boot and a manual reload is needed.
+  // letting navigations hit the network keeps the redirect + rewrites intact;
+  // the sw still caches every subresource below, which is where the win is.
+  if (request.mode === 'navigate') return;
+
   if (!request.url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
   if (isNested(request.url))           return;
   if (!isVendor(request.url) && !isSameOrigin(request.url)) return;
