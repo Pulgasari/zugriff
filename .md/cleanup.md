@@ -5,6 +5,13 @@
 ```javascript
 <${Button} class='back' onClick=${() => go('latest')} icon='arrow-left' />
 <button class="back" onClick=${() => go('latest')}><${Icon} name="mdi:arrow-left" /> Back</button>
+
+<button class="fe-btn small" onClick=${chooseFolder}>
+  <${Icon} name="mdi:folder-swap-outline" /> Change
+</button>
+<button class="fe-btn small ghost" onClick=${closeFolder}>
+  <${Icon} name="close" /> Close
+</button>
 ```
 
 ##
