@@ -13,7 +13,7 @@ import { stored }       from '/.shared/js/lib/signals.js';
 import * as fs          from '/.shared/js/filesystem/fsaccess.js';
 
 const { computed, signal, useEffect, useRef, Fragment } = preact;
-const { AppSettings, Button, Empty, Icon, IconButton, InstallTip } = zugriff.components;
+const { AppSettings, Button, Empty, Icon, IconButton, InstallTip, Tree } = zugriff.components;
 
 // ::: local
 import * as db from './db.js';
@@ -140,9 +140,8 @@ function SourceBlock ({ source }) {
   } else {
     const view = q && tree ? filterTree(tree, q) : tree;
     body = view && view.children.length
-      ? html`<aufbau-tree nodes=${toTreeNodes(view, source.id, !!q)}
-                          onaufbau-tree-select=${onTreeSelect}
-                          onaufbau-tree-toggle=${onTreeToggle}></aufbau-tree>`
+      ? html`<${Tree} nodes=${toTreeNodes(view, source.id, !!q)}
+                       onSelect=${onTreeSelect} onToggle=${onTreeToggle} />`
       : html`<div class="src-empty">${q ? 'No matches' : 'No markdown files here'}</div>`;
   }
 
