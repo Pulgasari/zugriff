@@ -13,8 +13,6 @@
   <script src="/.shared/js/boot.js"></script>
 
   <style>
-    /* the moving grid backdrop sits behind the page content but in front of the
-       themed body background; content is lifted above it */
     .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12; }
     body > #app, #welcome, header, footer { position: relative; z-index: 1; }
   </style>
@@ -104,15 +102,14 @@ function HomePage () {
 }
   site = html`<${HomePage}/>`;
   preact.render(site, document.body);
-
-  // a slow grid drifting downward behind the landing. the pattern is painted as
-  // a background, so the scroll is independent of anything else on the page; the
-  // fg is read off the resolved theme and baked in (a css var cannot resolve
-  // inside a background-image), the visible strength comes from .bg-grid opacity.
+  
   const fg  = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
   const bg  = Object.assign(document.createElement('div'), { className: 'bg-grid' });
   document.body.appendChild(bg);
   animatePattern(bg, 'grid', { motion: 'up', speed: '1s', size: 44, width: 1, fg, bg: 'transparent' });
+  applyFilter('.bg-grid', 'glitch-live', { animate: true, speed: "2s" });
+  //aufbau.patterns.apply({ target: bg, pattern: 'grid', motion: 'up', speed: '1s', size: 44, width: 1, fg, bg: 'transparent' });
+  //aufbau.filters.apply({ target: bg, filter: 'glitch-live', animate: true, speed: "2s" });
 }
 
 // ::: Page: Apps | Tools
