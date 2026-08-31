@@ -1,5 +1,7 @@
 # cleanup
 
+ich will in `zugriff/apps` mal gründlich aufräumen. ich hab bissl chaotisch notiert hier. lies dir hier erstmal gründlich durch, fokus auf was ich im sinn habe, danndie ganzen genannten stellen udn verzeicznisse usw gründlich untersuchen, dann plan, dann feuer frei!
+
 ## buttons
 
 ```javascript
@@ -56,12 +58,20 @@ vermutlich wärs hier sinnvoll generell mal in den importmaps von `zugriff/.shar
 
 in `aufbau/elements` finden sich viele nützliche webcomponents, von denen hier mal gebrauch gemacht werden kann.
 
+- `<aufbau-index>`
+- `<aufbau-input>` (hatzb direkt ne variante für search inputs)
+- `<aufbau-progress>`
 - `<aufbau-reader>`
+- `<aufbau-toc>`
 - `<aufbau-tree>`
 
 und bestimmt auch noch andere. 
 
 evtl. wäre die eineoder andere aufbau-wc auch noch etwas sinnvoll und generisch zu erweitern.
+
+## weitere components:
+
+ich finde ausserdem wiederholt `Empty` components, die in mehreren apps reproduziert werden.
 
 ## imports
 
