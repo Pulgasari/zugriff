@@ -145,30 +145,30 @@ export default function FileBrowser () {
 
       ${errorMsg && html`
         <div class="filebrowser-error">
-          <${Icon} name="material-symbols:error-outline" size="16" />
+          <${Icon} name="material-symbols:error-outline" />
           ${errorMsg}
         </div>`}
 
       <div class="filebrowser-body">
         ${status === 'init' && html`
           <div class="none">
-            <${Icon} name="material-symbols:hourglass-empty" size="24" /><br/>
+            <${Icon} name="material-symbols:hourglass-empty" /><br/>
             Loading saved session…
           </div>`}
         ${status === 'needs-restore' && html`
           <div class="none">
-            <${Icon} name="material-symbols:lock-outline" size="24" /><br/>
+            <${Icon} name="material-symbols:lock-outline" /><br/>
             Reconnect <strong>${savedHandle?.name}</strong> to continue.
           </div>`}
         ${status === 'ready' && html`
           <div class="tree-rootbar">
-            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><${Icon} name="material-symbols:note-add-outline" size="18" /></button>
-            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><${Icon} name="material-symbols:create-new-folder-outline" size="18" /></button>
-            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><${Icon} name="paste" size="18" /></button>`}
+            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><${Icon} name="material-symbols:note-add-outline" /></button>
+            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><${Icon} name="material-symbols:create-new-folder-outline" /></button>
+            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><${Icon} name="paste" /></button>`}
           </div>`}
         ${(status === 'ready' || status === 'idle') && html`
           ${files.length === 0
-            ? html`<div class="none"><${Icon} name="material-symbols:info" size="24" /><br/>No folder loaded.</div>`
+            ? html`<div class="none"><${Icon} name="material-symbols:info" /><br/>No folder loaded.</div>`
             : html`<ul class="tree-root">
                 ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} parent=${state.currentDirHandle} depth=${0} />`)}
               </ul>`}

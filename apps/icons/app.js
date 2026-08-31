@@ -113,7 +113,7 @@ function IconCell ({ name }) {
       <span class="cname">${name.split(':')[1]}</span>
       <button class=${'heart' + (fav ? ' on' : '')} title="Favourite"
               onClick=${e => { e.stopPropagation(); store.toggleFav(name); }}>
-        <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} size=${15} />
+        <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} />
       </button>
     </button>`;
 }
@@ -138,7 +138,7 @@ function IconGrid ({ names }) {
 }
 
 function Empty () {
-  return html`<div class="empty"><${Icon} name="mdi:image-search-outline" size=${52} /><p>Nothing here.</p></div>`;
+  return html`<div class="empty"><${Icon} name="mdi:image-search-outline" /><p>Nothing here.</p></div>`;
 }
 
 // ── sidebar ──────────────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ function Empty () {
 function NavItem ({ name, icon, label }) {
   return html`
     <button class=${'nav-item' + (route.value.name === name ? ' active' : '')} onClick=${() => name === 'sets' ? (ensureCollections(), go('sets')) : go(name)}>
-      <${Icon} name=${icon} size=${18} /> <span>${label}</span>
+      <${Icon} name=${icon} /> <span>${label}</span>
     </button>`;
 }
 
@@ -154,8 +154,8 @@ function Sidebar () {
   return html`
     <aside class=${'sidebar' + (nav.value ? ' open' : '')}>
       <div class="brand">
-        <${Icon} name="mdi:emoticon-outline" size=${22} /> <span>Icons</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => nav.value = false}><${Icon} name="mdi:close" size=${18} /></button>
+        <${Icon} name="mdi:emoticon-outline" /> <span>Icons</span>
+        <button class="ibtn nav-close" aria-label="Close" onClick=${() => nav.value = false}><${Icon} name="mdi:close" /></button>
       </div>
       <nav class="nav-group">
         <${NavItem} name="home"      icon="mdi:home-outline"          label="Home" />
@@ -165,8 +165,8 @@ function Sidebar () {
       </nav>
       <div class="side-foot">
         <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" size=${14} /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" size=${14} /> launcher</a>
+          <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>
+          <a href="./../../"><${Icon} name="mdi:home-outline" /> launcher</a>
         </div>
         <div class="powered">powered by <a href="https://iconify.design" target="_blank" rel="noopener">Iconify</a></div>
       </div>
@@ -182,12 +182,12 @@ function Home () {
   return html`
     <div class="home">
       <div class="hero">
-        <${Icon} name="mdi:emoticon-outline" size=${56} />
+        <${Icon} name="mdi:emoticon-outline" />
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <button class="btn primary" onClick=${() => { ensureCollections(); go('sets'); }}><${Icon} name="mdi:image-multiple-outline" size=${16} /> Browse sets</button>
-          <button class="btn" onClick=${() => go('search')}><${Icon} name="mdi:magnify" size=${16} /> Search</button>
+          <button class="btn primary" onClick=${() => { ensureCollections(); go('sets'); }}><${Icon} name="mdi:image-multiple-outline" /> Browse sets</button>
+          <button class="btn" onClick=${() => go('search')}><${Icon} name="mdi:magnify" /> Search</button>
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -203,7 +203,7 @@ function Home () {
 }
 
 function SetsView () {
-  if (!collections.value) return html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`;
+  if (!collections.value) return html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   const rows = filteredSets.value;
   return html`
     <div class="sets">
@@ -221,7 +221,7 @@ function SetsView () {
 
 function SetView () {
   const d = setData.value;
-  if (setLoading.value || !d) return html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`;
+  if (setLoading.value || !d) return html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   return html`
     <div class="setview">
       <header class="setview-head">
@@ -229,7 +229,7 @@ function SetView () {
           <h1>${d.title}</h1>
           <div class="sub">${nfmt(d.total)} icons · <code>${d.prefix}</code></div>
         </div>
-        <button class="btn small" onClick=${() => copy(d.prefix)}><${Icon} name="mdi:content-copy" size=${15} /> Copy prefix</button>
+        <button class="btn small" onClick=${() => copy(d.prefix)}><${Icon} name="mdi:content-copy" /> Copy prefix</button>
       </header>
       <${IconGrid} names=${d.icons} />
     </div>`;
@@ -238,9 +238,9 @@ function SetView () {
 function SearchView () {
   return html`
     <div class="searchview">
-      ${searching.value ? html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`
+      ${searching.value ? html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`
         : query.value.trim() ? html`<${IconGrid} names=${results.value} />`
-        : html`<div class="empty"><${Icon} name="mdi:magnify" size=${52} /><p>Search across every Iconify set.</p></div>`}
+        : html`<div class="empty"><${Icon} name="mdi:magnify" /><p>Search across every Iconify set.</p></div>`}
     </div>`;
 }
 
@@ -248,7 +248,7 @@ function FavoritesView () {
   const names = [...store.favs.value];
   return names.length
     ? html`<${IconGrid} names=${names} />`
-    : html`<div class="empty"><${Icon} name="mdi:heart-outline" size=${52} /><p>No favourites yet — tap the heart on any icon.</p></div>`;
+    : html`<div class="empty"><${Icon} name="mdi:heart-outline" /><p>No favourites yet — tap the heart on any icon.</p></div>`;
 }
 
 function Content () {
@@ -266,9 +266,9 @@ function Content () {
 function SizeControl () {
   return html`
     <div class="size">
-      <${Icon} name="mdi:magnify-minus-outline" size=${16} />
+      <${Icon} name="mdi:magnify-minus-outline" />
       <input type="range" min="56" max="200" step="1" value=${itemSize.value} onInput=${e => itemSize.value = +e.target.value} />
-      <${Icon} name="mdi:magnify-plus-outline" size=${16} />
+      <${Icon} name="mdi:magnify-plus-outline" />
     </div>`;
 }
 
@@ -277,17 +277,17 @@ function TopBar () {
   const grid = r.name === 'set' || r.name === 'search' || r.name === 'favorites';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => nav.value = true}><${Icon} name="mdi:menu" size=${20} /></button>
-      ${r.name === 'set' && html`<button class="ibtn" aria-label="Back" onClick=${() => go('sets')}><${Icon} name="mdi:arrow-left" size=${20} /></button>`}
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => nav.value = true}><${Icon} name="mdi:menu" /></button>
+      ${r.name === 'set' && html`<button class="ibtn" aria-label="Back" onClick=${() => go('sets')}><${Icon} name="mdi:arrow-left" /></button>`}
 
       ${r.name === 'search'
         ? html`<div class="searchbox big">
-            <${Icon} name="mdi:magnify" size=${18} />
+            <${Icon} name="mdi:magnify" />
             <input type="search" placeholder="Search all of Iconify…" autofocus value=${query.value} onInput=${e => onSearch(e.target.value)} />
           </div>`
         : r.name === 'sets'
         ? html`<div class="searchbox">
-            <${Icon} name="mdi:magnify" size=${16} />
+            <${Icon} name="mdi:magnify" />
             <input type="search" placeholder="Filter sets…" value=${setFilter.value} onInput=${e => setFilter.value = e.target.value} />
           </div>`
         : html`<h1 class="topbar-title">${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
@@ -308,16 +308,16 @@ function Detail () {
   return html`
     <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) detail.value = null; }}>
       <div class="sheet" role="dialog" aria-modal="true">
-        <button class="sheet-x" aria-label="Close" onClick=${() => detail.value = null}><${Icon} name="mdi:close" size=${20} /></button>
+        <button class="sheet-x" aria-label="Close" onClick=${() => detail.value = null}><${Icon} name="mdi:close" /></button>
         <div class="sheet-preview"><iconify-icon icon=${name}></iconify-icon></div>
         <div class="sheet-name">${icon}</div>
         <div class="sheet-set"><button class="linkish" onClick=${() => { detail.value = null; openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
-          <button class="btn" onClick=${() => copy(name)}><${Icon} name="mdi:content-copy" size=${16} /> Copy name</button>
-          <button class="btn" onClick=${() => copySvg(name)}><${Icon} name="mdi:svg" size=${16} /> Copy SVG</button>
-          <button class="btn" onClick=${() => downloadSvg(name)}><${Icon} name="mdi:download" size=${16} /> Download</button>
+          <button class="btn" onClick=${() => copy(name)}><${Icon} name="mdi:content-copy" /> Copy name</button>
+          <button class="btn" onClick=${() => copySvg(name)}><${Icon} name="mdi:svg" /> Copy SVG</button>
+          <button class="btn" onClick=${() => downloadSvg(name)}><${Icon} name="mdi:download" /> Download</button>
           <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => store.toggleFav(name)}>
-            <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} size=${16} /> ${fav ? 'Favourited' : 'Favourite'}
+            <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { renderMD } from '@aufbau/import';
 
 // ::: shared
 import { boot, config }               from '/.shared/js/app.js?slug=notes';
-import { Icon, AppSettings, InstallTip, toast } from '/.shared/js/components/index.js';
+import { Icon, AppSettings, InstallTip } from '/.shared/js/components/index.js';
 import { stored }            from '/.shared/js/lib/signals.js';
 import * as fs               from '/.shared/js/filesystem/fsaccess.js';
 
@@ -23,7 +23,7 @@ function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className
   return html`
     <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
             disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -36,10 +36,6 @@ const filter   = signal('');                       // tree filter query
 const expanded = stored([], 'notes:expanded');     // ['sourceId:dir/path', …]
 const navOpen  = signal(false);                     // mobile: is the tree drawer showing
 const noteToc  = signal([]);                        // headings of the open note
-
-// the shared toast system (zugriff.toast / <aufbau-toast>) replaces the old
-// bottom-centre pill; `flash` stays as the app's thin adapter over it
-const flash = (text, kind = 'ok') => kind === 'err' ? toast.error(text) : toast.success(text);
 
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
@@ -83,7 +79,7 @@ const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 function Empty ({ icon, title, hint, action }) {
   return html`
     <div class="empty">
-      <${Icon} name=${icon} size=${56} />
+      <${Icon} name=${icon} />
       <p class="empty-title">${title}</p>
       ${hint && html`<p class="empty-hint">${hint}</p>`}
       ${action}
@@ -100,7 +96,7 @@ function TreeItem ({ sourceId, node, depth, forceOpen }) {
     return html`
       <button class=${'tree-file' + (active ? ' active' : '')} style=${pad}
               onClick=${() => openNote(sourceId, node)} title=${node.path}>
-        <${Icon} name="mdi:file-document-outline" size=${15} />
+        <${Icon} name="mdi:file-document-outline" />
         <span class="tree-label">${titleOf(node)}</span>
       </button>`;
   }
@@ -121,8 +117,8 @@ function TreeItem ({ sourceId, node, depth, forceOpen }) {
   return html`
     <div class="tree-dir-wrap">
       <button class="tree-dir" style=${pad} onClick=${() => toggleExpand(sourceId, node.path)}>
-        <${Icon} name=${show ? 'mdi:chevron-down' : 'mdi:chevron-right'} size=${16} className="tree-caret" />
-        <${Icon} name=${show ? 'mdi:folder-open-outline' : 'mdi:folder-outline'} size=${15} />
+        <${Icon} name=${show ? 'mdi:chevron-down' : 'mdi:chevron-right'} className="tree-caret" />
+        <${Icon} name=${show ? 'mdi:folder-open-outline' : 'mdi:folder-outline'} />
         <span class="tree-label">${node.name}</span>
       </button>
       ${kids}
@@ -147,23 +143,23 @@ function SourceBlock ({ source }) {
       if (res.granted) return;
       const why = res.error ? `${res.error.name || 'error'}` : `browser said “${res.state}”`;
       console.warn('[notes] reconnect failed', { source, ...res });
-      flash(`Reconnect failed — ${why}. Try “Choose folder”.`, 'err');
+      zugriff.toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
     });
     const repick = () => db.repick(source.id).then(ok =>
-      ok || flash('Could not open that folder', 'err'));
+      ok || zugriff.toast.error('Could not open that folder'));
     body = html`
       <div class="src-reconnect">
         <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
         <div class="src-reconnect-row">
           <button class="btn small primary" onClick=${tryReconnect}>
-            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works"
                   onClick=${repick}>
-            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
         </div>
       </div>`;
   } else if (busy && !tree) {
-    body = html`<div class="src-loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${16} /> Scanning…</div>`;
+    body = html`<div class="src-loading"><${Icon} name="svg-spinners:bars-scale-middle" /> Scanning…</div>`;
   } else {
     const view = q && tree ? filterTree(tree, q) : tree;
     body = view && view.children.length
@@ -174,13 +170,13 @@ function SourceBlock ({ source }) {
   return html`
     <div class="src">
       <div class="src-head">
-        <${Icon} name="mdi:folder-outline" size=${15} />
+        <${Icon} name="mdi:folder-outline" />
         <span class="src-name" title=${source.name}>${source.name}</span>
         <button class="src-x" title="Refresh" onClick=${() => db.scan(source.id).catch(() => {})}
                 disabled=${busy || state !== 'granted'}>
-          <${Icon} name="mdi:refresh" size=${14} /></button>
+          <${Icon} name="mdi:refresh" /></button>
         <button class="src-x" title="Close folder" onClick=${remove}>
-          <${Icon} name="mdi:close" size=${14} /></button>
+          <${Icon} name="mdi:close" /></button>
       </div>
       ${body}
     </div>`;
@@ -190,18 +186,18 @@ function Sidebar () {
   return html`
     <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
       <div class="brand">
-        <${Icon} name="mdi:notebook-outline" size=${22} /> <span>Notes</span>
+        <${Icon} name="mdi:notebook-outline" /> <span>Notes</span>
         <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}>
-          <${Icon} name="mdi:close" size=${18} /></button>
+          <${Icon} name="mdi:close" /></button>
       </div>
 
       <div class="tree-filter">
-        <${Icon} name="search" size=${16} />
+        <${Icon} name="search" />
         <input type="search" placeholder="Filter notes…" value=${filter.value}
                onInput=${e => filter.value = e.target.value} />
         ${filter.value && html`
           <button class="ibtn" aria-label="Clear" onClick=${() => filter.value = ''}>
-            <${Icon} name="close" size=${14} /></button>`}
+            <${Icon} name="close" /></button>`}
       </div>
 
       <div class="tree">
@@ -213,7 +209,7 @@ function Sidebar () {
       <div class="side-foot">
         <${InstallTip} show=${db.sources.value.length > 0} />
         <button class="btn small primary" onClick=${addFolder}>
-          <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>
+          <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>
       </div>
     </aside>`;
 }
@@ -249,12 +245,12 @@ function Reader () {
     (async () => {
       let text;
       try { ({ text } = await db.readNote(note.node.handle)); }
-      catch (err) { if (alive) el.innerHTML = ''; flash('Could not read that note: ' + err.message, 'err'); return; }
+      catch (err) { if (alive) el.innerHTML = ''; zugriff.toast.error('Could not read that note: ' + err.message); return; }
       if (!alive) return;
 
       let htmlStr;
       try { htmlStr = await renderMD(text); }
-      catch (err) { if (alive) { el.innerHTML = ''; flash('Could not render that note: ' + err.message, 'err'); } return; }
+      catch (err) { if (alive) { el.innerHTML = ''; zugriff.toast.error('Could not render that note: ' + err.message); } return; }
       if (!alive) return;
 
       const frag = document.createElement('div');
@@ -338,7 +334,7 @@ function ReaderBody ({ note, bodyRef, onClick }) {
     <div class="reader">
       <header class=${'reader-head' + (note ? '' : ' empty')}>
         <button class="ibtn nav-open" aria-label="Open notes" onClick=${() => navOpen.value = true}>
-          <${Icon} name="mdi:menu" size=${20} /></button>
+          <${Icon} name="mdi:menu" /></button>
         ${note
           ? html`<nav class="crumbs">
               ${segs.map((seg, i) => html`
@@ -374,7 +370,7 @@ function ReaderBody ({ note, bodyRef, onClick }) {
                                               : 'Open a folder of Markdown files to get started.'}
               action=${!db.sources.value.length && html`
                 <button class="btn primary" onClick=${addFolder}>
-                  <${Icon} name="mdi:folder-plus-outline" size=${16} /> Open a folder</button>`} />
+                  <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>`} />
           </div>`}
     </div>`;
 }
@@ -392,28 +388,28 @@ function navigateRelative (from, href) {
   const tree   = db.trees.value[from.sourceId];
   const node   = tree && findByPath(tree, target);
   if (node) openNote(from.sourceId, node);
-  else flash('Linked note not found', 'err');
+  else zugriff.toast.error('Linked note not found');
 }
 
 // :::::: ACTIONS
 
 async function addFolder () {
-  if (!fs.supported()) { flash('This browser can’t open folders — try Chrome, Edge or another Chromium browser.', 'err'); return; }
+  if (!fs.supported()) { zugriff.toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.'); return; }
   try {
     const rec = await db.addFolder();
-    if (rec) flash(`Opened ${rec.name}`);
-  } catch (err) { flash(err.message, 'err'); }
+    if (rec) zugriff.toast.success(`Opened ${rec.name}`);
+  } catch (err) { zugriff.toast.error(err.message); }
 }
 
 // :::::: APP
 
 function App () {
   useEffect(() => {
-    db.load().catch(err => flash('Could not open the library: ' + err.message, 'err'));
+    db.load().catch(err => zugriff.toast.error('Could not open the library: ' + err.message));
   }, []);
 
   if (!db.ready.value) {
-    return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`;
+    return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   }
 
   return html`

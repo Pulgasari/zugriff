@@ -173,7 +173,7 @@ const videoTransform = computed(() => {
 function Taplet ({ icon, size, title, onClick }) {
   return html`
     <button class="taplet" title=${title} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
+      <${Icon} name=${icon} />
     </button>
   `;
 }
@@ -205,7 +205,7 @@ function Ctrl ({ icon, label, onClick, active = false, big = false, disabled = f
       aria-label=${label}
       disabled=${disabled}
       onClick=${onClick}>
-      <${Icon} name=${icon} size=${big ? 30 : 22} />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -268,7 +268,7 @@ function SettingsPanel () {
         <header class="sheet-head">
           <strong>Settings</strong>
           <button class="icon-btn" title="Close" onClick=${() => settingsOpen.value = false}>
-            <${Icon} name="mdi:close" size="22" />
+            <${Icon} name="mdi:close" />
           </button>
         </header>
         <div class="sheet-body">
@@ -326,7 +326,7 @@ function Stage () {
 
       ${!src.value && html`
         <button class="empty" onClick=${pick}>
-          <${Icon} name="mdi:movie-open-outline" size="48" />
+          <${Icon} name="mdi:movie-open-outline" />
           <span>Open a video</span>
           <small>It stays on your device.</small>
         </button>`}

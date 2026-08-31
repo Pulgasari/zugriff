@@ -19,7 +19,7 @@ import { Icon } from '/.shared/js/components/index.js';
 function App () {
   return html`
     <header class="topbar">
-      <${Icon} name=${config.icon} size="20" />
+      <${Icon} name=${config.icon} />
       <strong>${config.name}</strong>
     </header>
     <main class="stage">

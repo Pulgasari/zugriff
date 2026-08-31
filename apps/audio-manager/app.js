@@ -110,12 +110,12 @@ function Cover ({ blob, size = 40, radius = 6 }) {
   const style = `width:${size}px;height:${size}px;border-radius:${radius}px`;
   return u
     ? html`<img class="cover" style=${style} src=${u} alt="" loading="lazy" />`
-    : html`<span class="cover ph" style=${style}><${Icon} name="mdi:music-note" size=${Math.round(size * 0.5)} /></span>`;
+    : html`<span class="cover ph" style=${style}><${Icon} name="mdi:music-note" /></span>`;
 }
 
 function PlayGlyph ({ track }) {
   const isCur = player.current.value?.key === track.key;
-  return html`<${Icon} name=${isCur && player.playing.value ? 'mdi:volume-high' : 'mdi:play'} size=${16} />`;
+  return html`<${Icon} name=${isCur && player.playing.value ? 'mdi:volume-high' : 'mdi:play'} />`;
 }
 
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
@@ -124,7 +124,7 @@ function NavItem ({ name, icon, label }) {
   const active = route.value.name === name;
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => go(name)}>
-      <${Icon} name=${icon} size=${18} /> <span>${label}</span>
+      <${Icon} name=${icon} /> <span>${label}</span>
     </button>`;
 }
 
@@ -135,11 +135,11 @@ function SourceRow ({ source }) {
   return html`
     <div class="src">
       <button class="src-open" onClick=${reconnect} title=${source.name}>
-        <${Icon} name=${state === 'granted' ? 'mdi:folder-music-outline' : 'mdi:folder-alert-outline'} size=${15} />
+        <${Icon} name=${state === 'granted' ? 'mdi:folder-music-outline' : 'mdi:folder-alert-outline'} />
         <span class="src-name">${source.name}</span>
-        ${busy && html`<${Icon} name="svg-spinners:bars-scale-middle" size=${13} />`}
+        ${busy && html`<${Icon} name="svg-spinners:bars-scale-middle" />`}
       </button>
-      <button class="src-x" title="Remove folder" onClick=${() => removeFolder(source)}><${Icon} name="mdi:close" size=${14} /></button>
+      <button class="src-x" title="Remove folder" onClick=${() => removeFolder(source)}><${Icon} name="mdi:close" /></button>
     </div>`;
 }
 
@@ -148,8 +148,8 @@ function Sidebar () {
   return html`
     <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
       <div class="brand">
-        <${Icon} name="mdi:music-box-multiple-outline" size=${22} /> <span>Music</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}><${Icon} name="mdi:close" size=${18} /></button>
+        <${Icon} name="mdi:music-box-multiple-outline" /> <span>Music</span>
+        <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}><${Icon} name="mdi:close" /></button>
       </div>
 
       <nav class="nav-group">
@@ -168,10 +168,10 @@ function Sidebar () {
 
       <div class="side-foot">
         <${InstallTip} />
-        <button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" size=${16} /> Add folder</button>
+        <button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
         <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" size=${14} /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" size=${14} /> launcher</a>
+          <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>
+          <a href="./../../"><${Icon} name="mdi:home-outline" /> launcher</a>
         </div>
       </div>
     </aside>`;
@@ -181,11 +181,11 @@ function InstallTip () {
   if (pwa.installed.value || !db.sources.value.length) return null;
   return html`
     <div class="tip">
-      <${Icon} name="mdi:information-outline" size=${15} />
+      <${Icon} name="mdi:information-outline" />
       <div>
         <span>Install the app so your folders stay connected between visits.</span>
         ${pwa.canInstall.value
-          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}><${Icon} name="mdi:download" size=${14} /> Install</button>`
+          ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}><${Icon} name="mdi:download" /> Install</button>`
           : html`<span class="tip-hint">Use your browser’s <b>Install</b> menu.</span>`}
       </div>
     </div>`;
@@ -228,7 +228,7 @@ function AlbumsGrid () {
         <button class="album-card" key=${a.key} onClick=${() => go('album', a.key)}>
           <div class="album-art">
             <${Cover} blob=${a.cover} size=${160} radius=${10} />
-            <span class="album-play" onClick=${e => { e.stopPropagation(); player.play(a.tracks[0], a.tracks); }}><${Icon} name="mdi:play" size=${22} /></span>
+            <span class="album-play" onClick=${e => { e.stopPropagation(); player.play(a.tracks[0], a.tracks); }}><${Icon} name="mdi:play" /></span>
           </div>
           <div class="album-name" title=${a.album}>${a.album}</div>
           <div class="album-artist" title=${a.artist}>${a.artist}</div>
@@ -248,7 +248,7 @@ function AlbumDetail ({ id }) {
           <div class="detail-kind">Album</div>
           <h1>${a.album}</h1>
           <div class="detail-sub">${a.artist}${a.year ? ` · ${a.year}` : ''} · ${a.tracks.length} songs${total ? ` · ${fmtTotal(total)}` : ''}</div>
-          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><${Icon} name="mdi:play" size=${16} /> Play</button>
+          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><${Icon} name="mdi:play" /> Play</button>
         </div>
       </header>
       <${TrackList} tracks=${a.tracks} numbered />
@@ -267,7 +267,7 @@ function ArtistsList () {
             <div class="artist-name">${a.name}</div>
             <div class="artist-sub">${a.albums.size} album${a.albums.size === 1 ? '' : 's'} · ${a.tracks.length} song${a.tracks.length === 1 ? '' : 's'}</div>
           </div>
-          <${Icon} name="mdi:chevron-right" size=${20} />
+          <${Icon} name="mdi:chevron-right" />
         </button>`)}
     </div>`;
 }
@@ -284,7 +284,7 @@ function ArtistDetail ({ id }) {
           <div class="detail-kind">Artist</div>
           <h1>${a.name}</h1>
           <div class="detail-sub">${a.albums.size} album${a.albums.size === 1 ? '' : 's'} · ${a.tracks.length} songs</div>
-          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><${Icon} name="mdi:play" size=${16} /> Play all</button>
+          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><${Icon} name="mdi:play" /> Play all</button>
         </div>
       </header>
       <div class="albums">
@@ -321,9 +321,9 @@ function Empty ({ q }) {
   const has = db.sources.value.length > 0;
   return html`
     <div class="empty">
-      <${Icon} name=${q ? 'mdi:magnify' : 'mdi:music-note-off-outline'} size=${56} />
+      <${Icon} name=${q ? 'mdi:magnify' : 'mdi:music-note-off-outline'} />
       <p>${q ? `Nothing matches “${q}”` : has ? 'No audio here yet — try Rescan or another folder.' : 'Add a folder of music to get started.'}</p>
-      ${!has && !q && html`<button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" size=${16} /> Add folder</button>`}
+      ${!has && !q && html`<button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" /> Add folder</button>`}
     </div>`;
 }
 
@@ -335,16 +335,16 @@ function TopBar () {
   const back  = r.name === 'album' || r.name === 'artist';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}><${Icon} name="mdi:menu" size=${20} /></button>
-      ${back && html`<button class="ibtn" aria-label="Back" onClick=${() => go(r.name === 'album' ? 'albums' : 'artists')}><${Icon} name="mdi:arrow-left" size=${20} /></button>`}
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}><${Icon} name="mdi:menu" /></button>
+      ${back && html`<button class="ibtn" aria-label="Back" onClick=${() => go(r.name === 'album' ? 'albums' : 'artists')}><${Icon} name="mdi:arrow-left" /></button>`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>
       <div class="searchbox">
-        <${Icon} name="mdi:magnify" size=${16} />
+        <${Icon} name="mdi:magnify" />
         <input type="search" placeholder="Search…" value=${search.value} onInput=${e => search.value = e.target.value} />
       </div>
-      <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" size=${18} /></button>
+      <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" /></button>
       <${AppSettings} />
     </header>`;
 }
@@ -375,14 +375,14 @@ function PlayerBar () {
 
       <div class="controls">
         <div class="ctl-row">
-          <button class=${'ctl' + (player.shuffle.value ? ' on' : '')} title="Shuffle" onClick=${player.toggleShuffle}><${Icon} name="mdi:shuffle-variant" size=${18} /></button>
-          <button class="ctl" title="Previous" onClick=${player.prev}><${Icon} name="mdi:skip-previous" size=${24} /></button>
+          <button class=${'ctl' + (player.shuffle.value ? ' on' : '')} title="Shuffle" onClick=${player.toggleShuffle}><${Icon} name="mdi:shuffle-variant" /></button>
+          <button class="ctl" title="Previous" onClick=${player.prev}><${Icon} name="mdi:skip-previous" /></button>
           <button class="ctl play" title="Play/Pause" onClick=${player.toggle}>
-            <${Icon} name=${player.waiting.value ? 'svg-spinners:bars-scale-middle' : player.playing.value ? 'mdi:pause' : 'mdi:play'} size=${24} />
+            <${Icon} name=${player.waiting.value ? 'svg-spinners:bars-scale-middle' : player.playing.value ? 'mdi:pause' : 'mdi:play'} />
           </button>
-          <button class="ctl" title="Next" onClick=${() => player.next()}><${Icon} name="mdi:skip-next" size=${24} /></button>
+          <button class="ctl" title="Next" onClick=${() => player.next()}><${Icon} name="mdi:skip-next" /></button>
           <button class=${'ctl' + (player.repeat.value !== 'off' ? ' on' : '')} title=${'Repeat: ' + player.repeat.value} onClick=${player.cycleRepeat}>
-            <${Icon} name=${player.repeat.value === 'one' ? 'mdi:repeat-once' : 'mdi:repeat'} size=${18} />
+            <${Icon} name=${player.repeat.value === 'one' ? 'mdi:repeat-once' : 'mdi:repeat'} />
           </button>
         </div>
         <div class="seek">
@@ -394,7 +394,7 @@ function PlayerBar () {
       </div>
 
       <div class="extra">
-        <${Icon} name="mdi:volume-high" size=${18} />
+        <${Icon} name="mdi:volume-high" />
         <input class="vol" type="range" min="0" max="1" step="0.01" value=${player.volume.value}
                onInput=${e => player.setVolume(+e.target.value)} />
       </div>
@@ -411,7 +411,7 @@ function Toast () {
 function Unsupported () {
   return html`
     <div class="hero">
-      <${Icon} name="mdi:folder-alert-outline" size=${64} />
+      <${Icon} name="mdi:folder-alert-outline" />
       <h1>Can’t open folders here</h1>
       <p>This browser doesn’t support the File System Access API. Try a recent Chromium-based browser (Chrome, Edge, Brave…).</p>
     </div>`;
@@ -420,10 +420,10 @@ function Unsupported () {
 function Welcome () {
   return html`
     <div class="hero">
-      <${Icon} name="mdi:music-box-multiple-outline" size=${64} />
+      <${Icon} name="mdi:music-box-multiple-outline" />
       <h1>Your music, on your device</h1>
       <p>Add a folder of audio files — tags and cover art are read locally and never leave your machine.</p>
-      <button class="btn primary big" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" size=${18} /> Add a folder</button>
+      <button class="btn primary big" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>
     </div>`;
 }
 
@@ -433,7 +433,7 @@ function App () {
   useEffect(() => { db.load().catch(err => flash('Could not open the library: ' + err.message, 'err')); return dropCovers; }, []);
 
   if (!fs.supported())          return html`<div class="am-app centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)          return html`<div class="am-app centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div></div>`;
+  if (!db.ready.value)          return html`<div class="am-app centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
   if (!db.sources.value.length) return html`<div class="am-app centered"><${Welcome} /></div>`;
 
   return html`

@@ -21,11 +21,11 @@ function InstallTip ({ show = true, message = DEFAULT_MESSAGE }) {
 
   return html`
     <div class="install-tip">
-      <${Icon} name="mdi:information-outline" size=${18} />
+      <${Icon} name="mdi:information-outline" />
       <span class="install-tip-text">${message}</span>
       ${pwa.canInstall.value
         ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-            <${Icon} name="mdi:download" size=${15} /> Install app</button>`
+            <${Icon} name="mdi:download" /> Install app</button>`
         : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
     </div>`;
 }

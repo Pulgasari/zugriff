@@ -198,7 +198,7 @@ function App() {
 
           <div class="actions">
             <button class="btn icon-only" onClick=${togglePlay} title=${playing.value ? 'Pause' : 'Preview'}>
-              <${Icon} name=${playing.value ? 'mdi:pause' : 'mdi:play'} size="20" />
+              <${Icon} name=${playing.value ? 'mdi:pause' : 'mdi:play'} />
             </button>
             <button class="btn primary" onClick=${doConvert} disabled=${busy}>
               <${Icon} name=${busy ? 'mdi:loading' : 'mdi:content-cut'} className=${busy ? 'spin' : ''} />

@@ -10,7 +10,7 @@ export default function Welcome () {
     <div id="welcome">
       <img class="welcome-logo" src="./app.svg" alt="Code" width="160" height="160" />
       <div class="welcome-hint" onClick=${() => state.toggleModal('filebrowser')}>
-        <${Icon} name="material-symbols:info" size="24" />
+        <${Icon} name="material-symbols:info" />
         <span>No file selected — grant a folder to start.</span>
       </div>
     </div>

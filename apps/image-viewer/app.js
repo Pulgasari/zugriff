@@ -17,7 +17,7 @@ function IconBtn ({ icon, label, onClick, disabled, active, size = 20 }) {
   return html`
     <button class=${'iv-btn' + (active ? ' active' : '')} title=${label} aria-label=${label}
             disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -162,7 +162,7 @@ function TopBar () {
   return html`
     <header class="iv-top">
       <div class="iv-title">
-        <${Icon} name="image" size=${18} />
+        <${Icon} name="image" />
         <span class="iv-name" title=${s?.name}>${s?.name || 'Image Viewer'}</span>
         ${many.value && html`<span class="iv-count">${idx.value + 1} / ${shots.value.length}</span>`}
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
@@ -197,13 +197,13 @@ function ThumbStrip () {
 function Welcome () {
   return html`
     <div class="iv-welcome">
-      <${Icon} name="images" size=${64} />
+      <${Icon} name="images" />
       <h1>View an image</h1>
       <p>Open images from your device, or just drop them here. Nothing is
          uploaded — they stay on your machine.</p>
       <button class="iv-cta" onClick=${openPicker}>
-        <${Icon} name="mdi:folder-open-outline" size=${18} /> Open images</button>
-      ${error.value && html`<p class="iv-error"><${Icon} name="mdi:alert-outline" size=${16} /> ${error.value}</p>`}
+        <${Icon} name="mdi:folder-open-outline" /> Open images</button>
+      ${error.value && html`<p class="iv-error"><${Icon} name="mdi:alert-outline" /> ${error.value}</p>`}
       <${OpenWithTip} />
     </div>`;
 }
@@ -213,17 +213,17 @@ function OpenWithTip () {
   const canHandle = 'launchQueue' in window;
   if (!canHandle) return null;
   if (pwa.installed.value) {
-    return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" size=${15} />
+    return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" />
       Installed — pick <b>Viewer</b> from your device’s <b>Open with</b> menu to send images straight here.</p>`;
   }
   return html`
     <div class="iv-tip install">
-      <${Icon} name="mdi:cellphone-arrow-down" size=${15} />
+      <${Icon} name="mdi:cellphone-arrow-down" />
       <div>
         <span>Install the app to open images from your gallery or files with it.</span>
         ${pwa.canInstall.value
           ? html`<button class="iv-cta small" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="download" size=${14} /> Install app</button>`
+              <${Icon} name="download" /> Install app</button>`
           : html`<span class="iv-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
       </div>
     </div>`;
@@ -316,9 +316,9 @@ function App () {
 
         ${many.value && !bare.value && html`
           <button class="iv-nav prev" aria-label="Previous" onClick=${e => { e.stopPropagation(); go(-1); }}>
-            <${Icon} name="mdi:chevron-left" size=${34} /></button>
+            <${Icon} name="mdi:chevron-left" /></button>
           <button class="iv-nav next" aria-label="Next" onClick=${e => { e.stopPropagation(); go(1); }}>
-            <${Icon} name="mdi:chevron-right" size=${34} /></button>`}
+            <${Icon} name="mdi:chevron-right" /></button>`}
       </div>
 
       ${!bare.value && html`<${ThumbStrip} />`}

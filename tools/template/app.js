@@ -18,7 +18,7 @@ import { Icon } from '/.shared/js/components/index.js';
 function App () {
   return html`
     <div id="app-body">
-      <${Icon} name=${config.icon} size="48" />
+      <${Icon} name=${config.icon} />
       <p>${config.description}</p>
     </div>`;
 }

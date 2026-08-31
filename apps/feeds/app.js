@@ -237,7 +237,7 @@ function VideoCard ({ item }) {
       <div class="vid-thumb">
         ${item.image
           ? html`<${Image} src=${item.image} />`
-          : html`<div class="vid-noimg"><${Icon} name="youtube" size=${32} /></div>`}
+          : html`<div class="vid-noimg"><${Icon} name="youtube" /></div>`}
         ${unread && html`<span class="vid-new">new</span>`}
       </div>
       <div class="vid-title">${item.title}</div>
@@ -252,7 +252,7 @@ function Body () {
     const hasFeeds = db.feeds.value.length > 0;
     return html`
       <div class="empty">
-        <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} size=${56} />
+        <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} />
         <p>${hasFeeds ? 'Nothing here yet — try Refresh.' : 'Follow a feed to see the latest here.'}</p>
         ${!hasFeeds && html`<button class="cta" onClick=${() => { addVal.value = ''; dialog.value = 'add'; }}>
           <${Icon} name="plus" /> Add your first feed</button>`}
@@ -275,7 +275,7 @@ function Header () {
       ${v.feed?.link && html`<a class="ibtn" href=${v.feed.link} target="_blank" rel="noopener noreferrer" title="Open site">
         <${Icon} name="mdi:open-in-new" /></a>`}
       <span class="topbar-spacer"></span>
-      ${busy.value && html`<span class="topbar-busy"><${Icon} name="loading" size=${14} /> ${busy.value}</span>`}
+      ${busy.value && html`<span class="topbar-busy"><${Icon} name="loading" /> ${busy.value}</span>`}
       ${v.list.length > 0 && html`
         <button class="ibtn" title="Mark all read" onClick=${markAllRead}>
           <${Icon} name="mdi:check-all" /></button>`}
@@ -351,7 +351,7 @@ function App () {
     }).catch(err => flash('Could not open the library: ' + err.message, 'err'));
   }, []);
 
-  if (!db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`;
+  if (!db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   return html`
     <div class="rss-app">

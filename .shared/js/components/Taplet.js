@@ -6,7 +6,7 @@ import Icon from './Icon.js';
 function Taplet ({ icon, size, title, onClick }) {
   return html`
     <button class="taplet" title=${title} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
+      <${Icon} name=${icon} />
     </button>
   `;
 }

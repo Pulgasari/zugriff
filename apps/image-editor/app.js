@@ -315,7 +315,7 @@ function ToolButton ({ icon, label, onClick, disabled, active }) {
   return html`
     <button class=${'tbtn' + (active ? ' active' : '')} onClick=${onClick}
             disabled=${disabled} title=${label} aria-label=${label}>
-      <${Icon} name=${icon} size="18" />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -359,7 +359,7 @@ function CropBar () {
       <div class="spacer"></div>
       ${r && html`<span class="crop-size">${r.w} × ${r.h}</span>`}
       <button class="btn ghost"   onClick=${cancelCrop}>Cancel</button>
-      <button class="btn primary" onClick=${applyCrop}><${Icon} name="mdi:check" size="16" /> Apply crop</button>
+      <button class="btn primary" onClick=${applyCrop}><${Icon} name="mdi:check" /> Apply crop</button>
     </div>`;
 }
 
@@ -393,11 +393,11 @@ function Stage ({ onPick }) {
         </div>`
         : html`
         <button class="empty" onClick=${onPick}>
-          <${Icon} name="mdi:image-plus-outline" size="64" />
+          <${Icon} name="mdi:image-plus-outline" />
           <p>Open an image</p>
           <p class="sub">click to browse, or drop a file anywhere here</p>
         </button>`}
-      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" size="40" /> <span>Drop to open</span></div>
+      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" /> <span>Drop to open</span></div>
     </div>`;
 }
 
@@ -472,7 +472,7 @@ function Adjustments () {
       <${Slider} label="Grayscale"  value=${f.grayscale}  min="0" max="100" onInput=${v => set('grayscale', v)}  reset=${() => set('grayscale', 0)} />
       ${!edit.isIdentity(f) && html`
         <button class="btn ghost wide" onClick=${() => filters.value = { ...edit.IDENTITY }}>
-          <${Icon} name="mdi:backup-restore" size="16" /> Reset adjustments
+          <${Icon} name="mdi:backup-restore" /> Reset adjustments
         </button>`}
     </section>`;
 }
@@ -486,7 +486,7 @@ function ResizePanel () {
         </label>
         <button class=${'lock' + (lockAR.value ? ' on' : '')} title="Lock aspect ratio"
                 onClick=${() => lockAR.value = !lockAR.value}>
-          <${Icon} name=${lockAR.value ? 'mdi:link-variant' : 'mdi:link-variant-off'} size="16" />
+          <${Icon} name=${lockAR.value ? 'mdi:link-variant' : 'mdi:link-variant-off'} />
         </button>
         <label class="field"><span>H</span>
           <input type="number" min="1" value=${resizeH.value} onInput=${e => onResizeInput('h', +e.target.value)} />
@@ -515,7 +515,7 @@ function ExportPanel () {
         <em>.${fmt.ext}</em>
       </label>
       <button class="btn primary wide" onClick=${exportImage} disabled=${!work.value || busy.value}>
-        <${Icon} name="mdi:download" size="16" /> Download
+        <${Icon} name="mdi:download" /> Download
       </button>
     </section>`;
 }
@@ -529,7 +529,7 @@ function Panel () {
         ${TABS.map(t => html`
           <button class=${'tab' + (tab === t.id ? ' active' : '')} key=${t.id}
                   onClick=${() => panelTab.value = t.id}>
-            <${Icon} name=${t.icon} size="16" /> <span>${t.label}</span>
+            <${Icon} name=${t.icon} /> <span>${t.label}</span>
           </button>`)}
       </nav>
       <div class="tab-body">
@@ -544,11 +544,11 @@ function StatusBar () {
   const d = dims.value;
   return html`
     <footer class="statusbar">
-      <${Icon} name="mdi:image-outline" size="14" />
+      <${Icon} name="mdi:image-outline" />
       <span>${d ? `${d.w} × ${d.h} px` : 'no image'}</span>
-      ${error.value && html`<span class="err"><${Icon} name="mdi:alert-outline" size="14" /> ${error.value}</span>`}
+      ${error.value && html`<span class="err"><${Icon} name="mdi:alert-outline" /> ${error.value}</span>`}
       <span class="spacer"></span>
-      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" size="14" /> working…</span>`}
+      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" /> working…</span>`}
       ${dirty.value && !busy.value && html`<span class="edited">edited</span>`}
     </footer>`;
 }
