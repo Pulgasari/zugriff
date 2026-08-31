@@ -10,13 +10,6 @@
 
 // besser
 <${Button} class='back' icon='arrow-left' label='Back' onClick=${() => go('latest')} />
-
-<button class="fe-btn small" onClick=${chooseFolder}>
-  <${Icon} name="mdi:folder-swap-outline" /> Change
-</button>
-<button class="fe-btn small ghost" onClick=${closeFolder}>
-  <${Icon} name="close" /> Close
-</button>
 ```
 
 ### `IconButton`
