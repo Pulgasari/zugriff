@@ -146,7 +146,7 @@ function Dropzone () {
   const onDrop = e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f?.type.startsWith('image/')) usePhoto(f); };
   return html`
     <label class="drop" onDragOver=${e => e.preventDefault()} onDrop=${onDrop}>
-      <${Icon} name="mdi:image-plus-outline" size=${40} />
+      <${Icon} name="mdi:image-plus-outline" />
       <strong>Drop a photo</strong>
       <span>or tap to choose — a clear, front-facing portrait works best. Nothing leaves your device.</span>
       <input type="file" accept="image/*" hidden onChange=${onFile} />
@@ -166,7 +166,7 @@ function ColorRow () {
                   title=${s.name} style=${`background:rgb(${s.r},${s.g},${s.b})`}
                   onClick=${() => { color.value = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
         <label class="swatch custom" title="Custom colour">
-          <${Icon} name="mdi:eyedropper-variant" size=${16} />
+          <${Icon} name="mdi:eyedropper-variant" />
           <input type="color" onInput=${onCustom} />
         </label>
       </div>
@@ -191,14 +191,14 @@ function StyleRow () {
       <div class="group-head"><span>Hairstyle</span></div>
       <div class="styles">
         <button class=${'style none' + (!styleId.value ? ' on' : '')} onClick=${() => useStyle(null)}>
-          <${Icon} name="mdi:cancel" size=${18} /><span>None</span>
+          <${Icon} name="mdi:cancel" /><span>None</span>
         </button>
         ${HAIRSTYLES.map(s => html`
           <button class=${'style' + (styleId.value === s.id ? ' on' : '')} onClick=${() => useStyle(s)}>
             <img src=${s.src} alt=${s.name} /><span>${s.name}</span>
           </button>`)}
         <label class=${'style upload' + (styleId.value === 'custom' ? ' on' : '')}>
-          <${Icon} name="mdi:tray-arrow-up" size=${18} /><span>Your PNG</span>
+          <${Icon} name="mdi:tray-arrow-up" /><span>Your PNG</span>
           <input type="file" accept="image/png,image/*" hidden onChange=${onCustom} />
         </label>
       </div>
@@ -225,16 +225,16 @@ function App () {
 
   return html`
     <header class="topbar">
-      <${Icon} name=${config.icon} size=${20} />
+      <${Icon} name=${config.icon} />
       <strong>${config.name}</strong>
       <div class="spacer"></div>
       ${hasPhoto.value && html`
         <label class="ibtn" title="New photo">
-          <${Icon} name="mdi:image-refresh-outline" size=${18} />
+          <${Icon} name="mdi:image-refresh-outline" />
           <input type="file" accept="image/*" hidden onChange=${onNew} />
         </label>
-        <button class="ibtn" title="Reset edits" onClick=${reset}><${Icon} name="mdi:restore" size=${18} /></button>
-        <button class="ibtn" title="Download" onClick=${download}><${Icon} name="mdi:tray-arrow-down" size=${18} /></button>`}
+        <button class="ibtn" title="Reset edits" onClick=${reset}><${Icon} name="mdi:restore" /></button>
+        <button class="ibtn" title="Download" onClick=${download}><${Icon} name="mdi:tray-arrow-down" /></button>`}
     </header>
 
     <main class="stage">

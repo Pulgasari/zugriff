@@ -56,7 +56,7 @@ async function closeFolder () {
 function Unsupported () {
   return html`
     <div class="fe-hero">
-      <${Icon} name="mdi:folder-alert-outline" size="64" />
+      <${Icon} name="mdi:folder-alert-outline" />
       <h1>Can't open folders here</h1>
       <p>This browser doesn't support the File System Access API, so the explorer
          has no folder to open. Try a recent Chromium-based browser (Chrome, Edge,
@@ -68,13 +68,13 @@ function Unsupported () {
 function Welcome () {
   return html`
     <div class="fe-hero">
-      <${Icon} name="mdi:folder-open-outline" size="64" />
+      <${Icon} name="mdi:folder-open-outline" />
       <h1>Browse a folder</h1>
       <p>Pick a folder from your device — it becomes the root of the explorer.
          Nothing is uploaded and nothing is copied; everything stays on your
          machine.</p>
       <button class="fe-btn primary" onClick=${chooseFolder}>
-        <${Icon} name="mdi:folder-plus-outline" size="18" /> Open a folder</button>
+        <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>
     </div>`;
 }
 
@@ -83,17 +83,17 @@ function Reconnect () {
   const denied = db.perm.value === 'denied';
   return html`
     <div class="fe-hero">
-      <${Icon} name="mdi:folder-key-outline" size="64" />
+      <${Icon} name="mdi:folder-key-outline" />
       <h1>Reconnect “${db.folder.value.name}”</h1>
       <p>${denied
           ? 'Permission for this folder was blocked. Re-pick it to browse again.'
           : 'This folder needs permission again for this visit.'}</p>
       <div class="fe-hero-actions">
         <button class="fe-btn primary" onClick=${tryReconnect}>
-          <${Icon} name="mdi:folder-key-outline" size="18" /> Reconnect</button>
+          <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
         <button class="fe-btn ghost" title="Re-select the folder — always works"
                 onClick=${chooseFolder}>
-          <${Icon} name="mdi:folder-search-outline" size="18" /> Choose folder</button>
+          <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
       </div>
     </div>`;
 }
@@ -103,12 +103,12 @@ function InstallTip () {
   if (pwa.installed.value) return null;
   return html`
     <div class="fe-tip">
-      <${Icon} name="mdi:information-outline" size="15" />
+      <${Icon} name="mdi:information-outline" />
       <div class="fe-tip-body">
         <span>Install the app so your folder stays connected between visits.</span>
         ${pwa.canInstall.value
           ? html`<button class="fe-btn small primary" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="mdi:download" size="14" /> Install app</button>`
+              <${Icon} name="mdi:download" /> Install app</button>`
           : html`<span class="fe-tip-hint">Use your browser's <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
       </div>
     </div>`;
@@ -119,19 +119,19 @@ function Sidebar () {
   return html`
     <aside class="fe-side">
       <div class="fe-brand">
-        <${Icon} name="mdi:folder-outline" size="22" /> <span>Files</span>
+        <${Icon} name="mdi:folder-outline" /> <span>Files</span>
       </div>
 
       <div class="fe-current">
         <span class="fe-current-label">open folder</span>
         <div class="fe-current-name" title=${f.name}>
-          <${Icon} name="mdi:folder-open-outline" size="16" /> <span>${f.name}</span>
+          <${Icon} name="mdi:folder-open-outline" /> <span>${f.name}</span>
         </div>
         <div class="fe-current-actions">
           <button class="fe-btn small" onClick=${chooseFolder}>
-            <${Icon} name="mdi:folder-swap-outline" size="15" /> Change</button>
+            <${Icon} name="mdi:folder-swap-outline" /> Change</button>
           <button class="fe-btn small ghost" onClick=${closeFolder}>
-            <${Icon} name="mdi:close" size="15" /> Close</button>
+            <${Icon} name="mdi:close" /> Close</button>
         </div>
       </div>
 
@@ -147,7 +147,7 @@ function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
   if (!fs.supported())  return html`<div class="fe-app centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)  return html`<div class="fe-app centered"><div class="fe-booting"><${Icon} name="svg-spinners:bars-scale-middle" size="28" /></div></div>`;
+  if (!db.ready.value)  return html`<div class="fe-app centered"><div class="fe-booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
   if (!db.folder.value) return html`<div class="fe-app centered"><${Welcome} /></div>`;
   if (db.perm.value !== 'granted') return html`<div class="fe-app centered"><${Reconnect} /></div>`;
 

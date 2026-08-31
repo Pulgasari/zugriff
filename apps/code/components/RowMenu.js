@@ -15,14 +15,14 @@ export default function RowMenu ({ items }) {
   return html`
     <span class="rowmenu">
       <button class="rowmenu-btn" title="Actions" onClick=${e => { e.stopPropagation(); setOpen(o => !o); }}>
-        <${Icon} name="mdi:dots-horizontal" size="16" />
+        <${Icon} name="mdi:dots-horizontal" />
       </button>
       ${open && html`
         <div class="rowmenu-scrim" onClick=${e => { e.stopPropagation(); setOpen(false); }}></div>
         <div class="rowmenu-pop" onClick=${e => e.stopPropagation()}>
           ${list.map(it => html`
             <button class=${'rowmenu-item' + (it.danger ? ' danger' : '')} onClick=${run(it.onClick)}>
-              ${it.icon && html`<${Icon} name=${it.icon} size="15" />`}<span>${it.label}</span>
+              ${it.icon && html`<${Icon} name=${it.icon} />`}<span>${it.label}</span>
             </button>`)}
         </div>`}
     </span>`;

@@ -189,7 +189,7 @@ function IconBtn ({ icon, label, onClick, disabled, active, size = 20 }) {
   return html`
     <button class=${'iv-btn' + (active ? ' active' : '')} title=${label} aria-label=${label}
             disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -198,7 +198,7 @@ function ViewTopBar () {
   return html`
     <header class="iv-top">
       <div class="iv-title">
-        <${Icon} name="image" size=${18} />
+        <${Icon} name="image" />
         <span class="iv-name" title=${s?.name}>${s?.name || 'Image Viewer'}</span>
         ${many.value && html`<span class="iv-count">${idx.value + 1} / ${shots.value.length}</span>`}
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
@@ -240,17 +240,17 @@ function OpenWithTip () {
   const canHandle = 'launchQueue' in window;
   if (!canHandle) return null;
   if (pwa.installed.value) {
-    return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" size=${15} />
+    return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" />
       Installed — pick <b>Images</b> from your device’s <b>Open with</b> menu to send images straight here.</p>`;
   }
   return html`
     <div class="iv-tip install">
-      <${Icon} name="mdi:cellphone-arrow-down" size=${15} />
+      <${Icon} name="mdi:cellphone-arrow-down" />
       <div>
         <span>Install the app to open images from your gallery or files with it.</span>
         ${pwa.canInstall.value
           ? html`<button class="iv-cta small" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="download" size=${14} /> Install app</button>`
+              <${Icon} name="download" /> Install app</button>`
           : html`<span class="iv-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
       </div>
     </div>`;
@@ -259,13 +259,13 @@ function OpenWithTip () {
 function Welcome () {
   return html`
     <div class="iv-welcome">
-      <${Icon} name="images" size=${64} />
+      <${Icon} name="images" />
       <h1>View an image</h1>
       <p>Open images from your device, or just drop them here. Nothing is
          uploaded — they stay on your machine.</p>
       <button class="iv-cta" onClick=${openPicker}>
-        <${Icon} name="mdi:folder-open-outline" size=${18} /> Open images</button>
-      ${vError.value && html`<p class="iv-error"><${Icon} name="mdi:alert-outline" size=${16} /> ${vError.value}</p>`}
+        <${Icon} name="mdi:folder-open-outline" /> Open images</button>
+      ${vError.value && html`<p class="iv-error"><${Icon} name="mdi:alert-outline" /> ${vError.value}</p>`}
       <${OpenWithTip} />
     </div>`;
 }
@@ -348,9 +348,9 @@ function ViewMode () {
 
         ${many.value && !bare.value && html`
           <button class="iv-nav prev" aria-label="Previous" onClick=${e => { e.stopPropagation(); go(-1); }}>
-            <${Icon} name="mdi:chevron-left" size=${34} /></button>
+            <${Icon} name="mdi:chevron-left" /></button>
           <button class="iv-nav next" aria-label="Next" onClick=${e => { e.stopPropagation(); go(1); }}>
-            <${Icon} name="mdi:chevron-right" size=${34} /></button>`}
+            <${Icon} name="mdi:chevron-right" /></button>`}
       </div>
 
       ${!bare.value && html`<${ThumbStrip} />`}
@@ -658,7 +658,7 @@ function ToolButton ({ icon, label, onClick, disabled, active }) {
   return html`
     <button class=${'tbtn' + (active ? ' active' : '')} onClick=${onClick}
             disabled=${disabled} title=${label} aria-label=${label}>
-      <${Icon} name=${icon} size="18" />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -702,7 +702,7 @@ function CropBar () {
       <div class="spacer"></div>
       ${r && html`<span class="crop-size">${r.w} × ${r.h}</span>`}
       <button class="btn ghost"   onClick=${cancelCrop}>Cancel</button>
-      <button class="btn primary" onClick=${applyCropOp}><${Icon} name="mdi:check" size="16" /> Apply crop</button>
+      <button class="btn primary" onClick=${applyCropOp}><${Icon} name="mdi:check" /> Apply crop</button>
     </div>`;
 }
 
@@ -792,11 +792,11 @@ function EditStage ({ onPick }) {
         </div>`
         : html`
         <button class="empty" onClick=${onPick}>
-          <${Icon} name="mdi:image-plus-outline" size=${64} />
+          <${Icon} name="mdi:image-plus-outline" />
           <p>Open an image</p>
           <p class="sub">click to browse, or drop a file anywhere here</p>
         </button>`}
-      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" size=${40} /> <span>Drop to open</span></div>
+      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" /> <span>Drop to open</span></div>
     </div>`;
 }
 
@@ -845,7 +845,7 @@ function Adjustments () {
       <${EdSlider} label="Grayscale"  value=${f.grayscale}  min="0" max="100" onInput=${v => set('grayscale', v)}  reset=${() => set('grayscale', 0)} />
       ${!edit.isIdentity(f) && html`
         <button class="btn ghost wide" onClick=${() => filters.value = { ...edit.IDENTITY }}>
-          <${Icon} name="mdi:backup-restore" size="16" /> Reset adjustments
+          <${Icon} name="mdi:backup-restore" /> Reset adjustments
         </button>`}
     </section>`;
 }
@@ -859,7 +859,7 @@ function ResizePanel () {
         </label>
         <button class=${'lock' + (lockAR.value ? ' on' : '')} title="Lock aspect ratio"
                 onClick=${() => lockAR.value = !lockAR.value}>
-          <${Icon} name=${lockAR.value ? 'mdi:link-variant' : 'mdi:link-variant-off'} size="16" />
+          <${Icon} name=${lockAR.value ? 'mdi:link-variant' : 'mdi:link-variant-off'} />
         </button>
         <label class="field"><span>H</span>
           <input type="number" min="1" value=${resizeH.value} onInput=${e => onResizeInput('h', +e.target.value)} />
@@ -888,7 +888,7 @@ function ExportPanel () {
         <em>.${fmt.ext}</em>
       </label>
       <button class="btn primary wide" onClick=${exportImage} disabled=${!work.value || busy.value}>
-        <${Icon} name="mdi:download" size="16" /> Download
+        <${Icon} name="mdi:download" /> Download
       </button>
     </section>`;
 }
@@ -902,7 +902,7 @@ function EditPanel () {
         ${TABS.map(t => html`
           <button class=${'tab' + (tab === t.id ? ' active' : '')} key=${t.id}
                   onClick=${() => panelTab.value = t.id}>
-            <${Icon} name=${t.icon} size="16" /> <span>${t.label}</span>
+            <${Icon} name=${t.icon} /> <span>${t.label}</span>
           </button>`)}
       </nav>
       <div class="tab-body">
@@ -918,11 +918,11 @@ function EditStatusBar () {
   const d = dims.value;
   return html`
     <footer class="statusbar">
-      <${Icon} name="mdi:image-outline" size="14" />
+      <${Icon} name="mdi:image-outline" />
       <span>${d ? `${d.w} × ${d.h} px` : 'no image'}</span>
-      ${edError.value && html`<span class="err"><${Icon} name="mdi:alert-outline" size="14" /> ${edError.value}</span>`}
+      ${edError.value && html`<span class="err"><${Icon} name="mdi:alert-outline" /> ${edError.value}</span>`}
       <span class="spacer"></span>
-      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" size="14" /> working…</span>`}
+      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" /> working…</span>`}
       ${dirty.value && !busy.value && html`<span class="edited">edited</span>`}
     </footer>`;
 }
@@ -1026,7 +1026,7 @@ function Thumb ({ pic }) {
     <button ref=${ref} class="im-thumb" title=${pic.path} onClick=${() => openInView(pic)}>
       ${url
         ? html`<img src=${url} alt=${pic.name} loading="lazy" />`
-        : html`<div class="im-thumb-ph"><${Icon} name="mdi:image-outline" size=${22} /></div>`}
+        : html`<div class="im-thumb-ph"><${Icon} name="mdi:image-outline" /></div>`}
       <span class="im-thumb-name">${pic.name}</span>
     </button>`;
 }
@@ -1036,7 +1036,7 @@ function ReconnectBar () {
   if (!stale.length) return null;
   return html`
     <div class="im-reconnect">
-      <${Icon} name="mdi:folder-alert-outline" size=${18} />
+      <${Icon} name="mdi:folder-alert-outline" />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(s => html`
         <div class="im-reconnect-item" key=${s.id}>
@@ -1044,10 +1044,10 @@ function ReconnectBar () {
           <button class="btn small primary" onClick=${() => library.reconnect(s.id).then(res => {
             if (!res.granted) libMsg.value = `Reconnect failed — ${res.error ? (res.error.name || 'error') : 'browser said “' + res.state + '”'}. Try “Choose folder”.`;
           })}>
-            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works"
                   onClick=${() => library.repick(s.id).then(ok => { if (!ok) libMsg.value = `Could not open ${s.name}`; })}>
-            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
         </div>`)}
     </div>`;
 }
@@ -1056,11 +1056,11 @@ function InstallTip () {
   if (pwa.installed.value || !library.sources.value.length) return null;
   return html`
     <div class="im-install-tip">
-      <${Icon} name="mdi:information-outline" size=${18} />
+      <${Icon} name="mdi:information-outline" />
       <span>Install the app to keep your image folders connected between visits — no reconnecting.</span>
       ${pwa.canInstall.value
         ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-            <${Icon} name="mdi:download" size=${15} /> Install app</button>`
+            <${Icon} name="mdi:download" /> Install app</button>`
         : html`<span class="im-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
     </div>`;
 }
@@ -1081,7 +1081,7 @@ function LibraryMode () {
   useEffect(() => { library.ensureLoaded(); }, []);
 
   if (!library.ready.value) {
-    return html`<div class="im-lib"><div class="im-booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div></div>`;
+    return html`<div class="im-lib"><div class="im-booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
   }
 
   const pics       = visiblePics.value;
@@ -1091,21 +1091,21 @@ function LibraryMode () {
   return html`
     <div class="im-lib">
       <header class="im-lib-head">
-        ${scanning && html`<span class="im-scan-note"><${Icon} name="svg-spinners:bars-scale-middle" size=${14} /> scanning…</span>`}
+        ${scanning && html`<span class="im-scan-note"><${Icon} name="svg-spinners:bars-scale-middle" /> scanning…</span>`}
         <div class="im-lib-search">
-          <${Icon} name="mdi:magnify" size=${18} />
+          <${Icon} name="mdi:magnify" />
           <input type="search" placeholder="Search images…" value=${libSearch.value}
                  onInput=${e => libSearch.value = e.target.value} />
           ${libSearch.value && html`<button class="iv-btn" aria-label="Clear" onClick=${() => libSearch.value = ''}>
-            <${Icon} name="mdi:close" size=${16} /></button>`}
+            <${Icon} name="mdi:close" /></button>`}
         </div>
-        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => library.rescanAll()}><${Icon} name="mdi:refresh" size=${18} /></button>`}
+        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => library.rescanAll()}><${Icon} name="mdi:refresh" /></button>`}
         <button class="btn primary" onClick=${addFolderAction}>
-          <${Icon} name="mdi:folder-plus-outline" size=${16} /> Add folder</button>
+          <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
       </header>
 
-      ${libMsg.value && html`<div class="im-lib-msg"><${Icon} name="mdi:alert-outline" size=${15} /> ${libMsg.value}
-        <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><${Icon} name="mdi:close" size=${14} /></button></div>`}
+      ${libMsg.value && html`<div class="im-lib-msg"><${Icon} name="mdi:alert-outline" /> ${libMsg.value}
+        <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><${Icon} name="mdi:close" /></button></div>`}
 
       <${ReconnectBar} />
       <${InstallTip} />
@@ -1114,11 +1114,11 @@ function LibraryMode () {
       ${!hasFolders
         ? html`
           <div class="im-lib-empty">
-            <${Icon} name="mdi:folder-multiple-image" size=${56} />
+            <${Icon} name="mdi:folder-multiple-image" />
             <p class="im-empty-title">Browse an image folder</p>
             <p class="im-empty-hint">Grant a folder off your device and browse it as a gallery — open any image into the viewer or editor. Nothing is uploaded; only the folder permission is remembered.</p>
             <button class="btn primary" onClick=${addFolderAction}>
-              <${Icon} name="mdi:folder-plus-outline" size=${16} /> Add a folder</button>
+              <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>
           </div>`
         : pics.length
           ? html`<div class="im-scroll"><div class="im-grid">
@@ -1126,7 +1126,7 @@ function LibraryMode () {
             </div></div>`
           : html`
             <div class="im-lib-empty">
-              <${Icon} name=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'} size=${48} />
+              <${Icon} name=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'} />
               <p class="im-empty-title">${libSearch.value ? 'Nothing matches your search' : 'No images here yet'}</p>
               ${!libSearch.value && html`<p class="im-empty-hint">Scanning may still be running, or this folder has no images.</p>`}
             </div>`}
@@ -1155,7 +1155,7 @@ function ImgDrop ({ onFiles, label }) {
          onDragLeave=${e => { if (e.target === e.currentTarget) setOver(false); }}
          onDrop=${onDrop}
          onClick=${() => inputRef.current?.click()}>
-      <${Icon} name="mdi:image-plus" size=${40} />
+      <${Icon} name="mdi:image-plus" />
       <p>${label || 'Drop images here, or click to choose'}</p>
       <input ref=${inputRef} type="file" accept="image/*" multiple hidden
              onChange=${e => { onFiles(e.target.files); e.target.value = ''; }} />
@@ -1185,9 +1185,9 @@ function ToolFileItem ({ entry, onRemove }) {
       <span class="im-fi-name">${entry.file.name}</span>
       ${label && html`<span class="im-fi-label">${label}</span>`}
       ${entry.status === 'done' && html`
-        <a class="tbtn" href=${entry.blobUrl} download=${entry.outName} title="Download"><${Icon} name="mdi:download" size=${18} /></a>`}
+        <a class="tbtn" href=${entry.blobUrl} download=${entry.outName} title="Download"><${Icon} name="mdi:download" /></a>`}
       ${!busyRow && html`
-        <button class="tbtn" title="Remove" onClick=${() => onRemove(entry.id)}><${Icon} name="mdi:close" size=${18} /></button>`}
+        <button class="tbtn" title="Remove" onClick=${() => onRemove(entry.id)}><${Icon} name="mdi:close" /></button>`}
     </div>`;
 }
 
@@ -1261,9 +1261,9 @@ function ConvertMode () {
 
         <div class="im-tool-actions">
           ${pendingCnt > 0 && html`<button class="btn primary" onClick=${cvConvertAll}>
-            <${Icon} name="mdi:cog-outline" size=${16} /> Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}</button>`}
+            <${Icon} name="mdi:cog-outline" /> Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}</button>`}
           ${hasDone && html`<button class="btn" onClick=${cvDownloadAll}>
-            <${Icon} name="mdi:download-multiple" size=${16} /> Download all</button>`}
+            <${Icon} name="mdi:download-multiple" /> Download all</button>`}
         </div>`}
     </div>`;
 }
@@ -1446,11 +1446,11 @@ function TaskPane ({ task, index, total, children }) {
   return html`
     <div class="im-task">
       <header>
-        <span class="im-task-title"><${Icon} name=${icon} size=${16} /> ${label}</span>
+        <span class="im-task-title"><${Icon} name=${icon} /> ${label}</span>
         <span class="im-task-actions">
-          <button class="tbtn" onClick=${() => bpMoveTask(id, -1)} disabled=${index === 0}><${Icon} name="mdi:chevron-up" size=${16} /></button>
-          <button class="tbtn" onClick=${() => bpMoveTask(id, 1)} disabled=${index === total - 1}><${Icon} name="mdi:chevron-down" size=${16} /></button>
-          <button class="tbtn" onClick=${() => bpRemoveTask(id)}><${Icon} name="mdi:close" size=${16} /></button>
+          <button class="tbtn" onClick=${() => bpMoveTask(id, -1)} disabled=${index === 0}><${Icon} name="mdi:chevron-up" /></button>
+          <button class="tbtn" onClick=${() => bpMoveTask(id, 1)} disabled=${index === total - 1}><${Icon} name="mdi:chevron-down" /></button>
+          <button class="tbtn" onClick=${() => bpRemoveTask(id)}><${Icon} name="mdi:close" /></button>
         </span>
       </header>
       <main>${children}</main>
@@ -1484,8 +1484,8 @@ const ConvertTaskPane = props => { const { id, params: p } = props.task; return 
 
 const FlipTaskPane = props => { const { id, params: p } = props.task; return html`
   <${TaskPane} ...${props}>
-    <button class=${'chip' + (p.axis === 'h' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'h' })}><${Icon} name="mdi:flip-horizontal" size=${15} /> Horizontal</button>
-    <button class=${'chip' + (p.axis === 'v' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'v' })}><${Icon} name="mdi:flip-vertical" size=${15} /> Vertical</button>
+    <button class=${'chip' + (p.axis === 'h' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'h' })}><${Icon} name="mdi:flip-horizontal" /> Horizontal</button>
+    <button class=${'chip' + (p.axis === 'v' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'v' })}><${Icon} name="mdi:flip-vertical" /> Vertical</button>
   </${TaskPane}>`; };
 
 const GrayscaleTaskPane = props => html`<${TaskPane} ...${props}><span class="im-task-hint">No options</span></${TaskPane}>`;
@@ -1548,7 +1548,7 @@ function TaskAdder () {
       <span class="im-adder-label">Add task</span>
       <div class="im-adder-chips">
         ${Object.entries(BP_TASK_TYPES).map(([type, def]) => html`
-          <button class="chip" onClick=${() => bpAddTask(type)}><${Icon} name=${def.icon} size=${15} /> ${def.label}</button>`)}
+          <button class="chip" onClick=${() => bpAddTask(type)}><${Icon} name=${def.icon} /> ${def.label}</button>`)}
       </div>
     </div>`;
 }
@@ -1582,10 +1582,10 @@ function BatchMode () {
       ${(list.length > 0 && taskList.length > 0) && html`
         <div class="im-tool-actions">
           <button class="btn primary" onClick=${bpRunAll} disabled=${busy || pendingCnt === 0}>
-            <${Icon} name=${busy ? 'mdi:loading' : 'mdi:play'} class=${busy ? 'spin' : ''} size=${16} />
+            <${Icon} name=${busy ? 'mdi:loading' : 'mdi:play'} class=${busy ? 'spin' : ''} />
             ${busy ? 'Processing…' : 'Run on ' + pendingCnt + ' image' + (pendingCnt > 1 ? 's' : '')}</button>
           ${hasDone && html`<button class="btn" onClick=${bpDownloadAll}>
-            <${Icon} name="mdi:download-multiple" size=${16} /> Download all</button>`}
+            <${Icon} name="mdi:download-multiple" /> Download all</button>`}
         </div>`}
     </div>`;
 }
@@ -1596,13 +1596,13 @@ function BatchMode () {
 function ModeBar () {
   return html`
     <header class="im-modebar">
-      <div class="im-brand"><${Icon} name="mdi:image-multiple-outline" size=${18} /> <span>images</span></div>
+      <div class="im-brand"><${Icon} name="mdi:image-multiple-outline" /> <span>images</span></div>
       <nav class="im-modes">
         ${MODES.map(m => html`
           <button class=${'im-mode' + (screen.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => m.id === 'edit' ? editCurrent() : setScreen(m.id)}
                   title=${m.label}>
-            <${Icon} name=${m.icon} size=${18} /> <span>${m.label}</span>
+            <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
       <div class="im-modebar-actions"><${AppSettings} /></div>

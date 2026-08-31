@@ -180,7 +180,7 @@ export default function DataInspectorApp ({
               </div>
             ` : html`
               <div class="tree-empty">
-                <${Icon} name=${emptyIcon} size="32" />
+                <${Icon} name=${emptyIcon} />
                 <span>${emptyLabel}</span>
               </div>`}
           </div>

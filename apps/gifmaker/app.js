@@ -268,7 +268,7 @@ function ToolButton ({ icon, label, onClick, disabled, active }) {
   return html`
     <button class=${'tbtn' + (active ? ' active' : '')} onClick=${onClick}
             disabled=${disabled} title=${label} aria-label=${label}>
-      <${Icon} name=${icon} size="18" />
+      <${Icon} name=${icon} />
     </button>`;
 }
 const Sep = () => html`<span class="tsep"></span>`;
@@ -289,10 +289,10 @@ function Toolbar ({ onAdd, onImport }) {
       <div class="spacer"></div>
 
       <button class="btn" onClick=${exportZip} disabled=${!n || busy.value}>
-        <${Icon} name="mdi:folder-zip-outline" size="16" /> Project .zip
+        <${Icon} name="mdi:folder-zip-outline" /> Project .zip
       </button>
       <button class="btn primary" onClick=${exportGif} disabled=${!n || busy.value}>
-        <${Icon} name="mdi:file-gif-box" size="16" /> Export GIF
+        <${Icon} name="mdi:file-gif-box" /> Export GIF
       </button>
       <${AppSettings} />
     </div>`;
@@ -313,17 +313,17 @@ function Preview ({ onAdd }) {
   if (!list.length) return html`
     <div class="stage">
       <button class="empty" onClick=${onAdd}>
-        <${Icon} name="mdi:image-multiple-outline" size="64" />
+        <${Icon} name="mdi:image-multiple-outline" />
         <p>Add images to start</p>
         <p class="sub">click to browse, or drop files anywhere here</p>
       </button>
-      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" size="40" /> <span>Drop to add</span></div>
+      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" /> <span>Drop to add</span></div>
     </div>`;
 
   return html`
     <div class="stage" onPointerUp=${stageTap} title="Double-tap to hide/show the interface">
       <div class="canvas-wrap"><canvas ref=${ref} class="view"></canvas></div>
-      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" size="40" /> <span>Drop to add</span></div>
+      <div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" /> <span>Drop to add</span></div>
     </div>`;
 }
 
@@ -358,7 +358,7 @@ function Thumb ({ frame, index }) {
       <span class="idx">${index + 1}</span>
       <canvas ref=${ref}></canvas>
       <button class="thumb-x" title="Remove" onClick=${e => { e.stopPropagation(); removeAt(index); }}>
-        <${Icon} name="mdi:close" size="12" />
+        <${Icon} name="mdi:close" />
       </button>
     </div>`;
 }
@@ -370,7 +370,7 @@ function Filmstrip ({ onAdd }) {
     <div class="filmstrip">
       ${list.map((f, i) => html`<${Thumb} frame=${f} index=${i} key=${f.id} />`)}
       <button class="thumb add" title="Add images" onClick=${onAdd}>
-        <${Icon} name="mdi:plus" size="24" />
+        <${Icon} name="mdi:plus" />
       </button>
     </div>`;
 }
@@ -388,20 +388,20 @@ function FramePanel () {
   const i = cursor.value;
   return html`
     <section class="panel-sec">
-      <h3><${Icon} name="mdi:cursor-move" size="16" /> Frame</h3>
+      <h3><${Icon} name="mdi:cursor-move" /> Frame</h3>
       ${!f ? html`<p class="muted">no frame selected</p>` : html`
         <p class="muted">#${i + 1} · ${f.w}×${f.h}px · ${f.name}</p>
 
         <div class="nudge">
           <span class="n-label">Position</span>
           <div class="pad">
-            <button class="tbtn" title="Up"    onClick=${() => nudge(0, -step5())}><${Icon} name="mdi:arrow-up" size="16" /></button>
+            <button class="tbtn" title="Up"    onClick=${() => nudge(0, -step5())}><${Icon} name="mdi:arrow-up" /></button>
             <div class="pad-row">
-              <button class="tbtn" title="Left"  onClick=${() => nudge(-step5(), 0)}><${Icon} name="mdi:arrow-left" size="16" /></button>
-              <button class="tbtn" title="Reset position" onClick=${() => patchFrame(i, { dx: 0, dy: 0 })}><${Icon} name="mdi:target" size="16" /></button>
-              <button class="tbtn" title="Right" onClick=${() => nudge(step5(), 0)}><${Icon} name="mdi:arrow-right" size="16" /></button>
+              <button class="tbtn" title="Left"  onClick=${() => nudge(-step5(), 0)}><${Icon} name="mdi:arrow-left" /></button>
+              <button class="tbtn" title="Reset position" onClick=${() => patchFrame(i, { dx: 0, dy: 0 })}><${Icon} name="mdi:target" /></button>
+              <button class="tbtn" title="Right" onClick=${() => nudge(step5(), 0)}><${Icon} name="mdi:arrow-right" /></button>
             </div>
-            <button class="tbtn" title="Down"  onClick=${() => nudge(0, step5())}><${Icon} name="mdi:arrow-down" size="16" /></button>
+            <button class="tbtn" title="Down"  onClick=${() => nudge(0, step5())}><${Icon} name="mdi:arrow-down" /></button>
           </div>
         </div>
 
@@ -414,8 +414,8 @@ function FramePanel () {
                    onChange=${v => patchFrame(i, { delay: Math.max(20, v | 0) })} />
 
         <div class="row-btns">
-          <button class="btn ghost" onClick=${() => duplicateAt(i)}><${Icon} name="mdi:content-duplicate" size="15" /> Duplicate</button>
-          <button class="btn danger" onClick=${() => removeAt(i)}><${Icon} name="mdi:trash-can-outline" size="15" /> Remove</button>
+          <button class="btn ghost" onClick=${() => duplicateAt(i)}><${Icon} name="mdi:content-duplicate" /> Duplicate</button>
+          <button class="btn danger" onClick=${() => removeAt(i)}><${Icon} name="mdi:trash-can-outline" /> Remove</button>
         </div>`}
     </section>`;
 }
@@ -424,7 +424,7 @@ function AnimationPanel () {
   const size = canvasSize.value;
   return html`
     <section class="panel-sec">
-      <h3><${Icon} name="mdi:animation-outline" size="16" /> Animation</h3>
+      <h3><${Icon} name="mdi:animation-outline" /> Animation</h3>
 
       <${Slider} label="Default delay" value=${delayDef.value} min="20" max="2000" step="10" unit="ms" showButtons editable
                  onChange=${v => delayDef.value = Math.max(20, v | 0)} />
@@ -454,18 +454,18 @@ function AnimationPanel () {
 function ExportPanel ({ onImport }) {
   return html`
     <section class="panel-sec">
-      <h3><${Icon} name="mdi:export-variant" size="16" /> Export</h3>
+      <h3><${Icon} name="mdi:export-variant" /> Export</h3>
       <label class="field wide"><span>Name</span>
         <input type="text" value=${projName.value} onInput=${e => projName.value = e.target.value} />
       </label>
       <button class="btn primary wide" onClick=${exportGif} disabled=${!frames.value.length || busy.value}>
-        <${Icon} name="mdi:file-gif-box" size="16" /> Export GIF
+        <${Icon} name="mdi:file-gif-box" /> Export GIF
       </button>
       <button class="btn wide" onClick=${exportZip} disabled=${!frames.value.length || busy.value}>
-        <${Icon} name="mdi:folder-zip-outline" size="16" /> Save project (.zip)
+        <${Icon} name="mdi:folder-zip-outline" /> Save project (.zip)
       </button>
       <button class="btn ghost wide" onClick=${onImport}>
-        <${Icon} name="mdi:import" size="16" /> Import project (.zip)
+        <${Icon} name="mdi:import" /> Import project (.zip)
       </button>
       <p class="muted">The zip holds the original images plus a <code>project.json</code> — reimport it to keep editing.</p>
     </section>`;
@@ -484,12 +484,12 @@ function StatusBar () {
   const n = frames.value.length;
   return html`
     <footer class="statusbar">
-      <${Icon} name="mdi:animation-play-outline" size="14" />
+      <${Icon} name="mdi:animation-play-outline" />
       <span>${n ? `${n} frame${n === 1 ? '' : 's'} · ${(totalMs.value / 1000).toFixed(2)}s loop` : 'no frames'}</span>
       ${n > 0 && html`<span class="muted">· showing #${cursor.value + 1}</span>`}
-      ${error.value && html`<span class="err"><${Icon} name="mdi:alert-outline" size="14" /> ${error.value}</span>`}
+      ${error.value && html`<span class="err"><${Icon} name="mdi:alert-outline" /> ${error.value}</span>`}
       <span class="spacer"></span>
-      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" size="14" /> working…</span>`}
+      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" /> working…</span>`}
     </footer>`;
 }
 
@@ -559,7 +559,7 @@ function App () {
 
       ${immersive.value && html`
         <button class="exit-immersive" title="Show interface (Esc)" onClick=${() => immersive.value = false}>
-          <${Icon} name="mdi:fullscreen-exit" size="20" />
+          <${Icon} name="mdi:fullscreen-exit" />
         </button>`}
 
       <input ref=${addInput} type="file" accept="image/*" multiple hidden

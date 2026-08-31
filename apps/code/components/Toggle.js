@@ -10,7 +10,7 @@ export default function Toggle ({ value = false, onChange, label, size = '32' })
 
   return html`
     <div class="toggle" style=${{ opacity }} onClick=${onClick}>
-      <${Icon} name=${icon} size=${size} />
+      <${Icon} name=${icon} />
       ${label && html`<span>${label}</span>`}
     </div>
   `;

@@ -282,7 +282,7 @@ function ToolButton ({ icon, label, onClick, disabled, active }) {
       disabled=${disabled}
       title=${label}
       aria-label=${label}>
-      <${Icon} name=${icon} size="18" />
+      <${Icon} name=${icon} />
     </button>`;
 }
 
@@ -292,7 +292,7 @@ function Breadcrumb () {
   return html`
     <nav class="crumbs" aria-label="path">
       <button class="crumb root" onClick=${() => goTo(0)} title=${label}>
-        <${Icon} name="mdi:home-outline" size="16" /> ${label}
+        <${Icon} name="mdi:home-outline" /> ${label}
       </button>
       ${segs.map((name, i) => html`
         <span class="sep" key=${'s' + i}>/</span>
@@ -313,7 +313,7 @@ function Row ({ entry }) {
       onDblClick=${() => open(entry)}
       onContextMenu=${e => { e.preventDefault(); menu.value = { x: e.clientX, y: e.clientY, entry }; }}
       onKeyDown=${e => { if (e.key === 'Enter') open(entry); }}>
-      <span class=${'ic ' + entry.kind}><${Icon} name=${iconFor(entry)} size="20" /></span>
+      <span class=${'ic ' + entry.kind}><${Icon} name=${iconFor(entry)} /></span>
       <span class="nm">${entry.name}</span>
       <span class="sz">${entry.kind === 'file' ? fmtSize(entry.size) : '—'}</span>
       <span class="dt">${entry.kind === 'file' ? fmtDate(entry.lastModified) : 'folder'}</span>
@@ -330,7 +330,7 @@ function Cell ({ entry }) {
       onDblClick=${() => open(entry)}
       onContextMenu=${e => { e.preventDefault(); menu.value = { x: e.clientX, y: e.clientY, entry }; }}
       onKeyDown=${e => { if (e.key === 'Enter') open(entry); }}>
-      <span class=${'ic ' + entry.kind}><${Icon} name=${iconFor(entry)} size="34" /></span>
+      <span class=${'ic ' + entry.kind}><${Icon} name=${iconFor(entry)} /></span>
       <span class="nm">${entry.name}</span>
     </div>`;
 }
@@ -339,11 +339,11 @@ function Listing () {
   const rows = visible.value;
 
   if (loading.value && !rows.length) return html`<div class="hint">loading…</div>`;
-  if (error.value)  return html`<div class="hint err"><${Icon} name="mdi:alert-outline" size="20" /> ${error.value}</div>`;
+  if (error.value)  return html`<div class="hint err"><${Icon} name="mdi:alert-outline" /> ${error.value}</div>`;
 
   if (!rows.length) return html`
     <div class="empty">
-      <${Icon} name=${filter.value ? 'mdi:file-search-outline' : 'mdi:folder-open-outline'} size="56" />
+      <${Icon} name=${filter.value ? 'mdi:file-search-outline' : 'mdi:folder-open-outline'} />
       <p>${filter.value ? `nothing matches “${filter.value}”` : 'this folder is empty'}</p>
       ${!filter.value && writable.value && html`<p class="sub">drop files here, or use the buttons above</p>`}
     </div>`;
@@ -367,10 +367,10 @@ function Details () {
   return html`
     <aside class="details">
       <div class="d-head">
-        <span class=${'ic ' + d.kind}><${Icon} name=${iconFor(d)} size="22" /></span>
+        <span class=${'ic ' + d.kind}><${Icon} name=${iconFor(d)} /></span>
         <span class="d-name" title=${d.name}>${d.name}</span>
         <button class="tbtn" onClick=${clearSelection} title="Close" aria-label="Close details">
-          <${Icon} name="mdi:close" size="16" />
+          <${Icon} name="mdi:close" />
         </button>
       </div>
 
@@ -380,7 +380,7 @@ function Details () {
         ${d.previewError && html`<div class="hint err">${d.previewError}</div>`}
         ${!d.url && d.text == null && !d.previewError && html`
           <div class="no-preview">
-            <${Icon} name=${d.kind === 'directory' ? 'mdi:folder-open-outline' : 'mdi:file-hidden'} size="40" />
+            <${Icon} name=${d.kind === 'directory' ? 'mdi:folder-open-outline' : 'mdi:file-hidden'} />
             <span>${d.kind === 'directory' ? 'open to browse' : 'no preview'}</span>
           </div>`}
       </div>
@@ -393,11 +393,11 @@ function Details () {
 
       <div class="d-actions">
         ${d.kind === 'directory'
-          ? html`<button class="btn" onClick=${() => open(d)}><${Icon} name="mdi:folder-open-outline" size="16" /> Open</button>`
-          : html`<button class="btn" onClick=${() => download(d)}><${Icon} name="mdi:download" size="16" /> Download</button>`}
+          ? html`<button class="btn" onClick=${() => open(d)}><${Icon} name="mdi:folder-open-outline" /> Open</button>`
+          : html`<button class="btn" onClick=${() => download(d)}><${Icon} name="mdi:download" /> Download</button>`}
         ${writable.value && html`
-          <button class="btn ghost" onClick=${() => askRename(d)}><${Icon} name="mdi:form-textbox" size="16" /> Rename</button>
-          <button class="btn danger" onClick=${() => askDelete(d)}><${Icon} name="mdi:trash-can-outline" size="16" /> Delete</button>`}
+          <button class="btn ghost" onClick=${() => askRename(d)}><${Icon} name="mdi:form-textbox" /> Rename</button>
+          <button class="btn danger" onClick=${() => askDelete(d)}><${Icon} name="mdi:trash-can-outline" /> Delete</button>`}
       </div>
     </aside>`;
 }
@@ -408,7 +408,7 @@ function ContextMenu () {
   const e = m.entry;
   const item = (icon, label, fn) => html`
     <button onClick=${() => { menu.value = null; fn(); }}>
-      <${Icon} name=${icon} size="16" /> ${label}
+      <${Icon} name=${icon} /> ${label}
     </button>`;
 
   return html`
@@ -466,7 +466,7 @@ function StorageMeter () {
   return html`
     <div class="meter" title=${`${fmtSize(usage)} of ${fmtSize(quota)} used`}>
       <div class="meter-label">
-        <${Icon} name="mdi:database-outline" size="14" /> storage
+        <${Icon} name="mdi:database-outline" /> storage
       </div>
       <div class="meter-bar"><div class="meter-fill" style=${`width:${pct}%`}></div></div>
       <div class="meter-text">${fmtSize(usage)}${quota ? ` / ${fmtSize(quota)}` : ''}</div>
@@ -480,7 +480,7 @@ function Toolbar ({ onUpload }) {
       <${Breadcrumb} />
       <div class="spacer"></div>
       <div class="search">
-        <${Icon} name="mdi:magnify" size="16" />
+        <${Icon} name="mdi:magnify" />
         <input
           type="search"
           placeholder="Filter…"
@@ -514,7 +514,7 @@ function StatusBar () {
     <footer class="statusbar">
       <span>${dirs} folder${dirs === 1 ? '' : 's'}, ${files} file${files === 1 ? '' : 's'}</span>
       ${sel && html`<span class="sel">·  ${sel}</span>`}
-      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" size="14" /> working…</span>`}
+      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" /> working…</span>`}
       <span class="spacer"></span>
       <${StorageMeter} />
     </footer>`;
@@ -582,7 +582,7 @@ function FileExplorer ({ backend: be }) {
             <${Listing} />
           </div>
           <${Details} />
-          ${writable.value && html`<div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" size="40" /> <span>Drop to upload</span></div>`}
+          ${writable.value && html`<div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" /> <span>Drop to upload</span></div>`}
         </div>
         <${StatusBar} />
       </section>
@@ -600,7 +600,7 @@ function Unsupported ({ backend: be }) {
   return html`
     <div class="fx">
       <div class="unsupported">
-        <${Icon} name="mdi:database-alert-outline" size="64" />
+        <${Icon} name="mdi:database-alert-outline" />
         <h1>Not available here</h1>
         <p>This browser can't reach ${be?.label || 'this storage'}. Try a recent
            Chromium, Firefox or Safari.</p>

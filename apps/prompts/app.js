@@ -264,7 +264,7 @@ function Detail() {
 
   if (!isEdit && !prompt) return html`
     <div class="detail-empty">
-      <${Icon} name="mdi:text-box-outline" size="40" />
+      <${Icon} name="mdi:text-box-outline" />
       <span>Select a prompt or create a new one</span>
     </div>`;
     

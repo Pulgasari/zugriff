@@ -71,13 +71,13 @@ const continueReading = computed(() =>
 function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className = '' }) {
   return html`
     <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}><${Icon} name=${icon} size=${size} /></button>`;
+            disabled=${disabled} onClick=${onClick}><${Icon} name=${icon} /></button>`;
 }
 
 function Empty ({ icon, title, hint, action }) {
   return html`
     <div class="empty">
-      <${Icon} name=${icon} size=${56} />
+      <${Icon} name=${icon} />
       <p class="empty-title">${title}</p>
       ${hint && html`<p class="empty-hint">${hint}</p>`}
       ${action}
@@ -100,7 +100,7 @@ function Cover ({ book, className = '' }) {
     <div ref=${ref} class=${'cover ' + className} style=${`--hue:${hueOf(book.title)}`}>
       ${!book.cover && html`
         <div class="cover-fallback">
-          <${Icon} name=${book.kind === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:book-open-page-variant-outline'} size=${22} />
+          <${Icon} name=${book.kind === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:book-open-page-variant-outline'} />
           <span class="cover-title">${book.title}</span>
           ${book.author && html`<span class="cover-author">${book.author}</span>`}
         </div>`}
@@ -150,7 +150,7 @@ function SourceStatus () {
   if (!stale.length) return null;
   return html`
     <div class="reconnect-bar">
-      <${Icon} name="mdi:folder-alert-outline" size=${18} />
+      <${Icon} name="mdi:folder-alert-outline" />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(s => html`
         <div key=${s.id} class="reconnect-item">
@@ -161,10 +161,10 @@ function SourceStatus () {
             console.warn('[ebooks] reconnect failed', { source: s, ...res });
             flash(`Reconnect failed — ${why}. Try “Choose folder”.`, 'err');
           })}>
-            <${Icon} name="mdi:folder-key-outline" size=${15} /> Reconnect</button>
+            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works"
                   onClick=${() => db.repick(s.id).then(ok => ok || flash(`Could not open ${s.name}`, 'err'))}>
-            <${Icon} name="mdi:folder-search-outline" size=${15} /> Choose folder</button>
+            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
         </div>`)}
     </div>`;
 }
@@ -176,11 +176,11 @@ function InstallTip () {
   if (pwa.installed.value || !db.sources.value.length) return null;
   return html`
     <div class="install-tip">
-      <${Icon} name="mdi:information-outline" size=${18} />
+      <${Icon} name="mdi:information-outline" />
       <span class="install-tip-text">Install the app to keep your book folders connected between visits — no reconnecting.</span>
       ${pwa.canInstall.value
         ? html`<button class="btn small primary" onClick=${() => pwa.promptInstall()}>
-            <${Icon} name="mdi:download" size=${15} /> Install app</button>`
+            <${Icon} name="mdi:download" /> Install app</button>`
         : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
     </div>`;
 }
@@ -193,13 +193,13 @@ function Library () {
   return html`
     <div class="library">
       <header class="lib-head">
-        <div class="brand"><${Icon} name="mdi:bookshelf" size=${24} /> <strong>eBooks</strong></div>
+        <div class="brand"><${Icon} name="mdi:bookshelf" /> <strong>eBooks</strong></div>
         <div class="lib-tools">
           ${db.pending.value > 0 && html`
-            <span class="scan-note"><${Icon} name="svg-spinners:bars-scale-middle" size=${14} /> ${db.pending.value} left</span>`}
+            <span class="scan-note"><${Icon} name="svg-spinners:bars-scale-middle" /> ${db.pending.value} left</span>`}
           <${IconBtn} icon="mdi:refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
           <button class="btn primary" onClick=${addFolder}>
-            <${Icon} name="mdi:folder-plus-outline" size=${16} /> Add folder</button>
+            <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
           <${AppSettings} />
         </div>
       </header>
@@ -211,15 +211,15 @@ function Library () {
         ? html`<${Empty} icon="mdi:bookshelf" title="Your library is empty"
                  hint="Add a folder of EPUB and PDF files. It stays on your device — only the folder permission is remembered."
                  action=${html`<button class="btn primary" onClick=${addFolder}>
-                   <${Icon} name="mdi:folder-plus-outline" size=${16} /> Add a folder</button>`} />`
+                   <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>`} />`
         : html`
           <div class="lib-controls">
             <div class="lib-search">
-              <${Icon} name="mdi:magnify" size=${18} />
+              <${Icon} name="mdi:magnify" />
               <input type="search" placeholder="Search title or author…" value=${search.value}
                      onInput=${e => search.value = e.target.value} />
               ${search.value && html`<button class="ibtn" aria-label="Clear" onClick=${() => search.value = ''}>
-                <${Icon} name="mdi:close" size=${16} /></button>`}
+                <${Icon} name="mdi:close" /></button>`}
             </div>
             <${SortPicker} value=${sort.value} onChange=${v => sort.value = v}
                options=${[['recent', 'Recent'], ['title', 'Title'], ['author', 'Author'], ['added', 'Added']]} />
@@ -342,7 +342,7 @@ function ReaderView ({ bookKey }) {
     <div class="reader">
       <header class="reader-bar">
         <button class="ibtn" title="Back to library" aria-label="Back" onClick=${closeReader}>
-          <${Icon} name="mdi:arrow-left" size=${20} /></button>
+          <${Icon} name="mdi:arrow-left" /></button>
         <div class="reader-id">
           <span class="reader-title">${book?.title ?? 'Book'}</span>
           ${book?.author && html`<span class="reader-author">${book.author}</span>`}
@@ -370,21 +370,21 @@ function ReaderView ({ bookKey }) {
             onPick=${target => { if (ui.kind === 'pdf') eng?.gotoDest(target); else eng?.gotoHref(target); readerUi.value = { ...readerUi.value, tocOpen: false }; }} />`}
 
         ${!ui.ready && !ui.error && html`
-          <div class="reader-loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`}
+          <div class="reader-loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`}
         ${ui.error && html`
           <div class="reader-error"><${Empty} icon="mdi:book-alert-outline" title="Couldn’t open this book" hint=${ui.error} /></div>`}
 
         ${ui.kind === 'epub' && ui.ready && !ui.error && html`
-          <button class="page-edge left"  aria-label="Previous" onClick=${() => eng?.prev()}><${Icon} name="mdi:chevron-left" size=${28} /></button>
-          <button class="page-edge right" aria-label="Next"     onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-right" size=${28} /></button>`}
+          <button class="page-edge left"  aria-label="Previous" onClick=${() => eng?.prev()}><${Icon} name="mdi:chevron-left" /></button>
+          <button class="page-edge right" aria-label="Next"     onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-right" /></button>`}
       </div>
 
       <footer class="reader-foot">
         ${ui.kind === 'pdf' && ui.pages
           ? html`
-            <button class="ibtn" aria-label="Previous page" onClick=${() => eng?.prev()}><${Icon} name="mdi:chevron-up" size=${18} /></button>
+            <button class="ibtn" aria-label="Previous page" onClick=${() => eng?.prev()}><${Icon} name="mdi:chevron-up" /></button>
             <span class="foot-label">Page ${ui.page ?? 1} / ${ui.pages}</span>
-            <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-down" size=${18} /></button>`
+            <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-down" /></button>`
           : html`<span class="foot-label">${ui.percent != null ? Math.round((ui.percent || 0) * 100) + '%' : ''}</span>`}
         <span class="foot-bar"><span style=${`width:${Math.round((ui.percent || 0) * 100)}%`}></span></span>
       </footer>
@@ -408,7 +408,7 @@ function TocPanel ({ items, kind, onPick }) {
     <aside class="toc-panel">
       <div class="toc-head">Contents</div>
       ${items == null
-        ? html`<div class="toc-loading"><${Icon} name="svg-spinners:bars-scale-middle" size=${16} /></div>`
+        ? html`<div class="toc-loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`
         : items.length ? render(items) : html`<div class="toc-empty">No contents in this book.</div>`}
     </aside>`;
 }
@@ -437,7 +437,7 @@ function App () {
   }, []);
 
   if (!db.ready.value) {
-    return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" size=${28} /></div>`;
+    return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   }
 
   const r = route.value;
