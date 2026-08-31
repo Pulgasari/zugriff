@@ -3,14 +3,17 @@
 // :::::: IMPORT
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import aufbau, { html, preact, str } from '@aufbau/kits/preact-htm';
 import { renderMD } from '@aufbau/import';
+
 
 // ::: shared
 import { boot, config }               from '/.shared/js/app.js?slug=notes';
-import { Icon, AppSettings, InstallTip } from '/.shared/js/components/index.js';
 import { stored }            from '/.shared/js/lib/signals.js';
 import * as fs               from '/.shared/js/filesystem/fsaccess.js';
+
+const { computed, signal, useEffect, useRef, Fragment } = preact;
+const { AppSettings, Button, Icon, InstallTip } = zugriff.components;
 
 // ::: local
 import * as db from './db.js';
@@ -321,7 +324,7 @@ function Reader () {
   };
 
   return html`
-    <${ReaderBody} note=${note} bodyRef=${bodyRef} onClick=${onClick} />`;
+    <${ReaderBody} ...${{ bodyRef, note, onClick }} />`;
 }
 
 // the frame is always drawn — header (with the mobile menu button) included —
@@ -333,8 +336,7 @@ function ReaderBody ({ note, bodyRef, onClick }) {
   return html`
     <div class="reader">
       <header class=${'reader-head' + (note ? '' : ' empty')}>
-        <button class="ibtn nav-open" aria-label="Open notes" onClick=${() => navOpen.value = true}>
-          <${Icon} name="mdi:menu" /></button>
+        <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => navOpen.value = true} />
         ${note
           ? html`<nav class="crumbs">
               ${segs.map((seg, i) => html`
@@ -368,9 +370,7 @@ function ReaderBody ({ note, bodyRef, onClick }) {
             <${Empty} icon="mdi:file-document-outline" title="No note open"
               hint=${db.sources.value.length ? 'Choose a note to start reading.'
                                               : 'Open a folder of Markdown files to get started.'}
-              action=${!db.sources.value.length && html`
-                <button class="btn primary" onClick=${addFolder}>
-                  <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>`} />
+              action=${!db.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='mdi:folder-plus-outline' onClick=${addFolder} />`} />
           </div>`}
     </div>`;
 }
@@ -409,15 +409,16 @@ function App () {
   }, []);
 
   if (!db.ready.value) {
-    return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+    return html`<div class="booting"><${Icon} name='loading' /></div>`;
   }
 
   return html`
-    <div class="notes-app">
+    <${Fragment>
       <${Sidebar} />
       ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
-      <main class="main"><${Reader} /></main>
-    </div>`;
+      <main id="app-main"><${Reader} /></main>
+    </${Fragment}>
+  `;
 }
 
 // :::::: BOOT
