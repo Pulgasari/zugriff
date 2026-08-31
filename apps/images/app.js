@@ -1102,9 +1102,9 @@ function LibraryMode () {
               <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>
           </div>`
         : pics.length
-          ? html`<div class="im-scroll"><div class="im-grid">
+          ? html`<div class="im-scroll"><aufbau-index class="im-grid" viewmode="grid" item-size="140px" gap="0.6rem">
               ${pics.map(p => html`<${Thumb} key=${p.key} pic=${p} />`)}
-            </div></div>`
+            </aufbau-index></div>`
           : html`
             <div class="im-lib-empty">
               <${Icon} name=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'} />

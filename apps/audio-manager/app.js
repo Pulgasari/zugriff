@@ -205,7 +205,7 @@ function AlbumsGrid () {
   const rows = filteredAlbums.value;
   if (!rows.length) return html`<${Empty} q=${search.value} />`;
   return html`
-    <div class="albums">
+    <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
       ${rows.map(a => html`
         <button class="album-card" key=${a.key} onClick=${() => go('album', a.key)}>
           <div class="album-art">
@@ -215,7 +215,7 @@ function AlbumsGrid () {
           <div class="album-name" title=${a.album}>${a.album}</div>
           <div class="album-artist" title=${a.artist}>${a.artist}</div>
         </button>`)}
-    </div>`;
+    </aufbau-index>`;
 }
 
 function AlbumDetail ({ id }) {
@@ -269,14 +269,14 @@ function ArtistDetail ({ id }) {
           <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><${Icon} name="mdi:play" /> Play all</button>
         </div>
       </header>
-      <div class="albums">
+      <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
         ${albums.map(al => html`
           <button class="album-card" key=${al.key} onClick=${() => go('album', al.key)}>
             <div class="album-art"><${Cover} blob=${al.cover} size=${160} radius=${10} /></div>
             <div class="album-name" title=${al.album}>${al.album}</div>
             <div class="album-artist">${al.year || ''}</div>
           </button>`)}
-      </div>
+      </aufbau-index>
     </div>`;
 }
 

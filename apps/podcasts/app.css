@@ -271,15 +271,15 @@
   overflow: hidden;
 }
 .ep-progress {
+  --progress-size: 3px;
   display: block;
-  height: 3px;
   border-radius: 2px;
   background: var(--panel-2);
   margin-top: 0.5rem;
   overflow: hidden;
   max-width: 22rem;
 }
-.ep-progress-fill { display: block; height: 100%; background: var(--accent); }
+.ep-progress .progress-bar { background: var(--accent); }
 
 .ep-actions {
   display: flex;

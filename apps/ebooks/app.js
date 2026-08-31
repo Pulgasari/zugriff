@@ -95,7 +95,7 @@ function BookCard ({ book }) {
         <div class="book-title">${book.title}</div>
         ${book.author && html`<div class="book-author">${book.author}</div>`}
       </div>
-      ${p > 0 && html`<span class="book-progress"><span style=${`width:${Math.round(p * 100)}%`}></span></span>`}
+      ${p > 0 && html`<aufbau-progress class="book-progress" value=${Math.round(p * 100)}></aufbau-progress>`}
     </button>`;
 }
 
@@ -348,7 +348,7 @@ function ReaderView ({ bookKey }) {
             <span class="foot-label">Page ${ui.page ?? 1} / ${ui.pages}</span>
             <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-down" /></button>`
           : html`<span class="foot-label">${ui.percent != null ? Math.round((ui.percent || 0) * 100) + '%' : ''}</span>`}
-        <span class="foot-bar"><span style=${`width:${Math.round((ui.percent || 0) * 100)}%`}></span></span>
+        <aufbau-progress class="foot-bar" value=${Math.round((ui.percent || 0) * 100)}></aufbau-progress>
       </footer>
     </div>`;
 }

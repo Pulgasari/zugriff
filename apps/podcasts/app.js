@@ -167,7 +167,7 @@ function ProgressBar ({ state }) {
   if (!state || (!state.position && !state.done)) return null;
   const dur = state.duration || 0;
   const pct = state.done ? 100 : (dur ? Math.min(100, (state.position / dur) * 100) : 0);
-  return html`<span class="ep-progress"><span class="ep-progress-fill" style=${`width:${pct}%`}></span></span>`;
+  return html`<aufbau-progress class="ep-progress" value=${pct}></aufbau-progress>`;
 }
 
 
@@ -448,7 +448,7 @@ function EpisodeDetailView ({ id }) {
 
           ${(st.position > 0 || st.done) && html`
             <div class="ed-progress">
-              <span class="ep-progress"><span class="ep-progress-fill" style=${`width:${pct}%`}></span></span>
+              <aufbau-progress class="ep-progress" value=${pct}></aufbau-progress>
               <span class="ed-progress-label">
                 ${st.done ? 'Finished' : `${fmtDuration(st.position)}${dur ? ' / ' + fmtDuration(dur) : ''}`}
               </span>
