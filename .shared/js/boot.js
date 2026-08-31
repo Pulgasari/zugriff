@@ -23,7 +23,7 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
 
   const config = {
     sw: {
-      path  : ds.sw      ?? userConfig.sw      ?? false,     // off by default — app.js registers the sw; set data-sw to enable here
+      path  : ds.sw      ?? userConfig.sw      ?? '/sw.js',     // off by default — app.js registers the sw; set data-sw to enable here
       type  : ds.swType  ?? userConfig.swType  ?? 'module',  // 'module' | 'classic'
       scope : ds.swScope ?? userConfig.swScope ?? undefined,
     },
