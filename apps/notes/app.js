@@ -8,27 +8,15 @@ import { renderMD } from '@aufbau/import';
 
 
 // ::: shared
-import { boot, config }               from '/.shared/js/app.js?slug=notes';
-import { stored }            from '/.shared/js/lib/signals.js';
-import * as fs               from '/.shared/js/filesystem/fsaccess.js';
+import { boot, config } from '/.shared/js/app.js?slug=notes';
+import { stored }       from '/.shared/js/lib/signals.js';
+import * as fs          from '/.shared/js/filesystem/fsaccess.js';
 
 const { computed, signal, useEffect, useRef, Fragment } = preact;
-const { AppSettings, Button, Icon, InstallTip } = zugriff.components;
+const { AppSettings, Button, Icon, IconButton, InstallTip } = zugriff.components;
 
 // ::: local
 import * as db from './db.js';
-
-// gehört raus
-
-const slugify = text => text.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 64) || 'section';
-
-function IconBtn ({ icon, label, onClick, active, disabled, size = 18, className = '' }) {
-  return html`
-    <button class=${'ibtn ' + className + (active ? ' active' : '')} title=${label} aria-label=${label}
-            disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} />
-    </button>`;
-}
 
 // :::::: STATE
 
