@@ -112,6 +112,15 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
         .catch(err => console.warn('[boot] service worker registration failed:', err));
   });
 
+// eruda
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('dev')) {
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/eruda';
+  script.onload = () => eruda.init();
+  document.head.appendChild(script);
+}
+
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
   function getImportMap () {
