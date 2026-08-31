@@ -63,7 +63,9 @@ und bestimmt auch noch andere.
 
 evtl. wäre die eineoder andere aufbau-wc auch noch etwas sinnvoll und generisch zu erweitern.
 
-##
+## imports
+
+sowas is mir alles viel zu chaotisch.
 
 ```javascript
 import { boot, config }  from '/.shared/js/app.js?slug=files';
@@ -71,6 +73,8 @@ import { Icon, FileExplorer, AppSettings } from '/.shared/js/components/index.js
 import * as fs   from '/.shared/js/filesystem/fsaccess.js';
 import * as pwa  from '/.shared/js/lib/pwa.js';
 ```
+
+da vieles von dem zeug eh überall notwendig ist, habe ich angefangen in `.shared/js/runtime.js` zu konstruieren und denk mir dass das langfristtig sehr viel sauberer und einfacher machen wird.
 
 ```javascript
 const { AppSettings, FileExplorer, Icon } = zugriff.components;
