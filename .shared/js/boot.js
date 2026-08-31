@@ -132,6 +132,7 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
   });
 
 // eruda
+/*
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('dev')) {
   const script = document.createElement('script');
@@ -139,6 +140,7 @@ if (urlParams.has('dev')) {
   script.onload = () => eruda.init();
   document.head.appendChild(script);
 }
+*/
 
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
