@@ -19,6 +19,24 @@
 
   <title>...</title>
   <meta name="apple-mobile-web-app-title" content="Feeds">
+  <style>
+    html.is-loading {
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(4px);
+}
+
+html.is-ready {
+  opacity: 1;
+  transform: none;
+  filter: none;
+
+  transition:
+    opacity 450ms ease,
+    transform 450ms ease,
+    filter 450ms ease;
+}
+  </style>
   <link rel="stylesheet" href="/.shared/css/index.css">
   <link rel="stylesheet" href="/.shared/css/explorer.css">
   <link rel="stylesheet" href="./app.css">
