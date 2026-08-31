@@ -73,7 +73,7 @@ export async function boot ({
 
   await aufbau.init(aufbauConfig);
 
-  if (serviceWorker) registerServiceWorker();
+  //if (serviceWorker) registerServiceWorker();
 
   const target = typeof mount === 'string' ? document.querySelector(mount) : mount;
   if (!target) throw new Error(`[zugriff] mount target "${mount}" not found`);
