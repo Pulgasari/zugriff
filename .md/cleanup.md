@@ -14,7 +14,7 @@
 </button>
 ```
 
-##
+## `IconButton`
 
 viele apps bauen ne eigene `IconBtn` component. in `zugriff/.shared/js/components/IconButton.js` liegt bereits ne fertige. daher sollten diese überall verwendet werden.
 
@@ -28,7 +28,7 @@ zugriff.toast.success('...');
 ```
 
 
-## 
+## app wrapper
 
 die apps wrappen sich selbst komplett sinnlos selbst innerhalb von `#app` und obendrein noch als eigener class-name. zum beispiel:
 
@@ -47,6 +47,19 @@ das soll sein:
   <div id='app-main'>...</div>
 </div>
 ```
+
+vermutlich wärs hier sinnvoll generell mal in den importmaps von `zugriff/.shared/js/boot.js` und `pulgasari.github.io/importmap.js` (ich mein das repo) auf diese `htm/preact` (glabe so heisst das) umzustellen, dass diese `<>...</>` syntax unterstützt.
+
+## aufbau/elements
+
+in `aufbau/elements` finden sich viele nützliche webcomponents, von denen hier mal gebrauch gemacht werden kann.
+
+- `<aufbau-reader>`
+- `<aufbau-tree>`
+
+und bestimmt auch noch andere. 
+
+evtl. wäre die eineoder andere aufbau-wc auch noch etwas sinnvoll und generisch zu erweitern.
 
 ##
 
