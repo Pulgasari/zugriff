@@ -1,22 +1,24 @@
 // shared/js/patterns/CodeWorkbenchApp.js
-//
-// input pane -> execute() -> output pane. this is one blueprint, not two: the
-// old CodeTransformerApp was exactly this with `formats` left out, so both of
-// its names still work (see patterns/index.js).
-//
-//   const App = CodeWorkbenchApp({ appID, lang, execute });
-//
-// with `formats` the output side gets a format switcher and execute() is
-// called as execute(src, formatId).
+/*
+input pane -> execute() -> output pane. this is one blueprint, not two: the
+old CodeTransformerApp was exactly this with `formats` left out, so both of
+its names still work (see patterns/index.js).
 
-import { html, effect, signal } from '@aufbau/kits/preact-htm';
-import { debounce } from '@pulgasari/timing';
+const App = CodeWorkbenchApp({ appID, lang, execute });
+
+with `formats` the output side gets a format switcher and execute() is
+called as execute(src, formatId).
+*/
+
+import { debounce, html, effect, signal } from './../vendors.js';
 
 import CodeInputPane  from './../components/CodeInputPane.js';
 import CodeOutputPane from './../components/CodeOutputPane.js';
 import Icon           from './../components/Icon.js';
 import Toggle         from './../components/Toggle.js';
-import { stored }     from './../lib/signals.js';
+
+// muss aufs neue @aufbau/signals umgestellt werden
+import { stored }     from './../lib/signals.js'; 
 
 export default function CodeWorkbenchApp ({
   appID        = 'app',
@@ -147,6 +149,7 @@ export default function CodeWorkbenchApp ({
           <${Toggle} value=${live.value} onChange=${v => live.value = v} label="Live-Mode" />
         </div>
 
-      </div>`;
+      </div>
+    `;
   };
 }
