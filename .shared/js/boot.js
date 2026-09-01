@@ -5,10 +5,9 @@ theme-boot.js + importmap.js pair:
 
 1. apply the stored theme colours to :root before first paint (no FOUC)
 2. inject the framework importmap + modulepreloads
-3. (optional) register a service worker — off by default, because the app
-   bootstrap (shared/js/app.js) already registers the right sw per route
+3. (optional) register a service worker
 
-  <script src="/.shared/js/boot.js"></script>
+<script src="/.shared/js/boot.js"></script>
 
 override the defaults with data-attributes or a window.__BOOT_CONFIG__ object
 set before this script runs (data-sw="./sw.js" to opt back into sw here).
