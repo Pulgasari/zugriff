@@ -20,7 +20,7 @@ import Toggle         from './../components/Toggle.js';
 // muss aufs neue @aufbau/signals umgestellt werden
 import { stored }     from './../lib/signals.js'; 
 
-export default function CodeWorkbenchApp ({
+function CodeWorkbenchApp ({
   appID        = 'app',
   debounceTime = 1000,
 
@@ -153,3 +153,6 @@ export default function CodeWorkbenchApp ({
     `;
   };
 }
+
+export       { CodeWorkbenchApp };
+export default CodeWorkbenchApp;
