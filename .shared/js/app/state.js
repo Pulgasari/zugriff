@@ -3,6 +3,10 @@
 // :::::: IMPORTS
 
 import { deepSignal } from '@aufbau/signals';
+import { registry }   from './../registry.js';
+
+const slug   = new URL(import.meta.url).searchParams.get('slug');
+const config = (slug && registry.get(slug)) || {};
 
 // :::::: REFS
 
@@ -11,6 +15,7 @@ const $root = (typeof document !== 'undefined') ? document.documentElement : nul
 // :::::: MAIN
 
 const state = deepSignal({
+  ...config,
   dir    : 'ltr',
   dialog : null,
   route  : null,
