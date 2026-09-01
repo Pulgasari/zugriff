@@ -9,8 +9,9 @@ zugriff.app.state.font = 'Inter';
 zugriff.app.setState('font', 'Inter');
 */
 
-import config from './app/config.js';
-import state  from './app/state.js';
+import config   from './app/config.js';
+import state    from './app/state.js';
+import * as pwa from './app/pwa.js';
 
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
 import Shell  from './components/Shell.js';
@@ -28,6 +29,11 @@ app.toggleState = (key, force) => app.state[key] = force ?? app.state[key];
 app.resetState  = (key)        => app.state[key] = (key in app.config) ? app.config[key] : null;
 
 app.togglePanel = id => document.getElementById(id).classList.toggleClass('hidden');    
+
+// pwa
+app.canInstall    = pwa.canInstall;
+app.isInstalled   = pwa.isInstalled;
+app.promptInstall = pwa.promptInstall;
 
 // vormals 'boot'
 app.init = ({ App, target = '#app', shell } = {}) => {
