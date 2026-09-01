@@ -1,12 +1,11 @@
 // components/Shell.js
 // the frame around every tool
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import Icon from './Icon.js';
 import Settings, { SettingsButton } from './Settings.js';
-import { appGroup, themeGroup } from './../lib/settings.js';
 
-function Shell ({ app = {}, actions, groups = [appGroup, themeGroup], children }) {
+function Shell ({ app = {}, actions, children }) {
   return html`
     <div id='app-head'>
       <div id='app-logo'>
@@ -18,9 +17,7 @@ function Shell ({ app = {}, actions, groups = [appGroup, themeGroup], children }
         <${SettingsButton} />
       </div>
     </div>
-
-    <${Settings} groups=${groups} />
-
+    <${Settings} />
     ${children}
   `;
 }
