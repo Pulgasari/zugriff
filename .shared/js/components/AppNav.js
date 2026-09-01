@@ -1,7 +1,7 @@
 // AppNav.js
 
-//import AppNavItem from './AppNavItem.js';
-import Button from './Button.js';
+import { html } from './../vendors.js';
+import Button   from './Button.js';
 
 const items = [
   { title: 'Episodes', icon: 'mdi:playlist-play',     route: 'episodes' },
@@ -29,7 +29,8 @@ function AppNav ({ items, ...rest }) {
       <nav>
         {items.forEach(AppNavItem)}
       </nav>
-    </aside>`;
+    </aside>
+  `;
 }
 
 export       { AppNav, AppNavItem };
