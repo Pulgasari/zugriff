@@ -236,10 +236,12 @@ aufbau-picker, .picker {
   align-items : center;
   gap         : 0.5rem;
   width       : 100%;
+
+  .label { opacity: 0.6; font-size: 0.8rem; }
+  .track { flex: 1; }
+  .track input[type=range] { width: 100%; accent-color: var(--accent); }
 }
-.slider-label { opacity: 0.6; font-size: 0.8rem; }
-.slider-track { flex: 1; }
-.slider-track input[type=range] { width: 100%; accent-color: var(--accent); }
+
 .num-input {
   background    : color-mix(in srgb, var(--fg) 5%, transparent);
   border        : 1px solid var(--fg-25);
@@ -247,6 +249,8 @@ aufbau-picker, .picker {
   color         : var(--fg);
   padding       : 0.15rem 0.3rem;
 }
+
+aufbau-slider { width: 100%; }
 
 /* ── prompt overlay ─────────────────────────────────────────────────────── */
 
