@@ -6,9 +6,6 @@ import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
 const SCOPE   = self.registration.scope;
 const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
-// v3: navigations are no longer cache-answered (see fetch handler). bumping the
-// version purges any navigation documents the v2 worker stored, so returning
-// clients drop the stale un-redirected /code, /apps, … entries on activate.
 const VERSION = 'v3';
 
 const CACHE_APP     = `zugriff-${SLUG}-${VERSION}`;
