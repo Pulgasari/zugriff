@@ -11,9 +11,9 @@ import Icon          from './../components/Icon.js';
 import { stored }    from './../lib/signals.js'; // needs: @aufbau/signals
 
 // ── shared type helpers ───────────────────────────────────────────────────────
-export let typeOf    = v => v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v;
-export let typeIcon  = t => ({ object:'mdi:code-braces', array:'mdi:code-brackets', string:'mdi:format-quote-close', number:'mdi:numeric', boolean:'mdi:toggle-switch-outline', null:'mdi:null' })[t] ?? 'mdi:help';
-export let typeColor = t => ({ string:'var(--c-string)', number:'var(--c-number)', boolean:'var(--c-bool)', null:'var(--c-null)' })[t];
+let typeOf    = v => v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v;
+let typeIcon  = t => ({ object:'mdi:code-braces', array:'mdi:code-brackets', string:'mdi:format-quote-close', number:'mdi:numeric', boolean:'mdi:toggle-switch-outline', null:'mdi:null' })[t] ?? 'mdi:help';
+let typeColor = t => ({ string:'var(--c-string)', number:'var(--c-number)', boolean:'var(--c-bool)', null:'var(--c-null)' })[t];
 
 let matchesSearch = (node, q) => JSON.stringify(node).toLowerCase().includes(q.toLowerCase());
 
@@ -101,7 +101,7 @@ function Stats ({ value }) {
 }
 
 // ── factory ───────────────────────────────────────────────────────────────────
-export default function DataInspectorApp ({
+function DataInspectorApp ({
   appID,
   lang        = 'plaintext',
   icon        = 'mdi:code-json',
@@ -192,3 +192,6 @@ export default function DataInspectorApp ({
 
   return App;
 }
+
+export       { DataInspectorApp, typeColor, typeIcon, typeOf };
+export default DataInspectorApp;
