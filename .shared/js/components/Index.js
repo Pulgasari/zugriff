@@ -16,14 +16,14 @@ function Index ({
 }) {
   return html`
     <aufbau-index
-      viewmode=${viewmode}
-      item-size=${itemSize}
+      class=${klass}
+      gap=${gap}
       item-shape=${itemShape}
       item-look=${itemLook}
-      item-size-min=${itemSizeMin}
+      item-size=${itemSize}
       item-size-max=${itemSizeMax}
-      gap=${gap}
-      class=${klass}
+      item-size-min=${itemSizeMin}
+      viewmode=${viewmode}
       ...${rest}
     >${children}</aufbau-index>
   `;
