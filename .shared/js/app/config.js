@@ -1,5 +1,10 @@
 // .shared/js/app/config.js
 
+import { registry } from './../registry.js';
+
+const slug   = new URL(import.meta.url).searchParams.get('slug');
+const config = (slug && registry.get(slug)) || {};
+
 const config = {};
 
 function applyFont (id) {
