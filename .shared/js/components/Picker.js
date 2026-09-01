@@ -1,9 +1,6 @@
-// shared/js/components/Picker.js
-//
-// wraps <aufbau-picker>. options are either plain strings or
-// { value, label, icon, title } objects, exactly like before.
+// components/Picker.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 
 const isObject = v => typeof v === 'object' && v !== null;
 
@@ -27,15 +24,18 @@ function Picker ({ options = [], sig, value, onChange, look = 'segments', multip
 
   return html`
     <aufbau-picker class='picker' look=${look} multiple=${multiple} value=${current} onChange=${change}>
-      ${options.map(normalize).map(opt => html`
-        <aufbau-option
-          key=${opt.value}
-          value=${opt.value}
-          label=${opt.label}
-          icon=${opt.icon}
-          title=${opt.title}
-        ></aufbau-option>`)}
-    </aufbau-picker>`;
+      ${options.map(normalize).map(
+        opt => html`
+          <aufbau-option
+            key=${opt.value}
+            value=${opt.value}
+            label=${opt.label}
+            icon=${opt.icon}
+            title=${opt.title}
+          ></aufbau-option>
+        `)}
+    </aufbau-picker>
+  `;
 }
 
 export       { Picker, normalize };
