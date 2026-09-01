@@ -2,7 +2,7 @@
 // <${InstallTip} show=${db.sources.value.length > 0} />
 // <${InstallTip} message="Install to keep your book folders connected." />
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import Button from './Button.js';
 import Icon   from './Icon.js';
 
