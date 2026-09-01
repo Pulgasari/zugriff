@@ -25,6 +25,7 @@ app.setRoute  = id => app.state.route  = id;
 
 app.setState    = (key, value) => app.state[key] = value;
 app.toggleState = (key, force) => app.state[key] = force ?? app.state[key];
+app.resetState  = (key)        => app.state[key] = (key in app.config) ? app.config[key] : null;
 
 app.togglePanel = id => document.getElementById(id).classList.toggleClass('hidden');    
 
