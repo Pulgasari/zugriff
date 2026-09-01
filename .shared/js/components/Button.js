@@ -1,14 +1,15 @@
-// shared/js/components/Button.js
+// components/Button.js
 
-import { html } from '@aufbau/kits/preact-htm';
-import Icon from './Icon.js';
+import { html } from './../vendors.js';
+import Icon     from './Icon.js';
 
 function Button ({ children, className, class: klass, icon, onClick, label, text, disabled, title }) {
   return html`
-    <button class=${className || klass} onClick=${onClick} disabled=${disabled} title=${title}>
+    <button class=${className || klass} ...${{ disabled, onClick, title }}>
       ${icon && html`<${Icon} name=${icon} />`}
       ${children || label || text}
-    </button>`;
+    </button>
+  `;
 }
 
 export       { Button };
