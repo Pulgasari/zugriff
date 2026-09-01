@@ -2,7 +2,7 @@
 // a single overlay shared by everything that needs to ask for one value.
 // render <${Prompt} /> once per app, call openPrompt() from anywhere.
 
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from './../vendors.js';
 import GhostButton from './GhostButton.js';
 
 const promptState = signal(null);
@@ -28,26 +28,26 @@ function Prompt () {
     if (event.key === 'Enter')  confirm();
     if (event.key === 'Escape') cancel();
   };
+  const onInput = event => { promptState.value = { ...state, value: event.target.value }; };
 
   return html`
-    <div class="prompt-overlay" onClick=${cancel}>
-      <div class="prompt-dialog" onClick=${event => event.stopPropagation()}>
-        <div class="prompt-header">
-          <span class="prompt-title">${state.title}</span>
-          <${GhostButton} icon="mdi:close" onClick=${cancel} />
+    <div class="prompt" onClick=${cancel}>
+      <div class="dialog" onClick=${event => event.stopPropagation()}>
+        <div class="header">
+          <span class="title">${state.title}</span>
+          <${GhostButton} icon="close" onClick=${cancel} />
         </div>
         <input
-          class="prompt-input"
           type=${state.type}
           placeholder=${state.placeholder}
           value=${state.value}
           autoFocus
-          onInput=${event => { promptState.value = { ...state, value: event.target.value }; }}
+          onInput=${onInput}
           onKeyDown=${onKeyDown}
         />
-        <div class="prompt-actions">
-          <button class="btn secondary" onClick=${cancel}>Cancel</button>
-          <button class="btn primary"   onClick=${confirm} disabled=${!state.value}>Confirm</button>
+        <div class="actions">
+          <button class="primary"   onClick=${confirm} disabled=${!state.value}>Confirm</button>
+          <button class="secondary" onClick=${cancel}>Cancel</button>
         </div>
       </div>
     </div>`;
