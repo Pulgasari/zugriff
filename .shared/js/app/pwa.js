@@ -13,7 +13,7 @@
 // `installed`       — running as an installed/standalone app already.
 // `promptInstall()` — show the native install prompt (needs a user gesture).
 
-import { signal } from '@aufbau/kits/preact-htm';
+import { signal } from './../vendors.js';
 
 const standalone = () =>
   (typeof window !== 'undefined' && (
@@ -21,8 +21,8 @@ const standalone = () =>
     window.matchMedia?.('(display-mode: window-controls-overlay)')?.matches ||
     window.navigator?.standalone === true));
 
-export const canInstall = signal(false);
-export const installed  = signal(standalone());
+const canInstall = signal(false);
+const isInstalled  = signal(standalone());
 
 let deferred = null;
 
@@ -47,8 +47,7 @@ if (typeof window !== 'undefined') {
     });
 }
 
-/** show the native install prompt. resolves true if the user accepted. */
-export async function promptInstall () {
+async function promptInstall () {
   if (!deferred) return false;
   const evt = deferred;
   deferred = null;
@@ -61,3 +60,5 @@ export async function promptInstall () {
     return false;
   }
 }
+
+export { canInstall, isInstalled, promptInstall };
