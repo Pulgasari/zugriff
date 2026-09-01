@@ -1,13 +1,14 @@
-// shared/js/patterns/DataInspectorApp.js
-//
+// blueprints/DataInspectorApp.js
 // paste data -> parse -> browse it as a tree. the parse/format pair is what
 // makes it a json, yaml, toml or csv inspector.
 
-import { html, signal, useState } from '@aufbau/kits/preact-htm';
+import { html, signal, preact } from './../vendors.js';
+const { useState } = preact;
 
 import CodeInputPane from './../components/CodeInputPane.js';
 import Icon          from './../components/Icon.js';
-import { stored }    from './../lib/signals.js';
+
+import { stored }    from './../lib/signals.js'; // needs: @aufbau/signals
 
 // ── shared type helpers ───────────────────────────────────────────────────────
 export let typeOf    = v => v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v;
