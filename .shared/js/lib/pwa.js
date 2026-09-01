@@ -1,5 +1,5 @@
 // shared/js/lib/pwa.js
-//
+
 // install-to-home-screen plumbing, shared by the apps that grant on-disk
 // folders. it exists for one practical reason: the File System Access API only
 // *persists* a granted folder across sessions once the app is an installed PWA
