@@ -234,10 +234,10 @@ async function download (entry) {
 
 // ── dialogs ────────────────────────────────────────────────────────────────
 
-const askNewFolder = () => dialog.value = { mode: 'new-folder', title: 'New folder',  value: 'untitled folder' };
-const askNewFile   = () => dialog.value = { mode: 'new-file',   title: 'New file',    value: 'untitled.txt' };
-const askRename    = entry => dialog.value = { mode: 'rename',  title: 'Rename',      value: entry.name, entry };
-const askDelete    = entry => dialog.value = { mode: 'delete',  title: 'Delete',      entry };
+const askNewFolder = ()    => dialog.value = { mode: 'new-folder', title: 'New folder',  value: 'untitled folder' };
+const askNewFile   = ()    => dialog.value = { mode: 'new-file',   title: 'New file',    value: 'untitled.txt' };
+const askRename    = entry => dialog.value = { mode: 'rename',     title: 'Rename',      value: entry.name, entry };
+const askDelete    = entry => dialog.value = { mode: 'delete',     title: 'Delete',      entry };
 
 async function submitDialog (raw) {
   const d = dialog.value;
@@ -394,10 +394,10 @@ function Details () {
       <div class="d-actions">
         ${d.kind === 'directory'
           ? html`<button class="btn" onClick=${() => open(d)}><${Icon} name="mdi:folder-open-outline" /> Open</button>`
-          : html`<button class="btn" onClick=${() => download(d)}><${Icon} name="mdi:download" /> Download</button>`}
+          : html`<button class="btn" onClick=${() => download(d)}><${Icon} name="download" /> Download</button>`}
         ${writable.value && html`
-          <button class="btn ghost" onClick=${() => askRename(d)}><${Icon} name="mdi:form-textbox" /> Rename</button>
-          <button class="btn danger" onClick=${() => askDelete(d)}><${Icon} name="mdi:trash-can-outline" /> Delete</button>`}
+          <button class="btn ghost" onClick=${() => askRename(d)}><${Icon} name="rename" /> Rename</button>
+          <button class="btn danger" onClick=${() => askDelete(d)}><${Icon} name="delete" /> Delete</button>`}
       </div>
     </aside>`;
 }
@@ -409,16 +409,17 @@ function ContextMenu () {
   const item = (icon, label, fn) => html`
     <button onClick=${() => { menu.value = null; fn(); }}>
       <${Icon} name=${icon} /> ${label}
-    </button>`;
+    </button>
+  `;
 
   return html`
     <div class="ctx" style=${`left:${m.x}px; top:${m.y}px`}>
       ${e.kind === 'directory'
         ? item('mdi:folder-open-outline', 'Open', () => open(e))
         : item('mdi:eye-outline', 'Preview', () => select(e))}
-      ${e.kind === 'file' && item('mdi:download', 'Download', () => download(e))}
+      ${e.kind === 'file' && item('download', 'Download', () => download(e))}
       ${writable.value && item('mdi:form-textbox', 'Rename', () => askRename(e))}
-      ${writable.value && item('mdi:trash-can-outline', 'Delete', () => askDelete(e))}
+      ${writable.value && item('delete', 'Delete', () => askDelete(e))}
     </div>`;
 }
 
@@ -488,15 +489,15 @@ function Toolbar ({ onUpload }) {
           onInput=${e => filter.value = e.target.value} />
       </div>
       <div class="seg">
-        <${ToolButton} icon="mdi:view-list"  label="List view" active=${view.value === 'list'} onClick=${() => view.value = 'list'} />
-        <${ToolButton} icon="mdi:view-grid"  label="Grid view" active=${view.value === 'grid'} onClick=${() => view.value = 'grid'} />
+        <${ToolButton} icon="viewmode-list" label="List view" active=${view.value === 'list'} onClick=${() => view.value = 'list'} />
+        <${ToolButton} icon="viewmode-grid" label="Grid view" active=${view.value === 'grid'} onClick=${() => view.value = 'grid'} />
       </div>
       ${writable.value && html`
         <div class="seg">
           <${ToolButton} icon="mdi:folder-plus-outline" label="New folder" onClick=${askNewFolder} disabled=${busy.value} />
           <${ToolButton} icon="mdi:file-plus-outline"   label="New file"   onClick=${askNewFile}   disabled=${busy.value} />
-          <${ToolButton} icon="mdi:upload"              label="Upload"     onClick=${onUpload}      disabled=${busy.value} />
-          <${ToolButton} icon="mdi:refresh"             label="Refresh"    onClick=${refresh}       disabled=${loading.value} />
+          <${ToolButton} icon="upload"                  label="Upload"     onClick=${onUpload}      disabled=${busy.value} />
+          <${ToolButton} icon="refresh"                 label="Refresh"    onClick=${refresh}       disabled=${loading.value} />
         </div>`}
       ${!writable.value && html`
         <div class="seg">
@@ -506,8 +507,8 @@ function Toolbar ({ onUpload }) {
 }
 
 function StatusBar () {
-  const n   = visible.value.length;
-  const sel = selected.value;
+  const n     = visible.value.length;
+  const sel   = selected.value;
   const dirs  = visible.value.filter(e => e.kind === 'directory').length;
   const files = n - dirs;
   return html`
@@ -527,6 +528,7 @@ function StatusBar () {
  *   backend — a descriptor from dirfs.js (opfsBackend), or one an app builds
  *             around a granted on-disk folder. see dirfs.js for the shape.
  */
+
 function FileExplorer ({ backend: be }) {
   const fileInput = useRef(null);
 
@@ -602,11 +604,14 @@ function Unsupported ({ backend: be }) {
       <div class="unsupported">
         <${Icon} name="mdi:database-alert-outline" />
         <h1>Not available here</h1>
-        <p>This browser can't reach ${be?.label || 'this storage'}. Try a recent
-           Chromium, Firefox or Safari.</p>
+        <p>
+          This browser can't reach ${be?.label || 'this storage'}. 
+          Try a recent Chromium, Firefox or Safari.
+        </p>
       </div>
-    </div>`;
+    </div>
+  `;
 }
 
-export { FileExplorer };
+export       { FileExplorer };
 export default FileExplorer;
