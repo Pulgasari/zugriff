@@ -1,4 +1,4 @@
-// shared/js/sw-core.js
+// shared/js/service.js
 
 import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
