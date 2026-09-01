@@ -1,4 +1,4 @@
-// shared/js/patterns/CodeWorkbenchApp.js
+// blueprints/CodeWorkbenchApp.js
 /*
 input pane -> execute() -> output pane. this is one blueprint, not two: the
 old CodeTransformerApp was exactly this with `formats` left out, so both of
