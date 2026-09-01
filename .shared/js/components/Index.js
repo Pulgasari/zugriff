@@ -1,6 +1,6 @@
 // components/Index.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 
 function Index ({
   viewmode,
