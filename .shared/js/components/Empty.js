@@ -1,4 +1,4 @@
-// .shared/js/components/Empty.js
+// components/Empty.js
 
 /*
 <${Empty} 
