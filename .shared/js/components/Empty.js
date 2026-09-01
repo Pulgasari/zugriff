@@ -9,7 +9,7 @@
   />
 */
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import Icon from './Icon.js';
 
 function Empty ({ icon, title, hint, action, children }) {
@@ -20,7 +20,8 @@ function Empty ({ icon, title, hint, action, children }) {
       ${hint  && html`<p class="empty-hint">${hint}</p>`}
       ${action}
       ${children}
-    </div>`;
+    </div>
+  `;
 }
 
 export       { Empty };
