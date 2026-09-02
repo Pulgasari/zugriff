@@ -1,91 +1,73 @@
-// shared/js/app.js
+// .shared/js/app.js
+// the app factory behind zugriff.app. a page opens with
+//
+//   const app = zugriff.app('notes');
+//
+// which resolves that slug's registry entry, builds its reactive state and hands
+// back the app handle. one instance per slug (a page is one app), so repeat calls
+// are idempotent. the goal is to collapse each app's app.js boilerplate: state,
+// its cross-cutting effects and the mount all live here, not in every app.
+//
+//   app.state.font = 'Inter';       // reactive, drives the shared webfonts effect
+//   app.setState('font', 'Inter');  // same, imperative form
+//   app.init({ App });              // mount (replaces the old boot())
 
-import aufbau, { html, render } from '@aufbau/kits/preact-htm';
-import Shell        from './components/Shell.js';
-import { registry } from './registry.js';
-import './runtime.js'; // enable globalThis.zugriff
+// :::::: IMPORTS
 
-const $root = document.documentElement;
+import { configFor }  from './app/config.js';
+import { createState } from './app/state.js';
+import { toast }       from './app/toast.js';
+import * as pwa        from './app/pwa.js';
 
-// ── this page's config, from ?slug=… on our own module url ───────────────────
+import { aufbau, html, render } from './vendors.js';
+import Shell from './components/Shell.js';
 
-const slug = new URL(import.meta.url).searchParams.get('slug');
+// :::::: FACTORY
 
-/** the resolved registry entry for the page that imported this module, or {} */
-export const config = (slug && registry.get(slug)) || {};
+const instances = new Map();
 
-// ── url overrides ──────────────────────────────────────────────────────────
-// every ?--custom-prop=value in the query string is written onto :root, 
-// which is how a theme gets tweaked without touching a file. 
-// values that could break out of the declaration are dropped.
+export function createApp (slug) {
+  if (instances.has(slug)) return instances.get(slug);
 
-const MAX_VALUE_LENGTH = 100;
-const BLOCKED = /[;{}]|url\s*\(/i;
+  const config = configFor(slug);
+  const state  = createState(config);
 
-export function applyUrlProps (search = location.search) {
-  for (const [key, value] of new URLSearchParams(search)) {
-    if (!key.startsWith('--')) continue;
-    const safe = value.trim();
-    if (!safe || safe.length > MAX_VALUE_LENGTH || BLOCKED.test(safe)) continue;
-    $root.style.setProperty(key, safe);
-  }
+  const app = { slug, config, state, toast };
+
+  // ::: state helpers — thin sugar over the deepSignal
+  app.getState    = key          => state[key];
+  app.setState    = (key, value) => state[key] = value;
+  app.toggleState = (key, force) => state[key] = force ?? !state[key];
+  app.resetState  = key          => state[key] = key in config ? config[key] : null;
+  app.setDialog   = (id = null)  => state.dialog = id;
+  app.setRoute    = (id = null)  => state.route  = id;
+
+  // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
+  app.canInstall    = pwa.canInstall;
+  app.isInstalled   = pwa.isInstalled;
+  app.promptInstall = pwa.promptInstall;
+
+  // ::: mount. tools get the shared Shell frame; apps own the whole #app root
+  // (shell defaults off for type:'app', on otherwise) and can force it either way.
+  app.init = async ({ App, target = '#app', shell } = {}) => {
+    const useShell = shell ?? config.type === 'tool';
+
+    await aufbau.init(config.aufbau);
+
+    const $target = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
+
+    if (App) render(useShell ? html`<${Shell} app=${config}><${App} /><//>` : html`<${App} />`, $target);
+
+    return app;
+  };
+
+  instances.set(slug, app);
+  createApp.current = app;   // the page's active app — shared components (AppSettings) read it
+  return app;
 }
 
-// ── service worker ────────────────────────────────────────
-function ownServiceWorker () {
-  return /^\/(apps|tools)\/[^/]+\//.test(location.pathname) ? './sw.js' : '/sw.js';
-}
+// :::::: EXPORT
 
-export function registerServiceWorker (url = ownServiceWorker()) {
-  if (!('serviceWorker' in navigator)) return;
-  if (location.protocol === 'file:') return;
-
-  // a module worker, because sw-core.js imports @bunker by url 
-  // — import maps do not reach inside a service worker
-  const register = () => navigator.serviceWorker.register(url, { type: 'module' }).catch(
-    error => console.warn('[zugriff] service worker registration failed:', error)
-  );
-
-  // boot() is async, so `load` has usually fired by the time we get here —
-  // waiting for an event that already happened would register nothing at all
-  if (document.readyState === 'complete') register();
-  else window.addEventListener('load', register, { once: true });
-}
-
-// ── boot ───────────────
-
-export async function boot ({
-  config: cfg = config, // defaults to this page's ?slug= entry
-  App,
-  mount = '#app',
-  serviceWorker = true,
-  shell, // undefined → decide from the entry's type
-} = {}) {
-  const app          = cfg ?? {};
-  const aufbauConfig = app.aufbau ?? {};
-  const useShell     = shell ?? (app.type !== 'app');
-
-  if (app.name)  document.title      = app.title ?? app.name;
-  if (app.theme) $root.dataset.theme = app.theme;
-  if (app.lang)  $root.lang          = app.lang;
-
-  applyUrlProps();
-
-  await aufbau.init(aufbauConfig);
-
-  //if (serviceWorker) registerServiceWorker();
-
-  const target = typeof mount === 'string' ? document.querySelector(mount) : mount;
-  if (!target) throw new Error(`[zugriff] mount target "${mount}" not found`);
-
-  if (App) {
-    render(
-      useShell ? html`<${Shell} app=${app}><${App} /><//>` : html`<${App} />`,
-      target
-    );
-  }
-
-  return { aufbau, target };
-}
-
-export default boot;
+export { createApp as app };
+export default createApp;

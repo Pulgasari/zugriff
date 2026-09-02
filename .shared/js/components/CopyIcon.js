@@ -1,11 +1,11 @@
-// shared/js/components/CopyIcon.js
+// components/CopyIcon.js
 
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from './../vendors.js';
 import Icon from './Icon.js';
 
 const copied = signal(null);
 
-export function copy (str, time = 1500) {
+function copy (str, time = 1500) {
   navigator.clipboard.writeText(str);
   copied.value = str;
   setTimeout(() => { if (copied.value === str) copied.value = null; }, time);
@@ -18,8 +18,9 @@ function CopyIcon ({ content }) {
       name=${isCopied ? 'mdi:check' : 'mdi:content-copy'}
       onClick=${() => copy(content)}
       title='Copy to Clipboard'
-    />`;
+    />
+  `;
 }
 
-export       { CopyIcon };
+export       { CopyIcon, copy };
 export default CopyIcon;

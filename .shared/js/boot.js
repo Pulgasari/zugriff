@@ -16,12 +16,14 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
   const currentScript = document.currentScript;
   if (!currentScript) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
 
-   const root = document.documentElement;
-   root.classList.add('is-loading');
-   window.addEventListener('load', () => {
-     root.classList.remove('is-loading');
-     root.classList.add('is-ready');
-   });
+  const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
+  const $root = document.documentElement;
+
+  $root.classList.add('is-loading');
+  window.addEventListener('load', () => {
+    $root.classList.remove('is-loading');
+    $root.classList.add('is-ready');
+  });
 
   // Merge options: HTML data-attributes < global window config < default options
   const ds = currentScript.dataset;
@@ -48,8 +50,6 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
   };
   const { preload, sw, theme } = config;
 
-  const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
-
   // ── DEV TOOLS (?dev) ─────────────────────────────────────────────────────
   // `?dev` on any app url loads eruda — an on-screen console/inspector, the
   // closest thing to devtools on a phone. it sticks for the tab (sessionStorage)
@@ -74,7 +74,6 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
   if (theme.prefix) {
     const HEX = /^#[0-9a-f]{3,8}$/i;
     try {
-      const root = document.documentElement;
       let background = '';
 
       for (const key of theme.keys) {
@@ -85,7 +84,7 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
         try { value = JSON.parse(raw); } catch { continue; }
         if (typeof value !== 'string' || !HEX.test(value)) continue;
 
-        root.style.setProperty(`--${key}`, value);
+        $root.style.setProperty(`--${key}`, value);
         if (key === 'bg') background = value;
       }
 
@@ -163,6 +162,8 @@ if (urlParams.has('dev')) {
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
       "@aufbau/runtime"         : `${pkg}/aufbau/runtime/index.js`,
       "@aufbau/runtime/"        : `${pkg}/aufbau/runtime/`,
+      "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,
+      "@aufbau/signals/"        : `${pkg}/aufbau/signals/`,
       "@aufbau/store"           : `${pkg}/aufbau/store/index.js`,
       "@aufbau/stylesheet"      : `${pkg}/aufbau/stylesheet/index.js`,
       "@aufbau/stylesheet/"     : `${pkg}/aufbau/stylesheet/`,

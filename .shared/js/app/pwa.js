@@ -1,5 +1,5 @@
-// shared/js/lib/pwa.js
-//
+// .shared/js/app/pwa.js
+
 // install-to-home-screen plumbing, shared by the apps that grant on-disk
 // folders. it exists for one practical reason: the File System Access API only
 // *persists* a granted folder across sessions once the app is an installed PWA
@@ -13,7 +13,7 @@
 // `installed`       — running as an installed/standalone app already.
 // `promptInstall()` — show the native install prompt (needs a user gesture).
 
-import { signal } from '@aufbau/kits/preact-htm';
+import { signal } from './../vendors.js';
 
 const standalone = () =>
   (typeof window !== 'undefined' && (
@@ -21,8 +21,8 @@ const standalone = () =>
     window.matchMedia?.('(display-mode: window-controls-overlay)')?.matches ||
     window.navigator?.standalone === true));
 
-export const canInstall = signal(false);
-export const installed  = signal(standalone());
+const canInstall = signal(false);
+const isInstalled  = signal(standalone());
 
 let deferred = null;
 
@@ -32,23 +32,22 @@ if (typeof window !== 'undefined') {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferred = e;
-    canInstall.value = !installed.value;
+    canInstall.value = !isInstalled.value;
   });
 
   window.addEventListener('appinstalled', () => {
-    installed.value  = true;
-    canInstall.value = false;
+    isInstalled.value = true;
+    canInstall.value  = false;
     deferred = null;
   });
 
   window.matchMedia?.('(display-mode: standalone)')
     ?.addEventListener?.('change', e => {
-      if (e.matches) { installed.value = true; canInstall.value = false; }
+      if (e.matches) { isInstalled.value = true; canInstall.value = false; }
     });
 }
 
-/** show the native install prompt. resolves true if the user accepted. */
-export async function promptInstall () {
+async function promptInstall () {
   if (!deferred) return false;
   const evt = deferred;
   deferred = null;
@@ -61,3 +60,5 @@ export async function promptInstall () {
     return false;
   }
 }
+
+export { canInstall, isInstalled, promptInstall };

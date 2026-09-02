@@ -1,6 +1,6 @@
-// shared/js/components/Nav.js
+// components/Nav.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import Icon from './Icon.js';
 
 function Nav ({ here }) {
@@ -15,7 +15,7 @@ function Nav ({ here }) {
       ${links.map(link => html`
         <a
           key=${link.id}
-          class=${'btn ghost' + (here === link.id ? ' active' : '')}
+          class=${(here === link.id ? ' active' : '')}
           href=${link.href}
           aria-current=${here === link.id ? 'page' : null}
         >

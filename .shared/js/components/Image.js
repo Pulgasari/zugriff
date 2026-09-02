@@ -1,9 +1,9 @@
 // components/Image.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 
-function Image ({ alt = '', loading = 'lazy', src }) {
-  return html`<img src=${src} alt=${alt} loading=${loading} />`;
+function Image ({ loading = 'lazy', src, ...rest }) {
+  return html`<img ...${{ loading, src, ...rest }} />`;
 }
 
 export       { Image };

@@ -1,39 +1,45 @@
 // apps/notes/app.js
+//
+// notes on the new app runtime: one `zugriff.app('notes')` handle carries the
+// config, the reactive state and the mount. ephemeral ui state (the tree filter,
+// the mobile drawer, the open note's table of contents) lives on app.state — each
+// key is its own signal, so a write only wakes the effects that read it. the two
+// bits that must survive a reload (the open note, the expanded folders) stay on
+// their own persisted signals for now.
 
-// :::::: IMPORT
+// :::::: IMPORTS
 
 // ::: vendors
-import aufbau, { html, preact, str } from '@aufbau/kits/preact-htm';
-import { renderMD } from '@aufbau/import';
+import { html, computed, Fragment, useEffect, useRef, useState } from '/.shared/js/vendors.js';
+import { signal as persisted, local }                           from '@aufbau/signals';
 
-
-// ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=notes';
-import { stored }       from '/.shared/js/lib/signals.js';
-import * as fs          from '/.shared/js/filesystem/fsaccess.js';
-
-const { computed, signal, useEffect, useRef, Fragment } = preact;
-const { AppSettings, Button, Empty, Icon, IconButton, InstallTip, Tree } = zugriff.components;
+// ::: shared runtime
+import { zugriff } from '/.shared/js/runtime.js';
+import * as fs     from '/.shared/js/filesystem/fsaccess.js';
 
 // ::: local
 import * as db from './db.js';
 
+const app = zugriff.app('notes');
+const { AppSettings, Button, Empty, Icon, InstallTip, Tree } = zugriff.components;
+const toast = app.toast;
+
 // :::::: STATE
 
-// the open note, addressed by folder + path so it survives a rescan (the tree
-// node object is replaced, the path is not)
-const open     = stored(null, 'notes:open');       // { sourceId, path } | null
-const filter   = signal('');                       // tree filter query
-const expanded = stored([], 'notes:expanded');     // ['sourceId:dir/path', …]
-const navOpen  = signal(false);                     // mobile: is the tree drawer showing
-const noteToc  = signal([]);                        // headings of the open note
+// ephemeral ui state — on the shared deepSignal
+app.state.filter    = '';       // tree filter query
+app.state.isNavOpen = false;    // mobile: is the tree drawer showing
+
+// durable state — kept apart, hydrates from + persists to localStorage
+const open     = persisted({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
+const expanded = persisted({ value: [],   key: 'notes:expanded', store: local });   // ['sourceId:dir/path', …]
 
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
 
 function openNote (sourceId, node) {
   open.value = { sourceId, path: node.path };
-  navOpen.value = false;
+  app.state.isNavOpen = false;
 }
 
 // :::::: TREE HELPERS
@@ -55,14 +61,13 @@ function filterTree (node, q) {
   return kids.length ? { ...node, children: kids } : null;
 }
 
-
-// derive a note's display title: its first H1, else the filename without .md
+// derive a note's display title: the filename without its extension
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
 // :::::: SIDEBAR TREE
-// the tree itself is <aufbau-tree>; this maps a scanned folder into the node
-// shape it renders, and the value on each node ("f:"/"d:" + sourceId + path)
-// is what the select/toggle events hand back so we can act on it.
+// the tree itself is <aufbau-tree>; this maps a scanned folder into the node shape
+// it renders, and the value on each node ("f:"/"d:" + sourceId + path) is what the
+// select/toggle events hand back so we can act on it.
 
 const nodeValue = (kind, sourceId, path) => `${kind}:${sourceId}:${path}`;
 function parseValue (v = '') {
@@ -90,13 +95,13 @@ function toTreeNodes (dir, sourceId, forceOpen) {
 
 function onTreeSelect (e) {
   const { kind, sourceId, path } = parseValue(e.detail?.value);
-  if (kind === 'f') { open.value = { sourceId, path }; navOpen.value = false; }
+  if (kind === 'f') { open.value = { sourceId, path }; app.state.isNavOpen = false; }
 }
 
 function onTreeToggle (e) {
   const { kind, sourceId, path } = parseValue(e.detail?.value);
   if (kind !== 'd') return;
-  const k = keyOf(sourceId, path);
+  const k   = keyOf(sourceId, path);
   const has = expanded.value.includes(k);
   if (e.detail.expanded && !has)      expanded.value = [...expanded.value, k];
   else if (!e.detail.expanded && has) expanded.value = expanded.value.filter(x => x !== k);
@@ -106,7 +111,7 @@ function SourceBlock ({ source }) {
   const state = db.perms.value[source.id];
   const tree  = db.trees.value[source.id];
   const busy  = db.scanning.value[source.id];
-  const q     = filter.value.trim().toLowerCase();
+  const q     = app.state.filter.trim().toLowerCase();
 
   const remove = async () => {
     if (!confirm(`Close “${source.name}”? Your files are untouched — this only forgets the folder.`)) return;
@@ -120,10 +125,10 @@ function SourceBlock ({ source }) {
       if (res.granted) return;
       const why = res.error ? `${res.error.name || 'error'}` : `browser said “${res.state}”`;
       console.warn('[notes] reconnect failed', { source, ...res });
-      zugriff.toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
+      toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
     });
     const repick = () => db.repick(source.id).then(ok =>
-      ok || zugriff.toast.error('Could not open that folder'));
+      ok || toast.error('Could not open that folder'));
     body = html`
       <div class="src-reconnect">
         <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
@@ -152,9 +157,9 @@ function SourceBlock ({ source }) {
         <span class="src-name" title=${source.name}>${source.name}</span>
         <button class="src-x" title="Refresh" onClick=${() => db.scan(source.id).catch(() => {})}
                 disabled=${busy || state !== 'granted'}>
-          <${Icon} name="mdi:refresh" /></button>
+          <${Icon} name="refresh" /></button>
         <button class="src-x" title="Close folder" onClick=${remove}>
-          <${Icon} name="mdi:close" /></button>
+          <${Icon} name="close" /></button>
       </div>
       ${body}
     </div>`;
@@ -162,19 +167,19 @@ function SourceBlock ({ source }) {
 
 function Sidebar () {
   return html`
-    <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
+    <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
       <div class="brand">
-        <${Icon} name="mdi:notebook-outline" /> <span>Notes</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}>
-          <${Icon} name="mdi:close" /></button>
+        <${Icon} name="notes" /> <span>Notes</span>
+        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.isNavOpen = false}>
+          <${Icon} name="close" /></button>
       </div>
 
       <div class="tree-filter">
         <${Icon} name="search" />
-        <input type="search" placeholder="Filter notes…" value=${filter.value}
-               onInput=${e => filter.value = e.target.value} />
-        ${filter.value && html`
-          <button class="ibtn" aria-label="Clear" onClick=${() => filter.value = ''}>
+        <input type="search" placeholder="Filter notes…" value=${app.state.filter}
+               onInput=${e => app.state.filter = e.target.value} />
+        ${app.state.filter && html`
+          <button class="ibtn" aria-label="Clear" onClick=${() => app.state.filter = ''}>
             <${Icon} name="close" /></button>`}
       </div>
 
@@ -192,8 +197,6 @@ function Sidebar () {
     </aside>`;
 }
 
-
-
 // :::::: READER
 
 // resolve the note the router points at, against the freshest scan
@@ -206,112 +209,94 @@ const currentNote = computed(() => {
 });
 
 function Reader () {
-  const bodyRef = useRef(null);
-  const note    = currentNote.value;
+  return html`<${ReaderBody} note=${currentNote.value} />`;
+}
+
+// the open note: read its text off disk and hand it to <aufbau-reader>, which owns
+// the markdown pipeline. the transform hook resolves folder-relative images to blob
+// urls (before the reader paints, so no broken-image flash) and tags links;
+// <aufbau-toc> builds the "on this page" list off the rendered headings.
+function NoteView ({ note }) {
+  const root = db.sourceById(note.sourceId)?.handle;
+  const urls = useRef([]);
+  const [text, setText] = useState(null);
 
   useEffect(() => {
-    if (!note) return;
-    const root = db.sourceById(note.sourceId)?.handle;
-    const el   = bodyRef.current;
-    if (!el || !root) return;
-
     let alive = true;
-    const urls = [];
-    el.innerHTML = '<div class="md-loading">…</div>';
-    noteToc.value = [];
-
-    (async () => {
-      let text;
-      try { ({ text } = await db.readNote(note.node.handle)); }
-      catch (err) { if (alive) el.innerHTML = ''; zugriff.toast.error('Could not read that note: ' + err.message); return; }
-      if (!alive) return;
-
-      let htmlStr;
-      try { htmlStr = await renderMD(text); }
-      catch (err) { if (alive) { el.innerHTML = ''; zugriff.toast.error('Could not render that note: ' + err.message); } return; }
-      if (!alive) return;
-
-      const frag = document.createElement('div');
-      frag.innerHTML = htmlStr;
-
-      // headings → ids + a table of contents
-      const toc = [];
-      const seen = {};
-      frag.querySelectorAll('h1, h2, h3').forEach(h => {
-        let id = slugify(h.textContent);
-        if (seen[id]) id = `${id}-${seen[id]++}`; else seen[id] = 1;
-        h.id = id;
-        toc.push({ level: Number(h.tagName[1]), text: h.textContent, id });
-      });
-
-      // relative images → blob urls from the same granted folder
-      const imgs = [...frag.querySelectorAll('img')];
-      await Promise.all(imgs.map(async img => {
-        const src = img.getAttribute('src') || '';
-        const handle = await fs.resolveRelative(root, note.node.path, src);
-        if (!handle || !alive) return;
-        try {
-          const url = URL.createObjectURL(await handle.getFile());
-          urls.push(url);
-          img.src = url;
-          img.loading = 'lazy';
-        } catch {}
-      }));
-      if (!alive) return;
-
-      // links: relative .md links open the sibling note in-app; the rest open safely
-      frag.querySelectorAll('a[href]').forEach(a => {
-        const href = a.getAttribute('href') || '';
-        if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) {
-          a.target = '_blank'; a.rel = 'noopener noreferrer';
-        } else if (href.startsWith('#')) {
-          a.classList.add('anchor-link');
-        } else if (/\.(md|markdown)(#|$)/i.test(href)) {
-          a.classList.add('note-link');
-          a.dataset.href = href;
-        }
-      });
-
-      el.replaceChildren(...frag.childNodes);
-      noteToc.value = toc;
-    })();
-
+    setText(null);
+    db.readNote(note.node.handle)
+      .then(({ text }) => { if (alive) setText(text); })
+      .catch(err => { toast.error('Could not read that note: ' + err.message); if (alive) setText(''); });
     return () => {
       alive = false;
-      urls.forEach(u => URL.revokeObjectURL(u));
+      urls.current.forEach(URL.revokeObjectURL);
+      urls.current = [];
     };
-  }, [note?.sourceId, note?.node?.path, note?.node?.handle, db.trees.value]);
+  }, [note.sourceId, note.node.path, note.node.handle]);
 
-  // in-app navigation for note-to-note and anchor links (event delegation)
+  // runs inside the reader, over the parsed markup, before it is committed
+  const transform = async frag => {
+    urls.current.forEach(URL.revokeObjectURL);
+    urls.current = [];
+
+    // relative images → blob urls from the same granted folder
+    await Promise.all([...frag.querySelectorAll('img')].map(async img => {
+      const src = img.getAttribute('src') || '';
+      if (!src || /^([a-z]+:)?\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) return;
+      const handle = await fs.resolveRelative(root, note.node.path, src);
+      if (!handle) return;
+      try {
+        const url = URL.createObjectURL(await handle.getFile());
+        urls.current.push(url);
+        img.src = url;
+        img.loading = 'lazy';
+      } catch {}
+    }));
+
+    // relative .md links open the sibling note in-app; the rest open safely
+    frag.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      else if (href.startsWith('#'))                                    a.classList.add('anchor-link');
+      else if (/\.(md|markdown)(#|$)/i.test(href))                      { a.classList.add('note-link'); a.dataset.href = href; }
+    });
+  };
+
+  // in-app navigation for note-to-note and anchor links (delegated on the reader)
   const onClick = e => {
     const a = e.target.closest('a');
-    if (!a || !note) return;
+    if (!a) return;
     if (a.classList.contains('anchor-link')) {
       e.preventDefault();
-      bodyRef.current?.querySelector(decodeURIComponent(a.getAttribute('href')))
+      document.getElementById('notes-reader')?.querySelector(decodeURIComponent(a.getAttribute('href')))
         ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    if (a.classList.contains('note-link')) {
+    } else if (a.classList.contains('note-link')) {
       e.preventDefault();
       navigateRelative(note, a.dataset.href);
     }
   };
 
+  if (text == null) return html`<div class="reader-scroll"><div class="reader-grid"><div class="md-loading">…</div></div></div>`;
+
   return html`
-    <${ReaderBody} ...${{ bodyRef, note, onClick }} />`;
+    <div class="reader-scroll">
+      <div class="reader-grid">
+        <aufbau-reader id="notes-reader" class="md" format="markdown"
+                       raw=${text} transform=${transform} onClick=${onClick}></aufbau-reader>
+        <aside class="toc"><aufbau-toc target="#notes-reader" selector="h1, h2, h3"></aufbau-toc></aside>
+      </div>
+    </div>`;
 }
 
-// the frame is always drawn — header (with the mobile menu button) included —
-// so on a phone the tree drawer is always reachable, note open or not
-function ReaderBody ({ note, bodyRef, onClick }) {
-  const toc  = noteToc.value;
+// the frame is always drawn — header (with the mobile menu button) included — so on
+// a phone the tree drawer is always reachable, note open or not
+function ReaderBody ({ note }) {
   const segs = note ? note.node.path.split('/') : [];
 
   return html`
     <div class="reader">
       <header class=${'reader-head' + (note ? '' : ' empty')}>
-        <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => navOpen.value = true} />
+        <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
         ${note
           ? html`<nav class="crumbs">
               ${segs.map((seg, i) => html`
@@ -324,22 +309,7 @@ function ReaderBody ({ note, bodyRef, onClick }) {
       </header>
 
       ${note
-        ? html`
-          <div class="reader-scroll">
-            <div class="reader-grid">
-              <article class="md" ref=${bodyRef} onClick=${onClick}></article>
-              ${toc.length > 2 && html`
-                <aside class="toc">
-                  <div class="toc-title">On this page</div>
-                  ${toc.map(item => html`
-                    <a key=${item.id} href=${'#' + item.id} class=${'toc-item lvl' + item.level}
-                       onClick=${e => { e.preventDefault();
-                         bodyRef.current?.querySelector('#' + CSS.escape(item.id))
-                           ?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                      ${item.text}</a>`)}
-                </aside>`}
-            </div>
-          </div>`
+        ? html`<${NoteView} note=${note} />`
         : html`
           <div class="reader-empty">
             <${Empty} icon="mdi:file-document-outline" title="No note open"
@@ -363,24 +333,24 @@ function navigateRelative (from, href) {
   const tree   = db.trees.value[from.sourceId];
   const node   = tree && findByPath(tree, target);
   if (node) openNote(from.sourceId, node);
-  else zugriff.toast.error('Linked note not found');
+  else toast.error('Linked note not found');
 }
 
 // :::::: ACTIONS
 
 async function addFolder () {
-  if (!fs.supported()) { zugriff.toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.'); return; }
+  if (!fs.supported()) { toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.'); return; }
   try {
     const rec = await db.addFolder();
-    if (rec) zugriff.toast.success(`Opened ${rec.name}`);
-  } catch (err) { zugriff.toast.error(err.message); }
+    if (rec) toast.success(`Opened ${rec.name}`);
+  } catch (err) { toast.error(err.message); }
 }
 
 // :::::: APP
 
 function App () {
   useEffect(() => {
-    db.load().catch(err => zugriff.toast.error('Could not open the library: ' + err.message));
+    db.load().catch(err => toast.error('Could not open the library: ' + err.message));
   }, []);
 
   if (!db.ready.value) {
@@ -390,12 +360,11 @@ function App () {
   return html`
     <${Fragment}>
       <${Sidebar} />
-      ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
+      ${app.state.isNavOpen && html`<div class="scrim-mobile" onClick=${() => app.state.isNavOpen = false}></div>`}
       <main id="app-main"><${Reader} /></main>
-    </${Fragment}>
-  `;
+    <//>`;
 }
 
 // :::::: BOOT
 
-boot({ config, App });
+app.init({ App });

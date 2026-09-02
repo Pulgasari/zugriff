@@ -9,7 +9,7 @@
 // did, which is why every app kept hand-rolling a raw <input type=range>
 // instead of using this component.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 
 const single = value => Array.isArray(value) ? value[0] : Number(value);
 
@@ -28,10 +28,9 @@ function Slider ({
   const isFloat  = step < 1;
   const decimals = step < 0.01 ? 4 : 2;
   const clamp    = v => Math.min(max, Math.max(min, v));
-  const disp     = isFloat ? +Number(value).toFixed(decimals) : Math.round(value);
-
-  const set   = v     => onChange?.(clamp(v));
-  const input = event => set(single(event.detail?.value ?? event.target?.value));
+  const disp     = isFloat ? +Number(value).toFixed(decimals) : Math.round(value);     
+  const set      = value => onChange?.(clamp(value));
+  const onInput  = event => set(single(event.detail?.value ?? event.target?.value));
 
   return html`
     <div class="slider-row">
@@ -39,15 +38,11 @@ function Slider ({
 
       <div class="slider-track" style=${style}>
         <aufbau-slider
-          style="width:100%"
           controls=${showButtons}
-          editable=${editable}
+          ...${{ editable, step, unit, onInput }}
           min=${String(min)}
           max=${String(max)}
-          step=${step}
-          unit=${unit}
           value=${String(disp)}
-          onInput=${input}
         ></aufbau-slider>
       </div>
     </div>`;

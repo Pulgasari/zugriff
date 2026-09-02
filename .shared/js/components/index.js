@@ -19,18 +19,10 @@ export * from './Shell.js';
 export * from './Sidebar.js';
 export * from './Slider.js';
 export * from './Taplet.js';
-export * from './Toast.js';
+export * from './../app/toast.js';
 export * from './Tree.js';
 export * from './Toggle.js';
 export * from './Waveform.js';
 export * from './WaveformWithHandles.js';
 
 export { icons, resolveIcon } from './../data/icons.js';
-
-export {
-  SettingsButton,
-  SettingsGroups,
-  AppSettings,
-  settingsOpen,
-  toggleSettings,
-} from './Settings.js';

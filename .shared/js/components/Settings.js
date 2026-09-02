@@ -1,93 +1,44 @@
-// shared/js/components/Settings.js
-//
-// renders whatever a settings group describes. the fields themselves are built
-// by aufbau.gui (@aufbau/runtime/gui.js): each group's schema is handed to
-// gui.controls(), which turns it into <aufbau-*> controls, and the DOM it
-// returns is mounted into the preact tree through a ref. this component only
-// owns the chrome around them — the open/close toggle, the per-group header and
-// its reset button — so a new entry in a schema shows up here by itself.
-//
-//   <${Settings} groups=${[{ title: 'theme', settings: theme }]} />
+// components/Settings.js
+// the settings surface. `settingsOpen` is the single shared open-state signal;
+// `AppSettings` is the app-facing control — a gear button plus a panel built by
+// @aufbau/runtime/gui.js straight from the app's settings schema, so every app
+// gets a settings ui from its registry entry with no per-app plumbing. a change
+// writes into zugriff.app.current.state, which drives the shared state effects
+// (theme/font/dir apply + persist).
 
-// :::::: IMPORT
+// :::::: IMPORTS
 
-import { html, signal, useRef, useEffect, useState } from '@aufbau/kits/preact-htm';
-import * as gui from '@aufbau/runtime/gui.js';
 import Icon from './Icon.js';
-import { appGroup, themeGroup } from './../lib/settings.js';
 
-// :::::: STATE + HELPERS
+import gui                          from '@aufbau/runtime/gui.js';
+import { aufbau, html, signal, useEffect, useRef } from './../vendors.js';
+import { themeNames, DEFAULT_THEME } from './../data/themes.js';
+
+// :::::: STATE
 
 const settingsOpen   = signal(false);
 const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 
+// :::::: SPEC
+// theme is the one cross-cutting field; the rest comes verbatim from the app's
+// registry settings schema (font, dir, …). the font enum's values are filled from
+// the webfont catalog at build time, the registry stays import-free.
+
+function buildSpec (config) {
+  const fonts      = aufbau.webfonts?.fonts ?? [];
+  const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
+  const labelOf    = key => key[0].toUpperCase() + key.slice(1);
+
+  const spec = {
+    theme: { type: 'enum', look: 'combobox', values: themeNames, default: DEFAULT_THEME, label: 'Theme' },
+  };
+  for (const [key, entry] of Object.entries(config.settings ?? {}))
+    spec[key] = { label: labelOf(key), ...entry, ...(key === 'font' ? { values: fontValues } : {}) };
+
+  return spec;
+}
+
 // :::::: COMPONENTS
-
-// mounts one group's fields as aufbau controls. gui.controls() builds a detached
-// DOM subtree from the schema and, given onChange, reports the changed field back
-// so we can write it into the group's signal (which runs the group's onSet hook).
-// `nonce` bumps on reset to rebuild the controls from the freshly defaulted values.
-function GuiFields ({ settings, nonce }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const host = ref.current;
-    if (!host) return;
-
-    const values = Object.fromEntries(settings.keys.map(key => [key, settings.value(key)]));
-    const fields = gui.controls(settings.schema, {
-      values,
-      wrap : 'div',
-      onChange (vals, name) {
-        if (name && name in settings.schema) settings.set(name, vals[name]);
-      },
-    });
-
-    host.replaceChildren(fields);
-    return () => host.replaceChildren();
-  }, [settings, nonce]);
-
-  return html`<div class="settings-fields" ref=${ref}></div>`;
-}
-
-function Group ({ group }) {
-  const { title, settings } = group;
-  const [nonce, setNonce] = useState(0);
-
-  // reset defaults the signals, then rebuilds the controls so they show it
-  const reset = () => { settings.reset(); setNonce(n => n + 1); };
-
-  return html`
-    <section class="settings-group">
-      <header>
-        <code class="settings-title">${title}</code>
-        <button class="ghost-btn" onClick=${reset} title="back to defaults">
-          <${Icon} name="reset" /> reset
-        </button>
-      </header>
-      <${GuiFields} settings=${settings} nonce=${nonce} />
-    </section>`;
-}
-
-// just the group sections — no open/close gating, no panel wrapper. this is what
-// an app folds into its own settings dialog to show, say, only the app (font/dir)
-// group inline.
-function SettingsGroups ({ groups = [] }) {
-  return groups.map(group => html`<${Group} key=${group.title} group=${group} />`);
-}
-
-// the standalone panel: gated by the shared settingsOpen signal and wrapped in
-// #app-settings. `overlay` marks it as the fixed dropdown the /apps chrome uses
-// (styled by shared/css/settings.css); the tools Shell + launcher leave it off
-// and keep the inline panel their own sheets style.
-function Settings ({ groups = [], overlay = false }) {
-  if (!settingsOpen.value) return null;
-
-  return html`
-    <div id="app-settings" class=${overlay ? 'app-settings-overlay' : ''}>
-      <${SettingsGroups} groups=${groups} />
-    </div>`;
-}
 
 function SettingsButton () {
   return html`
@@ -100,25 +51,49 @@ function SettingsButton () {
     </button>`;
 }
 
-// drop-in for an app that draws its own chrome: the header gear plus the overlay
-// panel, defaulting to the predefined app settings (font + direction) and theme.
-// place it in the app's header actions — the panel positions itself.
-function AppSettings ({ groups = [appGroup, themeGroup] }) {
+// reads the page's active app off the runtime (set by zugriff.app('<slug>')), so a
+// shared component reaches this app's state without prop-drilling. gui.controls
+// returns a live dom subtree, mounted into the panel via a ref.
+function SettingsPanel () {
+  const app  = globalThis.zugriff?.app?.current;
+  const host = useRef(null);
+
+  useEffect(() => {
+    if (!app || !host.current) return;
+    const spec   = buildSpec(app.config);
+    const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state[key]]));
+    const panel  = gui.controls(spec, {
+      values,
+      onChange: (next, key) => { if (key != null) app.state[key] = next[key]; },
+    });
+    host.current.replaceChildren(panel);
+    return () => host.current?.replaceChildren();
+  }, [app]);
+
+  if (!app) return null;
+
+  return html`
+    <div id="app-settings" class="app-settings" role="dialog" aria-label="Settings">
+      <div class="app-settings-head">
+        <span>Settings</span>
+        <button class="ghost-btn" aria-label="Close" onClick=${toggleSettings}><${Icon} name="close" /></button>
+      </div>
+      <div class="app-settings-fields" ref=${host}></div>
+    </div>`;
+}
+
+function AppSettings () {
   return html`
     <${SettingsButton} />
-    <${Settings} groups=${groups} overlay />`;
+    ${settingsOpen.value && html`<${SettingsPanel} />`}`;
+}
+
+// tools mount this through Shell; the app panel is the live surface for now
+function Settings () {
+  return settingsOpen.value ? html`<${SettingsPanel} />` : null;
 }
 
 // :::::: EXPORT
 
-export {
-  settingsOpen,
-  toggleSettings,
-  // components
-  Settings,
-  SettingsGroups,
-  SettingsButton,
-  AppSettings,
-}
-
+export       { Settings, SettingsButton, AppSettings, settingsOpen, toggleSettings };
 export default Settings;

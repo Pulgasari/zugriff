@@ -1,24 +1,9 @@
 // .shared/js/app/config.js
+// resolve a page's registry entry by slug. replaces the old ?slug= module-url
+// trick — the slug now comes in as an argument (zugriff.app('notes')).
 
-import { registry } from './../registry.js';
+import { registry } from './../data/apps.js';
 
-const slug   = new URL(import.meta.url).searchParams.get('slug');
-const config = (slug && registry.get(slug)) || {};
+export const configFor = slug => (slug && registry.get(slug)) || {};
 
-const config = {};
-
-function applyFont (id) {
-  if (id) aufbau.webfonts.load(id).then(ok => { 
-    if (ok) aufbau.webfonts.apply({ name: id, target: '--font' }); 
-  });
-}
-
-function applyDir (value) {
-  if (typeof document === 'undefined') return;
-  document.documentElement.dir = value || 'ltr';
-}
-
-// :::::: EXPORT
-
-export { config };
-export default config;
+export default configFor;
