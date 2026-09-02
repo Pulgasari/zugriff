@@ -11,6 +11,7 @@ zugriff.app.setState('font', 'Inter');
 
 import config   from './app/config.js';
 import state    from './app/state.js';
+import toast    from './app/toast.js';
 import * as pwa from './app/pwa.js';
 
 import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
@@ -29,6 +30,9 @@ app.toggleState = (key, force) => app.state[key] = force ?? app.state[key];
 app.resetState  = (key)        => app.state[key] = (key in app.config) ? app.config[key] : null;
 
 app.togglePanel = id => document.getElementById(id).classList.toggleClass('hidden');    
+
+// toast
+pwa.toast = toast;
 
 // pwa
 app.canInstall    = pwa.canInstall;
