@@ -1,4 +1,7 @@
 // .shared/js/vendors.js
 
 export * from '@aufbau/kits/preact-htm';
-import * from '@pulgasari/timing';
+export * from '@pulgasari/is';
+export * from '@pulgasari/obj';
+export * from '@pulgasari/str';
+export * from '@pulgasari/timing';
