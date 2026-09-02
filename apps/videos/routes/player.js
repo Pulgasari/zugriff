@@ -7,7 +7,7 @@ import { Stage, Controls } from '/.shared/js/media/videoplayer.js';
 
 function PlayerRoute () {
   return html`
-    <div class="vid-player">
+    <div class="videoplayer">
       <${Stage} />
       <${Controls} />
     </div>`;
