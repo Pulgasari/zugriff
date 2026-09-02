@@ -5,7 +5,8 @@ import { computed, effect, html, signal, useEffect, useRef, useState } from '@au
 import { BunkerDB } from '@bunker/db';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=prompts';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('prompts');
 import { Icon, Picker } from '/.shared/js/components/index.js';
 
 // ::: local
@@ -385,4 +386,4 @@ function App() {
   `;
 }
 
-boot({ config, App });
+app.init({ App });

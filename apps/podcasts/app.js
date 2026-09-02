@@ -8,11 +8,11 @@ import aufbau, { html, preact, effect } from '@aufbau/kits/preact-htm';
 const { computed, signal, useEffect, useRef, useSignal, Fragment } = preact;
 
 // ::: shared
-import { boot, config }         from '/.shared/js/app.js?slug=podcasts';
-import { Icon, IconButton, Button, Empty, SettingsGroups } from '/.shared/js/components/index.js';
-import { stored }               from '/.shared/js/lib/signals.js';
-import { appGroup }             from '/.shared/js/lib/settings.js';
-import { createThumbCache }     from '/.shared/js/lib/thumbs.js';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('podcasts');
+import { Icon, IconButton, Button, Empty, AppSettings } from '/.shared/js/components/index.js';
+import { stored }               from '/.shared/js/app/signals.js';
+import { createThumbCache }     from '/.shared/js/thumbs.js';
 
 // ::: local
 import * as db           from './db.js';
@@ -653,7 +653,7 @@ function SettingsDialog () {
           </span>
         </div>
 
-        <${SettingsGroups} groups=${[appGroup]} />
+        <${AppSettings} />
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {
@@ -781,4 +781,4 @@ function App () {
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
 // the app draws its own chrome, so it skips the tools Shell
-boot({ config, App });
+app.init({ App });

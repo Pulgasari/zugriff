@@ -6,9 +6,10 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }              from '/.shared/js/app.js?slug=gifmaker';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('gifmaker');
 import { Icon, Slider, AppSettings } from '/.shared/js/components/index.js';
-import { stored }                    from '/.shared/js/lib/signals.js';
+import { stored }                    from '/.shared/js/app/signals.js';
 
 // ::: local
 import { zipStore, unzip } from './zip.js';
@@ -570,4 +571,4 @@ function App () {
 }
 
 // :::::: BOOT
-boot({ config, App });
+app.init({ App });

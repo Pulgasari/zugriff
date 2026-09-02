@@ -6,9 +6,10 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }                                    from '/.shared/js/app.js?slug=ebooks';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('ebooks');
 import { Icon, IconButton, Empty, InstallTip, AppSettings } from '/.shared/js/components/index.js';
-import { stored }                                          from '/.shared/js/lib/signals.js';
+import { stored }                                          from '/.shared/js/app/signals.js';
 import * as fs                                             from '/.shared/js/filesystem/fsaccess.js';
 
 // ::: local
@@ -404,4 +405,4 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
-boot({ config, App });
+app.init({ App });

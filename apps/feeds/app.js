@@ -6,13 +6,13 @@
 import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=feeds';
-import { stored }       from '/.shared/js/lib/signals.js';
-import { appGroup }     from '/.shared/js/lib/settings.js';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('feeds');
+import { stored }       from '/.shared/js/app/signals.js';
 import {
   Icon,
   Image,
-  SettingsGroups
+  AppSettings
 } from '/.shared/js/components/index.js';
 
 // ::: local
@@ -321,7 +321,7 @@ function SettingsDialog () {
             <button class="btn ghost small" onClick=${() => proxy.value = ''}>Direct only</button>
           </div>
         </label>
-        <${SettingsGroups} groups=${[appGroup]} />
+        <${AppSettings} />
         <div class="modal-actions">
           <button class="primary" onClick=${() => { dialog.value = null; flash('Settings saved'); }}>Done</button>
         </div>
@@ -357,4 +357,4 @@ function App () {
 
 // :::::: BOOT
 
-boot({ config, App });
+app.init({ App });

@@ -6,7 +6,9 @@
 import { html, signal, useRef, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=looksmaxx';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('looksmaxx');
+const config = app.config;
 import { Icon }         from '/.shared/js/components/index.js';
 
 // ::: local
@@ -268,4 +270,4 @@ function hexToRgb (hex) {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-boot({ config, App });
+app.init({ App });

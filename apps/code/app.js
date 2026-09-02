@@ -6,7 +6,8 @@
 import { html, effect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=code';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('code');
 import { Prompt }       from '/.shared/js/components/index.js';
 
 // ::: local — state first (it wires commands/editor/fs together)
@@ -80,4 +81,4 @@ function App () {
 }
 
 // :::::: BOOT
-boot({ config, App });
+app.init({ App });

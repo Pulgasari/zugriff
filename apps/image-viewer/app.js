@@ -6,9 +6,10 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }                 from '/.shared/js/app.js?slug=image-viewer';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('image-viewer');
 import { Icon, IconButton, AppSettings } from '/.shared/js/components/index.js';
-import * as pwa                          from '/.shared/js/lib/pwa.js';
+import * as pwa                          from '/.shared/js/app/pwa.js';
 import { useGesture }                    from '@aufbau/gestures/preact';
 
 // :::::: STATE
@@ -201,7 +202,7 @@ function Welcome () {
 function OpenWithTip () {
   const canHandle = 'launchQueue' in window;
   if (!canHandle) return null;
-  if (pwa.installed.value) {
+  if (pwa.isInstalled.value) {
     return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" />
       Installed — pick <b>Viewer</b> from your device’s <b>Open with</b> menu to send images straight here.</p>`;
   }
@@ -319,4 +320,4 @@ function App () {
 
 // :::::: BOOT
 
-boot({ config, App });
+app.init({ App });

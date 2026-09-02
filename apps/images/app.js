@@ -13,10 +13,11 @@ import { html, Fragment, signal, computed, useEffect, useRef, useState } from '@
 import { useGesture } from '@aufbau/gestures/preact';
 
 // ::: shared
-import { boot, config }                              from '/.shared/js/app.js?slug=images';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('images');
 import { Icon, IconButton, InstallTip, AppSettings } from '/.shared/js/components/index.js';
-import { stored }            from '/.shared/js/lib/signals.js';
-import * as pwa              from '/.shared/js/lib/pwa.js';
+import { stored }            from '/.shared/js/app/signals.js';
+import * as pwa              from '/.shared/js/app/pwa.js';
 
 // ::: local
 import * as edit    from './edit.js';
@@ -232,7 +233,7 @@ function ThumbStrip () {
 function OpenWithTip () {
   const canHandle = 'launchQueue' in window;
   if (!canHandle) return null;
-  if (pwa.installed.value) {
+  if (pwa.isInstalled.value) {
     return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" />
       Installed — pick <b>Images</b> from your device’s <b>Open with</b> menu to send images straight here.</p>`;
   }
@@ -1607,4 +1608,4 @@ function App () {
 
 // :::::: BOOT :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-boot({ config, App });
+app.init({ App });
