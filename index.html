@@ -258,7 +258,8 @@ function Launcher () {
 }
 
   // :::::: BOOT
-  boot({ config, App: Launcher, shell: false });
+  //boot({ config, App: Launcher, shell: false });
+  preact.render(html`<${Launcher}/>`, document.getElementById('app'));
 
 }
 </script>
