@@ -6,7 +6,8 @@
 import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }                  from '/.shared/js/app.js?slug=audio-manager';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('audio-manager');
 import { Icon, IconButton, InstallTip, AppSettings } from '/.shared/js/components/index.js';
 import * as fs                           from '/.shared/js/filesystem/fsaccess.js';
 
@@ -427,4 +428,4 @@ function App () {
     </${Fragment}>`;
 }
 
-boot({ config, App });
+app.init({ App });

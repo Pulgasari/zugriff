@@ -6,12 +6,15 @@
 import { html } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-// this app pulls its own registry entry in through the module url — change the
-// slug to yours after adding a `{ type: 'app', slug: '<slug>', … }` entry to
-// shared/js/registry.js. `config` is that entry; boot reads the title, theme and
-// aufbau options off it. an app has `type: 'app'`, so boot skips the tools Shell
-// and this component owns the whole #app frame.
-import { boot, config } from '/.shared/js/app.js?slug=template';
+// zugriff.app('<slug>') resolves this app's registry entry, builds its reactive
+// state and returns the handle — change the slug to yours after adding a
+// `{ type: 'app', slug: '<slug>', … }` entry to .shared/js/data/apps.js. `app.config`
+// is that entry (title/theme/lang/aufbau options ride through the shared state
+// effects). app.init mounts; type 'app' skips the tools Shell, so this component
+// owns the whole #app frame.
+import { zugriff } from '/.shared/js/runtime.js';
+const app    = zugriff.app('template');
+const config = app.config;
 import { Icon } from '/.shared/js/components/index.js';
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
@@ -29,4 +32,4 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
-boot({ config, App });
+app.init({ App });

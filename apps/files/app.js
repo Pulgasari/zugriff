@@ -6,7 +6,8 @@
 import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=files';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('files');
 
 const { AppSettings, Icon, InstallTip, FileExplorer } = zugriff.components;
 const { fs } = zugriff;
@@ -153,4 +154,4 @@ function App () {
 
 // :::::: BOOT
 
-boot({ config, App });
+app.init({ App });

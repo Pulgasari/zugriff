@@ -6,9 +6,10 @@
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 
 // ::: shared
-import { boot, config }                 from '/.shared/js/app.js?slug=videoplayer';
-import { Icon, Taplet, SettingsGroups } from '/.shared/js/components/index.js';
-import { appGroup }                     from '/.shared/js/lib/settings.js';
+import { zugriff } from '/.shared/js/runtime.js';
+const app = zugriff.app('videoplayer');
+const config = app.config;
+import { Icon, Taplet, AppSettings } from '/.shared/js/components/index.js';
 
 // :::::: STATE
 
@@ -272,7 +273,7 @@ function SettingsPanel () {
           </button>
         </header>
         <div class="sheet-body">
-          <${SettingsGroups} groups=${[appGroup]} />
+          <${AppSettings} />
         </div>
       </aside>
     </div>`;
@@ -348,4 +349,4 @@ function App () {
 
 // :::::: BOOT
 
-boot({ config, App });
+app.init({ App });
