@@ -14,13 +14,19 @@
 
 // :::::: IMPORTS
 
-import { configFor }  from './app/config.js';
 import { createState } from './app/state.js';
 import { toast }       from './app/toast.js';
 import * as pwa        from './app/pwa.js';
 
+import { registry } from './data/apps.js';
 import { aufbau, html, render } from './vendors.js';
 import Shell from './components/Shell.js';
+
+// :::::: CONFIG
+// resolve a page's registry entry by slug (zugriff.app('notes')). a miss yields {}
+// so a slugless or unknown page still boots on the registry defaults.
+
+const configFor = slug => (slug && registry.get(slug)) || {};
 
 // :::::: FACTORY
 
