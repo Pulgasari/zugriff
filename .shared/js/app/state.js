@@ -23,6 +23,7 @@ const $root = $doc?.documentElement ?? null;
 
 const THEME_PREFIX = 'zugriff:theme';   // :bg / :fg / :accent / :preset
 const FONT_KEY     = 'zugriff:app:font';
+const DIR_KEY      = 'zugriff:app:dir';
 const COLOR_KEYS   = ['bg', 'fg', 'accent'];
 
 const readJSON = key => {
@@ -51,10 +52,11 @@ const applyTheme = preset => {
 export function createState (config = {}) {
   const savedTheme = readJSON(`${THEME_PREFIX}:preset`);
   const savedFont  = readJSON(FONT_KEY);
+  const savedDir   = readJSON(DIR_KEY);
 
   const state = deepSignal({
     color    : config.color,
-    dir      : config.dir,
+    dir      : savedDir   ?? config.dir,
     font     : savedFont  ?? config.font  ?? 'Manrope',
     lang     : config.lang,
     theme    : savedTheme ?? config.theme ?? 'dracula',
@@ -69,7 +71,7 @@ export function createState (config = {}) {
   // :::::: EFFECTS
 
   state.$onEffects({
-    dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
+    dir   : value => { if ($root && value) { $root.setAttribute('dir', value); writeJSON(DIR_KEY, value); } },
     font  : value => { if (value) { aufbau.webfonts?.init?.({ name: value, target: '--font' }); writeJSON(FONT_KEY, value); } },
     lang  : value => { if ($root && value) $root.lang = value; },
     theme : value => applyTheme(value),

@@ -1,22 +1,44 @@
 // components/Settings.js
 // the settings surface. `settingsOpen` is the single shared open-state signal;
-// `AppSettings` is the app-facing control — a gear button plus a small panel wired
-// straight to zugriff.app.current.state, so a change to theme/font flows through the
-// shared state effects (apply + persist) with no per-app settings plumbing.
+// `AppSettings` is the app-facing control — a gear button plus a panel built by
+// @aufbau/runtime/gui.js straight from the app's settings schema, so every app
+// gets a settings ui from its registry entry with no per-app plumbing. a change
+// writes into zugriff.app.current.state, which drives the shared state effects
+// (theme/font/dir apply + persist).
 
 // :::::: IMPORTS
 
 import Icon from './Icon.js';
 
-import { aufbau, html, signal } from './../vendors.js';
-import { themeNames }           from './../data/themes.js';
+import gui                          from '@aufbau/runtime/gui.js';
+import { aufbau, html, signal, useEffect, useRef } from './../vendors.js';
+import { themeNames, DEFAULT_THEME } from './../data/themes.js';
 
 // :::::: STATE
 
 const settingsOpen   = signal(false);
 const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 
-// :::::: BUTTON
+// :::::: SPEC
+// theme is the one cross-cutting field; the rest comes verbatim from the app's
+// registry settings schema (font, dir, …). the font enum's values are filled from
+// the webfont catalog at build time, the registry stays import-free.
+
+function buildSpec (config) {
+  const fonts      = aufbau.webfonts?.fonts ?? [];
+  const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
+  const labelOf    = key => key[0].toUpperCase() + key.slice(1);
+
+  const spec = {
+    theme: { type: 'enum', look: 'combobox', values: themeNames, default: DEFAULT_THEME, label: 'Theme' },
+  };
+  for (const [key, entry] of Object.entries(config.settings ?? {}))
+    spec[key] = { label: labelOf(key), ...entry, ...(key === 'font' ? { values: fontValues } : {}) };
+
+  return spec;
+}
+
+// :::::: COMPONENTS
 
 function SettingsButton () {
   return html`
@@ -29,16 +51,26 @@ function SettingsButton () {
     </button>`;
 }
 
-// :::::: APP SETTINGS
 // reads the page's active app off the runtime (set by zugriff.app('<slug>')), so a
-// shared component needs no prop-drilling to reach this app's state.
-
+// shared component reaches this app's state without prop-drilling. gui.controls
+// returns a live dom subtree, mounted into the panel via a ref.
 function SettingsPanel () {
-  const app = globalThis.zugriff?.app?.current;
-  if (!app) return null;
+  const app  = globalThis.zugriff?.app?.current;
+  const host = useRef(null);
 
-  const { state } = app;
-  const fonts = aufbau.webfonts?.fonts ?? [];
+  useEffect(() => {
+    if (!app || !host.current) return;
+    const spec   = buildSpec(app.config);
+    const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state[key]]));
+    const panel  = gui.controls(spec, {
+      values,
+      onChange: (next, key) => { if (key != null) app.state[key] = next[key]; },
+    });
+    host.current.replaceChildren(panel);
+    return () => host.current?.replaceChildren();
+  }, [app]);
+
+  if (!app) return null;
 
   return html`
     <div id="app-settings" class="app-settings" role="dialog" aria-label="Settings">
@@ -46,21 +78,7 @@ function SettingsPanel () {
         <span>Settings</span>
         <button class="ghost-btn" aria-label="Close" onClick=${toggleSettings}><${Icon} name="close" /></button>
       </div>
-
-      <label class="app-settings-row">
-        <span>Theme</span>
-        <select value=${state.theme} onChange=${e => state.theme = e.target.value}>
-          ${themeNames.map(name => html`<option key=${name} value=${name}>${name}</option>`)}
-        </select>
-      </label>
-
-      <label class="app-settings-row">
-        <span>Font</span>
-        <select value=${state.font} onChange=${e => state.font = e.target.value}>
-          <option value="Manrope">default</option>
-          ${fonts.map(f => html`<option key=${f.id} value=${f.id}>${f.name}</option>`)}
-        </select>
-      </label>
+      <div class="app-settings-fields" ref=${host}></div>
     </div>`;
 }
 

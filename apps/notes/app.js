@@ -10,9 +10,8 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import { html, computed, Fragment, useEffect, useRef } from '/.shared/js/vendors.js';
-import { signal as persisted, local }                 from '@aufbau/signals';
-import { renderMD }                                    from '@aufbau/import';
+import { html, computed, Fragment, useEffect, useRef, useState } from '/.shared/js/vendors.js';
+import { signal as persisted, local }                           from '@aufbau/signals';
 
 // ::: shared runtime
 import { zugriff } from '/.shared/js/runtime.js';
@@ -30,7 +29,6 @@ const toast = app.toast;
 // ephemeral ui state — on the shared deepSignal
 app.state.filter    = '';       // tree filter query
 app.state.isNavOpen = false;    // mobile: is the tree drawer showing
-app.state.toc       = [];       // headings of the open note
 
 // durable state — kept apart, hydrates from + persists to localStorage
 const open     = persisted({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
@@ -65,9 +63,6 @@ function filterTree (node, q) {
 
 // derive a note's display title: the filename without its extension
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
-
-// heading text -> a url-safe id for anchors and the toc
-const slugify = text => text.toLowerCase().trim().replace(/[^\w]+/g, '-').replace(/^-+|-+$/g, '');
 
 // :::::: SIDEBAR TREE
 // the tree itself is <aufbau-tree>; this maps a scanned folder into the node shape
@@ -214,105 +209,88 @@ const currentNote = computed(() => {
 });
 
 function Reader () {
-  const bodyRef = useRef(null);
-  const note    = currentNote.value;
+  return html`<${ReaderBody} note=${currentNote.value} />`;
+}
+
+// the open note: read its text off disk and hand it to <aufbau-reader>, which owns
+// the markdown pipeline. the transform hook resolves folder-relative images to blob
+// urls (before the reader paints, so no broken-image flash) and tags links;
+// <aufbau-toc> builds the "on this page" list off the rendered headings.
+function NoteView ({ note }) {
+  const root = db.sourceById(note.sourceId)?.handle;
+  const urls = useRef([]);
+  const [text, setText] = useState(null);
 
   useEffect(() => {
-    if (!note) return;
-    const root = db.sourceById(note.sourceId)?.handle;
-    const el   = bodyRef.current;
-    if (!el || !root) return;
-
     let alive = true;
-    const urls = [];
-    el.innerHTML = '<div class="md-loading">…</div>';
-    app.state.toc = [];
-
-    (async () => {
-      let text;
-      try { ({ text } = await db.readNote(note.node.handle)); }
-      catch (err) { if (alive) el.innerHTML = ''; toast.error('Could not read that note: ' + err.message); return; }
-      if (!alive) return;
-
-      let htmlStr;
-      try { htmlStr = await renderMD(text); }
-      catch (err) { if (alive) { el.innerHTML = ''; toast.error('Could not render that note: ' + err.message); } return; }
-      if (!alive) return;
-
-      const frag = document.createElement('div');
-      frag.innerHTML = htmlStr;
-
-      // headings → ids + a table of contents
-      const toc  = [];
-      const seen = {};
-      frag.querySelectorAll('h1, h2, h3').forEach(h => {
-        let id = slugify(h.textContent);
-        if (seen[id]) id = `${id}-${seen[id]++}`; else seen[id] = 1;
-        h.id = id;
-        toc.push({ level: Number(h.tagName[1]), text: h.textContent, id });
-      });
-
-      // relative images → blob urls from the same granted folder
-      const imgs = [...frag.querySelectorAll('img')];
-      await Promise.all(imgs.map(async img => {
-        const src    = img.getAttribute('src') || '';
-        const handle = await fs.resolveRelative(root, note.node.path, src);
-        if (!handle || !alive) return;
-        try {
-          const url = URL.createObjectURL(await handle.getFile());
-          urls.push(url);
-          img.src = url;
-          img.loading = 'lazy';
-        } catch {}
-      }));
-      if (!alive) return;
-
-      // links: relative .md links open the sibling note in-app; the rest open safely
-      frag.querySelectorAll('a[href]').forEach(a => {
-        const href = a.getAttribute('href') || '';
-        if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) {
-          a.target = '_blank'; a.rel = 'noopener noreferrer';
-        } else if (href.startsWith('#')) {
-          a.classList.add('anchor-link');
-        } else if (/\.(md|markdown)(#|$)/i.test(href)) {
-          a.classList.add('note-link');
-          a.dataset.href = href;
-        }
-      });
-
-      el.replaceChildren(...frag.childNodes);
-      app.state.toc = toc;
-    })();
-
+    setText(null);
+    db.readNote(note.node.handle)
+      .then(({ text }) => { if (alive) setText(text); })
+      .catch(err => { toast.error('Could not read that note: ' + err.message); if (alive) setText(''); });
     return () => {
       alive = false;
-      urls.forEach(u => URL.revokeObjectURL(u));
+      urls.current.forEach(URL.revokeObjectURL);
+      urls.current = [];
     };
-  }, [note?.sourceId, note?.node?.path, note?.node?.handle, db.trees.value]);
+  }, [note.sourceId, note.node.path, note.node.handle]);
 
-  // in-app navigation for note-to-note and anchor links (event delegation)
+  // runs inside the reader, over the parsed markup, before it is committed
+  const transform = async frag => {
+    urls.current.forEach(URL.revokeObjectURL);
+    urls.current = [];
+
+    // relative images → blob urls from the same granted folder
+    await Promise.all([...frag.querySelectorAll('img')].map(async img => {
+      const src = img.getAttribute('src') || '';
+      if (!src || /^([a-z]+:)?\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) return;
+      const handle = await fs.resolveRelative(root, note.node.path, src);
+      if (!handle) return;
+      try {
+        const url = URL.createObjectURL(await handle.getFile());
+        urls.current.push(url);
+        img.src = url;
+        img.loading = 'lazy';
+      } catch {}
+    }));
+
+    // relative .md links open the sibling note in-app; the rest open safely
+    frag.querySelectorAll('a[href]').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      else if (href.startsWith('#'))                                    a.classList.add('anchor-link');
+      else if (/\.(md|markdown)(#|$)/i.test(href))                      { a.classList.add('note-link'); a.dataset.href = href; }
+    });
+  };
+
+  // in-app navigation for note-to-note and anchor links (delegated on the reader)
   const onClick = e => {
     const a = e.target.closest('a');
-    if (!a || !note) return;
+    if (!a) return;
     if (a.classList.contains('anchor-link')) {
       e.preventDefault();
-      bodyRef.current?.querySelector(decodeURIComponent(a.getAttribute('href')))
+      document.getElementById('notes-reader')?.querySelector(decodeURIComponent(a.getAttribute('href')))
         ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    if (a.classList.contains('note-link')) {
+    } else if (a.classList.contains('note-link')) {
       e.preventDefault();
       navigateRelative(note, a.dataset.href);
     }
   };
 
-  return html`<${ReaderBody} ...${{ bodyRef, note, onClick }} />`;
+  if (text == null) return html`<div class="reader-scroll"><div class="reader-grid"><div class="md-loading">…</div></div></div>`;
+
+  return html`
+    <div class="reader-scroll">
+      <div class="reader-grid">
+        <aufbau-reader id="notes-reader" class="md" format="markdown"
+                       raw=${text} transform=${transform} onClick=${onClick}></aufbau-reader>
+        <aside class="toc"><aufbau-toc target="#notes-reader" selector="h1, h2, h3"></aufbau-toc></aside>
+      </div>
+    </div>`;
 }
 
 // the frame is always drawn — header (with the mobile menu button) included — so on
 // a phone the tree drawer is always reachable, note open or not
-function ReaderBody ({ note, bodyRef, onClick }) {
-  const toc  = app.state.toc;
+function ReaderBody ({ note }) {
   const segs = note ? note.node.path.split('/') : [];
 
   return html`
@@ -331,22 +309,7 @@ function ReaderBody ({ note, bodyRef, onClick }) {
       </header>
 
       ${note
-        ? html`
-          <div class="reader-scroll">
-            <div class="reader-grid">
-              <article class="md" ref=${bodyRef} onClick=${onClick}></article>
-              ${toc.length > 2 && html`
-                <aside class="toc">
-                  <div class="toc-title">On this page</div>
-                  ${toc.map(item => html`
-                    <a key=${item.id} href=${'#' + item.id} class=${'toc-item lvl' + item.level}
-                       onClick=${e => { e.preventDefault();
-                         bodyRef.current?.querySelector('#' + CSS.escape(item.id))
-                           ?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}>
-                      ${item.text}</a>`)}
-                </aside>`}
-            </div>
-          </div>`
+        ? html`<${NoteView} note=${note} />`
         : html`
           <div class="reader-empty">
             <${Empty} icon="mdi:file-document-outline" title="No note open"
