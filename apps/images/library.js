@@ -1,27 +1,27 @@
 // apps/images/library.js
 //
-// the folder-library data layer for the library mode. it leans on the shared
+// the folder-library data layer for the library route. it leans on the shared
 // FolderLibrary (zugriff.fs.FolderLibrary), which owns the whole granted-folder
-// lifecycle — persisting the directory handles in @bunker/db, resolving their
-// permission on load, add / reconnect / re-pick / forget — and calls back here
-// only to turn a scanned folder into image records. no metadata, no covers: an
-// image is its own thumbnail, generated lazily in the ui.
+// lifecycle (persisting handles in @bunker/db, resolving perms, add / reconnect /
+// re-pick / forget) and calls back here only to turn a scanned folder into image
+// records. the built instance is extended with the app-specific surface (pics,
+// accept, ensureLoaded, openFile, fs) and exported whole; context.js binds it to
+// the app handle, so the app code reaches it as `app.lib`. no covers: an image is
+// its own thumbnail, generated lazily in the ui.
 
-import { signal } from '@aufbau/kits/preact-htm';
+import { signal }     from '@aufbau/kits/preact-htm';
 import { zugriff }    from '/.shared/js/runtime.js';
 import { syncSource } from '/.shared/js/filesystem/scan.js';
 import * as fs        from '/.shared/js/filesystem/fsaccess.js';
 
 const IMAGE_RE = /\.(png|jpe?g|jfif|gif|webp|avif|bmp|svg|ico|heic|heif|tiff?)$/i;
-export const accept = name => IMAGE_RE.test(name);
+const accept = name => IMAGE_RE.test(name);
 
 const SEP   = '/';
 const keyOf = (sourceId, path) => sourceId + SEP + path;
 
 // [{ key, sourceId, path, name, ext, sig, addedAt }]
-export const pics = signal([]);
-
-export const picByKey = key => pics.value.find(p => p.key === key) ?? null;
+const pics = signal([]);
 
 const lib = new zugriff.fs.FolderLibrary({
   db:       'zugriff-images',
@@ -48,24 +48,26 @@ const lib = new zugriff.fs.FolderLibrary({
   },
 });
 
-export const { sources, perms, scanning, ready } = lib;
-export const sourceById   = lib.sourceById;
-export const addFolder    = lib.addFolder;
-export const reconnect    = lib.reconnect;
-export const repick       = lib.repick;
-export const removeFolder = lib.removeFolder;
-export const rescanAll    = lib.rescanAll;
+// :::::: EXTEND
+// hang the app-facing surface straight off the instance; FolderLibrary already
+// carries sources / perms / scanning / ready / addFolder / reconnect / … so the
+// whole data layer is reachable through one object.
 
-// call load() at most once — the first time the library mode is shown
+lib.fs       = fs;
+lib.accept   = accept;
+lib.pics     = pics;
+lib.picByKey = key => pics.value.find(p => p.key === key) ?? null;
+
+// call load() at most once — the first time the library route is shown
 let started = false;
-export function ensureLoaded () {
+lib.ensureLoaded = () => {
   if (started) return;
   started = true;
   lib.load().catch(err => console.warn('[images] library load failed:', err));
-}
+};
 
 /** the live File for an image record, opened fresh from its granted folder */
-export async function openFile (pic) {
+lib.openFile = async (pic) => {
   const source = lib.sourceById(pic.sourceId);
   if (!source) throw new Error('This image’s folder is no longer open.');
   // this runs after a click, inside an effect — no user gesture to prompt with,
@@ -75,6 +77,7 @@ export async function openFile (pic) {
     throw new Error('Reconnect this folder in the library first.');
   }
   return lib.fileAt(source, pic.path);
-}
+};
 
-export { fs };
+export { lib };
+export default lib;

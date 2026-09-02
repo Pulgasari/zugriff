@@ -39,7 +39,7 @@ folder next time instead of asking you to pick it again.
 |-----------------|------------|
 | `index.html`    | static shell — links `../base.css`, `app.css` and the importmap |
 | `app.js`        | the app: tree sidebar + Markdown reader, mounted via `boot({ shell:false })` |
-| `db.js`         | the granted directory handles, in one `@bunker/db` store |
+| `library.js`    | the granted directory handles (folder-library data layer), bound to `app.lib` |
 | `app.css`       | the app's own look |
 | `app.config.js` | registry entry + aufbau runtime options |
 | `manifest.json` | PWA manifest |
