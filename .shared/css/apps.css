@@ -1,0 +1,18 @@
+
+
+
+.videoplayer {
+  position: relative;
+  
+  .stage {
+    z-index: 1;
+  }
+
+  .controls {
+    background: var(--bg);
+    display: flex; flex-flow: column;
+    z-index: 2;
+
+    > * { display: flex; flex-flow: row; gap: 1rem; }
+  }
+}
