@@ -4,7 +4,10 @@
 // leans on the shared FolderLibrary (zugriff.fs.FolderLibrary) — which owns the
 // granted-folder lifecycle (persisting handles in @bunker/db, resolving perms,
 // add / reconnect / re-pick / forget) — and calls back here only to turn a scanned
-// folder into clip records. no covers yet: a clip is shown as an icon in the ui.
+// folder into clip records. the built instance is extended with the app-specific
+// surface (clips, accept, ensureLoaded, openFile, fs) and exported whole; context.js
+// binds it to the app handle, so the app code reaches it as `app.lib`. no covers
+// yet: a clip is shown as an icon in the ui.
 
 import { signal }     from '@aufbau/kits/preact-htm';
 import { zugriff }    from '/.shared/js/runtime.js';
@@ -12,15 +15,13 @@ import { syncSource } from '/.shared/js/filesystem/scan.js';
 import * as fs        from '/.shared/js/filesystem/fsaccess.js';
 
 const VIDEO_RE = /\.(mp4|m4v|webm|mov|mkv|avi|ogv|ogg|3gp|flv|wmv|mpe?g|ts)$/i;
-export const accept = name => VIDEO_RE.test(name);
+const accept = name => VIDEO_RE.test(name);
 
 const SEP   = '/';
 const keyOf = (sourceId, path) => sourceId + SEP + path;
 
 // [{ key, sourceId, path, name, ext, sig, addedAt }]
-export const clips = signal([]);
-
-export const clipByKey = key => clips.value.find(c => c.key === key) ?? null;
+const clips = signal([]);
 
 const lib = new zugriff.fs.FolderLibrary({
   db:       'zugriff-videos',
@@ -47,24 +48,26 @@ const lib = new zugriff.fs.FolderLibrary({
   },
 });
 
-export const { sources, perms, scanning, ready } = lib;
-export const sourceById   = lib.sourceById;
-export const addFolder    = lib.addFolder;
-export const reconnect    = lib.reconnect;
-export const repick       = lib.repick;
-export const removeFolder = lib.removeFolder;
-export const rescanAll    = lib.rescanAll;
+// :::::: EXTEND
+// hang the app-facing surface straight off the instance; FolderLibrary already
+// carries sources / perms / scanning / ready / addFolder / reconnect / … so the
+// whole data layer is reachable through one object.
+
+lib.fs        = fs;
+lib.accept    = accept;
+lib.clips     = clips;
+lib.clipByKey = key => clips.value.find(c => c.key === key) ?? null;
 
 // call load() at most once — the first time the library route is shown
 let started = false;
-export function ensureLoaded () {
+lib.ensureLoaded = () => {
   if (started) return;
   started = true;
   lib.load().catch(err => console.warn('[videos] library load failed:', err));
-}
+};
 
 /** the live File for a clip record, opened fresh from its granted folder */
-export async function openFile (clip) {
+lib.openFile = async (clip) => {
   const source = lib.sourceById(clip.sourceId);
   if (!source) throw new Error('This clip’s folder is no longer open.');
   // this runs after a click, inside an effect — no user gesture to prompt with,
@@ -74,6 +77,7 @@ export async function openFile (clip) {
     throw new Error('Reconnect this folder in the library first.');
   }
   return lib.fileAt(source, clip.path);
-}
+};
 
-export { fs };
+export { lib };
+export default lib;
