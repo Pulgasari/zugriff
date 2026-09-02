@@ -3,19 +3,21 @@
 // :::::: IMPORT
 
 // ::: vendors
-import aufbau, { html, preact, str } from '@aufbau/kits/preact-htm';
+import { aufbau, html, preact, str } from '/.shared/js/vendors.js';
 import { renderMD } from '@aufbau/import';
 
 
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=notes';
 import { stored }       from '/.shared/js/lib/signals.js';
-import * as fs          from '/.shared/js/filesystem/fsaccess.js';
 
-const { computed, signal, useEffect, useRef, Fragment } = preact;
+const { signal } = aufbau.signals;
+const { computed, useEffect, useRef, Fragment } = preact;
 const { AppSettings, Button, Empty, Icon, IconButton, InstallTip, Tree } = zugriff.components;
+const { fs } = zugriff;
 
 // ::: local
+const app = zugriff.app;
 import * as db from './db.js';
 
 // :::::: STATE
@@ -24,9 +26,16 @@ import * as db from './db.js';
 // node object is replaced, the path is not)
 const open     = stored(null, 'notes:open');       // { sourceId, path } | null
 const filter   = signal('');                       // tree filter query
-const expanded = stored([], 'notes:expanded');     // ['sourceId:dir/path', …]
+const expanded = stored({ value: [], 'notes:expanded' });     // ['sourceId:dir/path', …]
 const navOpen  = signal(false);                     // mobile: is the tree drawer showing
 const noteToc  = signal([]);                        // headings of the open note
+
+app.state = {
+  open      : null,
+  filter    : '',
+  expanded  : '',
+  isNavOpen : false,
+};
 
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
@@ -152,9 +161,9 @@ function SourceBlock ({ source }) {
         <span class="src-name" title=${source.name}>${source.name}</span>
         <button class="src-x" title="Refresh" onClick=${() => db.scan(source.id).catch(() => {})}
                 disabled=${busy || state !== 'granted'}>
-          <${Icon} name="mdi:refresh" /></button>
+          <${Icon} name="refresh" /></button>
         <button class="src-x" title="Close folder" onClick=${remove}>
-          <${Icon} name="mdi:close" /></button>
+          <${Icon} name="close" /></button>
       </div>
       ${body}
     </div>`;
@@ -164,9 +173,9 @@ function Sidebar () {
   return html`
     <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
       <div class="brand">
-        <${Icon} name="mdi:notebook-outline" /> <span>Notes</span>
+        <${Icon} name="notes" /> <span>Notes</span>
         <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}>
-          <${Icon} name="mdi:close" /></button>
+          <${Icon} name="close" /></button>
       </div>
 
       <div class="tree-filter">
@@ -205,102 +214,19 @@ const currentNote = computed(() => {
   return node ? { sourceId: o.sourceId, node } : null;
 });
 
-function Reader () {
-  const bodyRef = useRef(null);
-  const note    = currentNote.value;
-
-  useEffect(() => {
-    if (!note) return;
-    const root = db.sourceById(note.sourceId)?.handle;
-    const el   = bodyRef.current;
-    if (!el || !root) return;
-
-    let alive = true;
-    const urls = [];
-    el.innerHTML = '<div class="md-loading">…</div>';
-    noteToc.value = [];
-
-    (async () => {
-      let text;
-      try { ({ text } = await db.readNote(note.node.handle)); }
-      catch (err) { if (alive) el.innerHTML = ''; zugriff.toast.error('Could not read that note: ' + err.message); return; }
-      if (!alive) return;
-
-      let htmlStr;
-      try { htmlStr = await renderMD(text); }
-      catch (err) { if (alive) { el.innerHTML = ''; zugriff.toast.error('Could not render that note: ' + err.message); } return; }
-      if (!alive) return;
-
-      const frag = document.createElement('div');
-      frag.innerHTML = htmlStr;
-
-      // headings → ids + a table of contents
-      const toc = [];
-      const seen = {};
-      frag.querySelectorAll('h1, h2, h3').forEach(h => {
-        let id = slugify(h.textContent);
-        if (seen[id]) id = `${id}-${seen[id]++}`; else seen[id] = 1;
-        h.id = id;
-        toc.push({ level: Number(h.tagName[1]), text: h.textContent, id });
-      });
-
-      // relative images → blob urls from the same granted folder
-      const imgs = [...frag.querySelectorAll('img')];
-      await Promise.all(imgs.map(async img => {
-        const src = img.getAttribute('src') || '';
-        const handle = await fs.resolveRelative(root, note.node.path, src);
-        if (!handle || !alive) return;
-        try {
-          const url = URL.createObjectURL(await handle.getFile());
-          urls.push(url);
-          img.src = url;
-          img.loading = 'lazy';
-        } catch {}
-      }));
-      if (!alive) return;
-
-      // links: relative .md links open the sibling note in-app; the rest open safely
-      frag.querySelectorAll('a[href]').forEach(a => {
-        const href = a.getAttribute('href') || '';
-        if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) {
-          a.target = '_blank'; a.rel = 'noopener noreferrer';
-        } else if (href.startsWith('#')) {
-          a.classList.add('anchor-link');
-        } else if (/\.(md|markdown)(#|$)/i.test(href)) {
-          a.classList.add('note-link');
-          a.dataset.href = href;
-        }
-      });
-
-      el.replaceChildren(...frag.childNodes);
-      noteToc.value = toc;
-    })();
-
-    return () => {
-      alive = false;
-      urls.forEach(u => URL.revokeObjectURL(u));
-    };
-  }, [note?.sourceId, note?.node?.path, note?.node?.handle, db.trees.value]);
-
-  // in-app navigation for note-to-note and anchor links (event delegation)
-  const onClick = e => {
-    const a = e.target.closest('a');
-    if (!a || !note) return;
-    if (a.classList.contains('anchor-link')) {
-      e.preventDefault();
-      bodyRef.current?.querySelector(decodeURIComponent(a.getAttribute('href')))
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    if (a.classList.contains('note-link')) {
-      e.preventDefault();
-      navigateRelative(note, a.dataset.href);
-    }
-  };
-
-  return html`
-    <${ReaderBody} ...${{ bodyRef, note, onClick }} />`;
+function AufbauElement ({ tag, ...rest }) {
+  return html`<aufbau-${tag} ...${{ ...rest }]></aufbau-${tag}>`;
 }
+
+function Reader () {
+  return html`<aufbau-reader></aufbau-reader>`;
+}
+
+function ReaderTOC () {
+  return html`<aufbau-toc></aufbau-toc>`;
+}
+
+
 
 // the frame is always drawn — header (with the mobile menu button) included —
 // so on a phone the tree drawer is always reachable, note open or not
@@ -372,8 +298,8 @@ async function addFolder () {
   if (!fs.supported()) { zugriff.toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.'); return; }
   try {
     const rec = await db.addFolder();
-    if (rec) zugriff.toast.success(`Opened ${rec.name}`);
-  } catch (err) { zugriff.toast.error(err.message); }
+    if (rec) zugriff.app.toast.({ message: `Opened ${rec.name}`, type: 'success' });
+  } catch (err) { zugriff.app.toast({ message: err.message, type: 'error' }); }
 }
 
 // :::::: APP
@@ -398,4 +324,4 @@ function App () {
 
 // :::::: BOOT
 
-boot({ config, App });
+zugriff.app.init({ App });
