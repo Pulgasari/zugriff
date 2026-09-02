@@ -14,8 +14,8 @@ import state    from './app/state.js';
 import toast    from './app/toast.js';
 import * as pwa from './app/pwa.js';
 
-import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
-import Shell  from './components/Shell.js';
+import { aufbau, html, preact } from './vendors.js';
+import Shell from './components/Shell.js';
 
 // :::::: API
 
