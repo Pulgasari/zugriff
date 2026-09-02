@@ -9,10 +9,11 @@
 // binds it to the app handle, so the app code reaches it as `app.lib`. no covers
 // yet: a clip is shown as an icon in the ui.
 
-import { signal }     from '@aufbau/kits/preact-htm';
-import { zugriff }    from '/.shared/js/runtime.js';
-import { syncSource } from '/.shared/js/filesystem/scan.js';
-import * as fs        from '/.shared/js/filesystem/fsaccess.js';
+import { signal }            from '@aufbau/kits/preact-htm';
+import { zugriff }           from '/.shared/js/runtime.js';
+import { syncSource }        from '/.shared/js/filesystem/scan.js';
+import * as fs               from '/.shared/js/filesystem/fsaccess.js';
+import { createPosterCache } from '/.shared/js/media/poster.js';
 
 const VIDEO_RE = /\.(mp4|m4v|webm|mov|mkv|avi|ogv|ogg|3gp|flv|wmv|mpe?g|ts)$/i;
 const accept = name => VIDEO_RE.test(name);
@@ -78,6 +79,10 @@ lib.openFile = async (clip) => {
   }
   return lib.fileAt(source, clip.path);
 };
+
+// lazy, persisted poster frames for the grid — only decodes a clip on a cache miss
+lib.posters = createPosterCache({ name: 'zugriff-videos-posters' });
+lib.poster  = (clip) => lib.posters.request(clip.key, clip.sig, () => lib.openFile(clip));
 
 export { lib };
 export default lib;

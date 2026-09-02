@@ -8,7 +8,9 @@ query-param router (`.shared/js/app/router.js`, bound to `app.state.route`):
 - **Library** (`?mode=library`) — a video-manager. Grant folders off your device
   with the File System Access API and browse them as galleries; open any clip
   into the player. Only the folder permission is remembered — nothing is
-  uploaded. Clips show as an icon for now; poster frames are a follow-up. Data
+  uploaded. Each clip shows a poster frame decoded on device (lazy as the cell
+  nears the viewport, then cached in IndexedDB via `.shared/js/media/poster.js`);
+  a clip the browser can't decode falls back to an icon. Data
   layer: [`library.js`](./library.js) over the shared `FolderLibrary`.
 - **Player** (`?mode=player`) — the shared video engine
   ([`.shared/js/media/videoplayer.js`](../../.shared/js/media/videoplayer.js)):

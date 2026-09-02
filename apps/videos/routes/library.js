@@ -3,7 +3,7 @@
 // and open one into the player. clips show as an icon for now — poster frames are
 // a follow-up.
 
-import { html, signal, computed, useEffect } from '@aufbau/kits/preact-htm';
+import { html, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
 import { Icon, InstallTip } from '/.shared/js/components/index.js';
 import { app }      from '../context.js';
 import { loadFile } from '/.shared/js/media/videoplayer.js';
@@ -40,10 +40,31 @@ async function openInPlayer (clip) {
   }
 }
 
+// a lazy poster: the clip is decoded (and cached) only once the cell nears the
+// viewport, so a folder of thousands doesn't decode all at once. the poster cache
+// owns the object-url (shared across mounts), so it is not revoked here.
 function Thumb ({ clip }) {
+  const ref = useRef(null);
+  const [url, setUrl] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(entries => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      io.disconnect();
+      app.lib.poster(clip).then(u => { if (alive && u) setUrl(u); }).catch(() => {});
+    }, { rootMargin: '300px' });
+    io.observe(el);
+    return () => { alive = false; io.disconnect(); };
+  }, [clip.key, clip.sig]);
+
   return html`
-    <button class="im-thumb vid-thumb" title=${clip.path} onClick=${() => openInPlayer(clip)}>
-      <div class="im-thumb-ph"><${Icon} name="mdi:movie-outline" /></div>
+    <button ref=${ref} class="im-thumb vid-thumb" title=${clip.path} onClick=${() => openInPlayer(clip)}>
+      ${url
+        ? html`<img src=${url} alt=${clip.name} loading="lazy" />`
+        : html`<div class="im-thumb-ph"><${Icon} name="mdi:movie-outline" /></div>`}
       <span class="im-thumb-name">${clip.name}</span>
     </button>`;
 }
