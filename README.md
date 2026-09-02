@@ -21,6 +21,7 @@ client-side mini-PWAs. static files only — no build step, no bundler, no node 
 - [podcasts](https://zugriff.dev/podcasts/)
 - [prompts](https://zugriff.dev/prompts/)
 - [videoplayer](https://zugriff.dev/videoplayer/)
+- [videos](https://zugriff.dev/videos/)
 
 ## tools
 [audio-converter](https://zugriff.dev/tools/audio-converter/) •
