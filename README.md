@@ -44,7 +44,3 @@ client-side mini-PWAs. static files only — no build step, no bundler, no node 
 - [image-batch-processor](https://zugriff.dev/tools/image-batch-processor/)
 - [image editor](https://zugriff.dev/image-editor/)
 - [image viewer](https://zugriff.dev/image-viewer/)
-
----
-
-- https://api.vercel.com/v1/integrations/deploy/prj_lfkAiOXVGjcI53qDMkzgKM9M9dC7/j0MfZGagv1
