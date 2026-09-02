@@ -199,6 +199,35 @@ const entries = [
   },
   {
     type        : 'app',
+    slug        : 'videos',
+    name        : 'Videos',
+    short_name  : 'Videos',
+    icon        : 'mdi:movie-open-outline',
+    description : 'Browse your video folders, play them, and make quick edits — trim, rotate, flip — all on your device.',
+    categories  : ['media'],
+    manifest    : {
+      launch_handler : { client_mode: ['focus-existing', 'auto'] },
+      file_handlers  : [{
+        action : './',
+        accept : {
+          'video/mp4'         : ['.mp4', '.m4v'],
+          'video/webm'        : ['.webm'],
+          'video/quicktime'   : ['.mov'],
+          'video/x-matroska'  : ['.mkv'],
+          'video/x-msvideo'   : ['.avi'],
+          'video/ogg'         : ['.ogv'],
+          'video/mpeg'        : ['.mpg', '.mpeg'],
+        },
+      }],
+      shortcuts : [
+        { name: 'Library', short_name: 'Library', url: './?mode=library' },
+        { name: 'Player',  short_name: 'Player',  url: './?mode=player'  },
+        { name: 'Edit',    short_name: 'Edit',    url: './?mode=edit'    },
+      ],
+    },
+  },
+  {
+    type        : 'app',
     slug        : 'looksmaxx',
     name        : 'Looksmaxx',
     short_name  : 'Looksmaxx',
