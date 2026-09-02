@@ -1,9 +1,8 @@
-// apps/images/routes/library.js
+// apps/images/routes/app.lib.js
 // library route: browse granted folders as galleries, open an image into view.
 
 import { html, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
 import { Icon, InstallTip } from '/.shared/js/components/index.js';
-import * as library from '../library.js';
 import { app } from '../context.js';
 import { setFiles } from '../state.js';
 
@@ -15,7 +14,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true
 
 const visiblePics = computed(() => {
   const q = libSearch.value.trim().toLowerCase();
-  let list = library.pics.value;
+  let list = app.lib.pics.value;
   if (libFolder.value) list = list.filter(p => p.sourceId === libFolder.value);
   if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.path.toLowerCase().includes(q));
   return [...list].sort(byName);
@@ -23,15 +22,15 @@ const visiblePics = computed(() => {
 
 async function addFolderAction () {
   libMsg.value = '';
-  if (!library.fs.supported()) { libMsg.value = 'This browser can’t open folders — try a Chromium-based one.'; return; }
-  try { await library.addFolder(); }
+  if (!app.lib.fs.supported()) { libMsg.value = 'This browser can’t open folders — try a Chromium-based one.'; return; }
+  try { await app.lib.addFolder(); }
   catch (err) { libMsg.value = err?.message || String(err); }
 }
 
 /** open an image record into the view mode */
 async function openInView (pic) {
   try {
-    const file = await library.openFile(pic);
+    const file = await app.lib.openFile(pic);
     setFiles([file]);
     app.setRoute('view');
   } catch (err) {
@@ -54,7 +53,7 @@ function Thumb ({ pic }) {
       io.disconnect();
       (async () => {
         try {
-          const file = await library.openFile(pic);
+          const file = await app.lib.openFile(pic);
           if (!alive) return;
           obj = URL.createObjectURL(file);
           setUrl(obj);
@@ -75,7 +74,7 @@ function Thumb ({ pic }) {
 }
 
 function ReconnectBar () {
-  const stale = library.sources.value.filter(s => library.perms.value[s.id] && library.perms.value[s.id] !== 'granted');
+  const stale = app.lib.sources.value.filter(s => app.lib.perms.value[s.id] && app.lib.perms.value[s.id] !== 'granted');
   if (!stale.length) return null;
   return html`
     <div class="im-reconnect">
@@ -84,19 +83,19 @@ function ReconnectBar () {
       ${stale.map(s => html`
         <div class="im-reconnect-item" key=${s.id}>
           <span class="im-reconnect-name">${s.name}</span>
-          <button class="btn small primary" onClick=${() => library.reconnect(s.id).then(res => {
+          <button class="btn small primary" onClick=${() => app.lib.reconnect(s.id).then(res => {
             if (!res.granted) libMsg.value = `Reconnect failed — ${res.error ? (res.error.name || 'error') : 'browser said “' + res.state + '”'}. Try “Choose folder”.`;
           })}>
             <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works"
-                  onClick=${() => library.repick(s.id).then(ok => { if (!ok) libMsg.value = `Could not open ${s.name}`; })}>
+                  onClick=${() => app.lib.repick(s.id).then(ok => { if (!ok) libMsg.value = `Could not open ${s.name}`; })}>
             <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
         </div>`)}
     </div>`;
 }
 
 function FolderChips () {
-  const list = library.sources.value;
+  const list = app.lib.sources.value;
   if (list.length < 2) return null;
   return html`
     <div class="im-folderbar">
@@ -108,15 +107,15 @@ function FolderChips () {
 }
 
 function LibraryMode () {
-  useEffect(() => { library.ensureLoaded(); }, []);
+  useEffect(() => { app.lib.ensureLoaded(); }, []);
 
-  if (!library.ready.value) {
+  if (!app.lib.ready.value) {
     return html`<div class="im-lib"><div class="im-booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
   }
 
   const pics       = visiblePics.value;
-  const hasFolders = library.sources.value.length > 0;
-  const scanning   = Object.values(library.scanning.value).some(Boolean);
+  const hasFolders = app.lib.sources.value.length > 0;
+  const scanning   = Object.values(app.lib.scanning.value).some(Boolean);
 
   return html`
     <div class="im-lib">
@@ -129,7 +128,7 @@ function LibraryMode () {
           ${libSearch.value && html`<button class="iv-btn" aria-label="Clear" onClick=${() => libSearch.value = ''}>
             <${Icon} name="mdi:close" /></button>`}
         </div>
-        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => library.rescanAll()}><${Icon} name="mdi:refresh" /></button>`}
+        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => app.lib.rescanAll()}><${Icon} name="mdi:refresh" /></button>`}
         <button class="btn primary" onClick=${addFolderAction}>
           <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
       </header>
@@ -138,7 +137,7 @@ function LibraryMode () {
         <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><${Icon} name="mdi:close" /></button></div>`}
 
       <${ReconnectBar} />
-      <${InstallTip} show=${library.sources.value.length > 0}
+      <${InstallTip} show=${app.lib.sources.value.length > 0}
                      message="Install the app to keep your image folders connected between visits — no reconnecting." />
       <${FolderChips} />
 

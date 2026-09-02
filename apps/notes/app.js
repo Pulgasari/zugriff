@@ -17,10 +17,12 @@ import { signal as persisted, local }                           from '@aufbau/si
 import { zugriff } from '/.shared/js/runtime.js';
 import * as fs     from '/.shared/js/filesystem/fsaccess.js';
 
-// ::: local
-import * as db from './db.js';
+// ::: local — the folder-library data layer, bound to the app handle as app.lib
+import { lib } from './library.js';
 
 const app = zugriff.app('notes');
+app.lib = lib;
+
 const { AppSettings, Button, Empty, Icon, InstallTip, Tree } = zugriff.components;
 const toast = app.toast;
 
@@ -108,26 +110,26 @@ function onTreeToggle (e) {
 }
 
 function SourceBlock ({ source }) {
-  const state = db.perms.value[source.id];
-  const tree  = db.trees.value[source.id];
-  const busy  = db.scanning.value[source.id];
+  const state = app.lib.perms.value[source.id];
+  const tree  = app.lib.trees.value[source.id];
+  const busy  = app.lib.scanning.value[source.id];
   const q     = app.state.filter.trim().toLowerCase();
 
   const remove = async () => {
     if (!confirm(`Close “${source.name}”? Your files are untouched — this only forgets the folder.`)) return;
     if (open.value?.sourceId === source.id) open.value = null;
-    await db.removeFolder(source.id);
+    await app.lib.removeFolder(source.id);
   };
 
   let body;
   if (state !== 'granted') {
-    const tryReconnect = () => db.reconnect(source.id).then(res => {
+    const tryReconnect = () => app.lib.reconnect(source.id).then(res => {
       if (res.granted) return;
       const why = res.error ? `${res.error.name || 'error'}` : `browser said “${res.state}”`;
       console.warn('[notes] reconnect failed', { source, ...res });
       toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
     });
-    const repick = () => db.repick(source.id).then(ok =>
+    const repick = () => app.lib.repick(source.id).then(ok =>
       ok || toast.error('Could not open that folder'));
     body = html`
       <div class="src-reconnect">
@@ -155,7 +157,7 @@ function SourceBlock ({ source }) {
       <div class="src-head">
         <${Icon} name="mdi:folder-outline" />
         <span class="src-name" title=${source.name}>${source.name}</span>
-        <button class="src-x" title="Refresh" onClick=${() => db.scan(source.id).catch(() => {})}
+        <button class="src-x" title="Refresh" onClick=${() => app.lib.scan(source.id).catch(() => {})}
                 disabled=${busy || state !== 'granted'}>
           <${Icon} name="refresh" /></button>
         <button class="src-x" title="Close folder" onClick=${remove}>
@@ -184,13 +186,13 @@ function Sidebar () {
       </div>
 
       <div class="tree">
-        ${db.sources.value.length
-          ? db.sources.value.map(s => html`<${SourceBlock} key=${s.id} source=${s} />`)
+        ${app.lib.sources.value.length
+          ? app.lib.sources.value.map(s => html`<${SourceBlock} key=${s.id} source=${s} />`)
           : html`<p class="tree-hint">No folders open yet.</p>`}
       </div>
 
       <div class="side-foot">
-        <${InstallTip} show=${db.sources.value.length > 0} />
+        <${InstallTip} show=${app.lib.sources.value.length > 0} />
         <button class="btn small primary" onClick=${addFolder}>
           <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>
       </div>
@@ -203,7 +205,7 @@ function Sidebar () {
 const currentNote = computed(() => {
   const o = open.value;
   if (!o) return null;
-  const tree = db.trees.value[o.sourceId];
+  const tree = app.lib.trees.value[o.sourceId];
   const node = tree && findByPath(tree, o.path);
   return node ? { sourceId: o.sourceId, node } : null;
 });
@@ -217,14 +219,14 @@ function Reader () {
 // urls (before the reader paints, so no broken-image flash) and tags links;
 // <aufbau-toc> builds the "on this page" list off the rendered headings.
 function NoteView ({ note }) {
-  const root = db.sourceById(note.sourceId)?.handle;
+  const root = app.lib.sourceById(note.sourceId)?.handle;
   const urls = useRef([]);
   const [text, setText] = useState(null);
 
   useEffect(() => {
     let alive = true;
     setText(null);
-    db.readNote(note.node.handle)
+    app.lib.readNote(note.node.handle)
       .then(({ text }) => { if (alive) setText(text); })
       .catch(err => { toast.error('Could not read that note: ' + err.message); if (alive) setText(''); });
     return () => {
@@ -313,9 +315,9 @@ function ReaderBody ({ note }) {
         : html`
           <div class="reader-empty">
             <${Empty} icon="mdi:file-document-outline" title="No note open"
-              hint=${db.sources.value.length ? 'Choose a note to start reading.'
+              hint=${app.lib.sources.value.length ? 'Choose a note to start reading.'
                                               : 'Open a folder of Markdown files to get started.'}
-              action=${!db.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='mdi:folder-plus-outline' onClick=${addFolder} />`} />
+              action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='mdi:folder-plus-outline' onClick=${addFolder} />`} />
           </div>`}
     </div>`;
 }
@@ -330,7 +332,7 @@ function navigateRelative (from, href) {
     if (seg === '..') parts.pop(); else parts.push(seg);
   }
   const target = parts.join('/');
-  const tree   = db.trees.value[from.sourceId];
+  const tree   = app.lib.trees.value[from.sourceId];
   const node   = tree && findByPath(tree, target);
   if (node) openNote(from.sourceId, node);
   else toast.error('Linked note not found');
@@ -341,7 +343,7 @@ function navigateRelative (from, href) {
 async function addFolder () {
   if (!fs.supported()) { toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.'); return; }
   try {
-    const rec = await db.addFolder();
+    const rec = await app.lib.addFolder();
     if (rec) toast.success(`Opened ${rec.name}`);
   } catch (err) { toast.error(err.message); }
 }
@@ -350,10 +352,10 @@ async function addFolder () {
 
 function App () {
   useEffect(() => {
-    db.load().catch(err => toast.error('Could not open the library: ' + err.message));
+    app.lib.load().catch(err => toast.error('Could not open the library: ' + err.message));
   }, []);
 
-  if (!db.ready.value) {
+  if (!app.lib.ready.value) {
     return html`<div class="booting"><${Icon} name='loading' /></div>`;
   }
 
