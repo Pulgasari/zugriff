@@ -13,15 +13,10 @@ import AufbauToast from '@aufbau/elements/AufbauToast.js';
 
 const DEFAULTS = { duration: 3000, dismissible: true };
 
-/** show a toast. pass a string message, or an options object. */
-export function toast (message, options = {}) {
+function toast (message, options = {}) {
   const opts = typeof message === 'string' ? { message, ...options } : { ...(message || {}) };
   return AufbauToast.notify({ ...DEFAULTS, ...opts });
 }
 
-toast.info    = (message, o) => toast(message, { type: 'info',    ...o });
-toast.success = (message, o) => toast(message, { type: 'success', ...o });
-toast.warning = (message, o) => toast(message, { type: 'warning', ...o });
-toast.error   = (message, o) => toast(message, { type: 'error', duration: 6000, ...o });
-
+export       { toast };
 export default toast;
