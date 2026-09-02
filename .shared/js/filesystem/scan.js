@@ -15,7 +15,7 @@
 // tree), so FolderLibrary takes a plain `scan` callback and these stay opt-in.
 
 import { signal } from '@aufbau/kits/preact-htm';
-import { createPool } from './../lib/pool.js';
+import { createPool } from './../vendors/pool.js';
 
 /** the size+mtime signature we use to tell whether a file changed since last scan */
 export const signatureOf = file => `${file.size}:${file.lastModified}`;

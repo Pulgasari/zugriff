@@ -23,7 +23,7 @@
 
 import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
 import Icon        from './Icon.js';
-import { stored }  from './../lib/signals.js';
+import { signal as persist, local } from '@aufbau/signals';
 import * as dirfs  from './../filesystem/dirfs.js';
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
@@ -43,7 +43,7 @@ const menu     = signal(null);    // { x, y, entry }
 const dragging = signal(false);
 const busy     = signal(false);   // a write is in flight
 
-const view = stored('list', 'files:view');   // 'list' | 'grid'
+const view = persist({ value: 'list', key: 'files:view', store: local });   // 'list' | 'grid'
 
 const writable = computed(() => !!backend.value?.writable);
 

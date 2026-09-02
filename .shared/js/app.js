@@ -1,64 +1,73 @@
-// .shared/js/app/app.js
-// (ersetzt später direkt: .shared/js/app.js)
-/*
-ziel ist es, die wiederkehrenden muster des handlings der app-states
-zu vereinheitlichen das management der jeweiligen `app.js` files
-der einzelnen apps massiv zu vereinfachen.
+// .shared/js/app.js
+// the app factory behind zugriff.app. a page opens with
+//
+//   const app = zugriff.app('notes');
+//
+// which resolves that slug's registry entry, builds its reactive state and hands
+// back the app handle. one instance per slug (a page is one app), so repeat calls
+// are idempotent. the goal is to collapse each app's app.js boilerplate: state,
+// its cross-cutting effects and the mount all live here, not in every app.
+//
+//   app.state.font = 'Inter';       // reactive, drives the shared webfonts effect
+//   app.setState('font', 'Inter');  // same, imperative form
+//   app.init({ App });              // mount (replaces the old boot())
 
-zugriff.app.state.font = 'Inter';
-zugriff.app.setState('font', 'Inter');
-*/
+// :::::: IMPORTS
 
-import config   from './app/config.js';
-import state    from './app/state.js';
-import toast    from './app/toast.js';
-import * as pwa from './app/pwa.js';
+import { configFor }  from './app/config.js';
+import { createState } from './app/state.js';
+import { toast }       from './app/toast.js';
+import * as pwa        from './app/pwa.js';
 
-import { aufbau, html, preact } from './vendors.js';
+import { aufbau, html, render } from './vendors.js';
 import Shell from './components/Shell.js';
 
-// :::::: API
+// :::::: FACTORY
 
-const app = { config, state };
-app.slug = new URL(import.meta.url).searchParams.get('slug');
+const instances = new Map();
 
-app.setDialog = id => app.state.dialog = id;
-app.setRoute  = id => app.state.route  = id;
+export function createApp (slug) {
+  if (instances.has(slug)) return instances.get(slug);
 
-app.setState    = (key, value) => app.state[key] = value;
-app.toggleState = (key, force) => app.state[key] = force ?? app.state[key];
-app.resetState  = (key)        => app.state[key] = (key in app.config) ? app.config[key] : null;
+  const config = configFor(slug);
+  const state  = createState(config);
 
-app.togglePanel = id => document.getElementById(id).classList.toggleClass('hidden');    
+  const app = { slug, config, state, toast };
 
-// toast
-pwa.toast = toast;
+  // ::: state helpers — thin sugar over the deepSignal
+  app.getState    = key          => state[key];
+  app.setState    = (key, value) => state[key] = value;
+  app.toggleState = (key, force) => state[key] = force ?? !state[key];
+  app.resetState  = key          => state[key] = key in config ? config[key] : null;
+  app.setDialog   = (id = null)  => state.dialog = id;
+  app.setRoute    = (id = null)  => state.route  = id;
 
-// pwa
-app.canInstall    = pwa.canInstall;
-app.isInstalled   = pwa.isInstalled;
-app.promptInstall = pwa.promptInstall;
+  // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
+  app.canInstall    = pwa.canInstall;
+  app.isInstalled   = pwa.isInstalled;
+  app.promptInstall = pwa.promptInstall;
 
-// vormals 'boot'
-app.init = ({ App, target = '#app', shell } = {}) => {
-  shell =?? (config.type === 'tool');
+  // ::: mount. tools get the shared Shell frame; apps own the whole #app root
+  // (shell defaults off for type:'app', on otherwise) and can force it either way.
+  app.init = async ({ App, target = '#app', shell } = {}) => {
+    const useShell = shell ?? config.type === 'tool';
 
-  await aufbau.init(config.aufbau);
+    await aufbau.init(config.aufbau);
 
-  const $target = typeof target === 'string' ? document.querySelector(target) : target;
-  const $app    = useShell ? html`<${Shell} app=${app.state}><${App} /><${Shell}>` : html`<${App} />`;  
-  
-  if (App) preact.render($app, $target);
+    const $target = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
+
+    if (App) render(useShell ? html`<${Shell} app=${config}><${App} /><//>` : html`<${App} />`, $target);
+
+    return app;
+  };
+
+  instances.set(slug, app);
+  createApp.current = app;   // the page's active app — shared components (AppSettings) read it
+  return app;
 }
 
 // :::::: EXPORT
 
-export       { app };
-export default app;
-
-
-
-
-
-
-
+export { createApp as app };
+export default createApp;

@@ -162,6 +162,8 @@ if (urlParams.has('dev')) {
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
       "@aufbau/runtime"         : `${pkg}/aufbau/runtime/index.js`,
       "@aufbau/runtime/"        : `${pkg}/aufbau/runtime/`,
+      "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,
+      "@aufbau/signals/"        : `${pkg}/aufbau/signals/`,
       "@aufbau/store"           : `${pkg}/aufbau/store/index.js`,
       "@aufbau/stylesheet"      : `${pkg}/aufbau/stylesheet/index.js`,
       "@aufbau/stylesheet/"     : `${pkg}/aufbau/stylesheet/`,

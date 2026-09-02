@@ -1,4 +1,4 @@
-// shared/js/lib/pwa.js
+// .shared/js/app/pwa.js
 
 // install-to-home-screen plumbing, shared by the apps that grant on-disk
 // folders. it exists for one practical reason: the File System Access API only
@@ -32,18 +32,18 @@ if (typeof window !== 'undefined') {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferred = e;
-    canInstall.value = !installed.value;
+    canInstall.value = !isInstalled.value;
   });
 
   window.addEventListener('appinstalled', () => {
-    installed.value  = true;
-    canInstall.value = false;
+    isInstalled.value = true;
+    canInstall.value  = false;
     deferred = null;
   });
 
   window.matchMedia?.('(display-mode: standalone)')
     ?.addEventListener?.('change', e => {
-      if (e.matches) { installed.value = true; canInstall.value = false; }
+      if (e.matches) { isInstalled.value = true; canInstall.value = false; }
     });
 }
 

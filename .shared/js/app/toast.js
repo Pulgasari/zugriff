@@ -1,4 +1,4 @@
-// shared/js/components/Toast.js
+// .shared/js/app/toast.js
 // one toast system for every app, on top of <aufbau-toast>. it is imperative —
 // there is no component to render; call it from anywhere and a stacked toast
 // appears top-right and dismisses itself. also bound to the runtime as
@@ -17,6 +17,13 @@ function toast (message, options = {}) {
   const opts = typeof message === 'string' ? { message, ...options } : { ...(message || {}) };
   return AufbauToast.notify({ ...DEFAULTS, ...opts });
 }
+
+// level shortcuts — toast.error('…'), toast.success({ title, message }), …
+const level = type => (message, options = {}) => toast(message, { ...options, type });
+toast.error   = level('error');
+toast.success = level('success');
+toast.info    = level('info');
+toast.warn    = level('warn');
 
 export       { toast };
 export default toast;
