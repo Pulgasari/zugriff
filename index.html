@@ -67,13 +67,14 @@ import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
 const { computed, signal, useEffect, useRef } = preact;
 
 //import { boot }     from '/.shared/js/app.js';
-import { registry } from '/.shared/js/registry.js';
+//import { registry } from '/.shared/js/registry.js';
 import Button       from '/.shared/js/components/Button.js';
 import GhostButton  from '/.shared/js/components/GhostButton.js';
 import Icon         from '/.shared/js/components/Icon.js';
 import Nav          from '/.shared/js/components/Nav.js';
 import Settings, { SettingsButton }       from '/.shared/js/components/Settings.js';
-import { launcher, appGroup, themeGroup } from '/.shared/js/lib/settings.js';
+//import { launcher, appGroup, themeGroup } from '/.shared/js/lib/settings.js';
+const registry = zugriff.registry;
 
 //const registry = zugriff.registry;
 //const { Button, GhostButton, Icon, Nav } = zugriff.components;
@@ -249,7 +250,6 @@ function Launcher () {
       <div id="app-logo">${page.name}</div>
       <div class="actions">
         <${Nav} here='apps' base='./../' />
-        <${SettingsButton} />
       </div>
     </div>
     <${Settings} groups=${groups} />
