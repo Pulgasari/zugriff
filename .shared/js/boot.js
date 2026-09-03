@@ -40,7 +40,7 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
       keys   : userConfig.themeKeys || ['bg', 'fg', 'accent'],
     },
     preload     : userConfig.preload || [
-      '@aufbau/kits/preact-htm',
+      //'@aufbau/kits/preact-htm',
       //'@aufbau/elements',
       //'@domina/core',
       //'preact'
