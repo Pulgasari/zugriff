@@ -39,8 +39,6 @@ import { zugriff } from '/.shared/js/runtime.js';
 const { Button, GhostButton, Icon, Nav, Settings } = zugriff.components;
 const registry = zugriff.registry;
 
-applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
-
 // :::::: RENDER
 
 // ::: Page: Home
@@ -65,45 +63,45 @@ if (route === 'home') {
   `;}
   
   preact.render(html`<${HomePage}/>`, document.body);
-  
+
+  const bg  = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#000000';
   const fg  = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
-  const bg  = Object.assign(document.createElement('div'), { className: 'bg-grid' });
-  document.body.appendChild(bg);
-  animatePattern(bg, 'grid', { motion: 'up', speed: '1s', size: 44, width: 1, fg, bg: 'transparent' });
+  applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
+  animatePattern(document.body, 'grid', { bg, fg, motion: 'up', speed: '1s', size: 44, width: 1 });
+
+  /*
+  const $bg = Object.assign(document.createElement('div'), { className: 'bg-grid' });
+  document.body.appendChild($bg);
+  animatePattern($bg, 'grid', { motion: 'up', speed: '1s', size: 44, width: 1, fg, bg: 'transparent' });
   applyFilter('.bg-grid', 'glitch-live', { animate: true, speed: "2s" });
-  //aufbau.patterns.apply({ target: bg, pattern: 'grid', motion: 'up', speed: '1s', size: 44, width: 1, fg, bg: 'transparent' });
-  //aufbau.filters.apply({ target: bg, filter: 'glitch-live', animate: true, speed: "2s" });
+  */
 }
 
 // ::: Page: Apps | Tools
 else {
+  await aufbau.init({ css: { theme: 'zombie' }});
 
-  const page = {};
+
+  // :::::: CONFIG + STATES
   
+  const page = {};
   if (route === 'apps') {
     page.basePath = '';
     page.cat  = 'app';
     page.name = 'zugriff apps';
-	  page.slug = 'apps';
+	page.slug = 'apps';
   } 
   else if (route === 'tools') {
-	  page.basePath = '/tools';
+	page.basePath = '/tools';
     page.cat  = 'tool';
     page.name = 'zugriff tools';
     page.slug = 'tools';
   }
-     
-
-// :::::: CONFIG
 
 const categories = registry.categories(page.cat);
 const config     = { slug: page.slug, name: page.name, theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
-//const groups     = [ { title: 'launcher', settings: launcher }, appGroup, themeGroup ];
-
-// :::::: STATES
-
-const query    = signal('');
-const category = signal('');
+const query      = signal('');
+const category   = signal('');
 
 const visible = computed(() => {
   const q = query.value.trim().toLowerCase();
