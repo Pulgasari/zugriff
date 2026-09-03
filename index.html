@@ -65,15 +65,16 @@ let site;
 
 if (route === 'home') {
   await aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
+  const Menu = () => html`
+    <nav>
+      <a href="/cli/">CLI</a>
+      <a href="/apps/">Apps</a>
+      <a href="/tools/">Tools</a>
+	  </nav>
+  `;
   function HomePage () { return html`
     <div id='app'>
-      <header>
-	      <nav>
-          <a href="/cli/">CLI</a>
-          <a href="/apps/">Apps</a>
-          <a href="/tools/">Tools</a>
-	      </nav>
-	    </header>
+      <header><${Menu}/></header>
       
       <main id="welcome">
 	  	<svg class="logo"><use href="logo.svg#logo"></use></svg>
@@ -98,13 +99,7 @@ if (route === 'home') {
 		  -->
 	    </main>
       
-      <footer>
-      	<nav>
-          <a href="/cli/">CLI</a>
-          <a href="/apps/">Apps</a>
-          <a href="/tools/">Tools</a>
-        </nav>
-    	</footer>
+      <footer><${Menu}/></footer>
     </div>
   `;}
   site = html`<${HomePage}/>`;
