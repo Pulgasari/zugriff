@@ -16,34 +16,6 @@
     .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12; }
     body > #app, #welcome, header, footer { position: relative; z-index: 1; }
   </style>
-	<!--
-  <style>
-    html {
-      opacity: 0;
-      transform: translateY(8px);
-      filter: blur(4px);
-      transition:
-        opacity 450ms ease,
-        transform 450ms cubic-bezier(.22, 1, .36, 1),
-        filter 450ms ease;
-    }
-    
-    html.is-ready {
-      opacity: 1;
-      transform: translateY(0);
-      filter: blur(0);
-    }
-    
-    @media (prefers-reduced-motion: reduce) {
-      html {
-        opacity: 1;
-        transform: none;
-        filter: none;
-        transition: none;
-      }
-    }
-  </style>
-	-->
 </head>
 
 <body class="mobilefix">
@@ -68,12 +40,14 @@ const { computed, signal, useEffect, useRef } = preact;
 
 //import { boot }     from '/.shared/js/app.js';
 //import { registry } from '/.shared/js/registry.js';
-import Button       from '/.shared/js/components/Button.js';
-import GhostButton  from '/.shared/js/components/GhostButton.js';
-import Icon         from '/.shared/js/components/Icon.js';
-import Nav          from '/.shared/js/components/Nav.js';
-import Settings, { SettingsButton }       from '/.shared/js/components/Settings.js';
+//import Button       from '/.shared/js/components/Button.js';
+//import GhostButton  from '/.shared/js/components/GhostButton.js';
+//import Icon         from '/.shared/js/components/Icon.js';
+//import Nav          from '/.shared/js/components/Nav.js';
+//import Settings, { SettingsButton }       from '/.shared/js/components/Settings.js';
 //import { launcher, appGroup, themeGroup } from '/.shared/js/lib/settings.js';
+import { zugriff } from '/.shared/js/runtime.js';
+const { Button, GhostButton, Icon, Nav, Settings } = zugriff.components;
 const registry = zugriff.registry;
 
 //const registry = zugriff.registry;
@@ -91,8 +65,7 @@ let site;
 
 if (route === 'home') {
   await aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
-function HomePage () {
-  return html`
+  function HomePage () { return html`
     <div id='app'>
       <header>
 	      <nav>
@@ -130,8 +103,7 @@ function HomePage () {
         </nav>
     	</footer>
     </div>
-  `;
-}
+  `;}
   site = html`<${HomePage}/>`;
   preact.render(site, document.body);
   
@@ -167,7 +139,7 @@ else {
 
 const categories = registry.categories(page.cat);
 const config     = { slug: page.slug, name: page.name, theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
-const groups     = [ { title: 'launcher', settings: launcher }, appGroup, themeGroup ];
+//const groups     = [ { title: 'launcher', settings: launcher }, appGroup, themeGroup ];
 
 // :::::: STATES
 
@@ -188,8 +160,10 @@ const visible = computed(() => {
 
 function Filter () {
   const ref      = useRef(null);
-  const sticky   = launcher.value('filter-sticky');
-  const position = launcher.value('filter-position');
+  //const sticky   = launcher.value('filter-sticky');
+  //const position = launcher.value('filter-position');
+  const position = 'bottom';
+  const sticky   = 'true';
 
   useEffect(() => {
     if (launcher.value('filter-autofocus')) ref.current?.focus();
@@ -212,11 +186,11 @@ function Filter () {
 
 function AppList () {
   const list = visible.value;
-  const top  = launcher.value('filter-position') === 'top';
+  //const top  = launcher.value('filter-position') === 'top';
+  const top = false;
 
   return html`
     <div id="app-body">
-
       ${top && html`<${Filter} />`}
 
       <div class="launcher-categories">
@@ -237,11 +211,9 @@ function AppList () {
           </li>`)}
       </ul>
 
-      ${!list.length && html`<p class="launcher-empty">nothing matches “${query.value}”.</p>`}
-
-      ${!top && html`<${Filter} />`}
-
-    </div>`;
+    ${!list.length && html`<p class="launcher-empty">nothing matches “${query.value}”.</p>`}
+    ${!top && html`<${Filter} />`}
+  </div>`;
 }
 
 function Launcher () {
@@ -252,10 +224,9 @@ function Launcher () {
         <${Nav} here='apps' base='./../' />
       </div>
     </div>
-    <${Settings} groups=${groups} />
     <${AppList} />
   `;
-}
+} // <${Settings} groups=${groups} />
 
   // :::::: BOOT
   //boot({ config, App: Launcher, shell: false });
