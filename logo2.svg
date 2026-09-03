@@ -11,4 +11,5 @@
       fill-rule="evenodd" 
     />
   </symbol>
+  <use href="#logo" />
 </svg>
