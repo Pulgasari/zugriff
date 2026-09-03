@@ -189,7 +189,10 @@ if (urlParams.has('dev')) {
       "@cosmonaut/layouter/": `${pkg}/cosmonaut/packages/layouter/`,
       "@cosmonaut/compiler/": `${pkg}/cosmonaut/packages/compiler/`,
 
-      "@domina/core" : `${pkg}/domina/core/index.js`,
+      "@domina/core"     : `${pkg}/domina/core/index.js`,
+      "@domina/core/"    : `${pkg}/domina/core/`,
+      "@domina/methods"  : `${pkg}/domina/core/methods/index.js`,
+      "@domina/methods/" : `${pkg}/domina/core/methods/`,
 
       "@poo/compiler" : `${pkg}/poo/js-packages/compiler/index.js`,
       "@poo/hljs"     : `${pkg}/poo/js-packages/hljs/index.js`,
