@@ -4,9 +4,8 @@
 import { html } from './../vendors.js';
 import Button from './Button.js';
 
-function IconButton ({ className = '', class: klass, ...rest }) {
-  //const cls = ['ibtn', className || klass, active ? 'active' : ''].filter(Boolean).join(' ');     
-  return html`<${Button} ...${{ class: cls, ...rest }} />`;
+function IconButton (props = {}) {
+  return html`<${Button} ...${props} />`;
 }
 
 export       { IconButton };
