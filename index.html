@@ -32,7 +32,7 @@ const route = window.location.pathname.split('/')[1] || 'home';
 // :::::: IMPORTS
 import { applyFilter }    from '@aufbau/filters';
 import { animatePattern } from '@aufbau/patterns';
-import aufbau, { dom, html, preact } from '@aufbau/kits/preact-htm';
+import { aufbau, html, preact } from '/.shared/js/vendors.js';
 const { computed, signal, useEffect, useRef } = preact;
 
 import { zugriff } from '/.shared/js/runtime.js';
