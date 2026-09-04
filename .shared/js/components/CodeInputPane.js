@@ -4,10 +4,10 @@
 // rather than a textarea, which is why the cursor has to be restored by hand
 // after every repaint.
 
-import { html, useEffect, useRef } from '@aufbau/kits/preact-htm';
-import GhostButton from './GhostButton.js';
-import { Prompt, openPrompt } from './Prompt.js';
-import { hljs, ensureLang } from './hljs.js';
+import { html, useEffect, useRef } from './../vendors.js';
+import GhostButton                 from './GhostButton.js';
+import { Prompt, openPrompt }      from './Prompt.js';
+import { hljs, ensureLang }        from './hljs.js';
 
 // ── cursor helpers ─────────────────────────────────────────────────────────
 
