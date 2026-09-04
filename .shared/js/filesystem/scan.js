@@ -14,7 +14,7 @@
 // `makeRecord` / a worker that does. notes doesn't need either (it just stores a
 // tree), so FolderLibrary takes a plain `scan` callback and these stay opt-in.
 
-import { signal } from '@aufbau/kits/preact-htm';
+import { signal }     from '@aufbau/signals';
 import { createPool } from './../vendors/pool.js';
 
 /** the size+mtime signature we use to tell whether a file changed since last scan */
@@ -37,7 +37,7 @@ export const signatureOf = file => `${file.size}:${file.lastModified}`;
  * ready to assign straight to the app's signal.
  */
 export async function syncSource ({ db, store, sourceId, files, rows, keyOf, makeRecord }) {
-  const seen    = new Set();
+  const seen    = new Set;
   const known   = new Map(rows.map(r => [r.key, r]));
   const next    = rows.filter(r => r.sourceId !== sourceId);   // rebuild this source's rows
   const toWrite = [];
@@ -58,7 +58,7 @@ export async function syncSource ({ db, store, sourceId, files, rows, keyOf, mak
 
   // rows for files that vanished from this source
   const gone = rows.filter(r => r.sourceId === sourceId && !seen.has(r.key)).map(r => r.key);
-  if (gone.length)    await db.task(store, 'readwrite', s => { for (const k of gone) s.delete(k); });
+  if    (gone.length) await db.task(store, 'readwrite', s => { for (const k of gone) s.delete(k); });
   if (toWrite.length) await db.task(store, 'readwrite', s => { for (const r of toWrite) s.put(r, r.key); });
 
   return next;
