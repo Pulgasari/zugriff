@@ -1,4 +1,5 @@
-// shared/js/components/Tree.js
+// components/Tree.js
+
 // a preact wrapper around <aufbau-tree>. the element is autoloaded lazily, so a
 // plain `nodes=${data}` from a vdom lib would be stringified into an attribute
 // before the element upgrades — this sets the `nodes` property imperatively once
@@ -8,8 +9,8 @@
 //            onSelect=${e => open(e.detail.value)}
 //            onToggle=${e => persist(e.detail.value, e.detail.expanded)} />
 
-import { html } from '@aufbau/kits/preact-htm';
-import { useRef, useEffect } from '@aufbau/kits/preact-htm';
+import { html }              from './../vendors.js';
+import { useRef, useEffect } from './../vendors.js';
 
 function Tree ({ nodes, onSelect, onToggle, class: klass }) {
   const ref = useRef(null);
