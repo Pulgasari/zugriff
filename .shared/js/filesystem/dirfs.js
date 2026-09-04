@@ -160,10 +160,9 @@ export async function usageEstimate () {
   return { usage: 0, quota: 0 };
 }
 
-export const opfsSupported = () =>
-  typeof navigator !== 'undefined' &&
-  navigator.storage &&
-  typeof navigator.storage.getDirectory === 'function';
+const isFn = sth => typeof sth === 'function';
+//export const opfsSupported = () => typeof navigator !== 'undefined' && navigator.storage && typeof navigator.storage.getDirectory === 'function';
+export const opfsSupported = () => isFn(navigator?.storage?.getDirectory);
 
 /**
  * the private on-device storage the cli owns. drop `<${FileExplorer}
