@@ -57,7 +57,7 @@ const loadVendor    = (name)      => {};
 
 const zugriff = {
   // namespaces
-  fs: Object.assign({ FolderLibrary }, fsaccess);
+  fs: Object.assign({ FolderLibrary }, fsaccess),
   opfs,
   registry,
   toast,
