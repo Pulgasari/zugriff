@@ -2,20 +2,24 @@
 
 // :::::: IMPORTS
 
-// ::: vendors
-import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { zugriff }               from '/.shared/js/runtime.js';
+import { html, preact, signals } from '/.shared/js/vendors.js';
 
-// ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
+const { Fragment, useEffect, useRef } = preact;
+const { computed, signal } = signals;
+const { Icon, IconButton, InstallTip, AppSettings } = zugriff.components;
+
 const app = zugriff.app('audio-manager');
-import { Icon, IconButton, InstallTip, AppSettings } from '/.shared/js/components/index.js';
-import * as fs                           from '/.shared/js/filesystem/fsaccess.js';
+const fs  = zugriff.fs;
 
 // ::: local
 import * as db     from './db.js';
 import * as player from './player.js';
 //import { displayTitle, displayArtist, displayAlbum } from './db.js';
 const { displayTitle, displayArtist, displayAlbum } = db;
+
+app.db     = db;
+app.player = player;
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -24,9 +28,8 @@ const search  = signal('');
 const sort    = signal({ key: 'artist', dir: 1 });
 const navOpen = signal(false);
 
-const flash = (text, kind = 'ok') =>
-  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
-const go = (name, id) => { route.value = { name, id }; navOpen.value = false; };
+const flash = (text, kind = 'ok') => kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
+const go    = (name, id)          => { route.value = { name, id }; navOpen.value = false; };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -54,8 +57,7 @@ function coverUrl (blob) {
 function dropCovers () { for (const u of coverUrls.values()) URL.revokeObjectURL(u); coverUrls.clear(); }
 
 // ── derived lists ───────────────────────────────────────────────────────────
-const matches = (t, q) =>
-  displayTitle(t).toLowerCase().includes(q) || displayArtist(t).toLowerCase().includes(q) || displayAlbum(t).toLowerCase().includes(q);
+const matches = (t,q) => displayTitle(t).toLowerCase().includes(q) || displayArtist(t).toLowerCase().includes(q) || displayAlbum(t).toLowerCase().includes(q);
 
 const filteredTracks = computed(() => {
   const q = search.value.trim().toLowerCase();
@@ -64,12 +66,12 @@ const filteredTracks = computed(() => {
 
 const sortedTracks = computed(() => {
   const { key, dir } = sort.value;
-  const val = t => key === 'title'  ? displayTitle(t)
-                 : key === 'album'  ? displayAlbum(t)
+  const val = t => key === 'title'    ? displayTitle(t)
+                 : key === 'album'    ? displayAlbum(t)
                  : key === 'duration' ? (t.duration ?? 0)
                  : displayArtist(t);
   return [...filteredTracks.value].sort((a, b) => {
-    const av = val(a), bv = val(b);
+    const av   = val(a), bv = val(b);
     const base = key === 'duration' ? av - bv : cmp(av, bv);
     // stable-ish secondary ordering inside an artist/album
     return (base || cmp(displayAlbum(a), displayAlbum(b)) || (a.trackNo ?? 1e9) - (b.trackNo ?? 1e9)) * dir;
@@ -165,10 +167,6 @@ function Sidebar () {
         <${InstallTip} show=${db.sources.value.length > 0}
                        message="Install the app so your folders stay connected between visits." />
         <button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
-        <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" /> launcher</a>
-        </div>
       </div>
     </aside>`;
 }
@@ -193,9 +191,9 @@ function SongsTable () {
         return html`
           <div class=${'song' + (cur ? ' active' : '')} key=${t.key} onDblClick=${() => player.play(t, rows)}>
             <button class="song-play" onClick=${() => player.play(t, rows)}><${PlayGlyph} track=${t} /></button>
-            <span class="c-title" title=${displayTitle(t)}>${displayTitle(t)}</span>
+            <span class="c-title"  title=${displayTitle(t)}>${displayTitle(t)}</span>
             <span class="c-artist" title=${displayArtist(t)}>${displayArtist(t)}</span>
-            <span class="c-album" title=${displayAlbum(t)}>${displayAlbum(t)}</span>
+            <span class="c-album"  title=${displayAlbum(t)}>${displayAlbum(t)}</span>
             <span class="c-time">${fmtTime(t.duration)}</span>
           </div>`;
       })}
@@ -334,11 +332,11 @@ function TopBar () {
 
 function Content () {
   switch (route.value.name) {
-    case 'albums':  return html`<${AlbumsGrid} />`;
-    case 'artists': return html`<${ArtistsList} />`;
-    case 'album':   return html`<${AlbumDetail} id=${route.value.id} />`;
-    case 'artist':  return html`<${ArtistDetail} id=${route.value.id} />`;
-    default:        return html`<${SongsTable} />`;
+    case 'albums'  : return html`<${AlbumsGrid} />`;
+    case 'artists' : return html`<${ArtistsList} />`;
+    case 'album'   : return html`<${AlbumDetail} id=${route.value.id} />`;
+    case 'artist'  : return html`<${ArtistDetail} id=${route.value.id} />`;
+    default        : return html`<${SongsTable} />`;
   }
 }
 
