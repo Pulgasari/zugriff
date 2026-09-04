@@ -73,7 +73,17 @@ export function createApp (slug) {
   return app;
 }
 
+class App {
+  url = (path) => new URL (path, this.baseURL);
+
+  // import app-modules
+  loadModule       = (sth)  => sth.endsWith('.js') ? this.loadModuleByPath(sth) : this.loadModuleByName(sth);     
+  loadModuleByName = (name) => import(this.url(`${name}.js`));
+  loadModuleByPath = (path) => import(this.url(path));
+  module = new Proxy({}, { get: (_, name) => this.loadModuleByName (name); });
+}
+
 // :::::: EXPORT
 
-export { createApp as app };
+export { App, createApp as app };
 export default createApp;
