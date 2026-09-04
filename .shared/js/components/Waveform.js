@@ -6,7 +6,7 @@
 // the split is the rendering model, not the data: reach for <aufbau-waveform>
 // for a plain progress waveform, this for the trim/seek editors.
 
-import { html, useRef, useEffect } from '@aufbau/kits/preact-htm';
+import { html, useRef, useEffect } from './../vendors.js';
 
 function Waveform ({ peaks, start, end, duration, playPos }) {
   const canvasRef = useRef(null);
