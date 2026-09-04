@@ -122,7 +122,7 @@ class App {
   loadModule       = (sth)  => sth.endsWith('.js') ? this.loadModuleByPath(sth) : this.loadModuleByName(sth);     
   loadModuleByName = (name) => import(this.url(`${name}.js`));
   loadModuleByPath = (path) => import(this.url(path));
-  module = new Proxy({}, { get: (_, name) => this.loadModuleByName (name); });
+  module = new Proxy ({}, { get: (_, name) => this.loadModuleByName(name) });
 
   // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
   canInstall    = pwa.canInstall;
