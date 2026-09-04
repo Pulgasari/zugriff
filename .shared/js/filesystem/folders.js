@@ -1,29 +1,32 @@
 // shared/js/filesystem/folders.js
 // zugriff.fs.FolderLibrary
-//
-// FolderLibrary — the shared lifecycle around folders the user grants us off
-// their real disk with the File System Access API. every app that is a live
-// view onto granted folders (notes, ebooks, audio-manager, files) used to
-// re-implement the same dance in its own db.js:
-//
-//   * keep the granted directory handles in a @bunker/db store, because a
-//     FileSystemDirectoryHandle is structured-cloneable and survives a reload
-//   * on load, resolve each handle's permission (never prompts) before showing
-//     the ui, then rescan the granted ones in the background
-//   * add / reconnect / re-pick / forget a folder, keeping signals and the db
-//     in step
-//
-// this class owns exactly that. what a scan *produces* — a tree, tagged tracks,
-// book covers — is app-specific, so the app passes a `scan` callback (and, if it
-// keeps its own record stores, an `onLoad` to hydrate them and a `cascade` to
-// drop them when a source is removed). the class owns the shared @bunker/db
-// instance and exposes it as `.db`.
-//
-// two shapes:
-//   multi  (default)  an array of granted folders — sources / perms / scanning
-//   single { single:true }  one granted root — folder / perm  (the files app)
-//
-// it hangs off the runtime as the constructor `zugriff.fs.FolderLibrary`.
+
+/* FolderLibrary — 
+the shared lifecycle around folders the user grants us off their real disk 
+with the File System Access API. 
+every app that is a live view onto granted folders used to
+re-implement the same dance in its own db.js:
+
+* keep the granted directory handles in a @bunker/db store, because a
+  FileSystemDirectoryHandle is structured-cloneable and survives a reload
+* on load, resolve each handle's permission (never prompts) before showing
+  the ui, then rescan the granted ones in the background
+* add / reconnect / re-pick / forget a folder, keeping signals and the db in step
+
+this class owns exactly that. what a scan *produces* — a tree, tagged tracks,
+book covers — is app-specific, so the app passes a `scan` callback (and, if it
+keeps its own record stores, an `onLoad` to hydrate them and a `cascade` to
+drop them when a source is removed). the class owns the shared @bunker/db
+instance and exposes it as `.db`.
+
+two shapes:
+  multi  (default)  an array of granted folders — sources / perms / scanning
+  single { single:true }  one granted root — folder / perm  (the files app)
+
+it hangs off the runtime as the constructor `zugriff.fs.FolderLibrary`.
+
+notes, ebooks, audio-manager, files
+*/
 
 /*
 function deleteKeyFromSignalObject(signal, key) {
@@ -76,7 +79,7 @@ import * as platform from './platform.js';
 // as whatever survives IndexedDB: on the web that is the handle itself (identity),
 // on a Capacitor build a plain { uri } descriptor. dehydrate at every db.set,
 // hydrate at every read — so the in-memory `handle` is always a live handle.
-const persist  = rec => ({ ...rec, handle: platform.dehydrate(rec.handle) });
+const persist   = rec => ({ ...rec, handle: platform.dehydrate(rec.handle) });
 const rehydrate = rec => rec && ({ ...rec, handle: platform.hydrate(rec.handle) });
 
 export class FolderLibrary {
