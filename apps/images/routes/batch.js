@@ -120,7 +120,7 @@ async function bpProcessOne (file) {
       ctx.putImageData(id, 0, 0);
     }
     else if (task.type === 'filter') {
-      fx.bake(canvas, p.id, { amount: +p.amount });
+      await fx.bake(canvas, p.id, { amount: +p.amount });
       ctx = canvas.getContext('2d');   // fx.bake redraws through a scratch canvas
     }
     else if (task.type === 'blur') {

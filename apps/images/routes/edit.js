@@ -287,7 +287,7 @@ async function exportImage () {
   busy.value = true;
   try {
     const flat = edit.applyFilter(w, filters.value);
-    fx.bake(flat, effect.value, { amount: effectAmt.value });
+    await fx.bake(flat, effect.value, { amount: effectAmt.value });
     const fmt  = fmtOf(exportFmt.value);
     const blob = await edit.toBlob(flat, fmt.type, quality.value / 100);
     const url  = URL.createObjectURL(blob);
