@@ -107,7 +107,7 @@ class App {
     this.state   = createState(this.config);
   }
   
-  url = (path) => new URL (path, this.baseURL);
+  //url = (path) => new URL (path, this.baseURL);
 
   
 
