@@ -39,7 +39,7 @@ import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
 
 // import * as pwa  from './app/pwa.js';
-// import { toast } from './app/toast.js';
+import { toast } from './app/toast.js';
 
 // :::::: CONSTS
 
