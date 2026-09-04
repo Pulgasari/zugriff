@@ -33,7 +33,7 @@ if (typeof globalThis !== 'undefined') globalThis.zugriff = zugriff;
 // :::::: IMPORTS
 
 import registry          from './data/apps.js';
-import { App }           from './app.js';
+import { ZugriffApp }    from './app.js';
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
@@ -68,7 +68,7 @@ const zugriff = {
   loadVendor,
 };
 
-zugriff.getApp         = (slug) => new App (slug);
+zugriff.getApp         = (slug) => new ZugriffApp (slug);
 zugriff.openPrompt     = await loadComponent ('Prompt', 'openPrompt');
 zugriff.toggleSettings = await loadComponent ('Settings', 'toggleSettings');
 
