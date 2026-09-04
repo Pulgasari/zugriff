@@ -15,11 +15,70 @@ import FileExplorer from '/.shared/js/components/FileExplorer.js';
 //
 
 import AppSettings  from '@/components/AppSettings.js';
+import FileExplorer from '@/components/FileExplorer.js';
 import Icon         from '@/components/Icon.js';
 import InstallTip   from '@/components/InstallTip.js';
-import FileExplorer from '@/components/FileExplorer.js';
 
-//
+// ==============================================================
+// ==============================================================
+// ==============================================================
+
+
+// Load all modules concurrently and extract default exports
+const [AppSettings, FileExplorer, Icon, InstallTip] = await Promise.all([
+  import('/.shared/js/components/AppSettings.js' ).then(m => m.default),
+  import('/.shared/js/components/Icon.js'        ).then(m => m.default),
+  import('/.shared/js/components/InstallTip.js'  ).then(m => m.default),
+  import('/.shared/js/components/FileExplorer.js').then(m => m.default)
+]);
+
+// Load modules sequentially using object destructuring for default exports
+const { default: AppSettings }  = await import('/.shared/js/components/AppSettings.js');
+const { default: FileExplorer } = await import('/.shared/js/components/FileExplorer.js');
+const { default: Icon }         = await import('/.shared/js/components/Icon.js');
+const { default: InstallTip }   = await import('/.shared/js/components/InstallTip.js');
+
+// Generic lazy loader for any ES module
+function lazy (importFn) {
+  let promise = null;
+
+  return function load () {
+    // 1. If already fetching/fetched, return the cached promise
+    if (!promise) {
+      // 2. Execute importFn() on first call and extract the default export
+      promise = importFn().then(module => module.default || module);
+    }
+    return promise;
+  };
+}
+
+// --- USAGE ---
+
+// Define lazy modules (no HTTP request happens here!)
+const getAppSettings  =           lazy(() => import('/.shared/js/components/AppSettings.js'));
+const getFileExplorer =           lazy(() => import('/.shared/js/components/FileExplorer.js'));
+const getComponent    = (name) => lazy(() => import(`/.shared/js/components/${name}.js`));
+
+const { AppSettings, Icon, InstallTip, FileExplorer } = componentsProxy;
+
+import AppSettings  from '/.shared/js/components/AppSettings.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import InstallTip   from '/.shared/js/components/InstallTip.js';
+import FileExplorer from '/.shared/js/components/FileExplorer.js';
+
+
+
+// The network request is triggered ONLY when you execute the function:
+async function openSettings() {
+    const AppSettings = await getAppSettings();
+    
+    // Now AppSettings is loaded and ready to use
+    console.log('Loaded module:', AppSettings);
+}
+
+// ==============================================================
+// ==============================================================
+// ==============================================================
 
 
 //
