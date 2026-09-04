@@ -97,7 +97,7 @@ import Shell from './components/Shell.js';
 
 const configFor = slug => (slug && registry.get(slug)) || {};
 
-class App {
+class ZugriffApp {
 
   constructor (slug ) {
     this.baseURL = './';
@@ -113,7 +113,7 @@ class App {
   init = async ({ App, target = '#app', shell } = {}) => {
     //const useShell = shell ?? config.type === 'tool';
     const useShell = false;
-    await aufbau.init(config.aufbau);
+    await aufbau.init(this.config.aufbau);
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
@@ -147,5 +147,5 @@ class App {
 
 // :::::: EXPORT
 
-export       { App };
-export default App;
+export       { ZugriffApp };
+export default ZugriffApp;
