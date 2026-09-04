@@ -6,8 +6,9 @@
 // route that mounts <Stage/> re-binds it. app-specific chrome (topbar, settings
 // sheet) stays in each app.
 
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
-import { Icon } from '/.shared/js/components/index.js';
+import { computed, signal }        from '@aufbau/signals';
+import { html, useEffect, useRef } from './../vendors.js';
+import { Icon } from '/.shared/js/components/Icon.js';
 
 // :::::: STATE
 
