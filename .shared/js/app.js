@@ -100,15 +100,16 @@ const configFor = slug => (slug && registry.get(slug)) || {};
 class App {
 
   constructor (slug ) {
-    this.baseURL = 
+    this.baseURL = './';
     this.slug    = slug;
     this.url     = 'https://zugriff.dev/' + slug + '/';
+    this.config  = configFor(this.slug);
+    this.state   = createState(this.config);
   }
   
   url = (path) => new URL (path, this.baseURL);
 
-  config = configFor(slug);
-  state  = createState(config);
+  
 
   // ::: state helpers — thin sugar over the deepSignal
   getState    = (key)        => this.state[key];
@@ -120,8 +121,8 @@ class App {
 
   // ::: import app-modules
   loadModule       = (sth)  => sth.endsWith('.js') ? this.loadModuleByPath(sth) : this.loadModuleByName(sth);     
-  loadModuleByName = (name) => import(this.url(`${name}.js`));
-  loadModuleByPath = (path) => import(this.url(path));
+  loadModuleByName = (name) => import(`./${name}.js`);
+  loadModuleByPath = (path) => import(path);
   module = new Proxy ({}, { get: (_, name) => this.loadModuleByName(name) });
 
   // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
