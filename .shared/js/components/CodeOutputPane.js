@@ -1,9 +1,9 @@
 // shared/js/components/CodeOutputPane.js
 
-import { html, useEffect, useRef } from '@aufbau/kits/preact-htm';
-import GhostButton from './GhostButton.js';
-import Icon        from './Icon.js';
-import { hljs, ensureLang } from './hljs.js';
+import { html, useEffect, useRef } from './../vendors.js';
+import GhostButton                 from './GhostButton.js';
+import Icon                        from './Icon.js';
+import { hljs, ensureLang }        from './hljs.js';
 
 function Highlighted ({ code, lang, innerRef }) {
   const ref = useRef(null);
