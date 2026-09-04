@@ -110,7 +110,7 @@ class App {
   //url = (path) => new URL (path, this.baseURL);
 
   // ::: init
-  app.init = async ({ App, target = '#app', shell } = {}) => {
+  init = async ({ App, target = '#app', shell } = {}) => {
     //const useShell = shell ?? config.type === 'tool';
     const useShell = false;
     await aufbau.init(config.aufbau);
