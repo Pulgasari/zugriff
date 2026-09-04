@@ -2,8 +2,10 @@
 // the frame around every tool
 
 import { html } from './../vendors.js';
-import Icon from './Icon.js';
-import Settings, { SettingsButton } from './Settings.js';
+
+import Icon               from './Icon.js';
+import Settings           from './Settings.js';
+import { SettingsButton } from './Settings.js';
 
 function Shell ({ app = {}, actions, children }) {
   return html`
