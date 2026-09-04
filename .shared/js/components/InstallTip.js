@@ -3,8 +3,8 @@
 // <${InstallTip} message="Install to keep your book folders connected." />
 
 import { html } from './../vendors.js';
-import Button from './Button.js';
-import Icon   from './Icon.js';
+import Button   from './Button.js';
+import Icon     from './Icon.js';
 
 const DEFAULT_MESSAGE = 'Install the app so your folders stay connected between visits — no reconnecting.';
 
