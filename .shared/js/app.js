@@ -12,6 +12,7 @@
 //   app.setState('font', 'Inter');  // same, imperative form
 //   app.init({ App });              // mount (replaces the old boot())
 
+/*
 // :::::: IMPORTS
 
 import { createState } from './app/state.js';
@@ -73,17 +74,64 @@ export function createApp (slug) {
   return app;
 }
 
+// :::::: EXPORT
+
+export { createApp as app };
+export default createApp;
+*/
+
+// ============== NEW ========================================================
+
+// :::::: IMPORTS
+
+import { createState } from './app/state.js';
+import { toast }       from './app/toast.js';
+import * as pwa        from './app/pwa.js';
+
+import { registry } from './data/apps.js';
+import { aufbau, html, render } from './vendors.js';
+import Shell from './components/Shell.js';
+
+// import * as pwa  from './app/pwa.js';
+// import { toast } from './app/toast.js';
+
+const configFor = slug => (slug && registry.get(slug)) || {};
+
 class App {
+
+  constructor (slug ) {
+    this.baseURL = 
+    this.slug    = slug;
+    this.url     = 'https://zugriff.dev/' + slug + '/';
+  }
+  
   url = (path) => new URL (path, this.baseURL);
 
-  // import app-modules
+  config = configFor(slug);
+  state  = createState(config);
+
+  // ::: state helpers — thin sugar over the deepSignal
+  getState    = (key)        => this.state[key];
+  setState    = (key, value) => this.state[key] = value;
+  toggleState = (key, force) => this.state[key] = force ?? !this.state[key];
+  resetState  = (key)        => this.state[key] = key in this.config ? this.config[key] : null;
+  setDialog   = (id = null)  => this.state.dialog = id;
+  setRoute    = (id = null)  => this.state.route  = id;
+
+  // ::: import app-modules
   loadModule       = (sth)  => sth.endsWith('.js') ? this.loadModuleByPath(sth) : this.loadModuleByName(sth);     
   loadModuleByName = (name) => import(this.url(`${name}.js`));
   loadModuleByPath = (path) => import(this.url(path));
   module = new Proxy({}, { get: (_, name) => this.loadModuleByName (name); });
+
+  // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
+  canInstall    = pwa.canInstall;
+  isInstalled   = pwa.isInstalled;
+  promptInstall = pwa.promptInstall;
+
 }
 
 // :::::: EXPORT
 
-export { App, createApp as app };
-export default createApp;
+export       { App };
+export default App;
