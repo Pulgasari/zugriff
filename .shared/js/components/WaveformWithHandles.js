@@ -1,6 +1,6 @@
 // shared/js/components/WaveformWithHandles.js
 
-import { html, useRef } from '@aufbau/kits/preact-htm';
+import { html, useRef } from './../vendors.js';
 import Waveform from './Waveform.js';
 
 const fmtT = s => Math.floor(s / 60) + ':' + (s % 60).toFixed(1).padStart(4, '0');
