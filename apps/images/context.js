@@ -6,6 +6,6 @@
 import { zugriff } from '/.shared/js/runtime.js';
 import { lib }     from './library.js';
 
-export const app = zugriff.app('images');
+export const app = zugriff.getApp('images');
 
 app.lib = lib;
