@@ -21,10 +21,12 @@
 // live at a time (an app embeds a single browser), which keeps the sub-views
 // free of prop-drilling.
 
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
-import Icon        from './Icon.js';
+import { html, useEffect, useRef }  from './../vendors.js';
+import { computed, signal        }  from './../vendors.js';
 import { signal as persist, local } from '@aufbau/signals';
+
 import * as dirfs  from './../filesystem/dirfs.js';
+import Icon        from './Icon.js';
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -86,7 +88,7 @@ const TEXT  = new Set([
 ]);
 
 const isImage = e => e.type?.startsWith('image/') || IMAGE.has(ext(e.name));
-const isText  = e => e.type?.startsWith('text/')  || TEXT.has(ext(e.name));
+const isText  = e => e.type?.startsWith('text/')  ||  TEXT.has(ext(e.name));
 
 function iconFor (e) {
   if (e.kind === 'directory') return 'mdi:folder';
