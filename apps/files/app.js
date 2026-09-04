@@ -2,19 +2,38 @@
 
 // :::::: IMPORTS
 
-// ::: vendors
+import { zugriff } from '/.shared/js/runtime.js';
 import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
-// ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('files');
+//
+
+import AppSettings  from '/.shared/js/components/AppSettings.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import InstallTip   from '/.shared/js/components/InstallTip.js';
+import FileExplorer from '/.shared/js/components/FileExplorer.js';
+
+//
+
+import AppSettings  from '@/components/AppSettings.js';
+import Icon         from '@/components/Icon.js';
+import InstallTip   from '@/components/InstallTip.js';
+import FileExplorer from '@/components/FileExplorer.js';
+
+//
+
+
+//
 
 const { AppSettings, Icon, InstallTip, FileExplorer } = zugriff.components;
+const { html, preact, signals }                       = zugriff.vendors;
+
+//
+
 const { fs } = zugriff;
 
-
-// ::: local
 import * as db   from './db.js';
+const app = zugriff.app('files');
+app.db = db;
 
 // :::::: BACKEND
 
@@ -26,11 +45,11 @@ const backend = computed(() => {
   const f = db.folder.value;
   if (!f || db.perm.value !== 'granted') return null;
   return {
-    id       : 'disk:' + f.addedAt,
-    label    : f.name,
-    writable : false,
-    supported: fs.supported,
-    getRoot  : () => f.handle,
+    id        : 'disk:' + f.addedAt,
+    label     : f.name,
+    writable  : false,
+    supported : fs.supported,
+    getRoot   : () => f.handle,
   };
 });
 
@@ -38,7 +57,7 @@ const backend = computed(() => {
 
 async function chooseFolder () {
   if (!fs.supported()) return;
-  try { await db.grant(); }
+  try         { await db.grant(); }
   catch (err) { console.warn('[files] grant failed', err); }
 }
 
