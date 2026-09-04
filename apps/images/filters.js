@@ -47,17 +47,17 @@ export const EFFECTS = [
 export const effectById = id => EFFECTS.find(e => e.id === id) ?? null;
 
 /** live, non-destructive preview on a dom element (css filter or injected svg url) */
-export function preview (el, id, opts) {
+export async function preview (el, id, opts) {
   if (!el) return;
   if (!id || id === NONE) { removeFilter(el); return; }
-  try { applyFilter(el, id, opts || {}); }
+  try { await applyFilter(el, id, opts || {}); }
   catch { removeFilter(el); }   // canvas-only effect — no live form; it bakes on export
 }
 
 /** destructive — bake the effect into a canvas in place (export / batch) */
-export function bake (canvas, id, opts) {
+export async function bake (canvas, id, opts) {
   if (!canvas || !id || id === NONE) return;
-  try { filterCanvas(canvas, id, opts || {}); }
+  try { await filterCanvas(canvas, id, opts || {}); }
   catch (err) { console.warn('[images] filter bake failed:', id, err); }
 }
 
@@ -67,8 +67,8 @@ export function bake (canvas, id, opts) {
  * declarations (e.g. the viewer's transform) without touching el.style itself —
  * the safe path when the element's style is re-rendered by the framework.
  */
-export function cssValue (id, opts) {
+export async function cssValue (id, opts) {
   if (!id || id === NONE) return '';
-  try { return filterCss(id, opts || {}) || ''; }
+  try { return (await filterCss(id, opts || {})) || ''; }
   catch { return ''; }
 }

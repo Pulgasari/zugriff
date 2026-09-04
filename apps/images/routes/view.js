@@ -1,7 +1,7 @@
 // apps/images/routes/view.js
 // view route (ex image-viewer): browse the shared tray, zoom/pan, live css effect.
 
-import { html, signal, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, signal, effect, useEffect, useRef } from '@aufbau/kits/preact-htm';
 import { useGesture } from '@aufbau/gestures/preact';
 import { Icon, IconButton } from '/.shared/js/components/index.js';
 import * as pwa from '/.shared/js/app/pwa.js';
@@ -14,6 +14,11 @@ const pan    = signal({ x: 0, y: 0 });
 const bare   = signal(false);          // immersive: chrome hidden
 const strip  = signal(true);           // show the thumbnail strip
 const vEffect = signal('none');   // a live, view-only css effect (non-destructive)
+const vFilterCss = signal('');    // fx.cssValue is async now — resolve it into a signal
+effect(() => {
+  const id = vEffect.value;
+  fx.cssValue(id).then(css => { if (vEffect.value === id) vFilterCss.value = css; });
+});
 
 function resetView () { zoom.value = 1; pan.value = { x: 0, y: 0 }; }
 
@@ -241,7 +246,7 @@ function ViewMode () {
         ${s
           ? html`<img class="iv-image" ref=${imageRef} src=${s.url} alt=${s.name} draggable="false"
                       style=${`transform: translate(${pan.value.x}px, ${pan.value.y}px) scale(${zoom.value})`
-                        + (fx.cssValue(vEffect.value) ? `; filter: ${fx.cssValue(vEffect.value)}` : '')} />`
+                        + (vFilterCss.value ? `; filter: ${vFilterCss.value}` : '')} />`
           : html`<${Welcome} />`}
 
         ${many.value && !bare.value && html`

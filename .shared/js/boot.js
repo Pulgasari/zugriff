@@ -166,7 +166,6 @@ if (urlParams.has('dev')) {
       "@aufbau/stylesheet"      : `${pkg}/aufbau/stylesheet/index.js`,
       "@aufbau/stylesheet/"     : `${pkg}/aufbau/stylesheet/`,
       "@aufbau/svg/"            : `${pkg}/aufbau/svg/`,
-      "@aufbau/utils"           : `${pkg}/aufbau/js/index.js`,
       "@aufbau/webfonts"        : `${pkg}/aufbau/webfonts/index.js`,
       "@aufbau/webfonts/"       : `${pkg}/aufbau/webfonts/`,
       "@aufbau/webfonts/google" : `${pkg}/aufbau/webfonts/google.js`,
