@@ -109,7 +109,20 @@ class App {
   
   //url = (path) => new URL (path, this.baseURL);
 
-  
+  // ::: init
+  app.init = async ({ App, target = '#app', shell } = {}) => {
+    //const useShell = shell ?? config.type === 'tool';
+    const useShell = false;
+    await aufbau.init(config.aufbau);
+
+    const $target = typeof target === 'string' ? document.querySelector(target) : target;
+    if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
+
+    //if (App) render(useShell ? html`<${Shell} app=${config}><${App} /><//>` : html`<${App} />`, $target);
+    if (App) render(html`<${App} />`, $target);
+
+    return app;
+  };
 
   // ::: state helpers — thin sugar over the deepSignal
   getState    = (key)        => this.state[key];
