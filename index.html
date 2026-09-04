@@ -30,14 +30,21 @@
 const route = window.location.pathname.split('/')[1] || 'home';
 
 // :::::: IMPORTS
-import { applyFilter }    from '@aufbau/filters';
-import { animatePattern } from '@aufbau/patterns';
+//const { Button, GhostButton, Icon, Nav, Settings } = zugriff.components;
+//const registry = zugriff.registry;
+	
+import { applyFilter }          from '@aufbau/filters';
+import { animatePattern }       from '@aufbau/patterns';
 import { aufbau, html, preact } from '/.shared/js/vendors.js';
 const { computed, signal, useEffect, useRef } = preact;
 
 import { zugriff } from '/.shared/js/runtime.js';
-const { Button, GhostButton, Icon, Nav, Settings } = zugriff.components;
-const registry = zugriff.registry;
+	
+const Button      = await zugriff.loadComponent('Button');
+const GhostButton = await zugriff.loadComponent('GhostButton');
+const Icon        = await zugriff.loadComponent('Icon');
+const Nav         = await zugriff.loadComponent('Nav');
+const Settings    = await zugriff.loadComponent('Settings');
 
 // :::::: RENDER
 
@@ -91,7 +98,7 @@ else {
     page.slug = 'tools';
   }
 
-const categories = registry.categories(page.cat);
+const categories = zugriff.registry.categories(page.cat);
 const config     = { slug: page.slug, name: page.name, theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };    
 const query      = signal('');
 const category   = signal('');
@@ -100,7 +107,7 @@ const visible = computed(() => {
   const q = query.value.trim().toLowerCase();
   const c = category.value;
 
-  return registry.getAll(page.cat).filter(app =>
+  return zugriff.registry.getAll(page.cat).filter(app =>
     (!c || app.categories?.includes(c)) &&
     (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
   );
