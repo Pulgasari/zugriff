@@ -66,9 +66,10 @@ function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
 */
 
 
-import { signal } from '@aufbau/kits/preact-htm';
-import { createDb } from '@bunker/db';
-import * as fs from './fsaccess.js';
+//import { signal }    from '@aufbau/kits/preact-htm';
+import { signal }    from '@aufbau/signals';
+import { createDb }  from '@bunker/db';
+import * as fs       from './fsaccess.js';
 import * as platform from './platform.js';
 
 // a granted root is kept live (a directory handle) in the signals, but persisted
