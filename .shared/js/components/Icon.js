@@ -1,6 +1,6 @@
 // shared/js/components/Icon.js
 
-import { html } from './../vendors.js';
+import { html }        from './../vendors.js';
 import { resolveIcon } from './../data/icons.js';
 
 // a bare number means pixels — call sites pass both 32 and "32"
