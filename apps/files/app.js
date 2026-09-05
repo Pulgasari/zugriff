@@ -5,7 +5,23 @@
 import { zugriff } from '/.shared/js/runtime.js';
 import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
-//
+const // shared components
+AppSettings  = await zugriff.component('AppSettings'),
+FileExplorer = await zugriff.component('FileExplorer'),
+Icon         = await zugriff.component('Icon'),
+InstallTip   = await zugriff.component('InstallTip');
+
+const // shared vendors
+computed  = await zugriff.vendor('computed'),
+html      = await zugriff.vendor('html'),
+useEffect = await zugriff.vendor('useEffect'),
+Fragment  = await zugriff.vendor('Fragment');
+
+const // shared vendors
+computed  = await zugriff.import({ signals: 'computed' }),
+html      = await zugriff.import('html'),
+useEffect = await zugriff.import({ 'preact/hooks': 'useEffect' }),
+Fragment  = await zugriff.import({ 'preact': 'Fragment' });
 
 import AppSettings  from '/.shared/js/components/AppSettings.js';
 import Icon         from '/.shared/js/components/Icon.js';
@@ -85,10 +101,16 @@ Icon         = await zugriff.loadComponent('Icon'),
 InstallTip   = await zugriff.loadComponent('InstallTip');
 
 const
-AppSettings  = await zugriff.components('AppSettings'),
-FileExplorer = await zugriff.components('FileExplorer'),
-Icon         = await zugriff.components('Icon'),
-InstallTip   = await zugriff.components('InstallTip');
+AppSettings  = await zugriff.component('AppSettings'),
+FileExplorer = await zugriff.component('FileExplorer'),
+Icon         = await zugriff.component('Icon'),
+InstallTip   = await zugriff.component('InstallTip');
+
+const
+AppSettings  = await component('AppSettings'),
+FileExplorer = await component('FileExplorer'),
+Icon         = await component('Icon'),
+InstallTip   = await component('InstallTip');
 
 const
 AppSettings  = await zugriff.components.AppSettings,
