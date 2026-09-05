@@ -30,21 +30,27 @@
 const route = window.location.pathname.split('/')[1] || 'home';
 
 // :::::: IMPORTS
-//const { Button, GhostButton, Icon, Nav, Settings } = zugriff.components;
-//const registry = zugriff.registry;
-	
-import { applyFilter }          from '@aufbau/filters';
-import { animatePattern }       from '@aufbau/patterns';
-import { aufbau, html, preact } from '/.shared/js/vendors.js';
-const { computed, signal, useEffect, useRef } = preact;
+// aufbau.pkg
 
-import { zugriff } from '/.shared/js/runtime.js';
-	
-const Button      = await zugriff.loadComponent('Button');
-const GhostButton = await zugriff.loadComponent('GhostButton');
-const Icon        = await zugriff.loadComponent('Icon');
-const Nav         = await zugriff.loadComponent('Nav');
-const Settings    = await zugriff.loadComponent('Settings');
+//import  filtersAPI from '@aufbau/filters';
+//import patternsAPI from '@aufbau/patterns';
+
+import aufbau                from '@aufbau/runtime';
+import { applyFilter }       from '@aufbau/filters';
+import { animatePattern }    from '@aufbau/patterns';
+import { computed, signal }  from '@aufbau/signals';
+import { render }            from 'preact';
+import { useEffect, useRef } from 'preact/hooks';
+
+//import { html, zugriff } from '/.shared/js/runtime.js';
+//import { aufbau, , preact } from '/.shared/js/vendors.js';
+
+const // shared components
+Button      = await zugriff.component('Button'),
+GhostButton = await zugriff.component('GhostButton'),
+Icon        = await zugriff.component('Icon'),
+Nav         = await zugriff.component('Nav'),
+Settings    = await zugriff.component('Settings');
 
 // :::::: RENDER
 
@@ -184,7 +190,7 @@ function Launcher () {
 
   // :::::: BOOT
   //boot({ config, App: Launcher, shell: false });
-  preact.render(html`<${Launcher}/>`, document.getElementById('app'));
+  render(html`<${Launcher}/>`, document.getElementById('app'));
 
 }
 </script>
