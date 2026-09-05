@@ -19,7 +19,7 @@ if (!currentScript) throw new Error('[boot] Must be executed synchronously as a 
 
 // ──────── TASKS ──────────────────────────────────
   
-// Task 1: Dev Tools Injection | ?dev
+// :::::: Task 1: Dev Tools Injection | ?dev
 function initDevTools () {
   try {
     const KEY = 'zugriff:devtools';
@@ -37,7 +37,7 @@ function initDevTools () {
   } catch {} // storage may be blocked in incognito
 }
   
-  // Task 2: Theme Boot (Synchronous - Prevents FOUC)
+  // :::::: Task 2: Theme Boot (Synchronous - Prevents FOUC)
   function applyTheme (theme) {
     if (!theme.prefix) return;
     const HEX = /^#[0-9a-f]{3,8}$/i;
@@ -63,17 +63,13 @@ function initDevTools () {
     } catch {}
   }
 
-  // Task 3: Import Map & Preloads Injection
+  // :::::: Task 3: Import Map & Preloads Injection
   function injectImportMapAndPreloads (imports, preload, scriptURL) {
     // rebase relative URLs against this boot script's location
     for (const key in imports) imports[key] = new URL(imports[key], scriptURL).href;
-
     const map = { imports };
-
-    // Inject importmap immediately after currentScript
-    currentScript.after(
-      createElement('script', { type: 'importmap', textContent: JSON.stringify(map) })
-    );
+    const $importmap =  createElement('script', { type: 'importmap', textContent: JSON.stringify(map) });   
+    currentScript.after($importmap); // Inject importmap immediately after currentScript
 
     // Inject <link rel="modulepreload"> tags for critical paths
     if (preload.length > 0) {
@@ -86,7 +82,7 @@ function initDevTools () {
     }
   }
 
-  // Task 4: Service Worker Registration
+  // :::::: Task 4: Service Worker Registration
   function registerServiceWorker (sw) {
     if (!sw.path) return;
     window.addEventListener('load', () => {
@@ -94,11 +90,11 @@ function initDevTools () {
       if (sw.scope) options.scope = sw.scope;
 
       navigator?.serviceWorker?.register(sw.path, options)
-        .catch(err => console.warn('[boot] service worker registration failed:', err));
+      .catch(err => console.warn('[boot] service worker registration failed:', err));
     });
   }
 
-  // Task 5: Zugriff Runtime Initialization
+  // :::::: Task 5: Zugriff Runtime Initialization
   async function initRuntime () {
     try {
       await import('./runtime.js');
@@ -109,15 +105,7 @@ function initDevTools () {
   }
 
   
-  // :::::: [1] init zugriff
-  (async function boot () {
-    try {
-      await import('./runtime.js');
-      console.log('Boot completed. Zugriff ready:', window.zugriff);
-    } catch (err) {
-      console.error('Boot process failed:', err);
-    }
-  })();
+
 
 
   const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
@@ -153,96 +141,6 @@ function initDevTools () {
     imports: Object.assign(getImportMap(), userConfig.imports || {})
   };
   const { preload, sw, theme } = config;
-
-  // ── DEV TOOLS (?dev) ─────────────────────────────────────────────────────
-  // `?dev` on any app url loads eruda — an on-screen console/inspector, the
-  // closest thing to devtools on a phone. it sticks for the tab (sessionStorage)
-  // so in-app navigation keeps it; `?dev=off` turns it back off.
-  try {
-    const KEY = 'zugriff:devtools';
-    const dev = new URLSearchParams(location.search).get('dev');
-    if (dev !== null) {
-      if (dev === 'off' || dev === '0') sessionStorage.removeItem(KEY);
-      else sessionStorage.setItem(KEY, '1');
-    }
-    if (sessionStorage.getItem(KEY)) {
-      document.head.append(createElement('script', {
-        src    : 'https://cdn.jsdelivr.net/npm/eruda@3',
-        onload : () => { try { window.eruda?.init(); } catch {} },
-      }));
-    }
-  } catch {} // storage may be blocked (incognito) — dev tools are optional
-
-  // ── 1. THEME BOOT (Synchronous - Prevents FOUC) ──────────────────────────
-
-  if (theme.prefix) {
-    const HEX = /^#[0-9a-f]{3,8}$/i;
-    try {
-      let background = '';
-
-      for (const key of theme.keys) {
-        const raw = localStorage.getItem(`${theme.prefix}:${key}`);
-        if (raw === null) continue;
-
-        let value;
-        try { value = JSON.parse(raw); } catch { continue; }
-        if (typeof value !== 'string' || !HEX.test(value)) continue;
-
-        $root.style.setProperty(`--${key}`, value);
-        if (key === 'bg') background = value;
-      }
-
-      if (background) {
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.content = background;
-      }
-    } catch {} // ignore storage restrictions (e.g., incognito mode)
-  }
-
-  // ── 2. IMPORT MAP & PRELOADS ─────────────────────────────────────────────
-  const { imports } = config;
-  const scriptURL = currentScript.src;
-
-  // rebase relative URLs against this boot script's location
-  for (const key in imports) imports[key] = new URL(imports[key], scriptURL).href;
-
-  const map = { imports };
-
-  // Inject importmap immediately after currentScript
-  currentScript.after(
-    createElement('script', { type: 'importmap', textContent: JSON.stringify(map) })
-  );
-
-  // Inject <link rel="modulepreload"> tags for critical paths
-  if (preload.length > 0) {
-    const fragment = document.createDocumentFragment();
-    for (const key of preload) {
-      const href = imports[key];
-      if (href) fragment.append(createElement('link', { href, rel: 'modulepreload' }));
-    }
-    document.head.append(fragment);
-  }
-
-  // ── 3. SERVICE WORKER REGISTRATION ───────────────────────────────────────
-
-  if (sw.path) window.addEventListener('load', () => {
-    const options = { type: sw.type };
-    if (sw.scope) options.scope = sw.scope;
-
-    navigator?.serviceWorker?.register(sw.path, options)
-        .catch(err => console.warn('[boot] service worker registration failed:', err));
-  });
-
-// eruda
-/*
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('dev')) {
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/eruda';
-  script.onload = () => eruda.init();
-  document.head.appendChild(script);
-}
-*/
 
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
