@@ -1,7 +1,5 @@
 // .shared/js/runtime.js
 
-
-
 // :::::: IMPORTS
 
 import registry          from './data/apps.js';
