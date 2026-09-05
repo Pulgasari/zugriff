@@ -61,12 +61,54 @@ const getComponent    = (name) => lazy(() => import(`/.shared/js/components/${na
 
 const { AppSettings, Icon, InstallTip, FileExplorer } = componentsProxy;
 
+
+
 import AppSettings  from '/.shared/js/components/AppSettings.js';
+import FileExplorer from '/.shared/js/components/FileExplorer.js';
 import Icon         from '/.shared/js/components/Icon.js';
 import InstallTip   from '/.shared/js/components/InstallTip.js';
-import FileExplorer from '/.shared/js/components/FileExplorer.js';
 
+import AppSettings  from '@/components/AppSettings.js';
+import FileExplorer from '@/components/FileExplorer.js';
+import Icon         from '@/components/Icon.js';
+import InstallTip   from '@/components/InstallTip.js';
 
+const AppSettings  = await zugriff.loadComponent('AppSettings');
+const FileExplorer = await zugriff.loadComponent('FileExplorer');
+const Icon         = await zugriff.loadComponent('Icon');
+const InstallTip   = await zugriff.loadComponent('InstallTip');
+
+const
+AppSettings  = await zugriff.loadComponent('AppSettings'),
+FileExplorer = await zugriff.loadComponent('FileExplorer'),
+Icon         = await zugriff.loadComponent('Icon'),
+InstallTip   = await zugriff.loadComponent('InstallTip');
+
+const
+AppSettings  = await zugriff.components('AppSettings'),
+FileExplorer = await zugriff.components('FileExplorer'),
+Icon         = await zugriff.components('Icon'),
+InstallTip   = await zugriff.components('InstallTip');
+
+const
+AppSettings  = await zugriff.components.AppSettings,
+FileExplorer = await zugriff.components.FileExplorer,
+Icon         = await zugriff.components.Icon,
+InstallTip   = await zugriff.components.InstallTip;
+
+const { AppSettings, FileExplorer, Icon, InstallTip } = await zugriff.loadComponent([ 'AppSettings', 'FileExplorer', 'Icon', 'InstallTip' ]);               
+
+const { 
+  AppSettings,
+  FileExplorer,
+  Icon, 
+  InstallTip 
+} = await zugriff.components({ 
+  AppSettings,
+  FileExplorer,
+  Icon, 
+  InstallTip
+});        
 
 // The network request is triggered ONLY when you execute the function:
 async function openSettings() {
