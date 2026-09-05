@@ -46,7 +46,7 @@ async function loadModule (spec, module) {
   const imported = await import(resolved);
   return module ? imported[module] : (imported.default ?? imported);
 }
-6
+
 const loadComponent = (name, sub) => loadModule(`${PATH_COMPS}/${name}.js`, sub);        
 const loadVendor    = (name)      => {};
 
