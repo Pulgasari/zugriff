@@ -72,6 +72,16 @@ zugriff.getApp         = (slug) => new ZugriffApp (slug);
 zugriff.openPrompt     = await loadComponent ('Prompt', 'openPrompt');
 zugriff.toggleSettings = await loadComponent ('Settings', 'toggleSettings');
 
+/* === dynamic module loader =======================================
+const signal = await zugriff.load('@aufbau/signals', { signal });
+const signal = await zugriff.load('@aufbau/signals', ['signal']);
+const signal = await zugriff.load('@aufbau/signals',  'signal' );
+
+import { signal } from '@aufbau/kits/preact-htm';
+import { createDb } from '@bunker/db';
+==================================================================== */
+
+
 /*
 // usage
 const zugriff = new ZugriffRuntime;
