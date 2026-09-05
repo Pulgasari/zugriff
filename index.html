@@ -90,18 +90,12 @@ else {
 
   // :::::: CONFIG + STATES
   
-  const page = {};
+  let page = {};
   if (route === 'apps') {
-    page.basePath = '';
-    page.cat  = 'app';
-    page.name = 'zugriff apps';
-	page.slug = 'apps';
+	page = { basePath: '', cat: 'app', name: 'zugriff apps', slug: 'apps' };
   } 
   else if (route === 'tools') {
-	page.basePath = '/tools';
-    page.cat  = 'tool';
-    page.name = 'zugriff tools';
-    page.slug = 'tools';
+	page = { basePath: '/tools', cat: 'tool', name: 'zugriff tools', slug: 'tools' };
   }
 
 const categories = zugriff.registry.categories(page.cat);
