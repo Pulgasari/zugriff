@@ -18,15 +18,10 @@ html      = await zugriff.module('html'),
 useEffect = await zugriff.module('preact/hooks', 'useEffect'),
 Fragment  = await zugriff.module('preact').Fragment
 
-
-
 //
-
 const { fs } = zugriff;
-
-import * as db   from './db.js';
 const app = zugriff.app('files');
-app.db = db;
+import * as db from './db.js'; app.db = db;
 
 // :::::: BACKEND
 
