@@ -71,6 +71,7 @@ const zugriff = {
 zugriff.getApp         = (slug) => new ZugriffApp (slug);
 zugriff.openPrompt     = await loadComponent ('Prompt', 'openPrompt');
 zugriff.toggleSettings = await loadComponent ('Settings', 'toggleSettings');
+//zugriff.toggleSettings = await load({ component: 'Settings', mod: 'toggleSettings' });
 
 /* === dynamic module loader =======================================
 // esml / desml / dml
