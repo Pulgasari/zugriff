@@ -37,31 +37,31 @@ function initDevTools () {
   } catch {} // storage may be blocked in incognito
 }
   
-  // :::::: Task 2: Theme Boot (Synchronous - Prevents FOUC)
-  function applyTheme (theme) {
-    if (!theme.prefix) return;
-    const HEX = /^#[0-9a-f]{3,8}$/i;
-    try {
-      let background = '';
+// :::::: Task 2: Theme Boot (Synchronous - Prevents FOUC)
+function applyTheme (theme) {
+  if (!theme.prefix) return;
+  const HEX = /^#[0-9a-f]{3,8}$/i;
+  try {
+    let background = '';
 
-      for (const key of theme.keys) {
-        const raw = localStorage.getItem(`${theme.prefix}:${key}`);
-        if (raw === null) continue;
+    for (const key of theme.keys) {
+      const raw = localStorage.getItem(`${theme.prefix}:${key}`);
+      if (raw === null) continue;
 
-        let value;
-        try { value = JSON.parse(raw); } catch { continue; }
-        if (typeof value !== 'string' || !HEX.test(value)) continue;
+      let value;
+      try { value = JSON.parse(raw); } catch { continue; }
+      if (typeof value !== 'string' || !HEX.test(value)) continue;
 
-        $root.style.setProperty(`--${key}`, value);
-        if (key === 'bg') background = value;
-      }
+      $root.style.setProperty(`--${key}`, value);
+      if (key === 'bg') background = value;
+    }
 
-      if (background) {
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.content = background;
-      }
-    } catch {}
-  }
+    if (background) {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = background;
+    }
+  } catch {}
+}
 
   // :::::: Task 3: Import Map & Preloads Injection
   function injectImportMapAndPreloads (imports, preload, scriptURL) {
@@ -98,9 +98,9 @@ function initDevTools () {
   async function initRuntime () {
     try {
       await import('./runtime.js');
-      console.log('Boot completed. Zugriff ready:', window.zugriff);
-    } catch (err) {
-      console.error('Boot process failed:', err);
+      console.log('zugriff booted:', window.zugriff);
+    } catch (error) {
+      console.error('Boot process failed:', error);
     }
   }
 
@@ -131,13 +131,7 @@ function initDevTools () {
       prefix : ds.themePrefix ?? userConfig.themePrefix ?? 'zugriff:theme',
       keys   : userConfig.themeKeys || ['bg', 'fg', 'accent'],
     },
-    preload     : userConfig.preload || [
-      //'@aufbau/kits/preact-htm',
-      //'@aufbau/elements',
-      //'@domina/core',
-      //'preact'
-    ],
-    // Base framework importmap (can be extended/overridden via userConfig.imports)
+    preload     : userConfig.preload || [],
     imports: Object.assign(getImportMap(), userConfig.imports || {})
   };
   const { preload, sw, theme } = config;
