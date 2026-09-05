@@ -142,6 +142,13 @@ function initDevTools () {
   };
   const { preload, sw, theme } = config;
 
+  // Run tasks sequentially
+  initDevTools();
+  applyTheme(config.theme);
+  injectImportMapAndPreloads(config.imports, config.preload, currentScript.src);
+  registerServiceWorker(config.sw);
+  initRuntime();
+
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
   function getImportMap () {
