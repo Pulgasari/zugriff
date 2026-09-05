@@ -4,7 +4,8 @@
 // user hearted) and `cache` (the Iconify collection/set responses, see
 // iconify.js). the whole app persists nothing else.
 
-import { signal } from '@aufbau/kits/preact-htm';
+
+import { signal }   from '@aufbau/signals';
 import { createDb } from '@bunker/db';
 
 export const db = createDb('zugriff-icons');
