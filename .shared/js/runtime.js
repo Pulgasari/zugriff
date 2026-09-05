@@ -1,34 +1,6 @@
 // .shared/js/runtime.js
-// assembles the `zugriff` global — the ambient surface apps reach for without an
-// import (zugriff.app, zugriff.components, zugriff.fs, zugriff.toast, …). importing
-// this module (directly, or transitively via an app's db.js) installs it.
 
-// :::::: IMPORTS
-/*
-import * as components from './components/index.js';
-import registry        from './data/apps.js';
-import createApp       from './app.js';
-import { App }         from './app.js';
-import { toast }       from './app/toast.js';
 
-import { FolderLibrary } from './filesystem/folders.js';
-import * as fsaccess     from './filesystem/fsaccess.js';
-import { opfs }          from './filesystem/opfs.js';
-import * as pwa          from './app/pwa.js';
-
-// :::::: BUNDLE
-
-const zugriff = { components, opfs, pwa, registry, toast };
-
-zugriff.app = createApp;                                 // zugriff.app('<slug>') -> app handle
-zugriff.fs  = Object.assign({ FolderLibrary }, fsaccess);
-
-zugriff.openPrompt     = components.openPrompt;
-zugriff.toggleSettings = components.toggleSettings;
-
-if (typeof globalThis !== 'undefined') globalThis.zugriff = zugriff;
-*/
-// ============ NEW ==========================================================
 
 // :::::: IMPORTS
 
@@ -37,6 +9,11 @@ import { ZugriffApp }    from './app.js';
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
+
+// ::: htm
+import { h } from 'preact';
+import htm   from 'htm'; 
+const html = htm.bind(h);
 
 // import * as pwa  from './app/pwa.js';
 import { toast } from './app/toast.js';
@@ -54,13 +31,26 @@ const vendorsMap = {
   patterns : '@aufbau/patterns',
   signals  : '@aufbau/signals',
   webfonts : '@aufbau/webfonts',
+
+  is     : '@pulgasari/is',
+  obj    : '@pulgasari/obj',
+  str    : '@pulgasari/str',
+  timing : '@pulgasari/timing',
   
   signal   : '@aufbau/signals',
-  
+
+  // preact
+  // preact/hooks
 };
 
+async function loadtModule (spec, module) {
+  const resolved = vendorsMap[spec] || spec;
+  const imported = await import(resolved);
+  return module ? imported[module] : (imported.default ?? imported);
+}
+
 //const loadModule    = (path)      => import(path).then(mod => mod.default ?? mod);
-const loadModule    = (path, sub) => import(path).then(mod => (sub ? mod[sub] : (mod.default ?? mod)));
+//const loadModule    = (path, sub) => import(path).then(mod => (sub ? mod[sub] : (mod.default ?? mod)));
 const loadComponent = (name, sub) => loadModule(`${PATH_COMPS}/${name}.js`, sub);        
 const loadVendor    = (name)      => {};
 
@@ -74,7 +64,8 @@ const zugriff = {
   toast,
 
   // methods
-  component: loadComponent,
+  component : loadComponent,
+  module    : loadModule,
   loadComponent,
   loadModule,
   loadVendor,
@@ -106,7 +97,10 @@ const Icon        = await zugriff.loadComponent('Icon');
 
 // :::::: EXPORT
 
-if (typeof globalThis !== 'undefined') globalThis.zugriff = zugriff;
+if (typeof globalThis !== 'undefined') {
+  globalThis.html    = html;
+  globalThis.zugriff = zugriff;
+}
 
 export       { zugriff };
 export default zugriff;
