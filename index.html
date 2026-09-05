@@ -75,7 +75,7 @@ if (route === 'home') {
     </div>
   `;}
   
-  preact.render(html`<${HomePage}/>`, document.body);
+  render(html`<${HomePage}/>`, document.body);
 
   const bg  = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#000000';
   const fg  = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
