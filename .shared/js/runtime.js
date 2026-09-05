@@ -48,6 +48,17 @@ const PATH_VENDOR = '/.shared/js/vendors.js';
 
 // :::::: METHODS
 
+const vendorsMap = {
+  filters  : '@aufbau/filters',
+  gestures : '@aufbau/gestures',
+  patterns : '@aufbau/patterns',
+  signals  : '@aufbau/signals',
+  webfonts : '@aufbau/webfonts',
+  
+  signal   : '@aufbau/signals',
+  
+};
+
 //const loadModule    = (path)      => import(path).then(mod => mod.default ?? mod);
 const loadModule    = (path, sub) => import(path).then(mod => (sub ? mod[sub] : (mod.default ?? mod)));
 const loadComponent = (name, sub) => loadModule(`${PATH_COMPS}/${name}.js`, sub);        
