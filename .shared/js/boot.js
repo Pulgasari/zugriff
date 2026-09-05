@@ -16,6 +16,17 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
   const currentScript = document.currentScript;
   if (!currentScript) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
 
+  // :::::: [1] init zugriff
+  (async function boot () {
+    try {
+      await import('./runtime.js');
+      console.log('Boot completed. Zugriff ready:', window.zugriff);
+    } catch (err) {
+      console.error('Boot process failed:', err);
+    }
+  })();
+
+
   const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
   const $root = document.documentElement;
 
