@@ -18,64 +18,18 @@ useEffect = await zugriff.vendor('useEffect'),
 Fragment  = await zugriff.vendor('Fragment');
 
 const // shared vendors
-computed  = await zugriff.import({ signals: 'computed' }),
-html      = await zugriff.import('html'),
-useEffect = await zugriff.import({ 'preact/hooks': 'useEffect' }),
-Fragment  = await zugriff.import({ 'preact': 'Fragment' });
+computed  = await zugriff.module('signals').computed,
+html      = await zugriff.module('html'),
+useEffect = await zugriff.module('preact/hooks', 'useEffect'),
+Fragment  = await zugriff.module('preact').Fragment
 
-import AppSettings  from '/.shared/js/components/AppSettings.js';
-import Icon         from '/.shared/js/components/Icon.js';
-import InstallTip   from '/.shared/js/components/InstallTip.js';
-import FileExplorer from '/.shared/js/components/FileExplorer.js';
-
-//
-
-import AppSettings  from '@/components/AppSettings.js';
-import FileExplorer from '@/components/FileExplorer.js';
-import Icon         from '@/components/Icon.js';
-import InstallTip   from '@/components/InstallTip.js';
 
 // ==============================================================
 // ==============================================================
 // ==============================================================
 
 
-// Load all modules concurrently and extract default exports
-const [AppSettings, FileExplorer, Icon, InstallTip] = await Promise.all([
-  import('/.shared/js/components/AppSettings.js' ).then(m => m.default),
-  import('/.shared/js/components/Icon.js'        ).then(m => m.default),
-  import('/.shared/js/components/InstallTip.js'  ).then(m => m.default),
-  import('/.shared/js/components/FileExplorer.js').then(m => m.default)
-]);
 
-// Load modules sequentially using object destructuring for default exports
-const { default: AppSettings }  = await import('/.shared/js/components/AppSettings.js');
-const { default: FileExplorer } = await import('/.shared/js/components/FileExplorer.js');
-const { default: Icon }         = await import('/.shared/js/components/Icon.js');
-const { default: InstallTip }   = await import('/.shared/js/components/InstallTip.js');
-
-// Generic lazy loader for any ES module
-function lazy (importFn) {
-  let promise = null;
-
-  return function load () {
-    // 1. If already fetching/fetched, return the cached promise
-    if (!promise) {
-      // 2. Execute importFn() on first call and extract the default export
-      promise = importFn().then(module => module.default || module);
-    }
-    return promise;
-  };
-}
-
-// --- USAGE ---
-
-// Define lazy modules (no HTTP request happens here!)
-const getAppSettings  =           lazy(() => import('/.shared/js/components/AppSettings.js'));
-const getFileExplorer =           lazy(() => import('/.shared/js/components/FileExplorer.js'));
-const getComponent    = (name) => lazy(() => import(`/.shared/js/components/${name}.js`));
-
-const { AppSettings, Icon, InstallTip, FileExplorer } = componentsProxy;
 
 
 
@@ -297,3 +251,17 @@ function App () {
 // :::::: BOOT
 
 app.init({ App });
+
+/*
+
+import AppSettings  from '/.shared/js/components/AppSettings.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import InstallTip   from '/.shared/js/components/InstallTip.js';
+import FileExplorer from '/.shared/js/components/FileExplorer.js';
+
+import AppSettings  from '@/components/AppSettings.js';
+import FileExplorer from '@/components/FileExplorer.js';
+import Icon         from '@/components/Icon.js';
+import InstallTip   from '@/components/InstallTip.js';
+
+*/
