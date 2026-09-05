@@ -74,6 +74,7 @@ const zugriff = {
   toast,
 
   // methods
+  component: loadComponent,
   loadComponent,
   loadModule,
   loadVendor,
