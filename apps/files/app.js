@@ -2,8 +2,9 @@
 
 // :::::: IMPORTS
 
-import { zugriff } from '/.shared/js/runtime.js';
-import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
+//import zugriff from '/.shared/js/runtime.js';
+//const { html, preact, signals } = zugriff.vendors;
+//import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 const // shared components
 AppSettings  = await zugriff.component('AppSettings'),
@@ -12,97 +13,12 @@ Icon         = await zugriff.component('Icon'),
 InstallTip   = await zugriff.component('InstallTip');
 
 const // shared vendors
-computed  = await zugriff.vendor('computed'),
-html      = await zugriff.vendor('html'),
-useEffect = await zugriff.vendor('useEffect'),
-Fragment  = await zugriff.vendor('Fragment');
-
-const // shared vendors
 computed  = await zugriff.module('signals').computed,
 html      = await zugriff.module('html'),
 useEffect = await zugriff.module('preact/hooks', 'useEffect'),
 Fragment  = await zugriff.module('preact').Fragment
 
 
-// ==============================================================
-// ==============================================================
-// ==============================================================
-
-
-
-
-
-
-import AppSettings  from '/.shared/js/components/AppSettings.js';
-import FileExplorer from '/.shared/js/components/FileExplorer.js';
-import Icon         from '/.shared/js/components/Icon.js';
-import InstallTip   from '/.shared/js/components/InstallTip.js';
-
-import AppSettings  from '@/components/AppSettings.js';
-import FileExplorer from '@/components/FileExplorer.js';
-import Icon         from '@/components/Icon.js';
-import InstallTip   from '@/components/InstallTip.js';
-
-const AppSettings  = await zugriff.loadComponent('AppSettings');
-const FileExplorer = await zugriff.loadComponent('FileExplorer');
-const Icon         = await zugriff.loadComponent('Icon');
-const InstallTip   = await zugriff.loadComponent('InstallTip');
-
-const
-AppSettings  = await zugriff.loadComponent('AppSettings'),
-FileExplorer = await zugriff.loadComponent('FileExplorer'),
-Icon         = await zugriff.loadComponent('Icon'),
-InstallTip   = await zugriff.loadComponent('InstallTip');
-
-const
-AppSettings  = await zugriff.component('AppSettings'),
-FileExplorer = await zugriff.component('FileExplorer'),
-Icon         = await zugriff.component('Icon'),
-InstallTip   = await zugriff.component('InstallTip');
-
-const
-AppSettings  = await component('AppSettings'),
-FileExplorer = await component('FileExplorer'),
-Icon         = await component('Icon'),
-InstallTip   = await component('InstallTip');
-
-const
-AppSettings  = await zugriff.components.AppSettings,
-FileExplorer = await zugriff.components.FileExplorer,
-Icon         = await zugriff.components.Icon,
-InstallTip   = await zugriff.components.InstallTip;
-
-const { AppSettings, FileExplorer, Icon, InstallTip } = await zugriff.loadComponent([ 'AppSettings', 'FileExplorer', 'Icon', 'InstallTip' ]);               
-
-const { 
-  AppSettings,
-  FileExplorer,
-  Icon, 
-  InstallTip 
-} = await zugriff.components({ 
-  AppSettings,
-  FileExplorer,
-  Icon, 
-  InstallTip
-});        
-
-// The network request is triggered ONLY when you execute the function:
-async function openSettings() {
-    const AppSettings = await getAppSettings();
-    
-    // Now AppSettings is loaded and ready to use
-    console.log('Loaded module:', AppSettings);
-}
-
-// ==============================================================
-// ==============================================================
-// ==============================================================
-
-
-//
-
-const { AppSettings, Icon, InstallTip, FileExplorer } = zugriff.components;
-const { html, preact, signals }                       = zugriff.vendors;
 
 //
 
