@@ -52,6 +52,9 @@ const loadVendor    = (name)      => {};
 
 // :::::: BUNDLE
 
+const route = window.location.pathname.split('/')[1] || null;
+const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
+
 const zugriff = {
   // namespaces
   fs: Object.assign({ FolderLibrary }, fsaccess),
@@ -67,6 +70,7 @@ const zugriff = {
   loadVendor,
 };
 
+zugriff.app            = isAppRoute ? new ZugriffApp(route) : null;
 zugriff.getApp         = (slug) => new ZugriffApp (slug);
 zugriff.openPrompt     = await loadComponent ('Prompt', 'openPrompt');
 zugriff.toggleSettings = await loadComponent ('Settings', 'toggleSettings');
