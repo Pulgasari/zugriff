@@ -1,30 +1,28 @@
 // apps/notes/app.js
-//
-// notes on the new app runtime: one `zugriff.app('notes')` handle carries the
-// config, the reactive state and the mount. ephemeral ui state (the tree filter,
-// the mobile drawer, the open note's table of contents) lives on app.state — each
-// key is its own signal, so a write only wakes the effects that read it. the two
-// bits that must survive a reload (the open note, the expanded folders) stay on
-// their own persisted signals for now.
 
-// :::::: IMPORTS
+// :::::: IMPORT
 
 // ::: vendors
-import { html, computed, Fragment, useEffect, useRef, useState } from '/.shared/js/vendors.js';
-import { signal as persisted, local }                           from '@aufbau/signals';
+import { computed, local, signal as persisted } from '@aufbau/signals';
+import { Fragment } from 'preact';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
-// ::: shared runtime
-import { zugriff } from '/.shared/js/runtime.js';
-import * as fs     from '/.shared/js/filesystem/fsaccess.js';
+const // shared components
+Button     = await zugriff.component('Button'),
+Empty      = await zugriff.component('Empty'),
+Icon       = await zugriff.component('Icon'),
+InstallTip = await zugriff.component('InstallTip'),
+Settings   = await zugriff.component('Settings'),
+Tree       = await zugriff.component('Tree');
 
-// ::: local — the folder-library data layer, bound to the app handle as app.lib
-import { lib } from './library.js';
+// ::: the app
+const app = zugriff.app;
+app.lib = await app.module('library');
 
-const app = zugriff.app('notes');
-app.lib = lib;
+const { fs } = zugriff;
 
-const { AppSettings, Button, Empty, Icon, InstallTip, Tree } = zugriff.components;
-const toast = app.toast;
+
+// const { Button, Empty, Icon, InstallTip, Settings, Tree } = zugriff.components;
 
 // :::::: STATE
 
@@ -33,9 +31,8 @@ app.state.filter    = '';       // tree filter query
 app.state.isNavOpen = false;    // mobile: is the tree drawer showing
 
 // durable state — kept apart, hydrates from + persists to localStorage
-const open     = persisted({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
-const expanded = persisted({ value: [],   key: 'notes:expanded', store: local });   // ['sourceId:dir/path', …]
-
+const open       = persisted({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
+const expanded   = persisted({ value: [],   key: 'notes:expanded', store: local });   // ['sourceId:dir/path', …]
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
 
@@ -143,25 +140,24 @@ function SourceBlock ({ source }) {
         </div>
       </div>`;
   } else if (busy && !tree) {
-    body = html`<div class="src-loading"><${Icon} name="svg-spinners:bars-scale-middle" /> Scanning…</div>`;
+    //body = html`<${Loading} text='Scanning...' />`;
+    body = html`<div class="src-loading"><${Icon} name='loading' /> Scanning…</div>`;
   } else {
     const view = q && tree ? filterTree(tree, q) : tree;
     body = view && view.children.length
-      ? html`<${Tree} nodes=${toTreeNodes(view, source.id, !!q)}
-                       onSelect=${onTreeSelect} onToggle=${onTreeToggle} />`
+      ? html`<${Tree} nodes=${toTreeNodes(view, source.id, !!q)} onSelect=${onTreeSelect} onToggle=${onTreeToggle} />`
       : html`<div class="src-empty">${q ? 'No matches' : 'No markdown files here'}</div>`;
   }
 
+  const disabled = busy || state !== 'granted';
+  const refresh  = () => app.lib.scan(source.id).catch(() => {});
   return html`
     <div class="src">
       <div class="src-head">
-        <${Icon} name="mdi:folder-outline" />
+        <${Icon} name="folder" />
         <span class="src-name" title=${source.name}>${source.name}</span>
-        <button class="src-x" title="Refresh" onClick=${() => app.lib.scan(source.id).catch(() => {})}
-                disabled=${busy || state !== 'granted'}>
-          <${Icon} name="refresh" /></button>
-        <button class="src-x" title="Close folder" onClick=${remove}>
-          <${Icon} name="close" /></button>
+        <${Button} class="src-x" icon='refresh' title="Refresh"      onClick=${refresh} disabled=${disabled} />
+        <${Button} class="src-x" icon='close'   title="Close folder" onClick=${remove} />
       </div>
       ${body}
     </div>`;
@@ -172,17 +168,13 @@ function Sidebar () {
     <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
       <div class="brand">
         <${Icon} name="notes" /> <span>Notes</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.isNavOpen = false}>
-          <${Icon} name="close" /></button>
+        <${Button} class="ibtn nav-close" icon='close' aria-label="Close" onClick=${() => app.state.isNavOpen = false} />
       </div>
 
       <div class="tree-filter">
         <${Icon} name="search" />
-        <input type="search" placeholder="Filter notes…" value=${app.state.filter}
-               onInput=${e => app.state.filter = e.target.value} />
-        ${app.state.filter && html`
-          <button class="ibtn" aria-label="Clear" onClick=${() => app.state.filter = ''}>
-            <${Icon} name="close" /></button>`}
+        <input type="search" placeholder="Filter notes…" value=${app.state.filter} onInput=${e => app.state.filter = e.target.value} />
+        ${app.state.filter && html`<${Button} class="ibtn" icon='close' aria-label="Clear" onClick=${() => app.state.filter = ''} />`}
       </div>
 
       <div class="tree">
@@ -193,10 +185,10 @@ function Sidebar () {
 
       <div class="side-foot">
         <${InstallTip} show=${app.lib.sources.value.length > 0} />
-        <button class="btn small primary" onClick=${addFolder}>
-          <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>
+        <${Button} class="small" icon='folder-add' label='Open a folder' onClick=${addFolder} />
       </div>
-    </aside>`;
+    </aside>
+  `;
 }
 
 // :::::: READER
@@ -283,9 +275,23 @@ function NoteView ({ note }) {
   return html`
     <div class="reader-scroll">
       <div class="reader-grid">
-        <aufbau-reader id="notes-reader" class="md" format="markdown"
-                       raw=${text} transform=${transform} onClick=${onClick}></aufbau-reader>
-        <aside class="toc"><aufbau-toc target="#notes-reader" selector="h1, h2, h3"></aufbau-toc></aside>
+      
+        <aufbau-reader 
+          id="notes-reader" 
+          class="md" 
+          format="markdown"
+          raw=${text}
+          transform=${transform}
+          onClick=${onClick}>
+        </aufbau-reader>
+        
+        <aside class="toc">
+          <aufbau-toc
+            target="#notes-reader" 
+            selector="h1, h2, h3">
+          </aufbau-toc>
+        </aside>
+        
       </div>
     </div>`;
 }
