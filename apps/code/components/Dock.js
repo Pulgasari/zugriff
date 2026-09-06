@@ -2,7 +2,7 @@
 // the bottom bar: modal toggles on the left, undo/commands/redo in the middle,
 // panel toggles on the right.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import state from './../state.js';
 import Tap   from './Tap.js';
 

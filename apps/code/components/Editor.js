@@ -3,7 +3,7 @@
 // a versioned CDN) rather than imported here, because the esm.sh ?worker builds
 // are broken and the service worker chokes on esm.sh streaming responses.
 
-import { html, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, useEffect, useRef } from './../vendors.js';
 import state       from './../state.js';
 import { loadMonaco } from './../monaco.js';
 import Welcome     from './Welcome.js';

@@ -2,7 +2,7 @@
 // the settings modal: a UI section (app theme, chrome options) and an editor
 // section (Monaco theme + construction options).
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import { themeNames } from '/.shared/js/data/themes.js';
 import state from './../state.js';
 import Modal from './Modal.js';
@@ -62,8 +62,8 @@ export default function Settings () {
         <h3>UI</h3>
         <${Dropdown}
           options=${themeNames}
-          selected=${state.config.theme.value}
-          onChange=${event => (state.config.theme.value = event.currentTarget.value)}
+          selected=${state.app.state.theme}
+          onChange=${event => (state.app.state.theme = event.currentTarget.value)}
         />
         ${uiToggles.map(UiToggleField)}
         ${uiPickers.map(UiPickerField)}

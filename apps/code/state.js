@@ -7,13 +7,22 @@
 // of preact-x's signalWithCookie), the open-file list, the active modal, the
 // toolbar layout, and the command dispatcher.
 
-import { signal } from '@aufbau/kits/preact-htm';
-import { stored } from '/.shared/js/lib/signals.js';
+import { signal } from '@aufbau/signals';
+import { stored } from '/.shared/js/app/signals.js';
 
 import commands   from './commands.js';
 import editor     from './editor.js';
 import fs         from './fs.js';
 import * as github from './github.js';
+
+// the shared runtime already builds this app's base reactive state as
+// zugriff.app.state (theme/font/dir/lang/title/dialog/route), persisted per-leaf
+// under `zugriff:code:` and wired to the shared DOM effects (applyTheme, webfonts,
+// …). the code app builds ON TOP of it: the shared leaves stay the single source
+// of truth — theme in particular drives the shared applyTheme (incl. the boot
+// colour cache used to avoid a FOUC) — and this module only adds the app's own
+// chrome config as extra persisted signals.
+const app = zugriff.app;
 
 // ── methods ──────────────────────────────────────────────────────────────────
 
@@ -24,18 +33,19 @@ const methods = {
   toggleSignal : sig => (sig.value = !sig.value),
 };
 
-const state = { commands, editor, fs, github, ...methods };
+const state = { app, commands, editor, fs, github, ...methods };
 
 // ── UI configuration / panel state (persisted) ───────────────────────────────
 
+// theme is not here — it lives on the shared state (app.state.theme) so the shared
+// applyTheme effect owns theming for every app. everything below is code-specific
+// chrome with no shared equivalent, so it stays as per-key persisted signals.
 const DEFAULT_UI_FONTSIZE = 12;
-const DEFAULT_UI_THEME    = 'dracula';
 
 state.config = {
   disableAndroidKeyboard : stored(true,               'code:disableAndroidKeyboard'),
   fileSizeFormat         : stored('formatted',        'code:fileSizeFormat'),
   fontSize               : stored(DEFAULT_UI_FONTSIZE, 'code:fontSize'),
-  theme                  : stored(DEFAULT_UI_THEME,   'code:theme'),
   showBrowser            : stored(false,              'code:showBrowser'),
   showKeyboard           : stored(true,               'code:showKeyboard'),
   showStatusbar          : stored(true,               'code:showStatusbar'),

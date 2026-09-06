@@ -2,7 +2,7 @@
 // the command palette — search every command, star favourites, run one.
 
 import { useState } from 'preact/hooks';
-import { stored } from '/.shared/js/lib/signals.js';
+import { stored } from '/.shared/js/app/signals.js';
 
 import Modal from './Modal.js';
 import Icon  from './Icon.js';

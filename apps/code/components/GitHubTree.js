@@ -5,7 +5,7 @@
 // is a root reload driven by the GitHub modal on treeops.version.github — this
 // node just fires the op and bumps.
 
-import { html, useState } from '@aufbau/kits/preact-htm';
+import { html, useState } from './../vendors.js';
 import state from './../state.js';
 import * as github from './../github.js';
 import { clipboard, bump, ask, validName } from './../treeops.js';

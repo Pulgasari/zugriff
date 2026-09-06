@@ -1,6 +1,6 @@
 // apps/code/components/Dropdown.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 
 export default function Dropdown ({ onChange, options, selected }) {
   return html`

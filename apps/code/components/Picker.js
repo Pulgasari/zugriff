@@ -1,7 +1,7 @@
 // apps/code/components/Picker.js
 // a row of chips; the active value is highlighted.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 
 export default function Picker ({ callback, options, value }) {
   return html`

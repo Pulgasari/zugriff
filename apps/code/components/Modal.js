@@ -1,6 +1,6 @@
 // apps/code/components/Modal.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import state from './../state.js';
 import Icon  from './Icon.js';
 

@@ -9,7 +9,7 @@
 // a fine-grained token scoped to the repos you want, with "Contents: read/write",
 // is enough to browse and commit.
 
-import { signal } from '@aufbau/kits/preact-htm';
+import { signal } from '@aufbau/signals';
 import { db, setup } from './db.js';
 
 const API      = 'https://api.github.com';

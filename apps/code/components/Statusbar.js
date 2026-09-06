@@ -2,7 +2,7 @@
 // the thin info strip above the editor: language, size, indent, and quick
 // toggles for wrap / minimap / line numbers, plus the font size.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import state from './../state.js';
 
 export default function Statusbar () {

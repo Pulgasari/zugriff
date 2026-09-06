@@ -4,7 +4,7 @@
 // GitHub tree use: a one-slot clipboard (cut/copy → paste) and a version signal
 // per source that bumps after any change so open folders reload.
 
-import { signal } from '@aufbau/kits/preact-htm';
+import { signal } from '@aufbau/signals';
 import { openPrompt } from '/.shared/js/components/index.js';
 
 /** a promise-returning single-value prompt; resolves null on cancel */
