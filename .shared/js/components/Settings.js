@@ -22,9 +22,9 @@ const settingsOpen   = signal(false);
 const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 
 // :::::: SPEC
-// theme is the one cross-cutting field; the rest comes verbatim from the app's
-// registry settings schema (font, dir, …). the font enum's values are filled from
-// the webfont catalog at build time, the registry stays import-free.
+// theme is the one cross-cutting field;
+// the rest comes verbatim from the app's registry settings schema (font, dir, …). 
+// the font enum's values are filled from the webfont catalog at build time, the registry stays import-free.
 
 function buildSpec (config) {
   const fonts      = webfonts?.fonts ?? [];
@@ -50,7 +50,8 @@ function SettingsButton () {
       title="settings"
       aria-expanded=${settingsOpen.value}>
       <${Icon} name="settings" />
-    </button>`;
+    </button>
+  `;
 }
 
 // reads the page's active app off the runtime (set by zugriff.app('<slug>')), so a
@@ -84,6 +85,7 @@ function SettingsPanel () {
     </div>`;
 }
 
+/*
 function AppSettings () {
   return html`
     <${SettingsButton} />
@@ -91,11 +93,18 @@ function AppSettings () {
 }
 
 // tools mount this through Shell; the app panel is the live surface for now
+function Settings () { return settingsOpen.value ? html`<${SettingsPanel} />` : null; }
+*/
+
 function Settings () {
-  return settingsOpen.value ? html`<${SettingsPanel} />` : null;
+  return html`
+    <${SettingsButton} />
+    ${settingsOpen.value && html`<${SettingsPanel} />`}
+  `;
 }
+
 
 // :::::: EXPORT
 
-export       { Settings, SettingsButton, AppSettings, settingsOpen, toggleSettings };
+export       { Settings, SettingsButton, settingsOpen, toggleSettings };
 export default Settings;
