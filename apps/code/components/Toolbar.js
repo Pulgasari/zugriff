@@ -1,7 +1,7 @@
 // apps/code/components/Toolbar.js
 // a quick strip of editor actions above the keyboard.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import state from './../state.js';
 import Tap   from './Tap.js';
 
