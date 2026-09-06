@@ -59,7 +59,8 @@
 </div>
 
 <script type='module'>
-import "https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js";
+const route = window.location.pathname.split('/')[1] || null;
+if (route === 'icons') import("https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js");
 </script>
   
 <script type="module" src="./app.js"></script>
