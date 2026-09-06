@@ -83,7 +83,7 @@ function toTreeNodes (dir, sourceId, forceOpen) {
     ? {
         label    : titleOf(child),
         value    : nodeValue('f', sourceId, child.path),
-        icon     : 'mdi:file-document-outline',
+        icon     : 'notes',
         selected : open.value?.sourceId === sourceId && open.value?.path === child.path,
       }
     : {
@@ -133,8 +133,8 @@ function SourceBlock ({ source }) {
       <div class="src-reconnect">
         <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
         <div class="src-reconnect-row">
-          <${Button} class='small'       icon='mdi:folder-key-outline'    label='Reconnect'     onClick=${tryReconnect} />
-          <${Button} class='small ghost' icon='mdi:folder-search-outline' label='Choose folder' onClick=${repick}       />
+          <${Button} class='small'       icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
+          <${Button} class='small ghost' icon='folder-search' label='Choose folder' onClick=${repick}       />
         </div>
       </div>`;
   } else if (busy && !tree) {
@@ -326,7 +326,7 @@ function NotesReaderBody ({ note }) {
         ? html`<${NoteView} note=${note} />`
         : html`<div class="reader-empty">
             <${Empty}
-              icon="mdi:file-document-outline"
+              icon='notes'
               title="No note open"
                  hint=${app.lib.sources.value.length ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.'}
               action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`}
