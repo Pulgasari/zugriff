@@ -1,11 +1,12 @@
 // apps/code/components/Commands.js
 // the command palette — search every command, star favourites, run one.
 
-import { html, useState } from '@aufbau/kits/preact-htm';
+import { useState } from 'preact/hooks';
 import { stored } from '/.shared/js/lib/signals.js';
-import state from './../state.js';
+
 import Modal from './Modal.js';
 import Icon  from './Icon.js';
+import state from './../state.js';
 
 export const favoritesSignal = stored([], 'code:favs');
 
