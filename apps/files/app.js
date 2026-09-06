@@ -7,10 +7,10 @@
 //import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // shared components
-import AppSettings  from '/.shared/js/components/AppSettings.js';
 import FileExplorer from '/.shared/js/components/FileExplorer.js';
 import Icon         from '/.shared/js/components/Icon.js';
 import InstallTip   from '/.shared/js/components/InstallTip.js';
+import Settings     from '/.shared/js/components/Settings.js';
 
 // shared vendors
 import { computed }  from '@aufbau/signals';
@@ -24,10 +24,10 @@ app.db = db;
 // :::::: IMPORTS
 /*
 const // shared components
-AppSettings  = await zugriff.component('AppSettings'),
 FileExplorer = await zugriff.component('FileExplorer'),
 Icon         = await zugriff.component('Icon'),
-InstallTip   = await zugriff.component('InstallTip');
+InstallTip   = await zugriff.component('InstallTip'),
+Settings     = await zugriff.component('Settings');
 
 const // shared vendors
 computed  = await zugriff.module('signals').computed,
