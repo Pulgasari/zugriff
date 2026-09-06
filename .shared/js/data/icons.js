@@ -7,6 +7,7 @@ export const icons = {
   'arrow-left'        : 'material-symbols:arrow-back',
   'arrow-right'       : 'material-symbols:arrow-forward',
   'arrow-up'          : 'material-symbols:arrow-upward',
+  'capslock'          : 'material-symbols:keyboard-capslock',
   'check'             : 'mdi:check',
   'check-circle'      : 'mdi:check-circle-outline',
   'chevron-down'      : 'mdi:chevron-down',
@@ -43,7 +44,7 @@ export const icons = {
   'images'            : 'mdi:image-multiple-outline',
   'import'            : 'mdi:import',
   'info'              : 'mdi:information-outline',
-  'join-lines'        : 'material-symbols:join-outline',
+  'keyboard'          : 'tdesign:keyboard',
   'lineheight'        : 'material-symbols:format-line-spacing',
   'loading'           : 'svg-spinners:bars-scale-middle',
   'menu'              : 'mdi:menu',
@@ -64,9 +65,12 @@ export const icons = {
   'search'            : 'mdi:magnify',
   'select-all'        : 'material-symbols:select-all',
   'settings'          : 'material-symbols:settings',
+  'shift'             : 'material-symbols:shift',
   'skip-next'         : 'mdi:skip-next',
   'skip-previous'     : 'mdi:skip-previous',
+  'sort-lines'        : 'material-symbols:reorder',
   'space'             : 'material-symbols:space-bar',
+  'split-line'        : 'material-symbols:split-scene-outline',
   'tab'               : 'bx:arrow-to-right',
   'tab-rtl'           : 'bx:arrow-to-left',
   'toggle-off'        : 'material-symbols:toggle-off',
@@ -82,6 +86,18 @@ export const icons = {
   'youtube'           : 'mdi:youtube',
   'zoom-in'           : 'mdi:magnify-plus-outline',
   'zoom-out'          : 'mdi:magnify-minus-outline',
+
+  // specific for apps/code
+  'backspace'           : 'material-symbols:backspace',
+  'blockindent'         : 'material-symbols:keyboard-tab',
+  'blockoutdent'        : 'material-symbols:keyboard-tab-rtl',
+  'copy-lines-down'     : 'material-symbols:move-down',
+  'copy-lines-up'       : 'material-symbols:move-up',
+  'join-lines'          : 'material-symbols:join-outline',
+  'move-lines-down'     : 'material-symbols:text-select-move-down',
+  'move-lines-up'       : 'material-symbols:text-select-move-up',
+  'move-selection-down' : 'material-symbols:move-selection-down',
+  'move-selection-up'   : 'material-symbols:move-selection-up',
 };
 
 export const 
