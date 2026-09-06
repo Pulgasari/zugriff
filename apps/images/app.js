@@ -41,8 +41,6 @@ function wireLaunchQueue () {
 function ModeBar () {
   return html`
     <header class="im-modebar">
-      <div class="im-brand"><${Icon} name='images' /> <span>images</span></div>
-      <${Brand} icon='images' text='images' />
       <${Brand} app=${app} />
       <nav class="im-modes">
         ${router.routes.map(m => html`
