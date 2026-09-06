@@ -6,6 +6,23 @@
 //const { html, preact, signals } = zugriff.vendors;
 //import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
+// shared components
+import AppSettings  from '/.shared/js/components/AppSettings.js';
+import FileExplorer from '/.shared/js/components/FileExplorer.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import InstallTip   from '/.shared/js/components/InstallTip.js';
+
+// shared vendors
+import { computed }  from '@aufbau/signals';
+import { useEffect } from 'preact/hooks';
+import { Fragment }  from 'preact';
+
+import * as db from './db.js'; 
+const app = zugriff.getApp('files');
+app.db = db;
+
+// :::::: IMPORTS
+/*
 const // shared components
 AppSettings  = await zugriff.component('AppSettings'),
 FileExplorer = await zugriff.component('FileExplorer'),
@@ -19,10 +36,11 @@ useEffect = await zugriff.module('preact/hooks', 'useEffect'),
 Fragment  = await zugriff.module('preact').Fragment
 
 //
-const { fs } = zugriff;
-const app = zugriff.app('files');
-import * as db from './db.js'; app.db = db;
+const app = zugriff.getApp('files');
+app.db = await app.module('db');
+*/
 
+const { fs } = zugriff;
 // :::::: BACKEND
 
 // the granted folder, described for the FileExplorer component. read-only for
