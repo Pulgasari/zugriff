@@ -7,6 +7,7 @@
 //import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
 
 // shared components
+import Button       from '/.shared/js/components/Button.js';
 import FileExplorer from '/.shared/js/components/FileExplorer.js';
 import Icon         from '/.shared/js/components/Icon.js';
 import InstallTip   from '/.shared/js/components/InstallTip.js';
@@ -95,13 +96,13 @@ function Unsupported () {
 function Welcome () {
   return html`
     <div class="fe-hero">
-      <${Icon} name="mdi:folder-open-outline" />
+      <${Icon} name="folder-open" />
       <h1>Browse a folder</h1>
       <p>Pick a folder from your device — it becomes the root of the explorer.
          Nothing is uploaded and nothing is copied; everything stays on your
          machine.</p>
       <button class="fe-btn primary" onClick=${chooseFolder}>
-        <${Icon} name="mdi:folder-plus-outline" /> Open a folder</button>
+        <${Icon} name="folder-add" /> Open a folder</button>
     </div>`;
 }
 
@@ -116,11 +117,19 @@ function Reconnect () {
           ? 'Permission for this folder was blocked. Re-pick it to browse again.'
           : 'This folder needs permission again for this visit.'}</p>
       <div class="fe-hero-actions">
-        <button class="fe-btn primary" onClick=${tryReconnect}>
-          <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
-        <button class="fe-btn ghost" title="Re-select the folder — always works"
-                onClick=${chooseFolder}>
-          <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
+        <${Button} 
+          class="primary"
+          icon="mdi:folder-key-outline"
+          label='Reconnect'
+          onClick=${tryReconnect}
+          />
+        <${Button}
+          class="ghost"
+          icon='mdi:folder-search-outline'
+          label='Choose folder'
+          title="Re-select the folder — always works"
+          onClick=${chooseFolder}
+          />
       </div>
     </div>`;
 }
@@ -130,13 +139,13 @@ function Sidebar () {
   return html`
     <aside class="sidebar">
       <div class="brand">
-        <${Icon} name="mdi:folder-outline" /> <span>Files</span>
+        <${Icon} name="folder" /> <span>Files</span>
       </div>
 
       <div class="fe-current">
         <span class="fe-current-label">open folder</span>
         <div class="fe-current-name" title=${f.name}>
-          <${Icon} name="mdi:folder-open-outline" /> <span>${f.name}</span>
+          <${Icon} name="folder-open" /> <span>${f.name}</span>
         </div>
         <div class="fe-current-actions">
           <button class="fe-btn small" onClick=${chooseFolder}>
