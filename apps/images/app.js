@@ -1,9 +1,4 @@
 // apps/images/app.js
-//
-// the unified images app. one PWA, several routes switched by ?mode= via the
-// shared query-param router (bound to app.state.route). the shell is just a mode
-// bar plus the router outlet — each mode lives in ./routes, the shared image tray
-// in ./state.js. the OS "open with" / launchQueue drops launched files into view.
 
 // :::::: IMPORT
 
@@ -11,14 +6,16 @@ import { Fragment }  from 'preact';
 import { useEffect } from 'preact/hooks';
 
 const // shared components
+Brand    = await zugriff.component('Brand'),
 Icon     = await zugriff.component('Icon'),
 Settings = await zugriff.component('Settings');
 
-import { app }              from './context.js';
-import { routes }           from './routes/index.js';
-import { editCurrent }      from './routes/edit.js';
+import { app } from './context.js';
+
 import { setFiles, revokeAll, vError } from './state.js';
 
+import { routes }       from './routes/index.js';
+import { editCurrent }  from './routes/edit.js';
 import { createRouter } from '/.shared/js/app/router.js';
 const router = createRouter(app, { routes, param: 'mode', fallback: 'view' });
 
@@ -45,6 +42,8 @@ function ModeBar () {
   return html`
     <header class="im-modebar">
       <div class="im-brand"><${Icon} name='images' /> <span>images</span></div>
+      <${Brand} icon='images' text='images' />
+      <${Brand} app=${app} />
       <nav class="im-modes">
         ${router.routes.map(m => html`
           <button class=${'im-mode' + (app.state.route === m.id ? ' active' : '')} key=${m.id}
@@ -63,7 +62,8 @@ function App () {
     <${Fragment}>
       <${ModeBar} />
       <div id="app-main"><${router.Outlet} /></div>
-    </${Fragment}>`;
+    </${Fragment}>
+  `;
 }
 
 // :::::: BOOT
