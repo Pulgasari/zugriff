@@ -10,7 +10,8 @@
 // :::::: IMPORTS
 
 import { signal, local } from '@aufbau/signals';
-import { aufbau }        from './../vendors.js';
+import webfonts          from '@aufbau/webfonts';
+//import { aufbau }        from './../vendors.js';
 import { themes }        from './../data/themes.js';
 
 // :::::: REFS
@@ -69,7 +70,7 @@ export function createState (config = {}) {
 
   state.$onEffects({
     dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
-    font  : value => { if (value) aufbau.webfonts?.init?.({ name: value, target: '--font' }); },
+    font  : value => { if (value) webfonts?.init?.({ name: value, target: '--font' }); },
     lang  : value => { if ($root && value) $root.lang = value; },
     theme : value => applyTheme(value),
     title : value => { if ($doc && value) $doc.title = value; },
