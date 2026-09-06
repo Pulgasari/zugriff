@@ -50,7 +50,7 @@ function ModeBar () {
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
-      <div class="im-modebar-actions"><${AppSettings} /></div>
+      <div class="im-modebar-actions"><${Settings}/></div>
     </header>`;
 }
 
