@@ -11,7 +11,8 @@
 import Icon from './Icon.js';
 
 //import aufbau from '@aufbau/runtime';
-import gui    from '@aufbau/runtime/gui.js';
+import gui      from '@aufbau/runtime/gui.js';
+import webfonts from '@aufbau/webfonts';
 import { html, signal, useEffect, useRef } from './../vendors.js';
 import { themeNames, DEFAULT_THEME }       from './../data/themes.js';
 
@@ -26,7 +27,7 @@ const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 // the webfont catalog at build time, the registry stays import-free.
 
 function buildSpec (config) {
-  const fonts      = aufbau.webfonts?.fonts ?? [];
+  const fonts      = webfonts?.fonts ?? [];
   const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
   const labelOf    = key => key[0].toUpperCase() + key.slice(1);
 
