@@ -10,7 +10,7 @@
 
 import Icon from './Icon.js';
 
-import aufbau from '@aufbau/runtime';
+//import aufbau from '@aufbau/runtime';
 import gui    from '@aufbau/runtime/gui.js';
 import { html, signal, useEffect, useRef } from './../vendors.js';
 import { themeNames, DEFAULT_THEME }       from './../data/themes.js';
