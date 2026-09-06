@@ -16,16 +16,16 @@ export default function Dock () {
         <${Tap} cmd="settings:toggle"    icon="settings"          className=${modal === 'settings'    ? 'active' : ''} />
         <${Tap} cmd="plugins:toggle"     icon="gridicons:plugins" className=${modal === 'plugins'     ? 'active' : ''} />
         <${Tap} cmd="filebrowser:toggle" icon="mdi:file-tree"     className=${modal === 'filebrowser' ? 'active' : ''} />
-        <${Tap} cmd="github:toggle"      icon="mdi:github"        className=${modal === 'github'      ? 'active' : ''} />
+        <${Tap} cmd="github:toggle"      icon="github"            className=${modal === 'github'      ? 'active' : ''} />
       </div>
       <div class="section">
-        <${Tap} cmd="editor:undo"     icon="bx:undo" />
-        <${Tap} cmd="commands:toggle" icon="bx:command" className=${modal === 'commands' ? 'active' : ''} />
-        <${Tap} cmd="editor:redo"     icon="bx:redo" />
+        <${Tap} cmd="editor:undo"     icon="undo" />
+        <${Tap} cmd="commands:toggle" icon="commands" className=${modal === 'commands' ? 'active' : ''} />
+        <${Tap} cmd="editor:redo"     icon="redo" />
       </div>
       <div class="section">
         <${Tap} cmd="browser:toggle"  icon="mynaui:globe" className=${config.showBrowser.value  ? 'active' : ''} />
-        <${Tap} cmd="keyboard:toggle" icon="bxs:keyboard" className=${config.showKeyboard.value ? 'active' : ''} />
+        <${Tap} cmd="keyboard:toggle" icon="keyboard"     className=${config.showKeyboard.value ? 'active' : ''} />
         <${Tap} cmd="toolbar:toggle"  icon="mdi:tools"    className=${config.showToolbar.value  ? 'active' : ''} />
       </div>
     </div>
