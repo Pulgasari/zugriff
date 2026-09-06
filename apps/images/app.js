@@ -5,16 +5,24 @@
 // bar plus the router outlet — each mode lives in ./routes, the shared image tray
 // in ./state.js. the OS "open with" / launchQueue drops launched files into view.
 
-import { html, Fragment, useEffect } from '@aufbau/kits/preact-htm';
-import { Icon, AppSettings }         from '/.shared/js/components/index.js';
-import { createRouter }              from '/.shared/js/app/router.js';
+// :::::: IMPORT
+
+import { Fragment }  from 'preact';
+import { useEffect } from 'preact/hooks';
+
+const // shared components
+Icon     = await zugriff.component('Icon'),
+Settings = await zugriff.component('Settings');
 
 import { app }              from './context.js';
 import { routes }           from './routes/index.js';
 import { editCurrent }      from './routes/edit.js';
 import { setFiles, revokeAll, vError } from './state.js';
 
+import { createRouter } from '/.shared/js/app/router.js';
 const router = createRouter(app, { routes, param: 'mode', fallback: 'view' });
+
+// ::::::
 
 // files opened via the OS "open with" arrive here on launch — drop them into view
 function wireLaunchQueue () {
@@ -36,7 +44,7 @@ function wireLaunchQueue () {
 function ModeBar () {
   return html`
     <header class="im-modebar">
-      <div class="im-brand"><${Icon} name="mdi:image-multiple-outline" /> <span>images</span></div>
+      <div class="im-brand"><${Icon} name='images' /> <span>images</span></div>
       <nav class="im-modes">
         ${router.routes.map(m => html`
           <button class=${'im-mode' + (app.state.route === m.id ? ' active' : '')} key=${m.id}
