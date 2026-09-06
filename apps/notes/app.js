@@ -12,7 +12,9 @@ Button     = await zugriff.component('Button'),
 Empty      = await zugriff.component('Empty'),
 Icon       = await zugriff.component('Icon'),
 InstallTip = await zugriff.component('InstallTip'),
+Reader     = await zugriff.component('Reader'),
 Settings   = await zugriff.component('Settings'),
+TOC        = await zugriff.component('TOC'),
 Tree       = await zugriff.component('Tree');
 
 // ::: the app
@@ -126,17 +128,13 @@ function SourceBlock ({ source }) {
       console.warn('[notes] reconnect failed', { source, ...res });
       toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
     });
-    const repick = () => app.lib.repick(source.id).then(ok =>
-      ok || toast.error('Could not open that folder'));
+    const repick = () => app.lib.repick(source.id).then(ok => ok || toast({ error: 'Could not open that folder' }));
     body = html`
       <div class="src-reconnect">
         <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
         <div class="src-reconnect-row">
-          <button class="btn small primary" onClick=${tryReconnect}>
-            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
-          <button class="btn small ghost" title="Re-select the folder — always works"
-                  onClick=${repick}>
-            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
+          <${Button} class='small'       icon='mdi:folder-key-outline'    label='Reconnect'     onClick=${tryReconnect} />
+          <${Button} class='small ghost' icon='mdi:folder-search-outline' label='Choose folder' onClick=${repick}       />
         </div>
       </div>`;
   } else if (busy && !tree) {
@@ -220,7 +218,7 @@ function NoteView ({ note }) {
     setText(null);
     app.lib.readNote(note.node.handle)
       .then(({ text }) => { if (alive) setText(text); })
-      .catch(err => { toast.error('Could not read that note: ' + err.message); if (alive) setText(''); });
+      .catch(err => { toast({ error: 'Could not read that note: ' + err.message }); if (alive) setText(''); });
     return () => {
       alive = false;
       urls.current.forEach(URL.revokeObjectURL);
@@ -296,35 +294,45 @@ function NoteView ({ note }) {
     </div>`;
 }
 
+function NotesReaderHeader () {
+  const segs = note ? note.node.path.split('/') : [];
+  
+  return html`
+    <header class=${'reader-head' + (note ? '' : ' empty')}>
+      <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
+      ${note
+        ? html`<nav class="crumbs">
+          ${segs.map((seg, i) => html`
+            <span key=${i}>${i > 0 && html`<span class="crumb-sep">/</span>`}
+            <span class=${i === segs.length - 1 ? 'crumb last' : 'crumb'}>${seg}</span></span>`)}
+            </nav>`
+          : html`<span class="crumb head-brand">Notes</span>`}
+        <span class="spacer"></span>
+        <${Settings} />
+    </header>
+  `;
+}
+
 // the frame is always drawn — header (with the mobile menu button) included — so on
 // a phone the tree drawer is always reachable, note open or not
-function ReaderBody ({ note }) {
+function NotesReaderBody ({ note }) {
   const segs = note ? note.node.path.split('/') : [];
 
   return html`
     <div class="reader">
-      <header class=${'reader-head' + (note ? '' : ' empty')}>
-        <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
-        ${note
-          ? html`<nav class="crumbs">
-              ${segs.map((seg, i) => html`
-                <span key=${i}>${i > 0 && html`<span class="crumb-sep">/</span>`}
-                  <span class=${i === segs.length - 1 ? 'crumb last' : 'crumb'}>${seg}</span></span>`)}
-            </nav>`
-          : html`<span class="crumb head-brand">Notes</span>`}
-        <span class="spacer"></span>
-        <${AppSettings} />
-      </header>
+      <${NotesReaderHeader} note=${note} />
 
       ${note
         ? html`<${NoteView} note=${note} />`
-        : html`
-          <div class="reader-empty">
-            <${Empty} icon="mdi:file-document-outline" title="No note open"
-              hint=${app.lib.sources.value.length ? 'Choose a note to start reading.'
-                                              : 'Open a folder of Markdown files to get started.'}
-              action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='mdi:folder-plus-outline' onClick=${addFolder} />`} />
-          </div>`}
+        : html`<div class="reader-empty">
+            <${Empty}
+              icon="mdi:file-document-outline"
+              title="No note open"
+                 hint=${app.lib.sources.value.length ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.'}
+              action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`}
+            />
+          </div>`
+      }
     </div>`;
 }
 
@@ -341,17 +349,18 @@ function navigateRelative (from, href) {
   const tree   = app.lib.trees.value[from.sourceId];
   const node   = tree && findByPath(tree, target);
   if (node) openNote(from.sourceId, node);
-  else toast.error('Linked note not found');
+  else app.toast({ error: 'Linked note not found' });
 }
 
 // :::::: ACTIONS
 
 async function addFolder () {
-  if (!fs.supported()) { toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.'); return; }
+  if (!fs.supported()) { app.toast({ error: 'This browser can’t open folders — try Chrome, Edge or another Chromium browser.' }); return; }
   try {
     const rec = await app.lib.addFolder();
-    if (rec) toast.success(`Opened ${rec.name}`);
-  } catch (err) { toast.error(err.message); }
+    if (rec) app.toast({ success: `Opened ${rec.name}` });
+  } 
+  catch (error) { app.toast({ error }); }
 }
 
 // :::::: APP
@@ -370,7 +379,8 @@ function App () {
       <${Sidebar} />
       ${app.state.isNavOpen && html`<div class="scrim-mobile" onClick=${() => app.state.isNavOpen = false}></div>`}
       <main id="app-main"><${Reader} /></main>
-    <//>`;
+    <//>
+  `;
 }
 
 // :::::: BOOT
