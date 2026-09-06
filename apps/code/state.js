@@ -9,11 +9,22 @@
 
 import { signal } from '@aufbau/signals';
 import { stored } from '/.shared/js/app/signals.js';
+import zugriff    from '/.shared/js/runtime.js';
 
 import commands   from './commands.js';
 import editor     from './editor.js';
 import fs         from './fs.js';
 import * as github from './github.js';
+
+// the shared runtime builds this app's base reactive state as zugriff.app.state
+// (theme/font/dir/lang/title/dialog/route), persisted per-leaf under `zugriff:code:`
+// and wired to the shared DOM effects (applyTheme, webfonts, …). the code app builds
+// ON TOP of it: the shared leaves stay the single source of truth — theme in
+// particular drives the shared applyTheme (incl. the boot colour cache that avoids a
+// FOUC) — and this module only adds the app's own chrome config below. importing the
+// runtime module directly (rather than reading the window global) makes the boot order
+// explicit — this module evaluates after runtime.js has finished.
+const app = zugriff.app;
 
 // ── methods ──────────────────────────────────────────────────────────────────
 
@@ -24,21 +35,7 @@ const methods = {
   toggleSignal : sig => (sig.value = !sig.value),
 };
 
-const state = { commands, editor, fs, github, ...methods };
-
-// the shared runtime builds this app's base reactive state as zugriff.app.state
-// (theme/font/dir/lang/title/dialog/route), persisted per-leaf under `zugriff:code:`
-// and wired to the shared DOM effects (applyTheme, webfonts, …). the code app builds
-// ON TOP of it: the shared leaves stay the single source of truth — theme in
-// particular drives the shared applyTheme (incl. the boot colour cache that avoids a
-// FOUC) — and this module only adds the app's own chrome config below.
-//
-// read LAZILY: boot.js starts runtime.js via a non-awaited dynamic import, and
-// runtime.js only assigns globalThis.zugriff after its own top-level awaits. this
-// module is evaluated early in app.js's import graph, before that assignment lands, so
-// reading zugriff at load time throws. the getter defers the read to first use (render
-// / effect time), by which point the runtime has booted.
-Object.defineProperty(state, 'app', { enumerable: true, get: () => zugriff.app });
+const state = { app, commands, editor, fs, github, ...methods };
 
 // ── UI configuration / panel state (persisted) ───────────────────────────────
 
