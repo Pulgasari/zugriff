@@ -11,7 +11,7 @@
 //export * from '@aufbau/kits/preact-htm';   // html, preact, render, str, signal, computed, effect, Fragment, hooks
 
 // aufbau
-export { default as aufbau } from '@aufbau/runtime';
+//export { default as aufbau } from '@aufbau/runtime';
 
 // ::: pulgasari utils
 export * from '@pulgasari/is';
