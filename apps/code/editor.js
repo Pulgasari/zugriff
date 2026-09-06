@@ -1,15 +1,8 @@
 // apps/code/editor.js
-//
-// the editor's own state: the Monaco construction options (persisted as one
-// object) plus the Monaco theme catalogue and the loader that pulls a theme's
-// json in on demand. this is the port of the old js/editor.js — where that used
-// preact-x's deepSignalWithStorage, here the whole options object lives in a
-// single `stored()` signal and the update/toggle helpers rewrite it immutably.
-//
 // https://microsoft.github.io/monaco-editor/docs.html
 // https://github.com/brijeshb42/monaco-themes
 
-import { stored } from '/.shared/js/lib/signals.js';
+import { local, signal } from '@aufbau/signals';
 
 // ── Monaco theme catalogue ───────────────────────────────────────────────────
 
@@ -109,8 +102,13 @@ const DEFAULTS = {
 // a single signal holding the whole options object; `stored` hydrates it from
 // localStorage and writes every change back. we merge over DEFAULTS so options
 // added in a later version appear for users who already have a saved object.
-const config = stored({ ...DEFAULTS }, 'code:editor-config');
-config.value = { ...DEFAULTS, ...config.value, minimap: { ...DEFAULTS.minimap, ...(config.value.minimap ?? {}) } };
+const config = signal({
+  deep   : true,
+  nested : true,
+  key    : 'code:editor-config',
+  store  : local,
+  value  : DEFAULTS,
+});
 
 // ── option helpers (immutable rewrites of the object) ────────────────────────
 
@@ -175,7 +173,7 @@ const updateTheme = async (themeKey) => {
 };
 
 const editor = {
-  config,                 // the whole-options signal
+  config, // the whole-options signal
   get, set, updateConfig, toggleConfig,
   updateTheme,
   themes,
