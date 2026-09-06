@@ -1,6 +1,5 @@
-// apps/code/components/Browser.js — placeholder preview pane (not yet built out).
-
-import { html } from '@aufbau/kits/preact-htm';
+// apps/code/components/Browser.js
+// — placeholder preview pane (not yet built out).
 
 export default function Browser () {
   return html`<div id="browser">Browser</div>`;
