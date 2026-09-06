@@ -1,7 +1,8 @@
 // apps/code/components/FileBrowser.js
 // the modal that grants / restores a workspace folder and renders its tree.
 
-import { html, signal, useEffect } from '@aufbau/kits/preact-htm';
+import { html, useEffect } from './../vendors.js';
+import { signal }          from '@aufbau/signals';
 import state    from './../state.js';
 import fs       from './../fs.js';
 import * as fsaccess from '/.shared/js/filesystem/fsaccess.js';   // picks via the platform seam (browser picker or native SAF)

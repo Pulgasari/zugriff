@@ -4,7 +4,7 @@
 // public repos can also be pinned by owner/name and browsed read-only, with or
 // without a token.
 
-import { html, useState, useEffect } from '@aufbau/kits/preact-htm';
+import { html, useState, useEffect } from './../vendors.js';
 import * as github from './../github.js';
 import { clipboard, version, bump, ask, validName } from './../treeops.js';
 import state from './../state.js';

@@ -1,6 +1,6 @@
 // apps/code/components/KeyboardButton.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import Icon from './Icon.js';
 
 export default function KeyboardButton ({ keyValue, icon, label, className = '', active = false, disabled = false, onAction }) {

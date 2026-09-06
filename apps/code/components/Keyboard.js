@@ -4,7 +4,7 @@
 // supports it, suppresses the native Android keyboard via the VirtualKeyboard
 // API. layout is German by default (the app's origin), symbols on top.
 
-import { html, useState, useEffect } from '@aufbau/kits/preact-htm';
+import { html, useState, useEffect } from './../vendors.js';
 import state from './../state.js';
 import KeyboardButton from './KeyboardButton.js';
 

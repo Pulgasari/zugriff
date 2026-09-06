@@ -2,7 +2,7 @@
 // a small "⋯" popover menu used on every tree row. `items` is a list of
 // { label, icon, onClick, danger } (falsy entries are skipped).
 
-import { html, useState } from '@aufbau/kits/preact-htm';
+import { html, useState } from './../vendors.js';
 import Icon from './Icon.js';
 
 export default function RowMenu ({ items }) {

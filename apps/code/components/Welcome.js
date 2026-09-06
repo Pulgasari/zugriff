@@ -1,7 +1,7 @@
 // apps/code/components/Welcome.js
 // shown in the editor pane when no file is open.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import state from './../state.js';
 import Icon  from './Icon.js';
 

@@ -5,7 +5,7 @@
 // containing directory handle). after any change treeops.bump('local') fires so
 // every open folder reloads.
 
-import { html, useState, useEffect } from '@aufbau/kits/preact-htm';
+import { html, useState, useEffect } from './../vendors.js';
 import state from './../state.js';
 import * as fsops from './../fsops.js';
 import { clipboard, version, bump, ask, validName } from './../treeops.js';

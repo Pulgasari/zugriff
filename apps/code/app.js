@@ -37,8 +37,9 @@ const $root = document.documentElement;
 // app chrome font size (drives --fontSize in app.css)
 effect(() => $root.style.setProperty('--fontSize', `${state.config.fontSize.value}px`));
 
-// app theme — one of the shared presets; overrides the boot default
-effect(() => { $root.dataset.theme = state.config.theme.value; });
+// theme is driven by the shared applyTheme effect off app.state.theme (see
+// .shared/js/app/state.js) — it sets data-theme and refreshes the boot colour
+// cache, so the app doesn't wire its own theme effect anymore.
 
 // native (Android) keyboard: hidden while the code keyboard is up,
 // or when the user has forced it off in settings

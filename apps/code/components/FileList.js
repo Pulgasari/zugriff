@@ -1,7 +1,7 @@
 // apps/code/components/FileList.js
 // the open-file tabs.
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import state from './../state.js';
 import Icon  from './Icon.js';
 

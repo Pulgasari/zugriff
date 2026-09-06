@@ -1,6 +1,6 @@
 // apps/code/components/Toggle.js
 
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from './../vendors.js';
 import Icon from './Icon.js';
 
 export default function Toggle ({ value = false, onChange, label, size = '32' }) {
