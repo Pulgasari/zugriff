@@ -3,30 +3,32 @@
 // :::::: IMPORTS
 
 // ::: vendors
-import { html, effect } from '@aufbau/kits/preact-htm';
+import { effect } from '@aufbau/signals';
 
 // ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('code');
-import { Prompt }       from '/.shared/js/components/index.js';
+const app = zugriff.app;
+import { Prompt } from '/.shared/js/components/Prompt.js';
 
 // ::: local — state first (it wires commands/editor/fs together)
 import * as github from './github.js';
 import state       from './state.js';
 
-import Statusbar   from './components/Statusbar.js';
-import FileList    from './components/FileList.js';
-import Editor      from './components/Editor.js';
-import Toolbar     from './components/Toolbar.js';
-import Dock        from './components/Dock.js';
+// ::: local components
 import Browser     from './components/Browser.js';
 import Commands    from './components/Commands.js';
+import Dock        from './components/Dock.js';
+import Editor      from './components/Editor.js';
 import FileBrowser from './components/FileBrowser.js';
+import FileList    from './components/FileList.js';
 import GitHub      from './components/GitHub.js';
+import Keyboard    from './components/Keyboard.js';
 import Plugins     from './components/Plugins.js';
 import Settings    from './components/Settings.js';
+import Statusbar   from './components/Statusbar.js';
+import Toolbar     from './components/Toolbar.js';
 import Workspace   from './components/Workspace.js';
-import Keyboard, { disableAndroidKeyboard, enableAndroidKeyboard } from './components/Keyboard.js';
+import { disableAndroidKeyboard } from './components/Keyboard.js';
+import {  enableAndroidKeyboard } from './components/Keyboard.js';
 
 // :::::: EFFECTS
 
@@ -57,7 +59,7 @@ function App () {
 
   return html`
     <div id="workspace">
-      ${cfg.showBrowser.value  && html`<${Browser} />`}
+      ${cfg.showBrowser.value   && html`<${Browser} />`}
       ${cfg.showStatusbar.value && html`<${Statusbar} />`}
       <${FileList} />
       <${Editor} />
