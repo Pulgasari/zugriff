@@ -88,9 +88,11 @@ import { createState } from './app/state.js';
 import { toast }       from './app/toast.js';
 import * as pwa        from './app/pwa.js';
 
-import { registry } from './data/apps.js';
-import { aufbau, html, render } from './vendors.js';
-import Shell from './components/Shell.js';
+import { registry }     from './data/apps.js';
+import { html, render } from './vendors.js';
+import Shell            from './components/Shell.js';
+
+import aufbau from '@aufbau/runtime';
 
 // import * as pwa  from './app/pwa.js';
 // import { toast } from './app/toast.js';
