@@ -15,15 +15,6 @@ import editor     from './editor.js';
 import fs         from './fs.js';
 import * as github from './github.js';
 
-// the shared runtime already builds this app's base reactive state as
-// zugriff.app.state (theme/font/dir/lang/title/dialog/route), persisted per-leaf
-// under `zugriff:code:` and wired to the shared DOM effects (applyTheme, webfonts,
-// …). the code app builds ON TOP of it: the shared leaves stay the single source
-// of truth — theme in particular drives the shared applyTheme (incl. the boot
-// colour cache used to avoid a FOUC) — and this module only adds the app's own
-// chrome config as extra persisted signals.
-const app = zugriff.app;
-
 // ── methods ──────────────────────────────────────────────────────────────────
 
 const methods = {
@@ -33,7 +24,21 @@ const methods = {
   toggleSignal : sig => (sig.value = !sig.value),
 };
 
-const state = { app, commands, editor, fs, github, ...methods };
+const state = { commands, editor, fs, github, ...methods };
+
+// the shared runtime builds this app's base reactive state as zugriff.app.state
+// (theme/font/dir/lang/title/dialog/route), persisted per-leaf under `zugriff:code:`
+// and wired to the shared DOM effects (applyTheme, webfonts, …). the code app builds
+// ON TOP of it: the shared leaves stay the single source of truth — theme in
+// particular drives the shared applyTheme (incl. the boot colour cache that avoids a
+// FOUC) — and this module only adds the app's own chrome config below.
+//
+// read LAZILY: boot.js starts runtime.js via a non-awaited dynamic import, and
+// runtime.js only assigns globalThis.zugriff after its own top-level awaits. this
+// module is evaluated early in app.js's import graph, before that assignment lands, so
+// reading zugriff at load time throws. the getter defers the read to first use (render
+// / effect time), by which point the runtime has booted.
+Object.defineProperty(state, 'app', { enumerable: true, get: () => zugriff.app });
 
 // ── UI configuration / panel state (persisted) ───────────────────────────────
 
