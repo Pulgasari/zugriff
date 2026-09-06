@@ -47,6 +47,7 @@ export const icons = {
   'lineheight'        : 'material-symbols:format-line-spacing',
   'loading'           : 'svg-spinners:bars-scale-middle',
   'menu'              : 'mdi:menu',
+  'notes'             : 'mdi:file-document-outline',
   'open-in-new'       : 'mdi:open-in-new',
   'paste'             : 'material-symbols:content-paste',
   'pause'             : 'mdi:pause',
