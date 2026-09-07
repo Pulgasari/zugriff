@@ -17,7 +17,7 @@ export default function EpisodeRow ({ episode, showPodcast = false }) {
   const teaser  = plain(episode.description).slice(0, 200);
 
   return html`
-    <div class=${'ep' + (st.done ? ' done' : '') + (player.current.value?.id === episode.id ? ' playing' : '')}>
+    <div class=${'ep' + (st.done ? ' done' : '') + (player.episode?.id === episode.id ? ' playing' : '')}>
       <button class="ep-art" onClick=${() => go('episode', episode.id)} aria-label="Open episode">
         <${Art} src=${episode.image || podcast?.image} size=${48} />
       </button>

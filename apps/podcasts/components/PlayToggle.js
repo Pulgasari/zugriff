@@ -7,9 +7,9 @@ const app = zugriff.app;
 const { player } = app;
 
 export default function PlayToggle ({ episode, size = 20 }) {
-  const isCurrent = player.current.value?.id === episode.id;
-  const isPlaying = isCurrent && player.playing.value;
-  const icon = isCurrent && player.waiting.value ? 'svg-spinners:bars-scale-middle'
+  const isCurrent = player.episode?.id === episode.id;
+  const isPlaying = isCurrent && player.isPlaying;
+  const icon = isCurrent && player.isWaiting ? 'svg-spinners:bars-scale-middle'
              : isPlaying ? 'mdi:pause' : 'mdi:play';
   return html`
     <button class=${'play-toggle' + (isCurrent ? ' current' : '')}

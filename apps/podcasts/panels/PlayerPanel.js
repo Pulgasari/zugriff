@@ -12,15 +12,15 @@ const app = zugriff.app;
 const { db, player } = app;
 
 export default function PlayerPanel () {
-  const ep = player.current.value;
+  const ep = player.episode;
   if (!ep) return null;
 
   const podcast = db.podcastById.value[ep.podcastId];
-  const dur     = player.duration.value || ep.duration || 0;
-  const t       = player.time.value;
+  const dur     = player.duration || ep.duration || 0;
+  const t       = player.time;
 
   const cycleRate = () => {
-    const i = RATES.indexOf(player.rate.value);
+    const i = RATES.indexOf(player.rate);
     player.setRate(RATES[(i + 1) % RATES.length] ?? 1);
   };
 
@@ -36,8 +36,8 @@ export default function PlayerPanel () {
 
       <div class="pl-controls">
         <${IconButton} icon="mdi:rewind-15" label="Back 15s" size=${22} onClick=${() => player.skip(-15)} />
-        <button class="pl-play" title=${player.playing.value ? 'Pause' : 'Play'} onClick=${player.toggle}>
-          <${Icon} name=${player.waiting.value ? 'svg-spinners:bars-scale-middle' : player.playing.value ? 'mdi:pause' : 'mdi:play'} />
+        <button class="pl-play" title=${player.isPlaying ? 'Pause' : 'Play'} onClick=${player.toggle}>
+          <${Icon} name=${player.isWaiting ? 'svg-spinners:bars-scale-middle' : player.isPlaying ? 'mdi:pause' : 'mdi:play'} />
         </button>
         <${IconButton} icon="mdi:fast-forward-30" label="Forward 30s" size=${22} onClick=${() => player.skip(30)} />
       </div>
@@ -50,10 +50,10 @@ export default function PlayerPanel () {
       </div>
 
       <div class="pl-right">
-        <button class="rate" title="Playback speed" onClick=${cycleRate}>${player.rate.value}×</button>
+        <button class="rate" title="Playback speed" onClick=${cycleRate}>${player.rate}×</button>
         <${IconButton} icon=${db.stateOf(ep.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
                     label="Mark as done" active=${db.stateOf(ep.id).done} onClick=${() => db.toggleDone(ep.id)} />
-        <${IconButton} icon="mdi:close" label="Close player" onClick=${() => { player.pause(); player.current.value = null; }} />
+        <${IconButton} icon="mdi:close" label="Close player" onClick=${() => player.close()} />
       </div>
     </footer>`;
 }

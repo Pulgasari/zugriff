@@ -25,8 +25,8 @@ export default function EpisodeDetailView ({ id }) {
   const dur     = st.duration || episode.duration || 0;
   const pct     = st.done ? 100 : (dur && st.position ? Math.min(100, (st.position / dur) * 100) : 0);
 
-  const isCurrent = player.current.value?.id === id;
-  const isPlaying = isCurrent && player.playing.value;
+  const isCurrent = player.episode?.id === id;
+  const isPlaying = isCurrent && player.isPlaying;
 
   return html`
     <div class="view">

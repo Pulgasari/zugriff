@@ -70,8 +70,11 @@ destructuring the stable module refs); shared components load from
   rarely send CORS headers, so it tries a direct request first and falls back to
   a CORS proxy whose URL you set in **Settings**.
 - **`modules/player.js`** — one `<audio>` element lifted out of the component
-  tree so it survives navigation, with its state mirrored into signals and the
-  position written back to the db as it plays.
+  tree so it survives navigation, with the position written back to the db as it
+  plays. its state is held in signals internally but the public surface
+  (`app.player`) is a `.value`-free facade of getters + methods: `app.player.episode`,
+  `.time`, `.duration`, `.isPlaying` / `.isWaiting` / `.status`, and `play()` /
+  `toggle()` / `close()` / `skip()` / `setRate()`.
 - **`modules/methods.js`** — pure view helpers (formatting, html→text, the
   list filters/sorts).
 

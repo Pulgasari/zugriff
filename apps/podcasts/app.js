@@ -16,7 +16,7 @@ import { createThumbCache } from '/.shared/js/thumbs.js';
 
 // ::: app modules
 import * as db          from './modules/db.js';
-import * as player      from './modules/player.js';
+import player           from './modules/player.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
 // ::: the app handle
@@ -88,7 +88,7 @@ app.actions = {
   'skip-forward'  : () => app.player.skip(30),
 };
 
-const hasPlayer = () => !!app.player.current.value;
+const hasPlayer = () => !!app.player.episode;
 app.hotkeys
   .bind('escape',     'close-dialog',  { when: () => !!app.state.dialog })
   .bind(' ',          'toggle-play',   { when: hasPlayer })
