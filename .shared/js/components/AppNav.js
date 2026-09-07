@@ -1,7 +1,7 @@
 // AppNav.js
 
-import { html } from './../vendors.js';
-import Button   from './Button.js';
+//import { html } from './../vendors.js';
+import Button from './Button.js';
 
 const items = [
   { title: 'Episodes', icon: 'mdi:playlist-play',     route: 'episodes' },
