@@ -1,12 +1,10 @@
 // apps/podcasts/app.js
-// the podcasts app assembled on the shared handle. the runtime binds zugriff (+
-// zugriff.app, html) to window before this runs, so nothing here imports the runtime.
-// this file hangs the app's modules on the handle (app.db / player / thumbs), seeds its
-// state on app.state, registers its actions + hotkeys, loads the views / panels /
-// components and mounts. the ui is split into:
-//   views/    routed main content (Latest, Podcasts, detail, Saved)
-//   panels/   chrome + overlays (Sidebar, Player, Search dock, Add/Settings dialogs)
-//   components/ small reusable pieces (rows, cards, artwork, …)
+
+/*
+1. unnötige ellenlange kommentare entfernt
+2. `app.flash` entfernt -> sinnloser wrapper um app.toast
+   (und diese bekloppte "err/ok" muster aus go, rust und co führ ich erst recht nich ein)   
+*/
 
 // ::: vendors
 import { useEffect } from 'preact/hooks';
@@ -16,30 +14,25 @@ import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
 // ::: app modules
-import * as db          from './modules/db.js';
-import player           from './modules/player.js';
+import * as db           from './modules/db.js';
+import player            from './modules/player.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
 // ::: the app handle
 const app = zugriff.app;
-
 app.db     = db;
 app.player = player;
 
-// :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::::
-// ephemeral ui state on the shared deep signal (app.state) — no `.value`, read/written
-// directly, read INSIDE render to stay reactive (never destructure at module top).
-// durable prefs live in their own typed store (app.settings) below.
+// :::::: META :::::::::::::::::::::::::::::::::::::::::::::::::
 
-app.state.route  = { name: 'latest', id: null };   // { name, id }
-app.state.search = '';                             // shared episode filter
-app.state.dialog = null;                           // 'add' | 'settings' | null
-app.state.busy   = '';                             // a label while a long task runs
-
-// durable preferences — a typed, `.value`-free store (enum leaves reject off-list writes),
-// persisted as one blob under zugriff:podcasts:settings. its own store (not an app.state
-// subtree) because typedSignal persistence is whole-store while app.state stays ephemeral.
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
+
+// :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::::
+
+app.state.route  = { name: 'latest', id: null }; // { name, id }
+app.state.search = '';   // shared episode filter
+app.state.dialog = null; // 'add' | 'settings' | null
+app.state.busy   = '';   // a label while a long task runs
 
 app.settings = typedSignal({
   podcastSort : oneOf(['recent', 'alpha'], 'recent'),
@@ -60,49 +53,52 @@ const buildResizer = (url, w) => {
 app.thumbs = createThumbCache({ resizer: buildResizer });
 
 // ::: navigation + toast — navigating always clears the current filter
-app.go    = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
+app.go    = (name, id)          => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
 app.flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
-// :::::: ACTIONS + HOTKEYS ::::::::::::::::::::::::::::::::::
-// named behaviours the ui and the keyboard share (see .shared/js/modules/actions.js)
+// :::::: ACTIONS
 
 async function refreshAll () {
   if (!app.db.podcasts.value.length) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
     const results = await app.db.refreshAll(app.settings.proxy, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
-    const added  = results.reduce((sum, r) => sum + (r.added || 0), 0);
-    const failed = results.filter(r => r.error).length;
-    app.flash(added ? `${added} new episode${added === 1 ? '' : 's'}` + (failed ? `, ${failed} feed${failed === 1 ? '' : 's'} failed` : '')
-                    : failed ? `${failed} feed${failed === 1 ? '' : 's'} failed` : 'Everything up to date',
-              failed ? 'err' : 'ok');
+    const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
+    const failed  = results.filter(r => r.error).length;
+    const message = `${added} new episode(s)` + `, ${failed} feed(s) failed` + 'Everything up to date';
+    app.toast(message);
   } finally { app.state.busy = ''; }
 }
 
 app.actions = {
+  'close-dialog'  : () => app.state.dialog = null,
+  
   'refresh-all'   : refreshAll,
   'add-podcast'   : () => app.state.dialog = 'add',
   'open-settings' : () => app.state.dialog = 'settings',
-  'close-dialog'  : () => app.state.dialog = null,
+  
   'toggle-play'   : () => app.player.toggle(),
   'skip-back'     : () => app.player.skip(-15),
   'skip-forward'  : () => app.player.skip(30),
 };
 
+// :::::: HOTKEYS
+
 const hasPlayer = () => !!app.player.episode;
-app.hotkeys
-  .bind('escape',     'close-dialog',  { when: () => !!app.state.dialog })
-  .bind(' ',          'toggle-play',   { when: hasPlayer })
-  .bind('arrowleft',  'skip-back',     { when: hasPlayer })
-  .bind('arrowright', 'skip-forward',  { when: hasPlayer });
+app.hotKeys = {
+  'ctrl + s'    : { action: 'toggle-settings' },
+  
+  'space'       : { action: 'toggle-play', when: hasPlayer },
+  'arrow-left'  : { action: 'skip-back',   when: hasPlayer },
+  'arrow-right' : { action: 'skip-back',   when: hasPlayer },
+};
 
 // :::::: EFFECTS ::::::::::::::::::::::::::::::::::::::::::::
 // the frame reads menu/player placement off #app's data-attributes; keep them in sync
 // so the layout responds without an extra wrapper element
 
 app.effect(() => {
-  const el = document.getElementById('app');
-  if (!el) return;
+  const el = document.getElementById('app'); if (!el) return;
   el.dataset.menu   = app.settings.menuPos;
   el.dataset.player = app.settings.playerPos;
 });
@@ -117,7 +113,7 @@ LatestView         = await app.view('LatestView'),
 PodcastsView       = await app.view('PodcastsView'),
 PodcastDetailView  = await app.view('PodcastDetailView'),
 EpisodeDetailView  = await app.view('EpisodeDetailView'),
-SavedView          = await app.view('SavedView');
+SavedView          = await app.view('SavedVi,ew');
 
 const // panels
 SidebarPanel    = await app.panel('SidebarPanel'),
@@ -157,11 +153,10 @@ function App () {
   if (!app.db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   const dialog = app.state.dialog;
-  return html`
-    <>
+  return html`<>
       <div id="app-main">
         <${SidebarPanel} />
-        <main class="main"><${Body} /></main>
+        <main><${Body} /></main>
       </div>
       <${PlayerPanel} />
       ${dialog === 'add'      && html`<${AddPodcastPanel} />`}
