@@ -1,16 +1,49 @@
 // apps/podcasts/app.js
 
-// :::::: IMPORTS
+// :::::: IMPORT
+import { computed, effect, signal } from '@aufbau/signals';
+import { useSignal }                from '@aufbau/signals/hooks';
+import { useEffect, useRef }        from 'preact';
 
-// ::: vendors
-import aufbau, { html, preact, effect } from '@aufbau/kits/preact-htm';
-//const { signal } = aufbau;
-const { computed, signal, useEffect, useRef, useSignal, Fragment } = preact;
+import { 
+  fmtDate, fmtDuration, 
+  plain, paragraphs,
+  filterEpisodes, sortEpisodes, sortPodcasts,
+} from './methods.js';
+
+const // :::::: COMPONENTS (SHARED) ::::::::::::::::::
+Button      = await zugriff.component('Button'),
+Empty       = await zugriff.component('Empty'),
+Icon        = await zugriff.component('Icon'),
+IconButton  = await zugriff.component('IconButton'),
+Settings    = await zugriff.component('Settings');
+
+const // :::::: COMPONENTS ::::::::::::::::::::::::::
+Artwork        = await app.component('Artwork'),
+EpisodeRow     = await app.component('EpisodeRow'),
+NavItem        = await app.component('NavItem'),
+PlayToggle     = await app.component('PlayToggle'),
+PodcastCard    = await app.component('PodcastCard'),
+PodcastListRow = await app.component('PodcastListRow'),
+ProgressBar    = await app.component('ProgressBar'),
+Scrim          = await app.component('Scrim'),
+SortPicker     = await app.component('SortPicker');
+
+const // :::::: PANELS ::::::::::::::::::::::::::::::
+AddPodcastPanel = await app.panel('AddPodcastPanel'),
+PlayerBar       = await app.panel('PlayerBar'),
+SearchPanel     = await app.panel('SearchPanel'),
+Sidebar         = await app.panel('Sidebar');
+
+const // :::::: VIEWS :::::::::::::::::::::::::::::::
+EpisodeDetailView   = await app.view('LatestView'),
+LatestView          = await app.view('LatestView'),
+EpisodePodcastView  = await app.view('LatestView'),
+PodcastsView        = await app.view('PodcastsView'),
+SavedView           = await app.view('SavedView'),
+SettingsView        = await app.view('SettingsView');
 
 // ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('podcasts');
-import { Icon, IconButton, Button, Empty, AppSettings } from '/.shared/js/components/index.js';
 import { stored }               from '/.shared/js/app/signals.js';
 import { createThumbCache }     from '/.shared/js/thumbs.js';
 
@@ -23,12 +56,17 @@ const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
 // :::::: SETTINGS (persisted signals) ::::::::::::::::::::::
 
-const view        = stored('grid',   'podcasts:view');           // grid | list
+// gehört nach PodcastsPanel intern
 const podcastSort = stored('recent', 'podcasts:podcast-sort');   // recent | alpha
+const view        = stored('grid',   'podcasts:view');           // grid | list
+
+// gehört nach EpisodesPanel intern
 const episodeSort = stored('newest', 'podcasts:episode-sort');   // newest | oldest | alpha
-const proxy       = stored(DEFAULT_PROXY, 'podcasts:proxy');
+
+// gehört zum app.state bzw SettingsPanel
 const menuPos     = stored('bottom', 'podcasts:menu-pos');       // top | bottom | left | right
 const playerPos   = stored('bottom', 'podcasts:player-pos');     // top | bottom
+const proxy       = stored(DEFAULT_PROXY, 'podcasts:proxy');
 const imgResizer  = stored(DEFAULT_IMG_RESIZER, 'podcasts:img-resizer');
 
 function buildResizer (url, w) {
@@ -57,36 +95,9 @@ const busy     = signal('');                   // a label while a long task runs
 
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
-import { 
-  fmtDate, fmtDuration, 
-  plain, paragraphs,
-  filterEpisodes, sortEpisodes, sortPodcasts,
-} from './methods.js';
 
-const // :::::: COMPONENTS ::::::::::::::::::::::::::
-Artwork        = await app.component('Artwork'),
-EpisodeRow     = await app.component('EpisodeRow'),
-NavItem        = await app.component('NavItem'),
-PlayToggle     = await app.component('PlayToggle'),
-PodcastCard    = await app.component('PodcastCard'),
-PodcastListRow = await app.component('PodcastListRow'),
-ProgressBar    = await app.component('ProgressBar'),
-Scrim          = await app.component('Scrim'),
-SortPicker     = await app.component('SortPicker');
 
-const // :::::: PANELS ::::::::::::::::::::::::::::::
-AddPodcastPanel = await app.component('AddPodcastPanel'),
-PlayerBar       = await app.component('PlayerBar'),
-SearchPanel     = await app.panel('SearchPanel'),
-Sidebar         = await app.component('Sidebar');
 
-const // :::::: VIEWS :::::::::::::::::::::::::::::::
-EpisodeDetailView   = await app.view('LatestView'),
-LatestView          = await app.view('LatestView'),
-EpisodePodcastView  = await app.view('LatestView'),
-PodcastsView        = await app.view('PodcastsView'),
-SavedView           = await app.view('SavedView'),
-SettingsView        = await app.view('SettingsView');
 
 // :::::: BUSY BAR :::::::::::::::::::::::::::::::::::::::::::
 
