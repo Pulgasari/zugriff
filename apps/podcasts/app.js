@@ -11,7 +11,9 @@ vermutlich als:
 /.shared/modules/hotkeys.js
 /.shared/modules/triggers.js
 
-der sinn dahinter ist bzgl triggers ist:
+(vllt wäre der name 'actions' besser für 'triggers' ???)
+
+der zweck von 'triggers' ist:
 1. reduzierung von boilerplate von standardzeug, dass sich fast jede app teilt
 2. app bekommt sauberes (optionales) system um ...
 3. zusätzlich ibtegriert es sich super mit hotkeys
@@ -19,7 +21,27 @@ der sinn dahinter ist bzgl triggers ist:
 der zweck von 'hotkeys':
 1. handy möglichkeit um mit keyboaord iwas in app zu machen
 2. tastencode + callback-function oder trigger-id
+(in `zugriff/.shared/js/modules/hotkeys.js` habe hierfür schon einen kleinen entwurf hinterlegt)   
 
+in der praxis stell ich mir das ungefähr so vor:
+
+zugriff.app.actions
+zugriff.app.hotkeys
+
+const app = zugriff.app;
+
+app.actions = {
+  refreshEpisodes : () => {...},
+  refreshPodcasts : () => {...},
+};
+
+app.actions.refreshEpisodes = () => {...};
+app.actions.refreshPodcasts = () => {...};
+
+app.action.add('refresh-episodes', () => {...});
+app.action.add('refresh-podcasts', () => {...});
+
+die keys sind canonical kebabcase, camelcase, snakecase
 
 */
 
