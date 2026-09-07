@@ -40,3 +40,29 @@ function paragraphs (htmlStr = '') {
     .map(s => s.trim())
     .filter(Boolean);
                 }
+
+
+// filter an episode list by the shared search query; `withPodcast` also matches
+// on the podcast title, for the mixed "latest" stream
+function filterEpisodes (list, withPodcast = false) {
+  const q = search.value.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(ep =>
+    ep.title.toLowerCase().includes(q) ||
+    (withPodcast && podcastById.value[ep.podcastId]?.title.toLowerCase().includes(q)));
+}
+
+const sortEpisodes = (list, mode) => [...list].sort((a, b) =>
+  mode === 'oldest' ? (a.pubDate || 0) - (b.pubDate || 0)
+  : mode === 'alpha' ? a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+  :                    (b.pubDate || 0) - (a.pubDate || 0));
+
+const sortPodcasts = (list, mode) => [...list].sort((a, b) =>
+  mode === 'alpha' ? a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
+  :                  (b.lastEpisodeAt || 0) - (a.lastEpisodeAt || 0));
+
+export { 
+  fmtDate, fmtDuration, 
+  plain, paragraphs,
+  filterEpisodes, sortEpisodes, sortPodcasts,
+};
