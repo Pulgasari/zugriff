@@ -54,16 +54,6 @@ const search   = signal('');                   // the episode filter, per view
 const dialog   = signal(null);                 // 'add' | 'settings' | null
 const busy     = signal('');                   // a label while a long task runs
 
-const flash = (text, kind = 'ok') =>
-  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
-
-// navigating always clears the current filter
-const go = (name, id) => { route.value = { name, id }; search.value = ''; };
-
-// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
-
-const podcastById = computed(() => Object.fromEntries(db.podcasts.value.map(p => [p.id, p])));
-const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e => [e.id, e])));
 
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
