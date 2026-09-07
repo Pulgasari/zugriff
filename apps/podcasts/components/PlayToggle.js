@@ -1,5 +1,12 @@
-// the play/pause control for one episode, reflecting the live player state
-function PlayToggle ({ episode, size = 20 }) {
+// apps/podcasts/components/PlayToggle.js
+// the play/pause control for one episode, reflecting the live player state.
+
+import Icon from '/.shared/js/components/Icon.js';
+
+const app = zugriff.app;
+const { player } = app;
+
+export default function PlayToggle ({ episode, size = 20 }) {
   const isCurrent = player.current.value?.id === episode.id;
   const isPlaying = isCurrent && player.playing.value;
   const icon = isCurrent && player.waiting.value ? 'svg-spinners:bars-scale-middle'
@@ -11,5 +18,3 @@ function PlayToggle ({ episode, size = 20 }) {
       <${Icon} name=${icon} />
     </button>`;
 }
-
-export default PlayToggle;

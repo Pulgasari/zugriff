@@ -1,14 +1,21 @@
-// podcasts :: components/PlayerBar.js
+// apps/podcasts/panels/PlayerPanel.js
+// the docked player bar — artwork/meta, transport, scrubber and speed/done/close.
+
+import Icon       from '/.shared/js/components/Icon.js';
+import IconButton from '/.shared/js/components/IconButton.js';
+import Art        from './../components/Artwork.js';
+import { fmtDuration } from './../modules/methods.js';
 
 const RATES = [0.8, 1, 1.2, 1.5, 1.75, 2];
 
 const app = zugriff.app;
+const { db, player } = app;
 
-export default function PlayerBar () {
+export default function PlayerPanel () {
   const ep = player.current.value;
   if (!ep) return null;
 
-  const podcast = podcastById.value[ep.podcastId];
+  const podcast = db.podcastById.value[ep.podcastId];
   const dur     = player.duration.value || ep.duration || 0;
   const t       = player.time.value;
 

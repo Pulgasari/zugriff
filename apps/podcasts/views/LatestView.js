@@ -1,10 +1,16 @@
-// podcasts :: views/LatestView.html
+// apps/podcasts/views/LatestView.js
+// the mixed "latest episodes" stream across all subscriptions.
 
-import Empty
-import EpisodeRow
-import Icon
-import IconButton
-import SearchBar
+import Empty      from '/.shared/js/components/Empty.js';
+import Icon       from '/.shared/js/components/Icon.js';
+import IconButton from '/.shared/js/components/IconButton.js';
+import EpisodeRow from './../components/EpisodeRow.js';
+import SearchBar  from './../panels/SearchPanel.js';
+import { filterEpisodes } from './../modules/methods.js';
+
+const app = zugriff.app;
+const { db } = app;
+const { busy, dialog, search } = app.ui;
 
 export default function LatestView () {
   const hasSubs = db.podcasts.value.length > 0;
@@ -18,7 +24,8 @@ export default function LatestView () {
       <div class="view-head">
         <h1>Latest episodes</h1>
         <div class="view-tools">
-          <${IconButton} icon="refresh" label="Refresh all feeds" onClick=${refreshAll} disabled=${!!busy.value} />
+          <${IconButton} icon="refresh" label="Refresh all feeds"
+                         onClick=${() => app.actions.run('refresh-all')} disabled=${!!busy.value} />
         </div>
       </div>
       ${!hasSubs

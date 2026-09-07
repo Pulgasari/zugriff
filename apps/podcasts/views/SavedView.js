@@ -1,4 +1,11 @@
-// podcasts :: SavedView.js
+// apps/podcasts/views/SavedView.js
+// the "listen later" list — every bookmarked episode, newest-saved first.
+
+import Empty      from '/.shared/js/components/Empty.js';
+import EpisodeRow from './../components/EpisodeRow.js';
+
+const app = zugriff.app;
+const { db } = app;
 
 export default function SavedView () {
   const list = db.savedEpisodes.value;

@@ -1,14 +1,25 @@
-// podcasts :: EpisodeDetailView.js
+// apps/podcasts/views/EpisodeDetailView.js
+// one episode: artwork, meta, actions and the full description.
 
-function EpisodeDetailView ({ id }) {
-  const episode = episodeById.value[id];
+import Empty      from '/.shared/js/components/Empty.js';
+import Icon       from '/.shared/js/components/Icon.js';
+import Button     from '/.shared/js/components/Button.js';
+import IconButton from '/.shared/js/components/IconButton.js';
+import Art        from './../components/Artwork.js';
+import { fmtDate, fmtDuration, paragraphs } from './../modules/methods.js';
+
+const app = zugriff.app;
+const { db, player, go } = app;
+
+export default function EpisodeDetailView ({ id }) {
+  const episode = db.episodeById.value[id];
   if (!episode) return html`
     <div class="view">
       <${Button} class="back" icon="arrow-left" label="Back" onClick=${() => go('latest')} />
       <${Empty} icon="mdi:alert-outline" title="Episode not found" />
     </div>`;
 
-  const podcast = podcastById.value[episode.podcastId];
+  const podcast = db.podcastById.value[episode.podcastId];
   const st      = db.stateOf(id);
   const paras   = paragraphs(episode.description);
   const dur     = st.duration || episode.duration || 0;
