@@ -10,7 +10,6 @@ import { filterEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
 const { db } = app;
-const { busy, dialog, search } = app.ui;
 
 export default function LatestView () {
   const hasSubs = db.podcasts.value.length > 0;
@@ -25,18 +24,18 @@ export default function LatestView () {
         <h1>Latest episodes</h1>
         <div class="view-tools">
           <${IconButton} icon="refresh" label="Refresh all feeds"
-                         onClick=${() => app.actions.run('refresh-all')} disabled=${!!busy.value} />
+                         onClick=${() => app.actions.run('refresh-all')} disabled=${!!app.state.busy} />
         </div>
       </div>
       ${!hasSubs
         ? html`<${Empty} icon="mdi:rss" title="No subscriptions yet"
                  hint="Add a podcast by its RSS feed URL to see its latest episodes here."
-                 action=${html`<button class="btn primary" onClick=${() => dialog.value = 'add'}>
+                 action=${html`<button class="btn primary" onClick=${() => app.state.dialog = 'add'}>
                    <${Icon} name="mdi:plus" /> Add a podcast</button>`} />`
         : !recent.length
-        ? html`<${Empty} icon=${search.value ? 'mdi:magnify-close' : 'mdi:playlist-remove'}
-                 title=${search.value ? 'Nothing matches your filter' : 'No episodes found'}
-                 hint=${search.value ? '' : 'Try refreshing your feeds.'} />`
+        ? html`<${Empty} icon=${app.state.search ? 'mdi:magnify-close' : 'mdi:playlist-remove'}
+                 title=${app.state.search ? 'Nothing matches your filter' : 'No episodes found'}
+                 hint=${app.state.search ? '' : 'Try refreshing your feeds.'} />`
         : html`<div class="ep-list">${recent.map(ep => html`<${EpisodeRow} episode=${ep} showPodcast key=${ep.id} />`)}</div>`}
     </div>
     ${hasSubs && html`<${SearchBar} placeholder="Filter episodes…" />`}

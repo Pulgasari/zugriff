@@ -11,37 +11,35 @@ import { sortPodcasts } from './../modules/methods.js';
 
 const app = zugriff.app;
 const { db } = app;
-const { dialog } = app.ui;
-const { podcastSort, view } = app.settings;
 
 export default function PodcastsView () {
-  const list = sortPodcasts(db.podcasts.value, podcastSort.value);
+  const list = sortPodcasts(db.podcasts.value, app.state.settings.podcastSort);
 
   return html`
     <div class="view">
       <div class="view-head">
         <h1>Podcasts</h1>
         <div class="view-tools">
-          <${SortPicker} value=${podcastSort.value} onChange=${v => podcastSort.value = v}
+          <${SortPicker} value=${app.state.settings.podcastSort} onChange=${v => app.state.settings.podcastSort = v}
              options=${[['recent', 'Recently updated'], ['alpha', 'A–Z']]} />
           <div class="seg">
-            <${IconButton} icon="viewmode-grid" label="Grid" active=${view.value === 'grid'} onClick=${() => view.value = 'grid'} />
-            <${IconButton} icon="viewmode-list" label="List" active=${view.value === 'list'} onClick=${() => view.value = 'list'} />
+            <${IconButton} icon="viewmode-grid" label="Grid" active=${app.state.settings.view === 'grid'} onClick=${() => app.state.settings.view = 'grid'} />
+            <${IconButton} icon="viewmode-list" label="List" active=${app.state.settings.view === 'list'} onClick=${() => app.state.settings.view = 'list'} />
           </div>
-          <${IconButton} icon="mdi:plus" label="Add podcast" onClick=${() => dialog.value = 'add'} />
+          <${IconButton} icon="mdi:plus" label="Add podcast" onClick=${() => app.state.dialog = 'add'} />
         </div>
       </div>
       ${!list.length
         ? html`<${Empty} icon="mdi:rss" title="No subscriptions yet"
                  hint="Paste a podcast's RSS feed URL to subscribe."
-                 action=${html`<button class="btn primary" onClick=${() => dialog.value = 'add'}>
+                 action=${html`<button class="btn primary" onClick=${() => app.state.dialog = 'add'}>
                    <${Icon} name="mdi:plus" /> Add a podcast</button>`} />`
         : html`
-          <aufbau-index class="pc-index" viewmode=${view.value}
-                        item-size="150px" gap=${view.value === 'grid' ? '1.25rem' : '0'}>
+          <aufbau-index class="pc-index" viewmode=${app.state.settings.view}
+                        item-size="150px" gap=${app.state.settings.view === 'grid' ? '1.25rem' : '0'}>
             ${list.map(p => html`
               <aufbau-item key=${p.id}>
-                ${view.value === 'grid'
+                ${app.state.settings.view === 'grid'
                   ? html`<${PodcastCard} podcast=${p} />`
                   : html`<${PodcastListRow} podcast=${p} />`}
               </aufbau-item>`)}

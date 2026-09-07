@@ -12,14 +12,12 @@ import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
 const { db, go, flash, thumbs } = app;
-const { busy } = app.ui;
-const { proxy, episodeSort } = app.settings;
 
 export default function PodcastDetailView ({ id }) {
   const podcast = db.podcastById.value[id];
   if (!podcast) return html`<${Empty} icon="mdi:alert-outline" title="Podcast not found" />`;
 
-  const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], episodeSort.value);
+  const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], app.state.settings.episodeSort);
   const eps = filterEpisodes(all, false);
   const doneCount = all.filter(e => db.stateOf(e.id).done).length;
 
@@ -33,12 +31,12 @@ export default function PodcastDetailView ({ id }) {
   };
 
   const refreshOne = async () => {
-    busy.value = 'Refreshing…';
+    app.state.busy = 'Refreshing…';
     try {
-      const { added } = await db.refresh(id, proxy.value);
+      const { added } = await db.refresh(id, app.state.settings.proxy);
       flash(added ? `${added} new episode${added === 1 ? '' : 's'}` : 'Up to date');
     } catch (err) { flash(err.message, 'err'); }
-    finally { busy.value = ''; }
+    finally { app.state.busy = ''; }
   };
 
   return html`
@@ -53,7 +51,7 @@ export default function PodcastDetailView ({ id }) {
           <div class="pd-stats">${eps.length} episodes · ${doneCount} done</div>
           ${podcast.description && html`<p class="pd-desc">${plain(podcast.description).slice(0, 400)}</p>`}
           <div class="pd-actions">
-            <button class="btn" onClick=${refreshOne} disabled=${!!busy.value}>
+            <button class="btn" onClick=${refreshOne} disabled=${!!app.state.busy}>
               <${Icon} name="mdi:refresh" /> Refresh</button>
             ${podcast.link && html`<a class="btn ghost" href=${podcast.link} target="_blank" rel="noopener">
               <${Icon} name="mdi:web" /> Website</a>`}
@@ -65,7 +63,7 @@ export default function PodcastDetailView ({ id }) {
 
       <div class="pd-tools">
         <span class="pd-tools-label">Episodes</span>
-        <${SortPicker} value=${episodeSort.value} onChange=${v => episodeSort.value = v}
+        <${SortPicker} value=${app.state.settings.episodeSort} onChange=${v => app.state.settings.episodeSort = v}
            options=${[['newest', 'Newest'], ['oldest', 'Oldest'], ['alpha', 'A–Z']]} />
       </div>
 
