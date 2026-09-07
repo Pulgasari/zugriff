@@ -1,8 +1,8 @@
 // apps/podcasts/app.js
 /*
-ich hab hier in erster linie erstmal bissl aufgeräumt, um einen überblicn zu verschaffen.  
-was wirb bei `code`neu eingeführt hattem an app-struktur gilt im prinzip auch hier.
-darüberhinaus ergaben sich noch ein paar weitere neuerungrn:
+ich hab hier in erster linie erstmal bissl aufgeräumt, um einen überblick zu verschaffen.  
+was wir bei `code` neu eingeführt hatten bzgl app-struktur gilt im prinzip auch hier.
+darüberhinaus ergaben sich noch ein paar weitere neuerungen:
 
 1. unterteilung in: views, panels, components
 
@@ -41,8 +41,105 @@ app.actions.refreshPodcasts = () => {...};
 app.action.add('refresh-episodes', () => {...});
 app.action.add('refresh-podcasts', () => {...});
 
-die keys sind canonical kebabcase, camelcase, snakecase
+die keys sind canonical kebabcase, camelcase, snakecase.
+ein passendes CanonicalMap klasse haben wir dafür auch schon:
+(importierbar als: `import CanonicalMap from '@pulgasari/canonicalmap';`)
 
+ich zitiere es hier nur damit du den inhalt kennst:
+===================================================
+// @pulgasari/canonicalmap
+
+import str from './str.js';
+
+const FORMS = {
+  camel    : str.toCamelCase,    // userProfileStatus
+  constant : str.toConstantCase, // USER_PROFILE_STATUS
+  kebab    : str.toKebabCase,    // user-profile-status
+  pascal   : str.toPascalCase,   // UserProfileStatus
+  snake    : str.toSnakeCase,    // user_profile_status
+};
+
+const toConverter = (form) => typeof form === 'function' ? form : FORMS[form];
+
+const toEntries = (source) =>
+    source == null                                  ? []
+  : typeof source[Symbol.iterator] === 'function'   ? source
+  : Object.entries(source);
+
+export class CanonicalMap extends Map {
+  constructor (source, forms = ['camel', 'kebab', 'snake']) {
+    super();
+
+    this.forms     = forms.map(toConverter).filter(Boolean);
+    if (!this.forms.length) this.forms = [FORMS.camel];
+    this.canonical = this.forms[0];
+    this.aliases   = new Map;
+    this.cache     = new Map;
+
+    for (const [key, value] of toEntries(source)) this.set(key, value);
+  }
+
+  static from (source, forms) {
+    return new CanonicalMap(source, forms);
+  }
+
+  key (rawKey) {
+    if (typeof rawKey !== 'string') return rawKey;
+
+    const alias = this.aliases.get(rawKey);
+    if (alias !== undefined) return alias;
+
+    const cached = this.cache.get(rawKey);
+    if (cached !== undefined) return cached;
+
+    const key = this.canonical(rawKey);
+    this.cache.set(rawKey, key);
+    return key;
+  }
+
+  set (rawKey, value) {
+    if (typeof rawKey !== 'string') return super.set(rawKey, value);
+
+    const key = this.aliases.get(rawKey) ?? this.canonical(rawKey);
+
+    if (!super.has(key)) {
+      this.aliases.set(rawKey, key);
+      for (const form of this.forms) this.aliases.set(form(key), key);
+    }
+
+    return super.set(key, value);
+  }
+
+  get (rawKey) { return super.get(this.key(rawKey)); }
+  has (rawKey) { return super.has(this.key(rawKey)); }
+
+  delete (rawKey) {
+    const key = this.key(rawKey);
+    for (const [alias, target] of this.aliases) if (target === key) this.aliases.delete(alias);
+    return super.delete(key);
+  }
+
+  clear () {
+    this.aliases.clear();
+    this.cache.clear();
+    return super.clear();
+  }
+
+  merge (source) {
+    for (const [key, value] of toEntries(source)) this.set(key, value);
+    return this;
+  }
+
+  toObject (form) {
+    const convert = form ? toConverter(form) : null;
+    const result  = {};
+    for (const [key, value] of this) result[convert ? convert(key) : key] = value;
+    return result;
+  }
+}
+
+export default CanonicalMap;
+===================================================
 */
 
 // :::::: IMPORT
