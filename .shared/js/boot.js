@@ -57,6 +57,7 @@ function applyTheme (theme) {
     }
 
     if (background) {
+      $root.style.background = 'var(--bg)';
       const meta = document.querySelector('meta[name="theme-color"]');
       if (meta) meta.content = background;
     }
@@ -110,10 +111,10 @@ function applyTheme (theme) {
   const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
   const $root = document.documentElement;
 
-  $root.classList.add('is-loading');
+  document.body.classList.add('is-loading');
   window.addEventListener('load', () => {
-    $root.classList.remove('is-loading');
-    $root.classList.add('is-ready');
+    document.body.classList.remove('is-loading');
+    document.body.classList.add('is-ready');
   });
 
   // Merge options: HTML data-attributes < global window config < default options
