@@ -46,6 +46,12 @@ einstiegspunkt: `app.html`
 
 # features
 
+## audio-manager
+- [ ] collections (scopes)
+- [ ] converter
+- [ ] editor
+- [ ] manager
+
 ## apps/code
 - [ ] integration: github
 - [ ] integration: webdav
@@ -55,6 +61,12 @@ einstiegspunkt: `app.html`
 - [ ] toolbar
 - [ ] transformer
 - [ ] workspace
+
+## ebooks
+- [ ] dashboard
+- [ ] settings
+- misc:
+  - [ ] extract pdf-pages as image
 
 ## feeds
 
