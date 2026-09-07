@@ -61,6 +61,20 @@ const sortPodcasts = (list, mode) => [...list].sort((a, b) =>
   mode === 'alpha' ? a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
   :                  (b.lastEpisodeAt || 0) - (a.lastEpisodeAt || 0));
 
+
+
+const flash = (text, kind = 'ok') =>
+  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
+
+// navigating always clears the current filter
+const go = (name, id) => { route.value = { name, id }; search.value = ''; };
+
+// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
+
+const podcastById = computed(() => Object.fromEntries(db.podcasts.value.map(p => [p.id, p])));
+const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e => [e.id, e])));
+
+
 export { 
   fmtDate, fmtDuration, 
   plain, paragraphs,
