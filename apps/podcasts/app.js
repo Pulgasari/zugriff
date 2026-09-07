@@ -1,4 +1,27 @@
 // apps/podcasts/app.js
+/*
+ich hab hier in erster linie erstmal bissl aufgeräumt, um einen überblicn zu verschaffen.  
+was wirb bei `code`neu eingeführt hattem an app-struktur gilt im prinzip auch hier.
+darüberhinaus ergaben sich noch ein paar weitere neuerungrn:
+
+1. unterteilung in: views, panels, components
+
+2. die runtime sollte ein ein trigger-system und ein hotkeys-system bekommen 
+vermutlich als:
+/.shared/modules/hotkeys.js
+/.shared/modules/triggers.js
+
+der sinn dahinter ist bzgl triggers ist:
+1. reduzierung von boilerplate von standardzeug, dass sich fast jede app teilt
+2. app bekommt sauberes (optionales) system um ...
+3. zusätzlich ibtegriert es sich super mit hotkeys
+
+der zweck von 'hotkeys':
+1. handy möglichkeit um mit keyboaord iwas in app zu machen
+2. tastencode + callback-function oder trigger-id
+
+
+*/
 
 // :::::: IMPORT
 import { computed, effect, signal } from '@aufbau/signals';
@@ -31,9 +54,9 @@ SortPicker     = await app.component('SortPicker');
 
 const // :::::: PANELS ::::::::::::::::::::::::::::::
 AddPodcastPanel = await app.panel('AddPodcastPanel'),
-PlayerBar       = await app.panel('PlayerBar'),
+PlayerPanel     = await app.panel('PlayerPanel'),
 SearchPanel     = await app.panel('SearchPanel'),
-Sidebar         = await app.panel('Sidebar');
+SidebarPanel    = await app.panel('SidebarPanel');
 
 const // :::::: VIEWS :::::::::::::::::::::::::::::::
 EpisodeDetailView   = await app.view('LatestView'),
