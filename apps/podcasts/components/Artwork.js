@@ -1,9 +1,17 @@
-// artwork, served from the on-device thumbnail cache. while the small copy is
-// being generated a placeholder shows; if it can't be made (image unreachable),
-// it falls back to the original url for display; if that is broken too, the
-// placeholder stays. the original is thus downloaded at most once and never
-// shown at full size on the happy path.
-function Artwork ({ src, size = 48, className = '' }) {
+// apps/podcasts/components/Artwork.js
+// artwork, served from the on-device thumbnail cache. while the small copy is being
+// generated a placeholder shows; if it can't be made (image unreachable), it falls back
+// to the original url; if that is broken too, the placeholder stays. the original is
+// thus downloaded at most once and never shown at full size on the happy path.
+
+import { useSignal } from '@aufbau/signals';
+import { useEffect } from 'preact/hooks';
+import Icon from '/.shared/js/components/Icon.js';
+
+const app = zugriff.app;
+const { thumbs } = app;
+
+export default function Artwork ({ src, size = 48, className = '' }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
   const st = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
 
@@ -33,5 +41,3 @@ function Artwork ({ src, size = 48, className = '' }) {
              <${Icon} name="mdi:podcast" />
            </span>`;
 }
-
-export default Artwork;

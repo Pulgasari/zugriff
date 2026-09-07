@@ -1,4 +1,13 @@
-function PodcastListRow ({ podcast }) {
+// apps/podcasts/components/PodcastListRow.js
+// a podcast row for the list view.
+
+import Art from './Artwork.js';
+import { fmtDate } from './../modules/methods.js';
+
+const app = zugriff.app;
+const { db, go } = app;
+
+export default function PodcastListRow ({ podcast }) {
   const eps = db.episodesByPodcast.value[podcast.id] ?? [];
   return html`
     <button class="pc-row" onClick=${() => go('podcast', podcast.id)}>
@@ -10,5 +19,3 @@ function PodcastListRow ({ podcast }) {
       <div class="pc-row-date">${fmtDate(podcast.lastEpisodeAt)}</div>
     </button>`;
 }
-
-export default PodcastListRow;

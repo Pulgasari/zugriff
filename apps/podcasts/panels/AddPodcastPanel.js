@@ -1,4 +1,17 @@
-function AddPodcastPanel () {
+// apps/podcasts/panels/AddPodcastPanel.js
+// the "add a podcast" dialog — paste a feed url, subscribe, open the new podcast.
+
+import { useSignal }        from '@aufbau/signals';
+import { useEffect, useRef } from 'preact/hooks';
+import Icon  from '/.shared/js/components/Icon.js';
+import Scrim from './../components/Scrim.js';
+
+const app = zugriff.app;
+const { db, go, flash } = app;
+const { dialog } = app.ui;
+const { proxy }  = app.settings;
+
+export default function AddPodcastPanel () {
   const value = useSignal('');
   const state = useSignal({ loading: false, error: '' });
   const ref   = useRef(null);
@@ -38,5 +51,3 @@ function AddPodcastPanel () {
       </div>
     <//>`;
 }
-
-export default AddPodcastPanel;

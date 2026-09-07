@@ -27,23 +27,50 @@ feed requests themselves.
 ## under the hood
 
 Everything is a static ES module — no build step, in keeping with the rest of
-zugriff.
+zugriff. The app runs on the shared **global runtime**: the page is
+`zugriff/app.html`, whose blocking `boot.js` binds `zugriff` (and `zugriff.app`,
+`html`) to `window`, so nothing here imports the runtime — `zugriff.app` is the
+reference point (see `.shared/js/app.js`).
 
-- **`db.js`** — the storage layer over [`@bunker/db`](https://github.com/pulgasari/bunker/)
+### structure
+
+```
+app.js         assembles the handle: modules, state, actions, hotkeys, mount
+modules/       app logic — db, player, feed, methods (pure helpers)
+views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail, Saved
+panels/        chrome + overlays — Sidebar, Player, Search dock, Add + Settings dialogs
+components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
+```
+
+`app.js` hangs the modules on the handle and seeds the state:
+
+- `app.db` / `app.player` / `app.thumbs` — the modules.
+- `app.ui` — ephemeral session signals: `route` (`{name,id}`), `search`, `dialog`, `busy`.
+- `app.settings` — persisted preferences (sorts, view, menu/player position, proxy, resizer).
+- `app.go(name, id)` / `app.flash(text, kind)` — navigate / toast.
+- `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …), and `app.hotkeys` binds keys to them (space = play/pause, ←/→ = skip, esc = close). See `.shared/js/modules/{actions,hotkeys}.js`.
+
+Views/panels/components reach all of this through `const app = zugriff.app` +
+destructuring; shared components load from `/.shared/js/components`, app pieces
+through `app.view()` / `app.panel()` / `app.component()`.
+
+### modules
+
+- **`modules/db.js`** — the storage layer over [`@bunker/db`](https://github.com/pulgasari/bunker/)
   (IndexedDB). Three tables — `podcasts`, `episodes`, `state` — mirrored into
-  three preact signals so the whole UI stays reactive. Episode keys start with
-  their podcast id, so "all episodes of this podcast" is a plain prefix scan.
-- **`feed.js`** — fetches and parses feeds in the browser. Podcast feeds rarely
-  send CORS headers, so it tries a direct request first and falls back to a
-  CORS proxy whose URL you set in **Settings** (`{url}` is replaced with the
-  feed URL; clear it for direct-only).
-- **`player.js`** — one `<audio>` element lifted out of the component tree so it
-  survives navigation, with its state mirrored into signals and the position
-  written back to the db as it plays.
-- **`app.js`** — the UI: a fixed sidebar, a scrolling main column and the docked
-  player, all drawn by the app itself (`boot({ shell: false })`). The
-  grid/list podcasts view is laid out by `<aufbau-index viewmode="grid|list">`
-  with each podcast in an `<aufbau-item>`.
+  preact signals so the whole UI stays reactive. Episode keys start with their
+  podcast id, so "all episodes of this podcast" is a plain prefix scan.
+- **`modules/feed.js`** — fetches and parses feeds in the browser. Podcast feeds
+  rarely send CORS headers, so it tries a direct request first and falls back to
+  a CORS proxy whose URL you set in **Settings**.
+- **`modules/player.js`** — one `<audio>` element lifted out of the component
+  tree so it survives navigation, with its state mirrored into signals and the
+  position written back to the db as it plays.
+- **`modules/methods.js`** — pure view helpers (formatting, html→text, the
+  list filters/sorts).
+
+The grid/list podcasts view is laid out by `<aufbau-index viewmode="grid|list">`
+with each podcast in an `<aufbau-item>`.
 
 ## notes
 
@@ -53,7 +80,7 @@ zugriff.
   frequently 1400–3000px but shown at 48–160px, so each image goes through
   `img.pulgasari.dev` (see [`/img-proxy`](./../../img-proxy/)), a tiny PHP
   endpoint that fetches the original server-side (no browser CORS) and returns a
-  small webp. The shared cache (`shared/js/lib/thumbs.js`) stores that result in
+  small webp. The shared cache (`.shared/js/thumbs.js`) stores that result in
   IndexedDB, so from then on nothing is fetched again. While it loads a
   placeholder shows; if the resizer is unreachable the original is shown for
   display, then a placeholder. The endpoint is set in **Settings → Artwork

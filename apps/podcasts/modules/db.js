@@ -16,7 +16,7 @@
 // truth the components read; every mutation writes IndexedDB *and* updates the
 // signal, so a change shows up everywhere at once and survives a reload.
 
-import { signal, computed }     from '@aufbau/kits/preact-htm';
+import { signal, computed }     from '@preact/signals';
 import { createDb }             from '@bunker/db';
 import { fetchFeed, parseFeed } from './feed.js';
 
@@ -58,6 +58,10 @@ export const episodesByPodcast = computed(() => {
   for (const ep of episodes.value) (map[ep.podcastId] ??= []).push(ep);
   return map;
 });
+
+// id -> record lookups the ui reads all over (episode rows, detail views)
+export const podcastById = computed(() => Object.fromEntries(podcasts.value.map(p => [p.id, p])));
+export const episodeById = computed(() => Object.fromEntries(episodes.value.map(e => [e.id, e])));
 
 // ── loading ──────────────────────────────────────────────────────────────
 

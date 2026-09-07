@@ -1,6 +1,19 @@
-function EpisodeRow ({ episode, showPodcast = false }) {
+// apps/podcasts/components/EpisodeRow.js
+// one episode in a list — artwork, meta, teaser, progress and the row actions.
+
+import Icon        from '/.shared/js/components/Icon.js';
+import IconButton  from '/.shared/js/components/IconButton.js';
+import Art         from './Artwork.js';
+import PlayToggle  from './PlayToggle.js';
+import ProgressBar from './ProgressBar.js';
+import { fmtDate, fmtDuration, plain } from './../modules/methods.js';
+
+const app = zugriff.app;
+const { db, player, go } = app;
+
+export default function EpisodeRow ({ episode, showPodcast = false }) {
   const st      = db.stateOf(episode.id);
-  const podcast = podcastById.value[episode.podcastId];
+  const podcast = db.podcastById.value[episode.podcastId];
   const teaser  = plain(episode.description).slice(0, 200);
 
   return html`
@@ -35,5 +48,3 @@ function EpisodeRow ({ episode, showPodcast = false }) {
     </div>
   `;
 }
-
-export default EpisodeRow;

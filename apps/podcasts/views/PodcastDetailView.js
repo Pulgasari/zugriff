@@ -1,7 +1,22 @@
-// podcasts :: views/PodcastDetailView.js
+// apps/podcasts/views/PodcastDetailView.js
+// one podcast: header, actions (refresh / website / unsubscribe) and its episodes.
+
+import Empty      from '/.shared/js/components/Empty.js';
+import Icon       from '/.shared/js/components/Icon.js';
+import Button     from '/.shared/js/components/Button.js';
+import Art        from './../components/Artwork.js';
+import EpisodeRow from './../components/EpisodeRow.js';
+import SortPicker from './../components/SortPicker.js';
+import SearchBar  from './../panels/SearchPanel.js';
+import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
+
+const app = zugriff.app;
+const { db, go, flash, thumbs } = app;
+const { busy } = app.ui;
+const { proxy, episodeSort } = app.settings;
 
 export default function PodcastDetailView ({ id }) {
-  const podcast = podcastById.value[id];
+  const podcast = db.podcastById.value[id];
   if (!podcast) return html`<${Empty} icon="mdi:alert-outline" title="Podcast not found" />`;
 
   const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], episodeSort.value);

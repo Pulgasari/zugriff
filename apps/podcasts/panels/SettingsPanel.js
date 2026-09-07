@@ -1,6 +1,22 @@
-// podcasts :: views/SettingsView.js
+// apps/podcasts/panels/SettingsPanel.js
+// the settings dialog: menu/player placement, the CORS proxy + artwork resizer, and
+// import/export of the subscription library.
 
-function SettingsView () {
+import { useSignal }     from '@aufbau/signals';
+import { useRef }        from 'preact/hooks';
+import Icon       from '/.shared/js/components/Icon.js';
+import Scrim      from './../components/Scrim.js';
+import SortPicker from './../components/SortPicker.js';
+import { DEFAULT_PROXY } from './../modules/feed.js';
+
+const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
+
+const app = zugriff.app;
+const { db, flash } = app;
+const { dialog, busy } = app.ui;
+const { proxy, imgResizer, menuPos, playerPos } = app.settings;
+
+export default function SettingsPanel () {
   const proxyVal   = useSignal(proxy.value);
   const resizerVal = useSignal(imgResizer.value);
   const fileRef    = useRef(null);
@@ -63,7 +79,7 @@ function SettingsView () {
         </label>
         <label class="field">
           <span class="field-label">Artwork resizer</span>
-          <span class="field-hint">A self-hosted endpoint that shrinks cover art server-side (see <code>/img-proxy</code>), so no third party is involved. <code>{url}</code> is the image, <code>{w}</code> the width. Clear it to resize in the browser instead (only works for images whose host allows it).</span>
+          <span class="field-hint">A self-hosted endpoint that shrinks cover art server-side, so no third party is involved. <code>{url}</code> is the image, <code>{w}</code> the width. Clear it to resize in the browser instead (only works for images whose host allows it).</span>
           <input class="modal-input" type="text" value=${resizerVal.value}
                  placeholder=${DEFAULT_IMG_RESIZER}
                  onInput=${e => resizerVal.value = e.target.value} />
@@ -83,8 +99,6 @@ function SettingsView () {
                    onChange=${e => { doImport(e.target.files[0]); e.target.value = ''; }} />
           </span>
         </div>
-
-        <${AppSettings} />
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {
