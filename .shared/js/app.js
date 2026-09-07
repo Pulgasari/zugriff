@@ -7,10 +7,12 @@
 
 // :::::: IMPORTS
 
-import { effect }      from '@aufbau/signals';
-import { createState } from './app/state.js';
-import { toast }       from './app/toast.js';
-import * as pwa        from './app/pwa.js';
+import { effect }        from '@aufbau/signals';
+import { createState }   from './app/state.js';
+import { createActions } from './modules/actions.js';
+import { createHotkeys } from './modules/hotkeys.js';
+import { toast }         from './app/toast.js';
+import * as pwa          from './app/pwa.js';
 
 import { registry }     from './data/apps.js';
 import { html, render } from './vendors.js';
@@ -36,12 +38,24 @@ class ZugriffApp {
     this.state   = createState(this.config);
     this.toast   = toast;
     this.effect  = effect;
+
+    // ::: behaviour registries — actions (named callbacks) + hotkeys wired to them
+    this._actions = createActions();
+    this.hotkeys  = createHotkeys(this._actions);
   }
 
-  // ::: loaders (app-relative). component() from ./components, module() from the app root.
-  // both resolve to a default export when present, else the namespace.
+  // ::: loaders (app-relative). ui pieces resolve to a default export when present,
+  // else the namespace: component() from ./components, view() from ./views,
+  // panel() from ./panels; module() from the app root.
   component = name => import(new URL(`components/${name}.js`, this.baseURL)).then(pick);
-  module    = name => import(new URL(`${name}.js`,           this.baseURL)).then(pick);
+  view      = name => import(new URL(`views/${name}.js`,      this.baseURL)).then(pick);
+  panel     = name => import(new URL(`panels/${name}.js`,     this.baseURL)).then(pick);
+  module    = name => import(new URL(`${name}.js`,            this.baseURL)).then(pick);
+
+  // ::: actions — app.actions is the registry (add/run/get + property access); assigning
+  // app.actions = { … } merges the object in rather than replacing the registry.
+  get actions ()    { return this._actions; }
+  set actions (obj) { for (const [id, fn] of Object.entries(obj ?? {})) this._actions.add(id, fn); }
 
   // ::: state extension — the mechanism to grow app.state and wire effects.
   // scalar/plain-data leaves land on the deep signal; `effects` are plain
