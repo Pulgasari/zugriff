@@ -245,9 +245,10 @@ function SearchBar ({ placeholder }) {
 
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
-const // :::::: COMPONRNTS ::::::::::::::::::::::::::
+const // :::::: COMPONENTS ::::::::::::::::::::::::::
 PlayerBar   = await app.component('PlayerBar'),
 ProgressBar = await app.component('ProgressBar'),
+Sidebar     = await app.component('Sidebar'),
 
 const // :::::: VIEWS :::::::::::::::::::::::::::::::
 EpisodeDetailView   = await app.view('LatestView'),
