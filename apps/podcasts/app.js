@@ -163,12 +163,7 @@ function Art ({ src, size = 48, className = '' }) {
            </span>`;
 }
 
-function ProgressBar ({ state }) {
-  if (!state || (!state.position && !state.done)) return null;
-  const dur = state.duration || 0;
-  const pct = state.done ? 100 : (dur ? Math.min(100, (state.position / dur) * 100) : 0);
-  return html`<aufbau-progress class="ep-progress" value=${pct}></aufbau-progress>`;
-}
+
 
 
 // the play/pause control for one episode, reflecting the live player state
@@ -251,14 +246,17 @@ function SearchBar ({ placeholder }) {
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
 const // :::::: COMPONRNTS ::::::::::::::::::::::::::
-PlayerBar = await app.component('PlayerBar');
+PlayerBar   = await app.component('PlayerBar'),
+ProgressBar = await app.component('ProgressBar'),
 
 const // :::::: VIEWS :::::::::::::::::::::::::::::::
 EpisodeDetailView   = await app.view('LatestView'),
 LatestView          = await app.view('LatestView'),
 EpisodePodcastView  = await app.view('LatestView'),
 PodcastsView        = await app.view('PodcastsView'),
-SavedView           = await app.view('SavedView');
+SavedView           = await app.view('SavedView'),
+SettingsView        = await app.view('SettingsView');
+
 
 function PodcastCard ({ podcast }) {
   const eps  = db.episodesByPodcast.value[podcast.id] ?? [];
@@ -329,103 +327,8 @@ function AddDialog () {
     <//>`;
 }
 
-function SettingsDialog () {
-  const proxyVal   = useSignal(proxy.value);
-  const resizerVal = useSignal(imgResizer.value);
-  const fileRef    = useRef(null);
 
-  const doExport = () => {
-    const data = db.exportData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = Object.assign(document.createElement('a'), {
-      href: url, download: `podcasts-${new Date().toISOString().slice(0, 10)}.json`,
-    });
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    flash(`Exported ${data.feeds.length} subscription${data.feeds.length === 1 ? '' : 's'}`);
-  };
 
-  const doImport = async file => {
-    if (!file) return;
-    let data;
-    try { data = JSON.parse(await file.text()); }
-    catch { flash('Could not read that file', 'err'); return; }
-    dialog.value = null;
-    busy.value = 'Importing…';
-    try {
-      const results = await db.importData(data, proxy.value, (n, total) => busy.value = `Importing ${n}/${total}…`);
-      const added = results.filter(r => r.added).length;
-      const failed = results.filter(r => r.error).length;
-      flash(`Imported ${added} new` + (failed ? `, ${failed} failed` : ''), failed ? 'err' : 'ok');
-    } catch (err) { flash(err.message, 'err'); }
-    finally { busy.value = ''; }
-  };
-
-  return html`
-    <${Scrim}>
-      <div class="modal wide">
-        <h2>Settings</h2>
-
-        <div class="field">
-          <span class="field-label">Menu position</span>
-          <${SortPicker} value=${menuPos.value} onChange=${v => menuPos.value = v}
-             options=${[['top', 'Top'], ['bottom', 'Bottom'], ['left', 'Left'], ['right', 'Right']]} />
-        </div>
-
-        <div class="field">
-          <span class="field-label">Player position</span>
-          <${SortPicker} value=${playerPos.value} onChange=${v => playerPos.value = v}
-             options=${[['top', 'Top'], ['bottom', 'Bottom']]} />
-        </div>
-
-        <label class="field">
-          <span class="field-label">CORS proxy</span>
-          <span class="field-hint">Most podcast feeds block direct browser requests. Feeds are fetched directly first, then through this proxy. <code>{url}</code> is replaced with the feed URL. Clear it to use direct requests only.</span>
-          <input class="modal-input" type="text" value=${proxyVal.value}
-                 placeholder=${DEFAULT_PROXY}
-                 onInput=${e => proxyVal.value = e.target.value} />
-          <span class="field-row">
-            <button class="btn ghost small" onClick=${() => proxyVal.value = DEFAULT_PROXY}>Reset to default</button>
-            <button class="btn ghost small" onClick=${() => proxyVal.value = ''}>Direct only</button>
-          </span>
-        </label>
-
-        <label class="field">
-          <span class="field-label">Artwork resizer</span>
-          <span class="field-hint">A self-hosted endpoint that shrinks cover art server-side (see <code>/img-proxy</code>), so no third party is involved. <code>{url}</code> is the image, <code>{w}</code> the width. Clear it to resize in the browser instead (only works for images whose host allows it).</span>
-          <input class="modal-input" type="text" value=${resizerVal.value}
-                 placeholder=${DEFAULT_IMG_RESIZER}
-                 onInput=${e => resizerVal.value = e.target.value} />
-          <span class="field-row">
-            <button class="btn ghost small" onClick=${() => resizerVal.value = DEFAULT_IMG_RESIZER}>Reset to default</button>
-            <button class="btn ghost small" onClick=${() => resizerVal.value = ''}>In-browser</button>
-          </span>
-        </label>
-
-        <div class="field">
-          <span class="field-label">Subscriptions</span>
-          <span class="field-hint">Back up your subscriptions and listening progress as JSON, or restore from a file.</span>
-          <span class="field-row">
-            <button class="btn" onClick=${doExport}><${Icon} name="mdi:download" /> Export JSON</button>
-            <button class="btn" onClick=${() => fileRef.current?.click()}><${Icon} name="mdi:upload" /> Import JSON</button>
-            <input ref=${fileRef} type="file" accept="application/json,.json" hidden
-                   onChange=${e => { doImport(e.target.files[0]); e.target.value = ''; }} />
-          </span>
-        </div>
-
-        <${AppSettings} />
-
-        <div class="modal-actions">
-          <button class="btn primary" onClick=${() => {
-            proxy.value      = proxyVal.value.trim();
-            imgResizer.value = resizerVal.value.trim();
-            dialog.value = null; flash('Settings saved');
-          }}>Done</button>
-        </div>
-      </div>
-    <//>`;
-}
 
 function Scrim ({ children }) {
   return html`
@@ -445,28 +348,7 @@ function NavItem ({ icon, label, name, count }) {
     </button>`;
 }
 
-function Sidebar () {
-  const saved = db.savedEpisodes.value.length;
-  return html`
-    <aside class="sidebar">
-      <div class="brand"><${Icon} name="mdi:podcast" /> <span>Podcasts</span></div>
 
-      <nav class="nav">
-        <${NavItem} icon="mdi:playlist-play"   label="Latest"    name="latest" />
-        <${NavItem} icon="mdi:view-grid-outline" label="Podcasts" name="podcasts" count=${db.podcasts.value.length} />
-        <${NavItem} icon="mdi:bookmark-outline" label="Listen later" name="saved" count=${saved} />
-      </nav>
-
-      <div class="side-foot">
-        <button class="nav-item" onClick=${() => dialog.value = 'settings'}>
-          <${Icon} name="mdi:cog-outline" /> <span>Settings</span></button>
-        <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" /> launcher</a>
-        </div>
-      </div>
-    </aside>`;
-}
 
 // :::::: BUSY BAR :::::::::::::::::::::::::::::::::::::::::::
 
