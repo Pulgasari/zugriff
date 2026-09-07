@@ -12,6 +12,6 @@
 - [ ] generell mal kontrollieren, ob das aktuell überhaupt gebuildet wird. ich kanns zumindest nirgendwo ne apk finden. (finde das eh unübersichtlich. könnnen die apks nich irgendwo direkt gesammelt landen?)
 - [ ] dieses secret-key bzgl. app-signing einrichten (ich weiss nicht wie?)
 
-## service worker (`.shared/js/service.js)
+## service worker (`.shared/js/service.js`)
 - [ ] sollte auch zeug von `https://code.pulgasari.dev/*` cachen (staleWhileRevalidate, ist in entwicklung, verändert sich öfters)
 - [ ] sollte zeug von `esm.sh` und co dauerhaft/aggressiv cachen (quasi nur erneuern wenn version höher, aber konkrete version is unveränderlich)
