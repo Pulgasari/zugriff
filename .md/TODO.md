@@ -56,8 +56,12 @@ einstiegspunkt: `app.html`
 - [ ] transformer
 - [ ] workspace
 
+## feeds
+
 ## apps/files
 - [ ] dashboard
+
+## icons
 
 ## apps/images
 - [ ] batch
@@ -78,10 +82,16 @@ einstiegspunkt: `app.html`
 - [ ] settings
 
 ## apps/podcasts
+- [ ] export/import
+- [ ] overview: episodes
+- [ ] overview: podcasts
 
+## prompts
+- [ ] taxonomies
 
 ## apps/videos
 - [ ] batch
+- [ ] converter
 - [ ] dashboard
 - [ ] editor
   - [ ] crop
