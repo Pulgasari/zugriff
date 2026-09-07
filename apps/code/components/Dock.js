@@ -18,6 +18,7 @@ export default function Dock () {
         <${Tap} cmd="plugins:toggle"     icon="gridicons:plugins" className=${modal === 'plugins'     ? 'active' : ''} />
         <${Tap} cmd="filebrowser:toggle" icon="mdi:file-tree"     className=${modal === 'filebrowser' ? 'active' : ''} />
         <${Tap} cmd="github:toggle"      icon="github"            className=${modal === 'github'      ? 'active' : ''} />
+        <${Tap} cmd="webdav:toggle"      icon="mdi:cloud-outline" className=${modal === 'webdav'      ? 'active' : ''} />
       </div>
       <div class="section">
         <${Tap} cmd="editor:undo"     icon="undo" />

@@ -38,6 +38,11 @@ export default function Statusbar () {
           ${file.gh.owner}/${file.gh.name}@${file.gh.branch}
         </span>
         <span class="sb-sep">·</span>`}
+      ${file?.source === 'webdav' && html`
+        <span class="sb-item sb-webdav" title=${`${file.dav.connName}: ${file.dav.path}`}>
+          ${file.dav.connName}
+        </span>
+        <span class="sb-sep">·</span>`}
       ${file ? html`
         <span class="sb-item sb-language">${file.language}</span>
         <span class="sb-sep">·</span>

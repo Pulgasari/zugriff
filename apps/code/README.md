@@ -101,33 +101,61 @@ IndexedDB (`db.js` → `auth` store) and is sent only to GitHub.
   so huge repos stay cheap; blobs are read via `git/blobs`, binary blobs open
   read-only.
 - `components/GitHub.js` / `GitHubTree.js` — the connect + browse modal.
-- files carry a `source` (`'local'` | `'github'`) and a stable `id` (the FS
-  handle, or `gh:owner/repo@branch:path`) so the tabs/editor match records
-  regardless of source. **Save** dispatches on `source`: local → a FS writable,
-  GitHub → a `PUT contents` commit (`state.saveActiveFile`).
+- files carry a `source` (`'local'` | `'github'` | `'webdav'`) and a stable `id`
+  (the FS handle, `gh:owner/repo@branch:path`, or `dav:<connId>:<path>`) so the
+  tabs/editor match records regardless of source. **Save** dispatches on `source`
+  (`modules/files.js`): local → a FS writable, GitHub → a `PUT contents` commit,
+  WebDAV → a `PUT`.
 
 Saving a GitHub file commits it. By default the commit message is `Update <path>`;
 turn on **Settings → GitHub → Prompt for commit message** to be asked each time
 (shared `openPrompt`). A one-click OAuth login can be added later with a tiny CORS
 relay (device flow); the app side wouldn't change.
 
+## WebDAV
+
+The third source is a **WebDAV** server (the dock's cloud tap). It runs entirely
+in the browser over `fetch` — PROPFIND to list, GET/PUT to read/write,
+MKCOL/DELETE/MOVE/COPY for the tree ops — with HTTP Basic auth. Connections (incl.
+the password) live in IndexedDB (`db.js` → `webdav` store) and are sent only to
+their server; prefer an app-password where the server offers one.
+
+**Direct only — no proxy.** The browser talks to the server straight, so the
+server MUST send CORS headers (`Access-Control-Allow-Origin` for this origin, and
+allow the WebDAV methods + `Authorization` / `Depth` / `Destination`). That covers
+a self-hosted **Nextcloud/ownCloud** with CORS enabled, an `rclone serve webdav
+--cors`, or a caddy/nginx that injects the headers. It is **not** a key to Google
+Drive / Dropbox / OneDrive — those speak their own OAuth APIs, not WebDAV, and
+still need registered client IDs + a backend for the token exchange (deferred).
+
+- `modules/webdav.js` — the client + connection signals (connections, active).
+  `webdav.list()` returns full relative paths, so the tree needs no prefix
+  threading; a NUL byte in a blob opens it read-only.
+- `components/WebDAV.js` / `WebDAVTree.js` — the connect + browse modal.
+
+(S)FTP stays deferred: the browser has no raw TCP/SSH, so it needs a stateful
+gateway (a backend). WebDAV is the browser-native substitute for "edit files on my
+server".
+
 ## file & folder operations
 
-Both trees carry a `⋯` row menu (and a root toolbar) with **New File / New Folder
-/ Rename / Delete / Cut / Copy / Paste** — see `RowMenu.js` and the per-source
-ops:
+All three trees carry a `⋯` row menu (and a root toolbar) with **New File / New
+Folder / Rename / Delete / Cut / Copy / Paste** — see `RowMenu.js` and the
+per-source ops:
 
-- local (`fsops.js`): File System Access; rename/move use the native
+- local (`modules/fsops.js`): File System Access; rename/move use the native
   `FileSystemHandle.move()` where present, else a recursive copy + delete.
-- GitHub (`github.js`): each change is a **single commit** through the Git Data
-  API — rename/move/copy reuse the existing blob shas, folder delete/rename walk
-  the recursive tree. New folders are a `.gitkeep`.
+- GitHub (`modules/github.js`): each change is a **single commit** through the Git
+  Data API — rename/move/copy reuse the existing blob shas, folder delete/rename
+  walk the recursive tree. New folders are a `.gitkeep`.
+- WebDAV (`modules/webdav.js`): each change is a **single request** — MKCOL / PUT /
+  DELETE / MOVE / COPY; a collection deletes recursively.
 
-`treeops.js` holds the shared bits: a one-slot cut/copy **clipboard** (same-source,
-and for GitHub same-repo+branch) and a per-source **version** signal that bumps
-after every change so the tree refreshes (local reloads in place; GitHub reloads
-from the branch head, since a commit moves the tree shas). Renaming or deleting an
-open file closes its now-stale tab.
+`modules/treeops.js` holds the shared bits: a one-slot cut/copy **clipboard**
+(same-source — for GitHub same-repo+branch, for WebDAV same-connection) and a
+per-source **version** signal that bumps after every change so the tree refreshes
+(local reloads in place; GitHub/WebDAV reload from the root). Renaming or deleting
+an open file closes its now-stale tab.
 
 ## still stubbed
 
