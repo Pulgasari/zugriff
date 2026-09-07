@@ -127,42 +127,6 @@ const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e =>
 
 // :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
 
-// artwork, served from the on-device thumbnail cache. while the small copy is
-// being generated a placeholder shows; if it can't be made (image unreachable),
-// it falls back to the original url for display; if that is broken too, the
-// placeholder stays. the original is thus downloaded at most once and never
-// shown at full size on the happy path.
-function Art ({ src, size = 48, className = '' }) {
-  // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
-  const st = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
-
-  useEffect(() => {
-    if (!src) { st.value = { url: null, phase: 'none', broken: false }; return; }
-    const cached = thumbs.peek(src);
-    if (cached) { st.value = { url: cached, phase: 'ready', broken: false }; return; }
-
-    st.value = { url: null, phase: 'pending', broken: false };
-    let alive = true;
-    thumbs.request(src).then(u => {
-      if (!alive) return;
-      st.value = u ? { url: u,   phase: 'ready', broken: false }
-                   : { url: src, phase: 'orig',  broken: false };
-    });
-    return () => { alive = false; };
-  }, [src]);
-
-  const s = st.value;
-  const showImg = (s.phase === 'ready' || s.phase === 'orig') && !s.broken;
-
-  return showImg
-    ? html`<img class=${'art ' + className} src=${s.url} alt="" loading="lazy"
-                width=${size} height=${size}
-                onError=${() => { st.value = { ...st.value, broken: true }; }} />`
-    : html`<span class=${'art art-fallback ' + className} style=${`width:${size}px;height:${size}px`}>
-             <${Icon} name="mdi:podcast" />
-           </span>`;
-}
-
 
 
 
@@ -217,38 +181,21 @@ function EpisodeRow ({ episode, showPodcast = false }) {
     </div>`;
 }
 
-function SortPicker ({ value, options, onChange }) {
-  return html`
-    <div class="seg">
-      ${options.map(([val, label]) => html`
-        <button key=${val} class=${'seg-btn' + (value === val ? ' active' : '')}
-                onClick=${() => onChange(val)}>${label}</button>`)}
-    </div>`;
-}
-
-// a filter bar docked at the bottom of the scroll area — writes the shared
-// `search` signal that the episode views filter on
-function SearchBar ({ placeholder }) {
-  return html`
-    <div class="search-dock">
-      <div class="search-bar">
-        <${Icon} name="mdi:magnify" />
-        <input type="search" placeholder=${placeholder} value=${search.value}
-               onInput=${e => search.value = e.target.value} />
-        ${search.value && html`
-          <button class="ibtn" aria-label="Clear filter" onClick=${() => search.value = ''}>
-            <${Icon} name="mdi:close" />
-          </button>`}
-      </div>
-    </div>`;
-}
 
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
 const // :::::: COMPONENTS ::::::::::::::::::::::::::
+Artwork        = await app.component('Artwork'),
+NavItem        = await app.component('NavItem'),
+PodcastCard    = await app.component('PodcastCard'),
+PodcastListRow = await app.component('PodcastListRow'),
+ProgressBar    = await app.component('ProgressBar'),
+SortPicker     = await app.component('SortPicker');
+
+const // :::::: PANELS ::::::::::::::::::::::::::::::
 PlayerBar   = await app.component('PlayerBar'),
-ProgressBar = await app.component('ProgressBar'),
-Sidebar     = await app.component('Sidebar'),
+SearchPanel = await app.panel('SearchPanel'),
+Sidebar     = await app.component('Sidebar');
 
 const // :::::: VIEWS :::::::::::::::::::::::::::::::
 EpisodeDetailView   = await app.view('LatestView'),
@@ -259,28 +206,9 @@ SavedView           = await app.view('SavedView'),
 SettingsView        = await app.view('SettingsView');
 
 
-function PodcastCard ({ podcast }) {
-  const eps  = db.episodesByPodcast.value[podcast.id] ?? [];
-  return html`
-    <button class="pc-card" onClick=${() => go('podcast', podcast.id)}>
-      <${Art} src=${podcast.image} size=${160} className="pc-art" />
-      <div class="pc-title">${podcast.title}</div>
-      <div class="pc-sub">${eps.length} episode${eps.length === 1 ? '' : 's'} · ${fmtDate(podcast.lastEpisodeAt)}</div>
-    </button>`;
-}
 
-function PodcastListRow ({ podcast }) {
-  const eps = db.episodesByPodcast.value[podcast.id] ?? [];
-  return html`
-    <button class="pc-row" onClick=${() => go('podcast', podcast.id)}>
-      <${Art} src=${podcast.image} size=${56} />
-      <div class="pc-row-body">
-        <div class="pc-title">${podcast.title}</div>
-        <div class="pc-sub">${podcast.author ? podcast.author + ' · ' : ''}${eps.length} episode${eps.length === 1 ? '' : 's'}</div>
-      </div>
-      <div class="pc-row-date">${fmtDate(podcast.lastEpisodeAt)}</div>
-    </button>`;
-}
+
+
 
 // :::::: PLAYER BAR :::::::::::::::::::::::::::::::::::::::::
 
@@ -340,14 +268,7 @@ function Scrim ({ children }) {
 
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
 
-function NavItem ({ icon, label, name, count }) {
-  const active = route.value.name === name || (name === 'podcasts' && route.value.name === 'podcast');
-  return html`
-    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => go(name)}>
-      <${Icon} name=${icon} /> <span>${label}</span>
-      ${count != null && count > 0 && html`<span class="nav-count">${count}</span>`}
-    </button>`;
-}
+
 
 
 
