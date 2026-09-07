@@ -13,4 +13,5 @@
 - [ ] dieses secret-key bzgl. app-signing einrichten (ich weiss nicht wie?)
 
 ## service worker (`.shared/js/service.js)
-- [ ]
+- [ ] sollte auch zeug von `https://code.pulgasari.dev/*` cachen (staleWhileRevalidate, ist in entwicklung, verändert sich öfters)
+- [ ] sollte zeug von `esm.sh` und co dauerhaft/aggressiv cachen (quasi nur erneuern wenn version höher, aber konkrete version is unveränderlich)
