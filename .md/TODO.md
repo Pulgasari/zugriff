@@ -44,6 +44,13 @@ einstiegspunkt: `app.html`
 
 - [ ] komplettes refactoring des CSS (das mache ich. und habe damit schon angefangen bzw. bin mittendrin. also das muss dich erstmal nicht jucken wenn du irgendwo kaputtes css bemerkst, ist dann vermutlich dem noch-im-umbau-refactor-prozess)
 
+# service worker
+
+- [ ] sollte auch zeug von `https://code.pulgasari.dev/*` cachen (staleWhileRevalidate, ist in entwicklung, verändert sich öfters)
+- [ ] sollte zeug von `esm.sh` und co dauerhaft/aggressiv cachen (quasi nur erneuern wenn version höher, aber konkrete version is unveränderlich)
+
+---
+
 # features
 
 ## audio-manager
