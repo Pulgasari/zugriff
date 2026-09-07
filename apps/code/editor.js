@@ -79,6 +79,7 @@ const DEFAULTS = {
   folding              : true,
   fontLigatures        : true,
   fontSize             : 13,
+  insertSpaces         : true,   // tab inserts spaces; drives the statusbar indent indicator
   letterSpacing        : 0,
   lineNumbers          : 'on',
   lineNumbersMinChars  : 3,
@@ -99,16 +100,27 @@ const DEFAULTS = {
   },
 };
 
-// a single signal holding the whole options object; `stored` hydrates it from
-// localStorage and writes every change back. we merge over DEFAULTS so options
-// added in a later version appear for users who already have a saved object.
-const config = signal({
+// the deep/nested carrier persists every option per-leaf under `code:editor-config:`
+// and merges the stored leaves over DEFAULTS on hydration, so options added in a later
+// version still surface for users who already have a saved object.
+const configSignal = signal({
   deep   : true,
   nested : true,
   key    : 'code:editor-config',
   store  : local,
   value  : DEFAULTS,
 });
+
+// the rest of this module and the components treat the options as one object via
+// `config.value`, but a deep signal has no `.value` — it exposes leaves directly.
+// bridge the two with a whole-object view over the carrier: reading returns the
+// carrier's memoized snapshot ($signal — reactive, and a stable identity that only
+// changes when a leaf actually changes, so `useEffect([cfg])` still fires only on real
+// option changes), assigning replaces every leaf (and persists per-leaf).
+const config = {
+  get value ()     { return configSignal.$signal.value; },
+  set value (next) { configSignal.$replace(next); },
+};
 
 // ── option helpers (immutable rewrites of the object) ────────────────────────
 
