@@ -22,6 +22,11 @@ einstiegspunkt: `app.html`
 
 ## shared
 
+### modules
+- vfs/opfs
+
+- add `stickers` to `IMAGES` and `VIDEOS` 
+
 
 ### components
 
@@ -38,3 +43,56 @@ einstiegspunkt: `app.html`
 ## misc
 
 - [ ] komplettes refactoring des CSS (das mache ich. und habe damit schon angefangen bzw. bin mittendrin. also das muss dich erstmal nicht jucken wenn du irgendwo kaputtes css bemerkst, ist dann vermutlich dem noch-im-umbau-refactor-prozess)
+
+# features
+
+## apps/code
+- [ ] integration: github
+- [ ] integration: webdav
+- [ ] keyboard
+- [ ] plugins
+- [ ] settings
+- [ ] toolbar
+- [ ] transformer
+- [ ] workspace
+
+## apps/files
+- [ ] dashboard
+
+## apps/images
+- [ ] batch
+- [ ] dashboard
+- [ ] editor
+  - [ ] crop
+  - [ ] cut
+  - [ ] filter/effects
+  - [ ] stickers
+- [ ] filesystem
+- [ ] filesystem (virtual)
+- [ ] gifmaker
+- [ ] manager
+- [ ] viewer
+
+## apps/notes
+- [ ] dashboard
+- [ ] settings
+
+## apps/podcasts
+
+
+## apps/videos
+- [ ] batch
+- [ ] dashboard
+- [ ] editor
+  - [ ] crop
+  - [ ] cut
+  - [ ] filter/effects
+  - [ ] stickers
+- [ ] filesystem
+- [ ] filesystem (virtual)
+- [ ] gifmaker
+- [ ] manager
+- [ ] viewer
+
+
+
