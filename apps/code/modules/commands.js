@@ -50,6 +50,7 @@ const commands = new Map([
   ['statusbar:toggle'   , { name: 'Toggle Statusbar'   , exec: () => toggleConfig('showStatusbar') }],
   ['filebrowser:toggle' , { name: 'Toggle File Browser', exec: () => app.toggleModal('filebrowser') }],
   ['github:toggle'      , { name: 'Toggle GitHub'      , exec: () => app.toggleModal('github')      }],
+  ['webdav:toggle'      , { name: 'Toggle WebDAV'      , exec: () => app.toggleModal('webdav')      }],
   ['commands:toggle'    , { name: 'Toggle Commands'    , exec: () => app.toggleModal('commands')    }],
   ['plugins:toggle'     , { name: 'Toggle Plugins'     , exec: () => app.toggleModal('plugins')     }],
   ['settings:toggle'    , { name: 'Toggle Settings'    , exec: () => app.toggleModal('settings')    }],

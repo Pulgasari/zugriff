@@ -65,6 +65,23 @@ const openGithub = (meta) => {
   });
 };
 
+/** open a WebDAV file. `meta` = { connId, connName, path, content, binary, readOnly } */
+const openWebdav = (meta) => {
+  const id = webdavId(meta.connId, meta.path);
+  const existing = openById(id);
+  if (existing) { active.value = existing; return existing; }
+
+  return activate({
+    id, source: 'webdav',
+    name: meta.path.split('/').pop(),
+    content: meta.content,
+    language: languageOf(meta.path),
+    isDirty: false,
+    readOnly: !!meta.binary || !!meta.readOnly,
+    dav: { connId: meta.connId, connName: meta.connName, path: meta.path },
+  });
+};
+
 /** replace the record for a file in the open list (keeps `active` in sync) */
 const patch = (file, delta) => {
   const next = { ...file, ...delta };
@@ -73,7 +90,7 @@ const patch = (file, delta) => {
   return next;
 };
 
-/** save the active file back to its source (local disk, or a GitHub commit) */
+/** save the active file back to its source (local disk, a GitHub commit, or a WebDAV PUT) */
 const save = async ({ message } = {}) => {
   const file = active.value;
   if (!file || file.readOnly) return false;
@@ -85,6 +102,15 @@ const save = async ({ message } = {}) => {
       message: message || `Update ${gh.path}`, content: file.content, sha: gh.sha,
     });
     patch(file, { isDirty: false, gh: { ...gh, sha: newSha } });
+    return true;
+  }
+
+  if (file.source === 'webdav') {
+    const webdav = zugriff.app.workspaces.webdav;
+    const conn   = webdav.connectionById(file.dav.connId);
+    if (!conn) return false;   // connection was removed
+    await webdav.writeFile(file.dav.path, file.content, conn);
+    patch(file, { isDirty: false });
     return true;
   }
 
@@ -100,6 +126,9 @@ const save = async ({ message } = {}) => {
 
 /** the gh id string for a repo path (to find/close an open GitHub tab) */
 const githubId = (owner, name, branch, path) => `gh:${owner}/${name}@${branch}:${path}`;
+
+/** the dav id string for a connection path (to find/close an open WebDAV tab) */
+const webdavId = (connId, path) => `dav:${connId}:${path}`;
 
 /** close a file (activates the previous tab, or none) */
 const close = (file) => {
@@ -118,7 +147,7 @@ const closeById = (id) => {
 
 const files = {
   open, active, languageOf,
-  openLocal, openGithub, patch, save, close, closeById, githubId,
+  openLocal, openGithub, openWebdav, patch, save, close, closeById, githubId, webdavId,
 };
 
 export default files;

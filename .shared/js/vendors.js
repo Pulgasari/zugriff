@@ -26,13 +26,17 @@ import * as preactCore    from 'preact';
 import * as preactHooks   from 'preact/hooks';
 import * as preactSignals from '@preact/signals';
 
-const preact = { 
+const preact = {
   ...preactCore,
   ...preactHooks,
   ...preactSignals,
 };
 
-const html = htm.bind(preact.h);
+// fragment-aware binding: htm emits an empty-string tag for `<>...</>`, which plain
+// htm.bind(h) would render as a literal empty element. mapping it to preact's Fragment
+// makes `<>...</>` a real fragment, so components skip the explicit <${Fragment}> wrapper.
+const { h, Fragment } = preactCore;
+const html = htm.bind((type, props, ...children) => h(type || Fragment, props, ...children));
 
 export * from 'preact';
 export * from 'preact/hooks';

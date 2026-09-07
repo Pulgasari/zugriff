@@ -13,10 +13,9 @@ import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
 import { toast }         from './app/toast.js';
 
-// ::: htm — the one tag instance, exposed as a global so components need no import
-import { h } from 'preact';
-import htm   from 'htm';
-const html = htm.bind(h);
+// ::: the one fragment-aware html tag (see vendors.js), exposed as a global so
+//     components need no import and `<>...</>` works everywhere
+import { html }          from './vendors.js';
 
 // :::::: CONSTS
 

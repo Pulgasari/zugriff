@@ -52,6 +52,7 @@ Plugins     = await app.component('Plugins'),
 Settings    = await app.component('Settings'),
 Statusbar   = await app.component('Statusbar'),
 Toolbar     = await app.component('Toolbar'),
+WebDAV      = await app.component('WebDAV'),
 Workspace   = await app.component('Workspace');
 
 const Prompt = await zugriff.component('Prompt');
@@ -75,8 +76,9 @@ app.effect(() => {
   (forceDisable || keyboardShown) ? disableAndroidKeyboard() : enableAndroidKeyboard();
 });
 
-// restore a stored GitHub token (and last repo/branch) in the background
+// restore stored GitHub token + saved WebDAV connections in the background
 app.workspaces.github.load().catch(() => {});
+app.workspaces.webdav.load().catch(() => {});
 
 // :::::: APP
 
@@ -95,6 +97,7 @@ function App () {
       ${modal === 'commands'    && html`<${Commands} />`}
       ${modal === 'filebrowser' && html`<${FileBrowser} />`}
       ${modal === 'github'      && html`<${GitHub} />`}
+      ${modal === 'webdav'      && html`<${WebDAV} />`}
       ${modal === 'plugins'     && html`<${Plugins} />`}
       ${modal === 'settings'    && html`<${Settings} />`}
       ${modal === 'workspaces'  && html`<${Workspace} />`}
