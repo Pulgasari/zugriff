@@ -34,24 +34,25 @@ const typeDefaults = {
 const entries = [
 
   // ── apps
-  {
-    type        : 'app',
-    slug        : 'files',
+  { // zugriff.dev/files/
+    capacitor   : true,
+    categories  : ['files'],
+    description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
+    icon        : 'mdi:folder-outline',
     name        : 'File Explorer',
     short_name  : 'Files',
-    icon        : 'mdi:folder-outline',
-    description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
-    categories  : ['files'],
-    capacitor   : true,   // wrapped as a Capacitor Android app (native fs) by build-capacitor
-  },
-  {
+    slug        : 'files',
     type        : 'app',
-    slug        : 'code',
+  },
+  { // zugriff.dev/code/
+    capacitor   : true,
+    categories  : ['code', 'files'],
+    description : 'A mobile-first code editor — edit a local folder or your GitHub repos with Monaco, a code keyboard and a command palette.',    
+    icon        : 'mdi:code-braces',
     name        : 'Code',
     short_name  : 'Code',
-    icon        : 'mdi:code-braces',
-    description : 'A mobile-first code editor — edit a local folder or your GitHub repos with Monaco, a code keyboard and a command palette.',
-    categories  : ['code', 'files'],
+    slug        : 'code',
+    type        : 'app',
   },
   {
     type        : 'app',
@@ -88,13 +89,13 @@ const entries = [
     },
   },
   {
+    autopack    : true,
     type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
     icon        : 'mdi:podcast',
     description : 'Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.',
     categories  : ['media'],
-    autopack    : true,   // built into an Android package by the build-android workflow
   },
   {
     type        : 'app',
