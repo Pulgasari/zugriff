@@ -62,10 +62,6 @@ const go = (name, id) => { route.value = { name, id }; search.value = ''; };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
-
-
-
-
 const podcastById = computed(() => Object.fromEntries(db.podcasts.value.map(p => [p.id, p])));
 const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e => [e.id, e])));
 
@@ -75,7 +71,7 @@ import {
   fmtDate, fmtDuration, 
   plain, paragraphs,
   filterEpisodes, sortEpisodes, sortPodcasts,
-} fron './methods.js';
+} from './methods.js';
 
 const // :::::: COMPONENTS ::::::::::::::::::::::::::
 Artwork        = await app.component('Artwork'),
