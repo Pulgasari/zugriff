@@ -13,12 +13,10 @@ const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
 const app = zugriff.app;
 const { db, flash } = app;
-const { dialog, busy } = app.ui;
-const { proxy, imgResizer, menuPos, playerPos } = app.settings;
 
 export default function SettingsPanel () {
-  const proxyVal   = useSignal(proxy.value);
-  const resizerVal = useSignal(imgResizer.value);
+  const proxyVal   = useSignal(app.state.settings.proxy);
+  const resizerVal = useSignal(app.state.settings.imgResizer);
   const fileRef    = useRef(null);
 
   const doExport = () => {
@@ -38,15 +36,15 @@ export default function SettingsPanel () {
     let data;
     try { data = JSON.parse(await file.text()); }
     catch { flash('Could not read that file', 'err'); return; }
-    dialog.value = null;
-    busy.value = 'Importing…';
+    app.state.dialog = null;
+    app.state.busy = 'Importing…';
     try {
-      const results = await db.importData(data, proxy.value, (n, total) => busy.value = `Importing ${n}/${total}…`);
+      const results = await db.importData(data, app.state.settings.proxy, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
       const added   = results.filter(r => r.added).length;
       const failed  = results.filter(r => r.error).length;
       flash(`Imported ${added} new` + (failed ? `, ${failed} failed` : ''), failed ? 'err' : 'ok');
     } catch (err) { flash(err.message, 'err'); }
-    finally { busy.value = ''; }
+    finally { app.state.busy = ''; }
   };
 
   return html`
@@ -56,13 +54,13 @@ export default function SettingsPanel () {
 
         <div class="field">
           <span class="field-label">Menu position</span>
-          <${SortPicker} value=${menuPos.value} onChange=${v => menuPos.value = v}
+          <${SortPicker} value=${app.state.settings.menuPos} onChange=${v => app.state.settings.menuPos = v}
              options=${[['top', 'Top'], ['bottom', 'Bottom'], ['left', 'Left'], ['right', 'Right']]} />
         </div>
 
         <div class="field">
           <span class="field-label">Player position</span>
-          <${SortPicker} value=${playerPos.value} onChange=${v => playerPos.value = v}
+          <${SortPicker} value=${app.state.settings.playerPos} onChange=${v => app.state.settings.playerPos = v}
              options=${[['top', 'Top'], ['bottom', 'Bottom']]} />
         </div>
 
@@ -102,9 +100,9 @@ export default function SettingsPanel () {
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {
-            proxy.value      = proxyVal.value.trim();
-            imgResizer.value = resizerVal.value.trim();
-            dialog.value = null; flash('Settings saved');
+            app.state.settings.proxy      = proxyVal.value.trim();
+            app.state.settings.imgResizer = resizerVal.value.trim();
+            app.state.dialog = null; flash('Settings saved');
           }}>Done</button>
         </div>
       </div>

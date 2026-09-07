@@ -6,10 +6,9 @@ import Icon from '/.shared/js/components/Icon.js';
 
 const app = zugriff.app;
 const { go } = app;
-const { route } = app.ui;
 
 export default function NavItem ({ icon, label, name, count }) {
-  const active = route.value.name === name || (name === 'podcasts' && route.value.name === 'podcast');
+  const active = app.state.route.name === name || (name === 'podcasts' && app.state.route.name === 'podcast');
 
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => go(name)}>

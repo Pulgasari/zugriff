@@ -44,15 +44,21 @@ components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
 
 `app.js` hangs the modules on the handle and seeds the state:
 
-- `app.db` / `app.player` / `app.thumbs` — the modules.
-- `app.ui` — ephemeral session signals: `route` (`{name,id}`), `search`, `dialog`, `busy`.
-- `app.settings` — persisted preferences (sorts, view, menu/player position, proxy, resizer).
+- `app.db` / `app.player` / `app.thumbs` — the modules (their own preact signals; read
+  with `.value`).
+- `app.state` — the app's own reactive state on the shared deep signal (`@aufbau/signals`),
+  read/written **without** `.value`. Ephemeral session state as top-level leaves —
+  `route` (`{name,id}`), `search`, `dialog`, `busy` — and durable prefs as a persisted
+  subtree `app.state.settings` (sorts, view, menu/player position, proxy, resizer), written
+  back by `app.persist('settings')`. Leaves are read inside render to stay reactive, so
+  they are never destructured at module top.
 - `app.go(name, id)` / `app.flash(text, kind)` — navigate / toast.
 - `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …), and `app.hotkeys` binds keys to them (space = play/pause, ←/→ = skip, esc = close). See `.shared/js/modules/{actions,hotkeys}.js`.
 
-Views/panels/components reach all of this through `const app = zugriff.app` +
-destructuring; shared components load from `/.shared/js/components`, app pieces
-through `app.view()` / `app.panel()` / `app.component()`.
+Views/panels/components reach all of this through `const app = zugriff.app` (+
+destructuring the stable module refs); shared components load from
+`/.shared/js/components`, app pieces through `app.view()` / `app.panel()` /
+`app.component()`.
 
 ### modules
 

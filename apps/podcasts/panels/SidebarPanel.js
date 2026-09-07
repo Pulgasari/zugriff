@@ -6,7 +6,6 @@ import NavItem from './../components/NavItem.js';
 
 const app = zugriff.app;
 const { db } = app;
-const { dialog } = app.ui;
 
 export default function SidebarPanel () {
   const saved = db.savedEpisodes.value.length;
@@ -21,7 +20,7 @@ export default function SidebarPanel () {
       </nav>
 
       <div class="side-foot">
-        <button class="nav-item" onClick=${() => dialog.value = 'settings'}>
+        <button class="nav-item" onClick=${() => app.state.dialog = 'settings'}>
           <${Icon} name="mdi:cog-outline" /> <span>Settings</span></button>
         <div class="side-links">
           <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>

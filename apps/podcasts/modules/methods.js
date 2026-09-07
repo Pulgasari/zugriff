@@ -1,7 +1,7 @@
 // apps/podcasts/modules/methods.js
 // pure view helpers — formatting, html→text and the episode/podcast list transforms.
 // the filter reads the shared search query + podcast lookup through the zugriff.app
-// global (app.ui.search, app.db.podcastById), so call sites stay filterEpisodes(list).
+// global (app.state.search, app.db.podcastById), so call sites stay filterEpisodes(list).
 
 export function fmtDuration (sec) {
   if (!sec || sec < 0) return '';
@@ -47,8 +47,8 @@ export function paragraphs (htmlStr = '') {
 // filter an episode list by the shared search query; `withPodcast` also matches on the
 // podcast title, for the mixed "latest" stream
 export function filterEpisodes (list, withPodcast = false) {
-  const { ui, db } = zugriff.app;
-  const q = ui.search.value.trim().toLowerCase();
+  const { state, db } = zugriff.app;
+  const q = state.search.trim().toLowerCase();
   if (!q) return list;
   return list.filter(ep =>
     ep.title.toLowerCase().includes(q) ||
