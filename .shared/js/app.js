@@ -1,149 +1,103 @@
 // .shared/js/app.js
-// the app factory behind zugriff.app. a page opens with
-//
-//   const app = zugriff.app('notes');
-//
-// which resolves that slug's registry entry, builds its reactive state and hands
-// back the app handle. one instance per slug (a page is one app), so repeat calls
-// are idempotent. the goal is to collapse each app's app.js boilerplate: state,
-// its cross-cutting effects and the mount all live here, not in every app.
-//
-//   app.state.font = 'Inter';       // reactive, drives the shared webfonts effect
-//   app.setState('font', 'Inter');  // same, imperative form
-//   app.init({ App });              // mount (replaces the old boot())
-
-/*
-// :::::: IMPORTS
-
-import { createState } from './app/state.js';
-import { toast }       from './app/toast.js';
-import * as pwa        from './app/pwa.js';
-
-import { registry } from './data/apps.js';
-import { aufbau, html, render } from './vendors.js';
-import Shell from './components/Shell.js';
-
-// :::::: CONFIG
-// resolve a page's registry entry by slug (zugriff.app('notes')). a miss yields {}
-// so a slugless or unknown page still boots on the registry defaults.
-
-const configFor = slug => (slug && registry.get(slug)) || {};
-
-// :::::: FACTORY
-
-const instances = new Map();
-
-export function createApp (slug) {
-  if (instances.has(slug)) return instances.get(slug);
-
-  const config = configFor(slug);
-  const state  = createState(config);
-
-  const app = { slug, config, state, toast };
-
-  // ::: state helpers — thin sugar over the deepSignal
-  app.getState    = key          => state[key];
-  app.setState    = (key, value) => state[key] = value;
-  app.toggleState = (key, force) => state[key] = force ?? !state[key];
-  app.resetState  = key          => state[key] = key in config ? config[key] : null;
-  app.setDialog   = (id = null)  => state.dialog = id;
-  app.setRoute    = (id = null)  => state.route  = id;
-
-  // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
-  app.canInstall    = pwa.canInstall;
-  app.isInstalled   = pwa.isInstalled;
-  app.promptInstall = pwa.promptInstall;
-
-  // ::: mount. tools get the shared Shell frame; apps own the whole #app root
-  // (shell defaults off for type:'app', on otherwise) and can force it either way.
-  app.init = async ({ App, target = '#app', shell } = {}) => {
-    const useShell = shell ?? config.type === 'tool';
-
-    await aufbau.init(config.aufbau);
-
-    const $target = typeof target === 'string' ? document.querySelector(target) : target;
-    if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
-
-    if (App) render(useShell ? html`<${Shell} app=${config}><${App} /><//>` : html`<${App} />`, $target);
-
-    return app;
-  };
-
-  instances.set(slug, app);
-  createApp.current = app;   // the page's active app — shared components (AppSettings) read it
-  return app;
-}
-
-// :::::: EXPORT
-
-export { createApp as app };
-export default createApp;
-*/
-
-// ============== NEW ========================================================
+// the app handle behind zugriff.app — one instance per slug (memoized in runtime.js).
+// `state` is the shared reactive base (createState → an @aufbau/signals deep signal);
+// an app extends it with its own leaves + effects, hangs its modules on the handle
+// (app.commands, app.editor, …) and mounts with app.init({ App }). the runtime and
+// the handle are the single reference point, so an app never imports the runtime.
 
 // :::::: IMPORTS
 
+import { effect }      from '@aufbau/signals';
 import { createState } from './app/state.js';
 import { toast }       from './app/toast.js';
 import * as pwa        from './app/pwa.js';
 
 import { registry }     from './data/apps.js';
 import { html, render } from './vendors.js';
-import Shell            from './components/Shell.js';
 
 import aufbau from '@aufbau/runtime';
 
-// import * as pwa  from './app/pwa.js';
-// import { toast } from './app/toast.js';
+// :::::: HELPERS
 
 const configFor = slug => (slug && registry.get(slug)) || {};
 
+// a dynamic import resolves to its default export, else the whole namespace
+const pick = mod => mod?.default ?? mod;
+
+// :::::: APP
+
 class ZugriffApp {
 
-  constructor (slug ) {
-    this.baseURL = './';
+  constructor (slug) {
     this.slug    = slug;
-    this.url     = 'https://zugriff.dev/' + slug + '/';
-    this.config  = configFor(this.slug);
+    this.config  = configFor(slug);
+    this.baseURL = new URL(`/${slug}/`, location.origin);   // absolute — loaders resolve against it
+    this.url     = this.baseURL.href;
     this.state   = createState(this.config);
+    this.toast   = toast;
+    this.effect  = effect;
   }
-  
-  //url = (path) => new URL (path, this.baseURL);
 
-  // ::: init
-  init = async ({ App, target = '#app', shell } = {}) => {
-    //const useShell = shell ?? config.type === 'tool';
-    const useShell = false;
+  // ::: loaders (app-relative). component() from ./components, module() from the app root.
+  // both resolve to a default export when present, else the namespace.
+  component = name => import(new URL(`components/${name}.js`, this.baseURL)).then(pick);
+  module    = name => import(new URL(`${name}.js`,           this.baseURL)).then(pick);
+
+  // ::: state extension — the mechanism to grow app.state and wire effects.
+  // scalar/plain-data leaves land on the deep signal; `effects` are plain
+  // @aufbau/signals effects the caller passes as functions.
+  extend = (seed = {}, effects = []) => {
+    for (const [key, value] of Object.entries(seed)) this.state[key] = value;
+    for (const fn of [].concat(effects)) if (fn) effect(fn);
+    return this;
+  };
+
+  // persist a deep-signal subtree (app.state[key]) as one localStorage blob under
+  // `zugriff:<slug>:<key>`: hydrate first, then write back on any leaf change.
+  persist = (key, storeKey = `zugriff:${this.slug}:${key}`) => {
+    const node = this.state[key];
+    if (!node?.$signal) return this;
+    try { const saved = JSON.parse(localStorage.getItem(storeKey)); if (saved) node.$update(saved); } catch {}
+    let first = true;
+    effect(() => {
+      const snapshot = node.$signal.value;
+      if (first) { first = false; return; }   // the hydrated/seed value is already stored (or intentionally not)
+      try { localStorage.setItem(storeKey, JSON.stringify(snapshot)); } catch {}
+    });
+    return this;
+  };
+
+  // ::: state sugar — base leaves live on the deep signal
+  getState    = key          => this.state[key];
+  setState    = (key, value) => this.state[key] = value;
+  toggleState = (key, force) => this.state[key] = force ?? !this.state[key];
+  resetState  = key          => this.state[key] = key in this.config ? this.config[key] : null;
+  setDialog   = (id = null)  => this.state.dialog = id;
+  setRoute    = (id = null)  => this.state.route  = id;
+
+  // ::: modal helpers (app.state.modal drives an app's overlays)
+  openModal   = id => this.state.modal = id;
+  closeModal  = () => this.state.modal = null;
+  toggleModal = id => this.state.modal = this.state.modal === id ? null : id;
+
+  // ::: command dispatch (app.commands is a Map<id, { exec }>)
+  exec = id => this.commands?.get(id)?.exec();
+
+  // ::: pwa (install-to-home-screen), lifted off the shared plumbing
+  canInstall    = pwa.canInstall;
+  isInstalled   = pwa.isInstalled;
+  promptInstall = pwa.promptInstall;
+
+  // ::: mount. the app owns the whole #app root; App is the top-level component.
+  init = async ({ App, target = '#app' } = {}) => {
     await aufbau.init(this.config.aufbau);
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
 
-    //if (App) render(useShell ? html`<${Shell} app=${config}><${App} /><//>` : html`<${App} />`, $target);
     if (App) render(html`<${App} />`, $target);
-
-    return app;
+    return this;
   };
-
-  // ::: state helpers — thin sugar over the deepSignal
-  getState    = (key)        => this.state[key];
-  setState    = (key, value) => this.state[key] = value;
-  toggleState = (key, force) => this.state[key] = force ?? !this.state[key];
-  resetState  = (key)        => this.state[key] = key in this.config ? this.config[key] : null;
-  setDialog   = (id = null)  => this.state.dialog = id;
-  setRoute    = (id = null)  => this.state.route  = id;
-
-  // ::: import app-modules
-  loadModule       = (sth)  => sth.endsWith('.js') ? this.loadModuleByPath(sth) : this.loadModuleByName(sth);     
-  loadModuleByName = (name) => import(`./${name}.js`);
-  loadModuleByPath = (path) => import(path);
-  module = new Proxy ({}, { get: (_, name) => this.loadModuleByName(name) });
-
-  // ::: pwa (install-to-home-screen), lifted straight off the shared plumbing
-  canInstall    = pwa.canInstall;
-  isInstalled   = pwa.isInstalled;
-  promptInstall = pwa.promptInstall;
 
 }
 

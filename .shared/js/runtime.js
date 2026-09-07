@@ -1,4 +1,8 @@
 // .shared/js/runtime.js
+// the global runtime — `zugriff` on window, with `zugriff.app` the current app
+// handle. boot.js imports this (blocking, in <head>) so every page has the runtime
+// bound before its app module runs; an app therefore never imports the runtime, it
+// reaches everything through the `zugriff` / `zugriff.app` globals.
 
 // :::::: IMPORTS
 
@@ -7,53 +11,54 @@ import { ZugriffApp }    from './app.js';
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
+import { toast }         from './app/toast.js';
 
-// ::: htm
+// ::: htm — the one tag instance, exposed as a global so components need no import
 import { h } from 'preact';
-import htm   from 'htm'; 
+import htm   from 'htm';
 const html = htm.bind(h);
-
-// import * as pwa  from './app/pwa.js';
-import { toast } from './app/toast.js';
 
 // :::::: CONSTS
 
-const PATH_COMPS  = '/.shared/js/components';
-const PATH_VENDOR = '/.shared/js/vendors.js';
+const PATH_COMPS = '/.shared/js/components';
 
-// :::::: METHODS
-
+// friendly aliases → importmap specifiers for zugriff.module(name)
 const vendorsMap = {
   filters  : '@aufbau/filters',
   gestures : '@aufbau/gestures',
   patterns : '@aufbau/patterns',
   signals  : '@aufbau/signals',
+  signal   : '@aufbau/signals',
   webfonts : '@aufbau/webfonts',
 
   is     : '@pulgasari/is',
   obj    : '@pulgasari/obj',
   str    : '@pulgasari/str',
   timing : '@pulgasari/timing',
-  
-  signal   : '@aufbau/signals',
-
-  // preact
-  // preact/hooks
 };
 
-async function loadModule (spec, module) {
-  const resolved = vendorsMap[spec] || spec;
-  const imported = await import(resolved);
-  return module ? imported[module] : (imported.default ?? imported);
+// :::::: LOADERS
+
+async function loadModule (spec, member) {
+  const imported = await import(vendorsMap[spec] || spec);
+  return member ? imported[member] : (imported.default ?? imported);
 }
 
-const loadComponent = (name, sub) => loadModule(`${PATH_COMPS}/${name}.js`, sub);        
-const loadVendor    = (name)      => {};
+const loadComponent = (name, member) => loadModule(`${PATH_COMPS}/${name}.js`, member);
+
+// :::::: APP INSTANCES
+// one handle per slug (a page is one app), so repeat lookups are idempotent.
+
+const instances = new Map();
+const getApp = slug => {
+  if (!instances.has(slug)) instances.set(slug, new ZugriffApp(slug));
+  return instances.get(slug);
+};
+
+const route      = window.location.pathname.split('/')[1] || null;
+const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
 
 // :::::: BUNDLE
-
-const route = window.location.pathname.split('/')[1] || null;
-const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
 
 const zugriff = {
   // namespaces
@@ -62,23 +67,23 @@ const zugriff = {
   registry,
   toast,
 
-  // methods
+  // loaders
   component : loadComponent,
   module    : loadModule,
   loadComponent,
   loadModule,
-  loadVendor,
+
+  // app handles
+  getApp,
+  app : isAppRoute ? getApp(route) : null,
 };
 
+// bind to window before any app module runs
 if (typeof globalThis !== 'undefined') {
   globalThis.html    = html;
+  globalThis.toast   = toast;
   globalThis.zugriff = zugriff;
 }
-
-zugriff.app            = isAppRoute ? new ZugriffApp(route) : null;
-zugriff.getApp         = (slug) => new ZugriffApp (slug);
-zugriff.openPrompt     = await loadComponent ('Prompt', 'openPrompt');
-zugriff.toggleSettings = await loadComponent ('Settings', 'toggleSettings');
 
 // :::::: EXPORT
 

@@ -3,13 +3,14 @@
 // toggles for wrap / minimap / line numbers, plus the font size.
 
 import { html } from './../vendors.js';
-import state from './../state.js';
+
+const app = zugriff.app;
 
 export default function Statusbar () {
-  const file        = state.activeFile.value;
-  const config      = state.editor.config.value;
-  const sizeFormat  = state.config.fileSizeFormat.value;
-  const toggle      = state.editor.toggleConfig;
+  const file        = app.files.active.value;
+  const config      = app.editor.config.value;
+  const sizeFormat  = app.state.config.fileSizeFormat;
+  const toggle      = app.editor.toggleConfig;
 
   const formatSize = bytes => {
     if (bytes < 1024)        return `${bytes} B`;
@@ -42,10 +43,10 @@ export default function Statusbar () {
         <span class="sb-sep">·</span>
         <span class="sb-item sb-size" onClick=${() => {
           const modes = ['formatted', 'bytes', 'chars'];
-          state.config.fileSizeFormat.value = modes[(modes.indexOf(sizeFormat) + 1) % modes.length];
+          app.state.config.fileSizeFormat = modes[(modes.indexOf(sizeFormat) + 1) % modes.length];
         }}>${getFileSize()}</span>
         <span class="sb-sep">·</span>
-        <span class="sb-item sb-indent" onClick=${() => (state.modal.value = 'settings')}>${indentStr}</span>
+        <span class="sb-item sb-indent" onClick=${() => (app.state.modal = 'settings')}>${indentStr}</span>
       ` : html`<span class="sb-item sb-empty">No file</span>`}
 
       <span class="sb-spacer"></span>

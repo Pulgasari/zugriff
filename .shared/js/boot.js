@@ -95,13 +95,12 @@ function applyTheme (theme) {
   }
 
   // :::::: Task 5: Zugriff Runtime Initialization
-  async function initRuntime () {
-    try {
-      await import('./runtime.js');
-      console.log('zugriff booted:', window.zugriff);
-    } catch (error) {
-      console.error('Boot process failed:', error);
-    }
+  // kick off the runtime import here (after the importmap is in place) and expose the
+  // readiness promise so app.html can await it before loading the app module. binds
+  // `zugriff` (and html/toast) to window; an app never imports the runtime itself.
+  function initRuntime () {
+    window.__ZUGRIFF_READY__ = import('./runtime.js')
+      .catch(error => { console.error('[boot] runtime init failed:', error); throw error; });
   }
 
   

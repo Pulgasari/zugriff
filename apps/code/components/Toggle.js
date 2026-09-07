@@ -1,7 +1,7 @@
 // apps/code/components/Toggle.js
 
 import { html } from './../vendors.js';
-import Icon from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
 
 export default function Toggle ({ value = false, onChange, label, size = '32' }) {
   const opacity = value ? '100%' : '50%';

@@ -58,12 +58,18 @@
   </div>
 </div>
 
-<script type='module'>
-const route = window.location.pathname.split('/')[1] || null;
-if (route === 'icons') import("https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js");
+<script type="module">
+  // the single mount point for every app: wait for the runtime boot.js started (zugriff
+  // bound to window, incl. zugriff.app for this route), then load the app module. the app
+  // therefore never imports the runtime — zugriff / zugriff.app are already global.
+  try { await (window.__ZUGRIFF_READY__ ?? import('/.shared/js/runtime.js')); }
+  catch (error) { console.error('[app] runtime not ready:', error); }
+
+  const route = window.location.pathname.split('/')[1] || null;
+  if (route === 'icons') import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
+
+  await import('./app.js');
 </script>
-  
-<script type="module" src="./app.js"></script>
-  
+
 </body>
 </html>

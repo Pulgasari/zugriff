@@ -5,8 +5,10 @@
 // API. layout is German by default (the app's origin), symbols on top.
 
 import { html, useState, useEffect } from './../vendors.js';
-import state from './../state.js';
+import { enableAndroidKeyboard } from './../modules/keyboard.js';
 import KeyboardButton from './KeyboardButton.js';
+
+const app = zugriff.app;
 
 const layouts = {
   de: {
@@ -14,40 +16,6 @@ const layouts = {
     shift   : ['QWERTZUIOPÜ', 'ASDFGHJKLÖÄ', '--YXCVBNM--'],
     symbols : [`([{<?.,'$#=+*12345`, `)]}>!:;"&|_-/67890`],
   },
-};
-
-// ── native (Android) keyboard suppression ────────────────────────────────────
-
-const KB_SELECTOR = 'input, textarea, [contenteditable]';
-const setManual   = el => el.setAttribute('virtualkeyboardpolicy', 'manual');
-const setAuto     = el => el.removeAttribute('virtualkeyboardpolicy');
-const onFocusIn   = () => navigator.virtualKeyboard?.hide();
-let   observer    = null;
-
-export const disableAndroidKeyboard = () => {
-  if (!navigator.virtualKeyboard) return;
-  navigator.virtualKeyboard.overlaysContent = true;
-  document.querySelectorAll(KB_SELECTOR).forEach(setManual);
-  observer = new MutationObserver(mutations => {
-    for (const { addedNodes } of mutations) {
-      for (const node of addedNodes) {
-        if (node.nodeType !== 1) continue;
-        if (node.matches?.(KB_SELECTOR)) setManual(node);
-        node.querySelectorAll?.(KB_SELECTOR).forEach(setManual);
-      }
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-  document.addEventListener('focusin', onFocusIn, true);
-};
-
-export const enableAndroidKeyboard = () => {
-  if (!navigator.virtualKeyboard) return;
-  navigator.virtualKeyboard.overlaysContent = false;
-  document.querySelectorAll(KB_SELECTOR).forEach(setAuto);
-  observer?.disconnect();
-  observer = null;
-  document.removeEventListener('focusin', onFocusIn, true);
 };
 
 // ── component ────────────────────────────────────────────────────────────────
@@ -60,7 +28,7 @@ export default function Keyboard () {
   const [isCtrlPressed]                       = useState(false);
 
   useEffect(() => () => {
-    if (!state.config.disableAndroidKeyboard.value) enableAndroidKeyboard();
+    if (!app.state.config.disableAndroidKeyboard) enableAndroidKeyboard();
   }, []);
 
   const specialKeys = ['alt', 'backspace', 'capslock', 'ctrl', 'enter', 'shift', 'space', 'tab', 'tab-rtl', 'left', 'right', 'up', 'down'];

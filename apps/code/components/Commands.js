@@ -5,8 +5,9 @@ import { useState } from 'preact/hooks';
 import { stored } from '/.shared/js/app/signals.js';
 
 import Modal from './Modal.js';
-import Icon  from './Icon.js';
-import state from './../state.js';
+import Icon  from '/.shared/js/components/Icon.js';
+
+const app = zugriff.app;
 
 export const favoritesSignal = stored([], 'code:favs');
 
@@ -21,10 +22,10 @@ export default function Commands () {
       : [...favorites, key];
   };
 
-  const run = key => { state.modal.value = null; state.exec(key); };
+  const run = key => { app.closeModal(); app.exec(key); };
 
   const query = search.toLowerCase();
-  const filtered = Array.from(state.commands.entries()).filter(([key, cmd]) =>
+  const filtered = Array.from(app.commands.entries()).filter(([key, cmd]) =>
     key.toLowerCase().includes(query) || (cmd.name && cmd.name.toLowerCase().includes(query)),
   );
 

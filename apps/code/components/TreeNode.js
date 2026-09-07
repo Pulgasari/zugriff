@@ -6,11 +6,11 @@
 // every open folder reloads.
 
 import { html, useState, useEffect } from './../vendors.js';
-import state from './../state.js';
-import * as fsops from './../fsops.js';
-import { clipboard, version, bump, ask, validName } from './../treeops.js';
-import Icon from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
 import RowMenu from './RowMenu.js';
+
+const app = zugriff.app;
+const { fsops, clipboard, version, bump, ask, validName } = app.workspaces;
 
 const readEntries = async (dir) => {
   const out = [];
@@ -38,7 +38,7 @@ export default function TreeNode ({ entry, parent, depth = 0 }) {
     setIsOpen(true);
   };
 
-  const openFile = async () => { await state.openFile(entry); state.closeModal(); };
+  const openFile = async () => { await app.files.openLocal(entry); app.closeModal(); };
 
   // ── actions ────────────────────────────────────────────────────────────
   const newFile = async () => {
@@ -57,13 +57,13 @@ export default function TreeNode ({ entry, parent, depth = 0 }) {
     const name = await ask('Rename', entry.name);
     if (name === null || !validName(name) || name === entry.name) return;
     await fsops.rename(parent, entry, name);
-    if (!isDir) state.closeById(entry);
+    if (!isDir) app.files.closeById(entry);
     bump('local');
   };
   const del = async () => {
     if (!confirm(`Delete “${entry.name}”?`)) return;
     await fsops.remove(parent, entry.name);
-    if (!isDir) state.closeById(entry);
+    if (!isDir) app.files.closeById(entry);
     bump('local');
   };
   const setClip = mode => { clipboard.value = { source: 'local', mode, isDir, name: entry.name, ctx: { entry, parent } }; };
@@ -73,7 +73,7 @@ export default function TreeNode ({ entry, parent, depth = 0 }) {
     let name = cb.name;
     if (await fsops.exists(entry, name)) { name = await ask('Name exists — new name', name); if (!validName(name)) return; }
     if (cb.mode === 'copy') await fsops.copyInto(cb.ctx.entry, entry, name);
-    else { await fsops.moveInto(cb.ctx.entry, cb.ctx.parent, entry); clipboard.value = null; state.closeById(cb.ctx.entry); }
+    else { await fsops.moveInto(cb.ctx.entry, cb.ctx.parent, entry); clipboard.value = null; app.files.closeById(cb.ctx.entry); }
     setIsOpen(true); await reload(); bump('local');
   };
 

@@ -3,7 +3,7 @@
 // { label, icon, onClick, danger } (falsy entries are skipped).
 
 import { html, useState } from './../vendors.js';
-import Icon from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
 
 export default function RowMenu ({ items }) {
   const [open, setOpen] = useState(false);

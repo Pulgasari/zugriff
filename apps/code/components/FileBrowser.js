@@ -3,15 +3,13 @@
 
 import { html, useEffect } from './../vendors.js';
 import { signal }          from '@aufbau/signals';
-import state    from './../state.js';
-import fs       from './../fs.js';
 import * as fsaccess from '/.shared/js/filesystem/fsaccess.js';   // picks via the platform seam (browser picker or native SAF)
-import * as fsops from './../fsops.js';
-import { clipboard, version, bump, ask, validName } from './../treeops.js';
 import Modal    from './Modal.js';
-import Icon     from './Icon.js';
-import RowMenu  from './RowMenu.js';
+import Icon     from '/.shared/js/components/Icon.js';
 import TreeNode from './TreeNode.js';
+
+const app = zugriff.app;
+const { local: fs, fsops, clipboard, version, bump, ask, validName } = app.workspaces;
 
 export const filesSignal = signal([]);
 const statusSignal       = signal('init');   // init | idle | ready | needs-restore | error
@@ -26,7 +24,7 @@ export default function FileBrowser () {
 
   const applyDirectory = (handle, entries) => {
     filesSignal.value       = entries;
-    state.currentDirHandle  = handle;
+    app.workspaces.dir  = handle;
     savedHandleSignal.value = handle;
     statusSignal.value      = 'ready';
   };
@@ -35,7 +33,7 @@ export default function FileBrowser () {
     try {
       await fs.clearRoot();
       filesSignal.value       = [];
-      state.currentDirHandle  = null;
+      app.workspaces.dir  = null;
       savedHandleSignal.value = null;
       statusSignal.value      = 'idle';
       errorSignal.value       = null;
@@ -83,28 +81,28 @@ export default function FileBrowser () {
 
   // re-read the root listing whenever anything in the local tree changes
   useEffect(() => {
-    const root = state.currentDirHandle;
+    const root = app.workspaces.dir;
     if (root && statusSignal.peek() === 'ready') fs.readDir(root).then(e => { filesSignal.value = e; }).catch(() => {});
   }, [version.local.value]);
 
   // ── root-level actions ─────────────────────────────────────────────────
   const rootNewFile = async () => {
-    const root = state.currentDirHandle; if (!root) return;
+    const root = app.workspaces.dir; if (!root) return;
     const name = await ask('New file'); if (!validName(name) || await fsops.exists(root, name)) return;
     await fsops.createFile(root, name); bump('local');
   };
   const rootNewFolder = async () => {
-    const root = state.currentDirHandle; if (!root) return;
+    const root = app.workspaces.dir; if (!root) return;
     const name = await ask('New folder'); if (!validName(name) || await fsops.exists(root, name)) return;
     await fsops.createDir(root, name); bump('local');
   };
   const rootPaste = async () => {
-    const root = state.currentDirHandle, cb = clipboard.value;
+    const root = app.workspaces.dir, cb = clipboard.value;
     if (!root || !cb || cb.source !== 'local') return;
     let name = cb.name;
     if (await fsops.exists(root, name)) { name = await ask('Name exists — new name', name); if (!validName(name)) return; }
     if (cb.mode === 'copy') await fsops.copyInto(cb.ctx.entry, root, name);
-    else { await fsops.moveInto(cb.ctx.entry, cb.ctx.parent, root); clipboard.value = null; state.closeById(cb.ctx.entry); }
+    else { await fsops.moveInto(cb.ctx.entry, cb.ctx.parent, root); clipboard.value = null; app.files.closeById(cb.ctx.entry); }
     bump('local');
   };
 
@@ -171,7 +169,7 @@ export default function FileBrowser () {
           ${files.length === 0
             ? html`<div class="none"><${Icon} name="material-symbols:info" /><br/>No folder loaded.</div>`
             : html`<ul class="tree-root">
-                ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} parent=${state.currentDirHandle} depth=${0} />`)}
+                ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} parent=${app.workspaces.dir} depth=${0} />`)}
               </ul>`}
         `}
       </div>

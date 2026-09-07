@@ -1,8 +1,11 @@
-// apps/code/editor.js
-// https://microsoft.github.io/monaco-editor/docs.html
-// https://github.com/brijeshb42/monaco-themes
+// apps/code/modules/editor.js
+// the Monaco layer. the editor OPTIONS are state and live on app.state.editor (a
+// deep-signal subtree, seeded from DEFAULTS and persisted in app.js); this module is
+// the behaviour bridge over them — the whole-object `config` view, the option
+// read/write helpers, the theme loader and the live editor instance.
+// https://microsoft.github.io/monaco-editor/docs.html · https://github.com/brijeshb42/monaco-themes
 
-import { local, signal } from '@aufbau/signals';
+import { loadMonaco } from './monaco.js';
 
 // ── Monaco theme catalogue ───────────────────────────────────────────────────
 
@@ -65,9 +68,9 @@ const NATIVE_THEMES = ['vs', 'vs-dark', 'hc-black', 'hc-light'];
 const themes        = [...NATIVE_THEMES, ...Object.keys(MONACO_THEMES)];
 const themeCache    = new Set();
 
-// ── options (the persisted Monaco construction object) ───────────────────────
+// ── the persisted Monaco construction object (seeded onto app.state.editor) ───
 
-const DEFAULTS = {
+export const DEFAULTS = {
   autoIndent           : 'none',
   automaticLayout      : true,
   contextmenu          : false,
@@ -100,26 +103,15 @@ const DEFAULTS = {
   },
 };
 
-// the deep/nested carrier persists every option per-leaf under `code:editor-config:`
-// and merges the stored leaves over DEFAULTS on hydration, so options added in a later
-// version still surface for users who already have a saved object.
-const configSignal = signal({
-  deep   : true,
-  nested : true,
-  key    : 'code:editor-config',
-  store  : local,
-  value  : DEFAULTS,
-});
+// ── config: a whole-object view over app.state.editor ─────────────────────────
+// the module + components treat the options as one object via `config.value`;
+// reading returns the deep signal's memoized snapshot ($signal — reactive, stable
+// identity that changes only on a real leaf change), assigning replaces every leaf.
 
-// the rest of this module and the components treat the options as one object via
-// `config.value`, but a deep signal has no `.value` — it exposes leaves directly.
-// bridge the two with a whole-object view over the carrier: reading returns the
-// carrier's memoized snapshot ($signal — reactive, and a stable identity that only
-// changes when a leaf actually changes, so `useEffect([cfg])` still fires only on real
-// option changes), assigning replaces every leaf (and persists per-leaf).
+const node   = () => zugriff.app.state.editor;
 const config = {
-  get value ()     { return configSignal.$signal.value; },
-  set value (next) { configSignal.$replace(next); },
+  get value ()     { return node().$signal.value; },
+  set value (next) { node().$replace(next); },
 };
 
 // ── option helpers (immutable rewrites of the object) ────────────────────────
@@ -142,7 +134,7 @@ const set = (key, value) => {
 
 /** shallow/deep merge a partial options object in */
 const updateConfig = (patch) => {
-  const next = clone(config.value);
+  const next  = clone(config.value);
   const merge = (dst, src) => {
     for (const [k, v] of Object.entries(src)) {
       if (v !== null && typeof v === 'object' && !Array.isArray(v)) merge((dst[k] ??= {}), v);
@@ -184,11 +176,30 @@ const updateTheme = async (themeKey) => {
   set('theme', themeKey);
 };
 
+// ── the quick-action toolbar (editor actions above the keyboard) ──────────────
+
+const toolbar = [
+  { cmd: 'file:save'           , icon: 'save'            },
+  { cmd: 'editor:copy'         , icon: 'copy'            },
+  { cmd: 'editor:cut'          , icon: 'cut'             },
+  { cmd: 'editor:paste'        , icon: 'paste'           },
+  { cmd: 'editor:selectAll'    , icon: 'select-all'      },
+  { cmd: 'editor:duplicateLine', icon: 'copy-lines-down' },
+  { cmd: 'editor:moveLineDown' , icon: 'move-lines-down' },
+  { cmd: 'editor:moveLineUp'   , icon: 'move-lines-up'   },
+  { cmd: 'editor:joinLines'    , icon: 'join-lines'      },
+  { cmd: 'editor:sortLinesAsc' , icon: 'sort-lines'      },
+];
+
+// ── the module ────────────────────────────────────────────────────────────────
+
 const editor = {
-  config, // the whole-options signal
+  config,                                   // whole-options view over app.state.editor
   get, set, updateConfig, toggleConfig,
-  updateTheme,
-  themes,
+  updateTheme, themes,
+  toolbar,
+  load     : loadMonaco,
+  instance : null,                          // the live Monaco editor, bound in components/Editor.js
 };
 
 export default editor;

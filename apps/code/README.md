@@ -36,20 +36,55 @@ itself from `inline-size`/`block-size`, and forcing `display: inline` makes it
 ignore both and collapse to nothing (the Tap wrappers are `inline-flex` boxes so
 the icon inside is blockified and keeps its size).
 
+## runtime / the app object
+
+the app runs on the shared **global runtime**: the page is `zugriff/app.html`, whose
+`<head>` blocking `boot.js` injects the import map + theme colours and binds `zugriff`
+(and `zugriff.app` for this route) to `window`; the mount script then awaits the runtime
+and imports `./app.js`. so nothing here imports the runtime — `zugriff` and `zugriff.app`
+are the always-present reference points (see `.shared/js/runtime.js`, `.shared/js/app.js`).
+
+`app.js` assembles the app on that handle:
+
+```
+app                        the handle (zugriff.app)
+app.state                  reactive base (@aufbau/signals deep signal)
+app.state.theme/font/…     shared leaves from the registry (theme drives applyTheme)
+app.state.config           chrome / panel prefs        (persisted, app.persist('config'))
+app.state.editor           monaco construction options (persisted, app.persist('editor'))
+app.state.modal            active overlay id | null    (ephemeral)
+app.commands               the command registry (Map<id,{ exec }>)
+app.editor                 monaco behaviour — config view over app.state.editor, theme, instance
+app.files                  open tabs (open/active) + open/save/close ops
+app.workspaces             the sources: local fs + github + tree clipboard/version
+```
+
+state is extended by assigning onto `app.state` and wiring effects with `app.effect`;
+durable subtrees hydrate + persist through `app.persist`. `app.state.editor` is the
+data, `app.editor` the behaviour over it (the bridge). modules are hung directly on the
+handle (`app.commands = …`) and reach each other through the `zugriff.app` global, so
+there is no import cycle; `app.module()` / `app.component()` load app-relative modules
+and components on demand.
+
 ## files
 
-| file                     | what it is |
+| path                     | what it is |
 |--------------------------|------------|
-| `index.html`             | static shell — base css, Monaco css, the import map |
-| `app.js`                 | boot, the top-level layout, the app-wide effects |
-| `state.js`               | the shared app object — config, open files, modal, dispatch |
-| `editor.js`              | Monaco options (persisted) + the theme loader |
-| `commands.js`            | the command registry (palette / dock / toolbar) |
-| `fs.js`                  | the granted workspace root, stored via `@bunker/db` |
-| `icons.js`               | the editor's short icon aliases → iconify ids |
+| `app.js`                 | assembles the handle: state, modules, effects, layout, mount |
+| `modules/config.js`      | chrome / panel prefs (defaults seeded onto `app.state.config`) |
+| `modules/editor.js`      | Monaco options view over `app.state.editor` + the theme loader |
+| `modules/commands.js`    | the command registry (palette / dock / toolbar) |
+| `modules/files.js`       | the open documents — tabs, active, open/save/close |
+| `modules/workspaces.js`  | the editable sources: local fs + github + tree clipboard/version |
+| `modules/fs.js`          | the granted workspace root, stored via `@bunker/db` |
+| `modules/github.js`      | the in-browser GitHub client |
+| `modules/keyboard.js`    | native (Android) keyboard suppression |
+| `modules/{db,fsops,treeops,monaco}.js` | idb, local file ops, tree helpers, the Monaco loader |
 | `components/`            | the UI (Editor, Keyboard, Dock, Statusbar, FileBrowser, …) |
 | `app.css`                | the editor's own look |
 | `app.svg` / `manifest.json` / `assets/` | icon + pwa manifest (generated from the registry + `app.svg`) |
+
+the page is the shared `zugriff/app.html`; there is no per-app `index.html`.
 
 ## GitHub
 

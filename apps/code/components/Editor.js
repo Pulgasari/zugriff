@@ -1,53 +1,53 @@
 // apps/code/components/Editor.js
-// the Monaco editor. Monaco is loaded through ./../monaco.js (its AMD loader on
-// a versioned CDN) rather than imported here, because the esm.sh ?worker builds
-// are broken and the service worker chokes on esm.sh streaming responses.
+// the Monaco editor. Monaco is loaded through app.editor.load() (its AMD loader on a
+// versioned CDN) rather than imported here, because the esm.sh ?worker builds are
+// broken and the service worker chokes on esm.sh streaming responses.
 
 import { html, useEffect, useRef } from './../vendors.js';
-import state       from './../state.js';
-import { loadMonaco } from './../monaco.js';
-import Welcome     from './Welcome.js';
+import Welcome from './Welcome.js';
+
+const app = zugriff.app;
 
 export default function Editor () {
   const containerRef = useRef(null);
   const monacoRef    = useRef(null);   // the Monaco namespace
   const editorRef    = useRef(null);   // the editor instance
   const programmatic = useRef(false);  // true while we set the value ourselves
-  const activeFile   = state.activeFile.value;
-  const cfg          = state.editor.config.value; // subscribe to option changes
+  const activeFile   = app.files.active.value;
+  const cfg          = app.editor.config.value; // subscribe to option changes
 
   // create Monaco once (async: the loader resolves when the editor is ready)
   useEffect(() => {
     let disposed = false;
-    loadMonaco().then(monaco => {
+    app.editor.load().then(monaco => {
       if (disposed || !containerRef.current) return;
       monacoRef.current = monaco;
-      const { theme, ...options } = state.editor.config.value;
+      const { theme, ...options } = app.editor.config.value;
       const instance = monaco.editor.create(containerRef.current, {
         ...options,
-        value    : state.activeFile.value?.content  ?? '',
-        language : state.activeFile.value?.language ?? 'plaintext',
+        value    : app.files.active.value?.content  ?? '',
+        language : app.files.active.value?.language ?? 'plaintext',
       });
-      editorRef.current = instance;
-      state.monaco      = instance;
+      editorRef.current   = instance;
+      app.editor.instance = instance;
 
-      state.editor.updateTheme(theme);
+      app.editor.updateTheme(theme);
 
       // push edits back into the open-file record and flag it dirty — but ignore
       // the change events our own setValue() (on tab switch) triggers
       instance.onDidChangeModelContent(() => {
         if (programmatic.current) return;
-        const file = state.activeFile.value;
+        const file = app.files.active.value;
         if (!file) return;
-        state.patchFile(file, { content: instance.getValue(), isDirty: true });
+        app.files.patch(file, { content: instance.getValue(), isDirty: true });
       });
     }).catch(err => console.error('[code] Monaco failed to load:', err));
 
     return () => {
       disposed = true;
       editorRef.current?.dispose();
-      editorRef.current = null;
-      state.monaco = null;
+      editorRef.current   = null;
+      app.editor.instance = null;
     };
   }, []);
 
@@ -62,13 +62,13 @@ export default function Editor () {
     }
     monaco.editor.setModelLanguage(editorRef.current.getModel(), activeFile.language);
     // binary GitHub blobs open read-only; a normal file follows the config
-    editorRef.current.updateOptions({ readOnly: !!activeFile.readOnly || !!state.editor.config.value.readOnly });
+    editorRef.current.updateOptions({ readOnly: !!activeFile.readOnly || !!app.editor.config.value.readOnly });
   }, [activeFile]);
 
   // apply option changes (theme is driven separately through updateTheme)
   useEffect(() => {
     if (!editorRef.current) return;
-    const { theme, ...options } = state.editor.config.value;
+    const { theme, ...options } = app.editor.config.value;
     editorRef.current.updateOptions(options);
   }, [cfg]);
 
