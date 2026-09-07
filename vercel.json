@@ -11,7 +11,7 @@
     },
     {
       "source"      : "/:appname([a-z0-9-]+)/",
-      "destination" : "/app.html?app=:appname"
+      "destination" : "/index.html"
     },
     {
       "source"      :      "/:appname/:path*",

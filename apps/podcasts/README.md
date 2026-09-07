@@ -27,8 +27,8 @@ feed requests themselves.
 ## under the hood
 
 Everything is a static ES module — no build step, in keeping with the rest of
-zugriff. The app runs on the shared **global runtime**: the page is
-`zugriff/app.html`, whose blocking `boot.js` binds `zugriff` (and `zugriff.app`,
+zugriff. The app runs on the shared **global runtime**: the page is the unified
+`zugriff/index.html`, whose blocking `boot.js` binds `zugriff` (and `zugriff.app`,
 `html`) to `window`, so nothing here imports the runtime — `zugriff.app` is the
 reference point (see `.shared/js/app.js`).
 
