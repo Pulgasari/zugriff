@@ -24,6 +24,14 @@ import * as github from './github.js';
 // FOUC) — and this module only adds the app's own chrome config below. importing the
 // runtime module directly (rather than reading the window global) makes the boot order
 // explicit — this module evaluates after runtime.js has finished.
+// the shared runtime already builds this app's base reactive state as
+// zugriff.app.state (theme/font/dir/lang/title/dialog/route), persisted per-leaf
+// under `zugriff:code:` and wired to the shared DOM effects (applyTheme, webfonts,
+// …). the code app builds ON TOP of it: the shared leaves stay the single source
+// of truth — theme in particular drives the shared applyTheme (incl. the boot
+// colour cache used to avoid a FOUC) — and this module only adds the app's own
+// chrome config as extra persisted signals.
+import zugriff from '/.shared/js/runtime.js';
 const app = zugriff.app;
 
 // ── methods ──────────────────────────────────────────────────────────────────

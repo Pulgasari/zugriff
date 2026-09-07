@@ -70,17 +70,17 @@ const zugriff = {
   loadVendor,
 };
 
+if (typeof globalThis !== 'undefined') {
+  globalThis.html    = html;
+  globalThis.zugriff = zugriff;
+}
+
 zugriff.app            = isAppRoute ? new ZugriffApp(route) : null;
 zugriff.getApp         = (slug) => new ZugriffApp (slug);
 zugriff.openPrompt     = await loadComponent ('Prompt', 'openPrompt');
 zugriff.toggleSettings = await loadComponent ('Settings', 'toggleSettings');
 
 // :::::: EXPORT
-
-if (typeof globalThis !== 'undefined') {
-  globalThis.html    = html;
-  globalThis.zugriff = zugriff;
-}
 
 export       { zugriff };
 export default zugriff;
