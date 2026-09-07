@@ -105,16 +105,13 @@ function applyTheme (theme) {
   }
 
   
-
-
-
   const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
   const $root = document.documentElement;
 
-  document.body.classList.add('is-loading');
+  $root.classList.add('is-loading');
   window.addEventListener('load', () => {
-    document.body.classList.remove('is-loading');
-    document.body.classList.add('is-ready');
+    $root.classList.remove('is-loading');
+    $root.classList.add('is-ready');
   });
 
   // Merge options: HTML data-attributes < global window config < default options
