@@ -13,18 +13,18 @@ const app = zugriff.app;
 const { db } = app;
 
 export default function PodcastsView () {
-  const list = sortPodcasts(db.podcasts.value, app.state.settings.podcastSort);
+  const list = sortPodcasts(db.podcasts.value, app.settings.podcastSort);
 
   return html`
     <div class="view">
       <div class="view-head">
         <h1>Podcasts</h1>
         <div class="view-tools">
-          <${SortPicker} value=${app.state.settings.podcastSort} onChange=${v => app.state.settings.podcastSort = v}
+          <${SortPicker} value=${app.settings.podcastSort} onChange=${v => app.settings.podcastSort = v}
              options=${[['recent', 'Recently updated'], ['alpha', 'A–Z']]} />
           <div class="seg">
-            <${IconButton} icon="viewmode-grid" label="Grid" active=${app.state.settings.view === 'grid'} onClick=${() => app.state.settings.view = 'grid'} />
-            <${IconButton} icon="viewmode-list" label="List" active=${app.state.settings.view === 'list'} onClick=${() => app.state.settings.view = 'list'} />
+            <${IconButton} icon="viewmode-grid" label="Grid" active=${app.settings.view === 'grid'} onClick=${() => app.settings.view = 'grid'} />
+            <${IconButton} icon="viewmode-list" label="List" active=${app.settings.view === 'list'} onClick=${() => app.settings.view = 'list'} />
           </div>
           <${IconButton} icon="mdi:plus" label="Add podcast" onClick=${() => app.state.dialog = 'add'} />
         </div>
@@ -35,11 +35,11 @@ export default function PodcastsView () {
                  action=${html`<button class="btn primary" onClick=${() => app.state.dialog = 'add'}>
                    <${Icon} name="mdi:plus" /> Add a podcast</button>`} />`
         : html`
-          <aufbau-index class="pc-index" viewmode=${app.state.settings.view}
-                        item-size="150px" gap=${app.state.settings.view === 'grid' ? '1.25rem' : '0'}>
+          <aufbau-index class="pc-index" viewmode=${app.settings.view}
+                        item-size="150px" gap=${app.settings.view === 'grid' ? '1.25rem' : '0'}>
             ${list.map(p => html`
               <aufbau-item key=${p.id}>
-                ${app.state.settings.view === 'grid'
+                ${app.settings.view === 'grid'
                   ? html`<${PodcastCard} podcast=${p} />`
                   : html`<${PodcastListRow} podcast=${p} />`}
               </aufbau-item>`)}

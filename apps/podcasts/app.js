@@ -10,6 +10,7 @@
 
 // ::: vendors
 import { useEffect } from 'preact/hooks';
+import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 
 // ::: shared
 import { createThumbCache } from '/.shared/js/thumbs.js';
@@ -26,33 +27,33 @@ app.db     = db;
 app.player = player;
 
 // :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::::
-// app-owned reactive state on the shared deep signal (app.state, @aufbau/signals) — no
-// `.value`: leaves are read/written directly. ephemeral session state sits as top-level
-// leaves; durable prefs are a persisted subtree (app.persist writes it back per change).
-// leaves must be read INSIDE render to stay reactive — never destructure app.state at
-// module top. (app.db / app.player keep their own plain signals; those still use .value.)
+// ephemeral ui state on the shared deep signal (app.state) — no `.value`, read/written
+// directly, read INSIDE render to stay reactive (never destructure at module top).
+// durable prefs live in their own typed store (app.settings) below.
 
 app.state.route  = { name: 'latest', id: null };   // { name, id }
 app.state.search = '';                             // shared episode filter
 app.state.dialog = null;                           // 'add' | 'settings' | null
 app.state.busy   = '';                             // a label while a long task runs
 
+// durable preferences — a typed, `.value`-free store (enum leaves reject off-list writes),
+// persisted as one blob under zugriff:podcasts:settings. its own store (not an app.state
+// subtree) because typedSignal persistence is whole-store while app.state stays ephemeral.
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
-app.state.settings = {
-  podcastSort : 'recent',   // recent | alpha
-  episodeSort : 'newest',   // newest | oldest | alpha
-  view        : 'grid',     // grid | list
-  menuPos     : 'bottom',   // top | bottom | left | right
-  playerPos   : 'bottom',   // top | bottom
-  proxy       : DEFAULT_PROXY,
-  imgResizer  : DEFAULT_IMG_RESIZER,
-};
-app.persist('settings');   // hydrate + write back under zugriff:podcasts:settings
+app.settings = typedSignal({
+  podcastSort : oneOf(['recent', 'alpha'], 'recent'),
+  episodeSort : oneOf(['newest', 'oldest', 'alpha'], 'newest'),
+  view        : oneOf(['grid', 'list'], 'grid'),
+  menuPos     : oneOf(['top', 'bottom', 'left', 'right'], 'bottom'),
+  playerPos   : oneOf(['top', 'bottom'], 'bottom'),
+  proxy       : text(DEFAULT_PROXY),
+  imgResizer  : text(DEFAULT_IMG_RESIZER),
+}, { key: 'zugriff:podcasts:settings', store: local });
 
 // on-device artwork thumbnail cache, resized through the configured endpoint
 const buildResizer = (url, w) => {
-  const tpl = app.state.settings.imgResizer.trim();
+  const tpl = app.settings.imgResizer.trim();
   if (!tpl || !url) return null;
   return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
 };
@@ -69,7 +70,7 @@ async function refreshAll () {
   if (!app.db.podcasts.value.length) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
-    const results = await app.db.refreshAll(app.state.settings.proxy, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.db.refreshAll(app.settings.proxy, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
     const added  = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed = results.filter(r => r.error).length;
     app.flash(added ? `${added} new episode${added === 1 ? '' : 's'}` + (failed ? `, ${failed} feed${failed === 1 ? '' : 's'} failed` : '')
@@ -102,8 +103,8 @@ app.hotkeys
 app.effect(() => {
   const el = document.getElementById('app');
   if (!el) return;
-  el.dataset.menu   = app.state.settings.menuPos;
-  el.dataset.player = app.state.settings.playerPos;
+  el.dataset.menu   = app.settings.menuPos;
+  el.dataset.player = app.settings.playerPos;
 });
 
 // :::::: UI ::::::::::::::::::::::::::::::::::::::::::::::::::
