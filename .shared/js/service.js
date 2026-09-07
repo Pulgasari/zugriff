@@ -69,9 +69,10 @@ self.addEventListener('fetch', event => {
   // cache renders at the *requested* url, not the redirected one, so:
   //   • vercel's `trailingSlash: true` 308 (/apps → /apps/) never fires while
   //     the sw is in control — the page stays on the un-slashed url;
-  //   • app.html then resolves its relative assets (./app.js, ./app.css) one
-  //     segment too high (/code/app.js becomes /app.js), so the app shell fails
-  //     to boot and a manual reload is needed.
+  //   • the index.html shell would then resolve any relative assets one segment
+  //     too high (/code/app.js becomes /app.js); the shell injects absolute
+  //     /<route>/… paths for exactly this reason, but keeping navigations on the
+  //     network preserves the redirect + rewrites regardless.
   // letting navigations hit the network keeps the redirect + rewrites intact;
   // the sw still caches every subresource below, which is where the win is.
   if (request.mode === 'navigate') return;

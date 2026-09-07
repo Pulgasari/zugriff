@@ -1,63 +1,36 @@
 // apps/files/app.js
+// the files app on the shared handle. the runtime binds zugriff (+ zugriff.app, html) to
+// window before this runs, so nothing here imports the runtime. a live, read-only view onto
+// one granted folder through the shared FileExplorer; the granted folder lives in the db
+// module. the app draws its own chrome and owns the #app root.
 
-// :::::: IMPORTS
-
-//import zugriff from '/.shared/js/runtime.js';
-//const { html, preact, signals } = zugriff.vendors;
-//import { html, Fragment, computed, useEffect } from '@aufbau/kits/preact-htm';
-
-// shared components
+// ::: shared components
 import Button       from '/.shared/js/components/Button.js';
 import FileExplorer from '/.shared/js/components/FileExplorer.js';
 import Icon         from '/.shared/js/components/Icon.js';
 import InstallTip   from '/.shared/js/components/InstallTip.js';
-import Settings     from '/.shared/js/components/Settings.js';
 
-// shared vendors
+// ::: vendors
 import { computed }  from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
-import { Fragment }  from 'preact';
 
-import * as db from './db.js'; 
-const app = zugriff.getApp('files');
+// ::: app modules
+import * as db from './modules/db.js';
+
+// ::: the app handle
+const app = zugriff.app;
 app.db = db;
 
-// :::::: IMPORTS
-/*
-const // shared components
-FileExplorer = await zugriff.component('FileExplorer'),
-Icon         = await zugriff.component('Icon'),
-InstallTip   = await zugriff.component('InstallTip'),
-Settings     = await zugriff.component('Settings');
-
-const // shared vendors
-computed  = await zugriff.module('signals').computed,
-html      = await zugriff.module('html'),
-useEffect = await zugriff.module('preact/hooks', 'useEffect'),
-Fragment  = await zugriff.module('preact').Fragment
-
-//
-const app = zugriff.getApp('files');
-app.db = await app.module('db');
-*/
-
 const { fs } = zugriff;
-// :::::: BACKEND
 
-// the granted folder, described for the FileExplorer component. read-only for
-// now (the folder is picked with mode:'read') — you browse, preview and
-// download; granting write is a later step. the id keys off the grant time so
-// switching to a different folder remounts the explorer at its new root.
+// :::::: BACKEND
+// the granted folder described for FileExplorer. read-only for now (picked as mode:'read')
+// — browse, preview, download; write is a later step. the id keys off the grant time so
+// switching folders remounts the explorer at its new root.
 const backend = computed(() => {
   const f = db.folder.value;
   if (!f || db.perm.value !== 'granted') return null;
-  return {
-    id        : 'disk:' + f.addedAt,
-    label     : f.name,
-    writable  : false,
-    supported : fs.supported,
-    getRoot   : () => f.handle,
-  };
+  return { id: 'disk:' + f.addedAt, label: f.name, writable: false, supported: fs.supported, getRoot: () => f.handle };
 });
 
 // :::::: ACTIONS
@@ -117,19 +90,9 @@ function Reconnect () {
           ? 'Permission for this folder was blocked. Re-pick it to browse again.'
           : 'This folder needs permission again for this visit.'}</p>
       <div class="fe-hero-actions">
-        <${Button} 
-          class="primary"
-          icon="mdi:folder-key-outline"
-          label='Reconnect'
-          onClick=${tryReconnect}
-          />
-        <${Button}
-          class="ghost"
-          icon='mdi:folder-search-outline'
-          label='Choose folder'
-          title="Re-select the folder — always works"
-          onClick=${chooseFolder}
-          />
+        <${Button} class="primary" icon="mdi:folder-key-outline" label='Reconnect' onClick=${tryReconnect} />
+        <${Button} class="ghost" icon='mdi:folder-search-outline' label='Choose folder'
+          title="Re-select the folder — always works" onClick=${chooseFolder} />
       </div>
     </div>`;
 }
@@ -172,34 +135,17 @@ function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
   return html`
-    <${Fragment}>${
+    <>${
         isNotSupported() ? html`<${Unsupported} />`
       : isLoading()      ? html`<${Icon} name='loading' />`
       : isWelcome()      ? html`<${Welcome} />`
       : isNotGranted()   ? html`<${Reconnect} />`
       : html`
-      <${Sidebar} />
-      <main id="app-main">
-        <${FileExplorer} backend=${backend.value} />
-      </main>`
-    }</${Fragment}>
-  `;
+        <${Sidebar} />
+        <main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`
+    }</>`;
 }
 
 // :::::: BOOT
 
 app.init({ App });
-
-/*
-
-import AppSettings  from '/.shared/js/components/AppSettings.js';
-import Icon         from '/.shared/js/components/Icon.js';
-import InstallTip   from '/.shared/js/components/InstallTip.js';
-import FileExplorer from '/.shared/js/components/FileExplorer.js';
-
-import AppSettings  from '@/components/AppSettings.js';
-import FileExplorer from '@/components/FileExplorer.js';
-import Icon         from '@/components/Icon.js';
-import InstallTip   from '@/components/InstallTip.js';
-
-*/

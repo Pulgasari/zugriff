@@ -21,7 +21,7 @@ export default function AddPodcastPanel () {
     if (!url) return;
     state.value = { loading: true, error: '' };
     try {
-      const p = await db.subscribe(url, app.state.settings.proxy);
+      const p = await db.subscribe(url, app.settings.proxy);
       flash(`Subscribed to ${p.title}`);
       app.state.dialog = null;
       go('podcast', p.id);

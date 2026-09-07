@@ -38,10 +38,10 @@ the icon inside is blockified and keeps its size).
 
 ## runtime / the app object
 
-the app runs on the shared **global runtime**: the page is `zugriff/app.html`, whose
-`<head>` blocking `boot.js` injects the import map + theme colours and binds `zugriff`
-(and `zugriff.app` for this route) to `window`; the mount script then awaits the runtime
-and imports `./app.js`. so nothing here imports the runtime — `zugriff` and `zugriff.app`
+the app runs on the shared **global runtime**: the page is the unified
+`zugriff/index.html`, whose `<head>` blocking `boot.js` injects the import map + theme
+colours and binds `zugriff` (and `zugriff.app` for this route) to `window`; the mount
+script then awaits the runtime and imports the route's `app.js`. so nothing here imports the runtime — `zugriff` and `zugriff.app`
 are the always-present reference points (see `.shared/js/runtime.js`, `.shared/js/app.js`).
 
 `app.js` assembles the app on that handle:
@@ -84,7 +84,8 @@ and components on demand.
 | `app.css`                | the editor's own look |
 | `app.svg` / `manifest.json` / `assets/` | icon + pwa manifest (generated from the registry + `app.svg`) |
 
-the page is the shared `zugriff/app.html`; there is no per-app `index.html`.
+the page is the shared `zugriff/index.html` (one shell for the launcher and every app
+route); there is no per-app `index.html`.
 
 ## GitHub
 

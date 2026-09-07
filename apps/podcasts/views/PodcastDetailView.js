@@ -17,7 +17,7 @@ export default function PodcastDetailView ({ id }) {
   const podcast = db.podcastById.value[id];
   if (!podcast) return html`<${Empty} icon="mdi:alert-outline" title="Podcast not found" />`;
 
-  const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], app.state.settings.episodeSort);
+  const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], app.settings.episodeSort);
   const eps = filterEpisodes(all, false);
   const doneCount = all.filter(e => db.stateOf(e.id).done).length;
 
@@ -33,7 +33,7 @@ export default function PodcastDetailView ({ id }) {
   const refreshOne = async () => {
     app.state.busy = 'Refreshing…';
     try {
-      const { added } = await db.refresh(id, app.state.settings.proxy);
+      const { added } = await db.refresh(id, app.settings.proxy);
       flash(added ? `${added} new episode${added === 1 ? '' : 's'}` : 'Up to date');
     } catch (err) { flash(err.message, 'err'); }
     finally { app.state.busy = ''; }
@@ -63,7 +63,7 @@ export default function PodcastDetailView ({ id }) {
 
       <div class="pd-tools">
         <span class="pd-tools-label">Episodes</span>
-        <${SortPicker} value=${app.state.settings.episodeSort} onChange=${v => app.state.settings.episodeSort = v}
+        <${SortPicker} value=${app.settings.episodeSort} onChange=${v => app.settings.episodeSort = v}
            options=${[['newest', 'Newest'], ['oldest', 'Oldest'], ['alpha', 'A–Z']]} />
       </div>
 

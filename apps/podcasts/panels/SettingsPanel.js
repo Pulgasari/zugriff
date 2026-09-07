@@ -15,8 +15,8 @@ const app = zugriff.app;
 const { db, flash } = app;
 
 export default function SettingsPanel () {
-  const proxyVal   = useSignal(app.state.settings.proxy);
-  const resizerVal = useSignal(app.state.settings.imgResizer);
+  const proxyVal   = useSignal(app.settings.proxy);
+  const resizerVal = useSignal(app.settings.imgResizer);
   const fileRef    = useRef(null);
 
   const doExport = () => {
@@ -39,7 +39,7 @@ export default function SettingsPanel () {
     app.state.dialog = null;
     app.state.busy = 'Importing…';
     try {
-      const results = await db.importData(data, app.state.settings.proxy, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
+      const results = await db.importData(data, app.settings.proxy, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
       const added   = results.filter(r => r.added).length;
       const failed  = results.filter(r => r.error).length;
       flash(`Imported ${added} new` + (failed ? `, ${failed} failed` : ''), failed ? 'err' : 'ok');
@@ -54,13 +54,13 @@ export default function SettingsPanel () {
 
         <div class="field">
           <span class="field-label">Menu position</span>
-          <${SortPicker} value=${app.state.settings.menuPos} onChange=${v => app.state.settings.menuPos = v}
+          <${SortPicker} value=${app.settings.menuPos} onChange=${v => app.settings.menuPos = v}
              options=${[['top', 'Top'], ['bottom', 'Bottom'], ['left', 'Left'], ['right', 'Right']]} />
         </div>
 
         <div class="field">
           <span class="field-label">Player position</span>
-          <${SortPicker} value=${app.state.settings.playerPos} onChange=${v => app.state.settings.playerPos = v}
+          <${SortPicker} value=${app.settings.playerPos} onChange=${v => app.settings.playerPos = v}
              options=${[['top', 'Top'], ['bottom', 'Bottom']]} />
         </div>
 
@@ -100,8 +100,8 @@ export default function SettingsPanel () {
 
         <div class="modal-actions">
           <button class="btn primary" onClick=${() => {
-            app.state.settings.proxy      = proxyVal.value.trim();
-            app.state.settings.imgResizer = resizerVal.value.trim();
+            app.settings.proxy      = proxyVal.value.trim();
+            app.settings.imgResizer = resizerVal.value.trim();
             app.state.dialog = null; flash('Settings saved');
           }}>Done</button>
         </div>

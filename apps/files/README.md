@@ -35,12 +35,10 @@ a reusable component any app can embed.
 
 | file            | what it is |
 |-----------------|------------|
-| `app.js`        | the app chrome — sidebar + welcome/reconnect screens — around `<${FileExplorer}>` |
-| `db.js`         | persists the one granted root handle (`@bunker/db`) + the permission dance |
+| `app.js`        | the app chrome — sidebar + welcome/reconnect screens — around `<${FileExplorer}>`, mounted on `zugriff.app` |
+| `modules/db.js` | persists the one granted root handle (`@bunker/db`) + the permission dance |
 | `app.css`       | the app's own look — sidebar and hero screens only |
-| `index.html`    | links `../base.css` + `shared/css/explorer.css` + `app.css` and the importmap |
 | `manifest.json` | pwa manifest (generated from the registry) |
-| `sw.js`         | one-liner, pulls in `shared/js/sw-core.js` |
 | `app.svg`       | the app icon |
 
 The explorer engine lives in `shared/`:

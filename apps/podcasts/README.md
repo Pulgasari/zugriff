@@ -27,8 +27,8 @@ feed requests themselves.
 ## under the hood
 
 Everything is a static ES module — no build step, in keeping with the rest of
-zugriff. The app runs on the shared **global runtime**: the page is
-`zugriff/app.html`, whose blocking `boot.js` binds `zugriff` (and `zugriff.app`,
+zugriff. The app runs on the shared **global runtime**: the page is the unified
+`zugriff/index.html`, whose blocking `boot.js` binds `zugriff` (and `zugriff.app`,
 `html`) to `window`, so nothing here imports the runtime — `zugriff.app` is the
 reference point (see `.shared/js/app.js`).
 
@@ -46,12 +46,15 @@ components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
 
 - `app.db` / `app.player` / `app.thumbs` — the modules (their own preact signals; read
   with `.value`).
-- `app.state` — the app's own reactive state on the shared deep signal (`@aufbau/signals`),
-  read/written **without** `.value`. Ephemeral session state as top-level leaves —
-  `route` (`{name,id}`), `search`, `dialog`, `busy` — and durable prefs as a persisted
-  subtree `app.state.settings` (sorts, view, menu/player position, proxy, resizer), written
-  back by `app.persist('settings')`. Leaves are read inside render to stay reactive, so
-  they are never destructured at module top.
+- `app.state` — the app's ephemeral ui state on the shared deep signal (`@aufbau/signals`),
+  read/written **without** `.value`: `route` (`{name,id}`), `search`, `dialog`, `busy`.
+  Leaves are read inside render to stay reactive, so they are never destructured at module
+  top. Nothing here persists.
+- `app.settings` — the durable prefs as a typed, `.value`-free store (`typedSignal`):
+  `podcastSort` / `episodeSort` / `view` / `menuPos` / `playerPos` are enum leaves (off-list
+  writes are ignored), `proxy` / `imgResizer` are text. Persisted as one blob under
+  `zugriff:podcasts:settings`. Its own store rather than an `app.state` subtree because
+  `typedSignal` persistence is whole-store and `app.state` must stay ephemeral.
 - `app.go(name, id)` / `app.flash(text, kind)` — navigate / toast.
 - `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …), and `app.hotkeys` binds keys to them (space = play/pause, ←/→ = skip, esc = close). See `.shared/js/modules/{actions,hotkeys}.js`.
 

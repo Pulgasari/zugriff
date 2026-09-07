@@ -97,8 +97,8 @@ function applyTheme (theme) {
 
   // :::::: Task 5: Zugriff Runtime Initialization
   // kick off the runtime import here (after the importmap is in place) and expose the
-  // readiness promise so app.html can await it before loading the app module. binds
-  // `zugriff` (and html/toast) to window; an app never imports the runtime itself.
+  // readiness promise so the index.html shell can await it before loading the app
+  // module. binds `zugriff` (and html/toast) to window; an app never imports the runtime.
   function initRuntime () {
     window.__ZUGRIFF_READY__ = import('./runtime.js')
       .catch(error => { console.error('[boot] runtime init failed:', error); throw error; });
