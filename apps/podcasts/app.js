@@ -125,77 +125,24 @@ const sortPodcasts = (list, mode) => [...list].sort((a, b) =>
 const podcastById = computed(() => Object.fromEntries(db.podcasts.value.map(p => [p.id, p])));
 const episodeById = computed(() => Object.fromEntries(db.episodes.value.map(e => [e.id, e])));
 
-// :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
-
-
-
-
-// the play/pause control for one episode, reflecting the live player state
-function PlayToggle ({ episode, size = 20 }) {
-  const isCurrent = player.current.value?.id === episode.id;
-  const isPlaying = isCurrent && player.playing.value;
-  const icon = isCurrent && player.waiting.value ? 'svg-spinners:bars-scale-middle'
-             : isPlaying ? 'mdi:pause' : 'mdi:play';
-  return html`
-    <button class=${'play-toggle' + (isCurrent ? ' current' : '')}
-            title=${isPlaying ? 'Pause' : 'Play'} aria-label=${isPlaying ? 'Pause' : 'Play'}
-            onClick=${() => player.play(episode)}>
-      <${Icon} name=${icon} />
-    </button>`;
-}
-
-function EpisodeRow ({ episode, showPodcast = false }) {
-  const st      = db.stateOf(episode.id);
-  const podcast = podcastById.value[episode.podcastId];
-  const teaser  = plain(episode.description).slice(0, 200);
-
-  return html`
-    <div class=${'ep' + (st.done ? ' done' : '') + (player.current.value?.id === episode.id ? ' playing' : '')}>
-      <button class="ep-art" onClick=${() => go('episode', episode.id)} aria-label="Open episode">
-        <${Art} src=${episode.image || podcast?.image} size=${48} />
-      </button>
-      <div class="ep-body">
-        <div class="ep-meta">
-          ${showPodcast && podcast && html`
-            <button class="ep-podcast" onClick=${() => go('podcast', podcast.id)}>${podcast.title}</button>`}
-          <span class="ep-date">${fmtDate(episode.pubDate)}</span>
-          ${episode.duration && html`<span class="ep-dur">· ${fmtDuration(episode.duration)}</span>`}
-        </div>
-        <button class="ep-title" onClick=${() => go('episode', episode.id)}>${episode.title}</button>
-        ${teaser && html`<div class="ep-teaser">${teaser}</div>`}
-        <${ProgressBar} state=${st} />
-      </div>
-      <div class="ep-actions">
-        <${PlayToggle} episode=${episode} />
-        <${IconButton} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
-                    label=${st.saved ? 'Remove from list' : 'Save for later'}
-                    active=${st.saved} onClick=${() => db.toggleSaved(episode.id)} />
-        <${IconButton} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
-                    label=${st.done ? 'Mark unplayed' : 'Mark as done'}
-                    active=${st.done} onClick=${() => db.toggleDone(episode.id)} />
-        ${episode.link && html`
-          <a class="ibtn" href=${episode.link} target="_blank" rel="noopener" title="Open episode page">
-            <${Icon} name="mdi:open-in-new" />
-          </a>`}
-      </div>
-    </div>`;
-}
-
-
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
 const // :::::: COMPONENTS ::::::::::::::::::::::::::
 Artwork        = await app.component('Artwork'),
+EpisodeRow     = await app.component('EpisodeRow'),
 NavItem        = await app.component('NavItem'),
+PlayToggle     = await app.component('PlayToggle'),
 PodcastCard    = await app.component('PodcastCard'),
 PodcastListRow = await app.component('PodcastListRow'),
 ProgressBar    = await app.component('ProgressBar'),
+Scrim          = await app.component('Scrim'),
 SortPicker     = await app.component('SortPicker');
 
 const // :::::: PANELS ::::::::::::::::::::::::::::::
-PlayerBar   = await app.component('PlayerBar'),
-SearchPanel = await app.panel('SearchPanel'),
-Sidebar     = await app.component('Sidebar');
+AddPodcastPanel = await app.component('AddPodcastPanel'),
+PlayerBar       = await app.component('PlayerBar'),
+SearchPanel     = await app.panel('SearchPanel'),
+Sidebar         = await app.component('Sidebar');
 
 const // :::::: VIEWS :::::::::::::::::::::::::::::::
 EpisodeDetailView   = await app.view('LatestView'),
@@ -204,73 +151,6 @@ EpisodePodcastView  = await app.view('LatestView'),
 PodcastsView        = await app.view('PodcastsView'),
 SavedView           = await app.view('SavedView'),
 SettingsView        = await app.view('SettingsView');
-
-
-
-
-
-
-// :::::: PLAYER BAR :::::::::::::::::::::::::::::::::::::::::
-
-
-// :::::: DIALOGS :::::::::::::::::::::::::::::::::::::::::::
-
-function AddDialog () {
-  const value = useSignal('');
-  const state = useSignal({ loading: false, error: '' });
-  const ref   = useRef(null);
-
-  useEffect(() => { ref.current?.focus(); }, []);
-
-  const submit = async () => {
-    const url = value.value.trim();
-    if (!url) return;
-    state.value = { loading: true, error: '' };
-    try {
-      const p = await db.subscribe(url, proxy.value);
-      flash(`Subscribed to ${p.title}`);
-      dialog.value = null;
-      go('podcast', p.id);
-    } catch (err) {
-      state.value = { loading: false, error: err.message };
-    }
-  };
-
-  return html`
-    <${Scrim}>
-      <div class="modal">
-        <h2>Add a podcast</h2>
-        <p class="modal-sub">Paste the podcast's RSS feed URL.</p>
-        <input ref=${ref} class="modal-input" type="url" placeholder="https://example.com/feed.xml"
-               value=${value.value}
-               onInput=${e => value.value = e.target.value}
-               onKeyDown=${e => { if (e.key === 'Enter') submit(); }} />
-        ${state.value.error && html`<p class="modal-err">${state.value.error}</p>`}
-        <div class="modal-actions">
-          <button class="btn ghost" onClick=${() => dialog.value = null}>Cancel</button>
-          <button class="btn primary" disabled=${state.value.loading} onClick=${submit}>
-            ${state.value.loading ? html`<${Icon} name="svg-spinners:bars-scale-middle" /> Fetching…` : 'Subscribe'}
-          </button>
-        </div>
-      </div>
-    <//>`;
-}
-
-
-
-
-function Scrim ({ children }) {
-  return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) dialog.value = null; }}>
-      ${children}
-    </div>`;
-}
-
-// :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
-
-
-
-
 
 // :::::: BUSY BAR :::::::::::::::::::::::::::::::::::::::::::
 
