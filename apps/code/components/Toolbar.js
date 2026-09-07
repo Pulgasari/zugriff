@@ -2,14 +2,14 @@
 // a quick strip of editor actions above the keyboard.
 
 import { html } from './../vendors.js';
-import state from './../state.js';
 import Tap   from './Tap.js';
 
+const app = zugriff.app;
+
 export default function Toolbar () {
-  const items = state.toolbar.items.value;
   return html`
     <div id="toolbar">
-      ${items.map(({ cmd, icon }) => html`<${Tap} cmd=${cmd} icon=${icon} />`)}
+      ${app.editor.toolbar.map(({ cmd, icon }) => html`<${Tap} cmd=${cmd} icon=${icon} />`)}
     </div>
   `;
 }

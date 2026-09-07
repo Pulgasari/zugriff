@@ -1,16 +1,17 @@
 // apps/code/components/GitHub.js
 // the GitHub modal: paste a token to connect, pick a repo + branch, browse the
-// tree and open files. saving a GitHub file commits it back (see state.js).
+// tree and open files. saving a GitHub file commits it back (see modules/files.js).
 // public repos can also be pinned by owner/name and browsed read-only, with or
 // without a token.
 
 import { html, useState, useEffect } from './../vendors.js';
-import * as github from './../github.js';
-import { clipboard, version, bump, ask, validName } from './../treeops.js';
-import state from './../state.js';
 import Modal from './Modal.js';
-import Icon from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
 import GitHubTree from './GitHubTree.js';
+
+const app = zugriff.app;
+const github = app.workspaces.github;
+const { clipboard, version, bump, ask, validName } = app.workspaces;
 
 const TOKEN_URL = 'https://github.com/settings/personal-access-tokens/new';
 
@@ -79,7 +80,7 @@ export default function GitHub () {
     if (cb.ctx.repo.owner !== repo.owner || cb.ctx.repo.name !== repo.name || cb.ctx.branch !== branch) throw new Error('Paste must stay in the same repo and branch.');
     const m = { isDir: cb.isDir, sha: cb.ctx.sha, mode: cb.ctx.mode };
     if (cb.mode === 'copy') await github.copyPath(cb.ctx.path, cb.name, m);
-    else { await github.renamePath(cb.ctx.path, cb.name, m); clipboard.value = null; if (!cb.isDir) state.closeById(state.githubId(repo.owner, repo.name, branch, cb.ctx.path)); }
+    else { await github.renamePath(cb.ctx.path, cb.name, m); clipboard.value = null; if (!cb.isDir) app.files.closeById(app.files.githubId(repo.owner, repo.name, branch, cb.ctx.path)); }
   });
 
   const filtered = query

@@ -1,7 +1,7 @@
 // apps/code/components/KeyboardButton.js
 
 import { html } from './../vendors.js';
-import Icon from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
 
 export default function KeyboardButton ({ keyValue, icon, label, className = '', active = false, disabled = false, onAction }) {
   const content     = icon ? html`<${Icon} name=${icon} />` : (label || keyValue);

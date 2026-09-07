@@ -1,17 +1,12 @@
-// apps/code/commands.js
-//
-// the command registry — every action the command palette, the dock and the
-// toolbar can fire, keyed by id. ported from the old js/commands.js; the editor
-// option commands are rewired onto editor.js's get/set/toggleConfig helpers, and
-// the file commands (which were stubs) are wired to state's file operations.
-//
-// this module imports `state` too, but only reads it inside the exec closures,
-// so the state <-> commands import cycle resolves fine (nothing is touched at
-// module-evaluation time).
+// apps/code/modules/commands.js
+// the command registry — every action the palette, the dock and the toolbar can fire,
+// keyed by id. exec closures reach the rest of the app through the zugriff.app global
+// (app.editor, app.files, app.state, …), so there is no import cycle: nothing here
+// touches the app at module-evaluation time, only when a command runs.
 
-import state  from './state.js';
-import editor from './editor.js';
 import { openPrompt } from '/.shared/js/components/index.js';
+
+const app = zugriff.app;
 
 // a promise-returning commit-message prompt (default = the auto message)
 const askCommitMessage = (path) => new Promise(resolve => openPrompt({
@@ -22,53 +17,56 @@ const askCommitMessage = (path) => new Promise(resolve => openPrompt({
   onCancel: () => resolve(null),
 }));
 
-// helpers
-const monacoAction  = id => state.monaco?.getAction(id)?.run();
-const monacoTrigger = id => state.monaco?.trigger('keyboard', id, null);
+// monaco helpers — the live instance lives on app.editor.instance
+const monacoAction  = id => app.editor.instance?.getAction(id)?.run();
+const monacoTrigger = id => app.editor.instance?.trigger('keyboard', id, null);
 
-// save one file, surfacing a failed GitHub commit in the GitHub modal rather
-// than throwing into the void (a local save that fails just returns false)
+// flip a persisted chrome toggle on app.state.config
+const toggleConfig = key => { app.state.config[key] = !app.state.config[key]; };
+
+// save one file, surfacing a failed GitHub commit in the GitHub modal rather than
+// throwing into the void (a local save that fails just returns false)
 const save = async (file) => {
   if (!file || file.readOnly) return;
   try {
-    if (file.source === 'github' && state.config.commitPrompt.value) {
+    if (file.source === 'github' && app.state.config.commitPrompt) {
       const message = await askCommitMessage(file.gh.path);
       if (message == null) return;            // cancelled
-      await state.saveActiveFile({ message });
+      await app.files.save({ message });
     } else {
-      await state.saveActiveFile();
+      await app.files.save();
     }
   } catch (e) {
-    if (file.source === 'github') { state.github.error.value = e.message; state.openModal('github'); }
+    if (file.source === 'github') { app.workspaces.github.error.value = e.message; app.openModal('github'); }
     else console.error('[code] save failed:', e);
   }
 };
 
 const commands = new Map([
   // ── UI ──────────────────────────────────────────────────────────────────
-  ['browser:toggle'     , { name: 'Toggle Browser'     , exec: () => state.toggleSignal(state.config.showBrowser)   }],
-  ['keyboard:toggle'    , { name: 'Toggle Keyboard'    , exec: () => state.toggleSignal(state.config.showKeyboard)  }],
-  ['toolbar:toggle'     , { name: 'Toggle Toolbar'     , exec: () => state.toggleSignal(state.config.showToolbar)   }],
-  ['statusbar:toggle'   , { name: 'Toggle Statusbar'   , exec: () => state.toggleSignal(state.config.showStatusbar) }],
-  ['filebrowser:toggle' , { name: 'Toggle File Browser', exec: () => state.toggleModal('filebrowser') }],
-  ['github:toggle'      , { name: 'Toggle GitHub'      , exec: () => state.toggleModal('github')      }],
-  ['commands:toggle'    , { name: 'Toggle Commands'    , exec: () => state.toggleModal('commands')    }],
-  ['plugins:toggle'     , { name: 'Toggle Plugins'     , exec: () => state.toggleModal('plugins')     }],
-  ['settings:toggle'    , { name: 'Toggle Settings'    , exec: () => state.toggleModal('settings')    }],
-  ['workspaces:toggle'  , { name: 'Toggle Workspaces'  , exec: () => state.toggleModal('workspaces')  }],
+  ['browser:toggle'     , { name: 'Toggle Browser'     , exec: () => toggleConfig('showBrowser')   }],
+  ['keyboard:toggle'    , { name: 'Toggle Keyboard'    , exec: () => toggleConfig('showKeyboard')  }],
+  ['toolbar:toggle'     , { name: 'Toggle Toolbar'     , exec: () => toggleConfig('showToolbar')   }],
+  ['statusbar:toggle'   , { name: 'Toggle Statusbar'   , exec: () => toggleConfig('showStatusbar') }],
+  ['filebrowser:toggle' , { name: 'Toggle File Browser', exec: () => app.toggleModal('filebrowser') }],
+  ['github:toggle'      , { name: 'Toggle GitHub'      , exec: () => app.toggleModal('github')      }],
+  ['commands:toggle'    , { name: 'Toggle Commands'    , exec: () => app.toggleModal('commands')    }],
+  ['plugins:toggle'     , { name: 'Toggle Plugins'     , exec: () => app.toggleModal('plugins')     }],
+  ['settings:toggle'    , { name: 'Toggle Settings'    , exec: () => app.toggleModal('settings')    }],
+  ['workspaces:toggle'  , { name: 'Toggle Workspaces'  , exec: () => app.toggleModal('workspaces')  }],
 
   // ── File ────────────────────────────────────────────────────────────────
-  ['file:close'   , { name: 'Close File' , exec: () => { const f = state.activeFile.value; if (f) state.closeFile(f); } }],
-  ['file:save'    , { name: 'Save File'  , exec: () => save(state.activeFile.value) }],
+  ['file:close'   , { name: 'Close File' , exec: () => { const f = app.files.active.value; if (f) app.files.close(f); } }],
+  ['file:save'    , { name: 'Save File'  , exec: () => save(app.files.active.value) }],
   ['file:saveAll' , { name: 'Save All'   , exec: async () => {
-    for (const f of [...state.openFiles.value]) {
-      if (f.isDirty) { state.activeFile.value = f; await save(f); }
+    for (const f of [...app.files.open.value]) {
+      if (f.isDirty) { app.files.active.value = f; await save(f); }
     }
   } }],
 
   // ── Editor – History ──────────────────────────────────────────────────────
-  ['editor:redo'   , { name: 'Redo' , exec: () => state.monaco?.getModel()?.redo() }],
-  ['editor:undo'   , { name: 'Undo' , exec: () => state.monaco?.getModel()?.undo() }],
+  ['editor:redo'   , { name: 'Redo' , exec: () => app.editor.instance?.getModel()?.redo() }],
+  ['editor:undo'   , { name: 'Undo' , exec: () => app.editor.instance?.getModel()?.undo() }],
 
   // ── Editor – Clipboard ────────────────────────────────────────────────────
   ['editor:copy'   , { name: 'Copy'  , exec: () => monacoAction('editor.action.clipboardCopyAction')  }],
@@ -118,11 +116,11 @@ const commands = new Map([
   ['editor:quickFix'        , { name: 'Quick Fix'        , exec: () => monacoAction('editor.action.quickFix')        }],
 
   // ── Editor – View / Options ───────────────────────────────────────────────
-  ['editor:wordWrap:toggle'    , { name: 'Toggle Word Wrap'      , exec: () => editor.toggleConfig('wordWrap')        }],
-  ['editor:lineNumbers:toggle' , { name: 'Toggle Line Numbers'   , exec: () => editor.toggleConfig('lineNumbers')     }],
-  ['editor:minimap:toggle'     , { name: 'Toggle Minimap'        , exec: () => editor.toggleConfig('minimap.enabled') }],
-  ['editor:fontSize:increase'  , { name: 'Font Size +'           , exec: () => editor.set('fontSize', editor.get('fontSize') + 1)              }],
-  ['editor:fontSize:decrease'  , { name: 'Font Size –'           , exec: () => editor.set('fontSize', Math.max(6, editor.get('fontSize') - 1)) }],
+  ['editor:wordWrap:toggle'    , { name: 'Toggle Word Wrap'      , exec: () => app.editor.toggleConfig('wordWrap')        }],
+  ['editor:lineNumbers:toggle' , { name: 'Toggle Line Numbers'   , exec: () => app.editor.toggleConfig('lineNumbers')     }],
+  ['editor:minimap:toggle'     , { name: 'Toggle Minimap'        , exec: () => app.editor.toggleConfig('minimap.enabled') }],
+  ['editor:fontSize:increase'  , { name: 'Font Size +'           , exec: () => app.editor.set('fontSize', app.editor.get('fontSize') + 1)              }],
+  ['editor:fontSize:decrease'  , { name: 'Font Size –'           , exec: () => app.editor.set('fontSize', Math.max(6, app.editor.get('fontSize') - 1)) }],
 ]);
 
 export default commands;

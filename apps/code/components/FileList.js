@@ -2,12 +2,13 @@
 // the open-file tabs.
 
 import { html } from './../vendors.js';
-import state from './../state.js';
-import Icon  from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
+
+const app = zugriff.app;
 
 export default function FileList () {
-  const openFiles  = state.openFiles.value;
-  const activeFile = state.activeFile.value;
+  const openFiles  = app.files.open.value;
+  const activeFile = app.files.active.value;
 
   return html`
     <div id="filelist">
@@ -16,12 +17,12 @@ export default function FileList () {
         : openFiles.map(file => html`
             <div
               class=${'file-tab' + (file === activeFile ? ' active' : '')}
-              onClick=${() => (state.activeFile.value = file)}
+              onClick=${() => (app.files.active.value = file)}
             >
               <${Icon} name="material-symbols:description" color="#888" />
               <span class="tab-name">${file.name}</span>
               ${file.isDirty && html`<span class="tab-dirty">●</span>`}
-              <button class="tab-close" onClick=${e => { e.stopPropagation(); state.closeFile(file); }}>
+              <button class="tab-close" onClick=${e => { e.stopPropagation(); app.files.close(file); }}>
                 <${Icon} name="material-symbols:close" />
               </button>
             </div>

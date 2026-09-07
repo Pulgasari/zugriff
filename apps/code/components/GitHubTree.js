@@ -6,11 +6,12 @@
 // node just fires the op and bumps.
 
 import { html, useState } from './../vendors.js';
-import state from './../state.js';
-import * as github from './../github.js';
-import { clipboard, bump, ask, validName } from './../treeops.js';
-import Icon from './Icon.js';
+import Icon from '/.shared/js/components/Icon.js';
 import RowMenu from './RowMenu.js';
+
+const app = zugriff.app;
+const github = app.workspaces.github;
+const { clipboard, bump, ask, validName } = app.workspaces;
 
 export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
   const [children,  setChildren]  = useState([]);
@@ -43,14 +44,14 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
     setIsLoading(true); setErr(null);
     try {
       const { text, binary } = await github.readBlob(entry.sha);
-      state.openGithubFile({ owner: repo.owner, name: repo.name, branch, path: fullPath, sha: entry.sha, content: binary ? '' : text, binary, readOnly });
-      state.closeModal();
+      app.files.openGithub({ owner: repo.owner, name: repo.name, branch, path: fullPath, sha: entry.sha, content: binary ? '' : text, binary, readOnly });
+      app.closeModal();
     } catch (e) { fail(e); } finally { setIsLoading(false); }
   };
 
   // ── actions ────────────────────────────────────────────────────────────
   const meta   = { isDir, sha: entry.sha, mode: entry.mode };
-  const idOf   = path => state.githubId(repo.owner, repo.name, branch, path);
+  const idOf   = path => app.files.githubId(repo.owner, repo.name, branch, path);
   const CANCEL = Symbol('cancel');
   // run a mutation: refresh on success, surface real errors, ignore cancels
   const run = fn => async () => {
@@ -64,12 +65,12 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
     const n = await ask('Rename', entry.path);
     if (n === null || !validName(n) || n === entry.path) throw CANCEL;
     await github.renamePath(fullPath, prefix ? `${prefix}/${n}` : n, meta);
-    if (!isDir) state.closeById(idOf(fullPath));
+    if (!isDir) app.files.closeById(idOf(fullPath));
   });
   const del = run(async () => {
     if (!confirm(`Delete “${entry.path}” from ${repo.name}? This commits to ${branch}.`)) throw CANCEL;
     await github.deletePath(fullPath, meta);
-    if (!isDir) state.closeById(idOf(fullPath));
+    if (!isDir) app.files.closeById(idOf(fullPath));
   });
   const setClip = mode => { clipboard.value = { source: 'github', mode, isDir, name: entry.path, ctx: { path: fullPath, sha: entry.sha, mode: entry.mode, repo, branch } }; };
   const paste = run(async () => {
@@ -80,7 +81,7 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
     const dest = `${fullPath}/${cb.name}`;
     const m = { isDir: cb.isDir, sha: cb.ctx.sha, mode: cb.ctx.mode };
     if (cb.mode === 'copy') await github.copyPath(cb.ctx.path, dest, m);
-    else { await github.renamePath(cb.ctx.path, dest, m); clipboard.value = null; if (!cb.isDir) state.closeById(idOf(cb.ctx.path)); }
+    else { await github.renamePath(cb.ctx.path, dest, m); clipboard.value = null; if (!cb.isDir) app.files.closeById(idOf(cb.ctx.path)); }
   });
 
   const items = readOnly ? [] : [

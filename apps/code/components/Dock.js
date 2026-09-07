@@ -3,12 +3,13 @@
 // panel toggles on the right.
 
 import { html } from './../vendors.js';
-import state from './../state.js';
 import Tap   from './Tap.js';
 
+const app = zugriff.app;
+
 export default function Dock () {
-  const modal  = state.modal.value;
-  const config = state.config;
+  const modal  = app.state.modal;
+  const config = app.state.config;
 
   return html`
     <div id="dock">
@@ -24,9 +25,9 @@ export default function Dock () {
         <${Tap} cmd="editor:redo"     icon="redo" />
       </div>
       <div class="section">
-        <${Tap} cmd="browser:toggle"  icon="mynaui:globe" className=${config.showBrowser.value  ? 'active' : ''} />
-        <${Tap} cmd="keyboard:toggle" icon="keyboard"     className=${config.showKeyboard.value ? 'active' : ''} />
-        <${Tap} cmd="toolbar:toggle"  icon="mdi:tools"    className=${config.showToolbar.value  ? 'active' : ''} />
+        <${Tap} cmd="browser:toggle"  icon="mynaui:globe" className=${config.showBrowser  ? 'active' : ''} />
+        <${Tap} cmd="keyboard:toggle" icon="keyboard"     className=${config.showKeyboard ? 'active' : ''} />
+        <${Tap} cmd="toolbar:toggle"  icon="mdi:tools"    className=${config.showToolbar  ? 'active' : ''} />
       </div>
     </div>
   `;

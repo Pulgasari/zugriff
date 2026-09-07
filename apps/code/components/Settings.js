@@ -4,11 +4,12 @@
 
 import { html } from './../vendors.js';
 import { themeNames } from '/.shared/js/data/themes.js';
-import state from './../state.js';
 import Modal from './Modal.js';
 import Picker from './Picker.js';
 import Toggle from './Toggle.js';
 import Dropdown from './Dropdown.js';
+
+const app = zugriff.app;
 
 const editorPickers = [
   { key: 'fontSize'         , options: [8, 9, 10, 11, 12, 13, 14, 16, 18] },
@@ -31,27 +32,27 @@ const uiToggles = ['disableAndroidKeyboard'];
 const UiPickerField = ({ key, options }) => html`
   <div class="field settings-field">
     <label>${key}</label>
-    <${Picker} options=${options} value=${state.config[key].value} callback=${v => (state.config[key].value = v)} />
+    <${Picker} options=${options} value=${app.state.config[key]} callback=${v => (app.state.config[key] = v)} />
   </div>`;
 
 const UiToggleField = key => html`
   <div>
-    <${Toggle} label=${key} value=${state.config[key].value} onChange=${() => (state.config[key].value = !state.config[key].value)} />
+    <${Toggle} label=${key} value=${app.state.config[key]} onChange=${() => (app.state.config[key] = !app.state.config[key])} />
   </div>`;
 
 // ── editor section fields ─────────────────────────────────────────────────
 const EditorPickerField = ({ key, options }) => html`
   <div class="field settings-field">
     <label>${key}</label>
-    <${Picker} options=${options} value=${state.editor.config.value[key]} callback=${v => state.editor.updateConfig({ [key]: v })} />
+    <${Picker} options=${options} value=${app.editor.config.value[key]} callback=${v => app.editor.updateConfig({ [key]: v })} />
   </div>`;
 
 const EditorToggleField = key => {
-  const raw = state.editor.config.value[key];
+  const raw = app.editor.config.value[key];
   const checked = raw === true || raw === 'on';
   return html`
     <div>
-      <${Toggle} label=${key} value=${checked} onChange=${() => state.editor.toggleConfig(key)} />
+      <${Toggle} label=${key} value=${checked} onChange=${() => app.editor.toggleConfig(key)} />
     </div>`;
 };
 
@@ -62,8 +63,8 @@ export default function Settings () {
         <h3>UI</h3>
         <${Dropdown}
           options=${themeNames}
-          selected=${state.app.state.theme}
-          onChange=${event => (state.app.state.theme = event.currentTarget.value)}
+          selected=${app.state.theme}
+          onChange=${event => (app.state.theme = event.currentTarget.value)}
         />
         ${uiToggles.map(UiToggleField)}
         ${uiPickers.map(UiPickerField)}
@@ -72,16 +73,16 @@ export default function Settings () {
         <h3>GitHub</h3>
         <${Toggle}
           label="Prompt for commit message"
-          value=${state.config.commitPrompt.value}
-          onChange=${() => (state.config.commitPrompt.value = !state.config.commitPrompt.value)}
+          value=${app.state.config.commitPrompt}
+          onChange=${() => (app.state.config.commitPrompt = !app.state.config.commitPrompt)}
         />
       </div>
       <div class="section">
         <h3>Editor</h3>
         <${Dropdown}
-          options=${state.editor.themes}
-          selected=${state.editor.config.value.theme}
-          onChange=${event => state.editor.updateTheme(event.currentTarget.value)}
+          options=${app.editor.themes}
+          selected=${app.editor.config.value.theme}
+          onChange=${event => app.editor.updateTheme(event.currentTarget.value)}
         />
         ${editorToggles.map(EditorToggleField)}
         ${editorPickers.map(EditorPickerField)}
