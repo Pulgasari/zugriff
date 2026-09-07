@@ -1,4 +1,9 @@
-// apps/podcasts/player.js
+// apps/podcasts/modules/player.js
+// one <audio> element lifted out of the component tree so playback survives navigation.
+// its state lives in preact signals internally; the public surface (app.player) is a
+// `.value`-free facade of getters + methods, so the ui reads app.player.isPlaying /
+// app.player.episode / app.player.time rather than a raw signal. reads inside render
+// stay reactive (the getter reads the signal during render, so it subscribes).
 
 import { signal } from '@preact/signals';
 import { stored } from '/.shared/js/app/signals.js';
@@ -8,16 +13,16 @@ import { stateOf, setProgress, markDone } from './db.js';
 const audio = new Audio();
 audio.preload = 'metadata';
 
-// ── signals the ui binds to ──────────────────────────────────────────────
+// ── internal signals ─────────────────────────────────────────────────────────
 
-export const current = signal(null);      // the episode record being played
-export const playing = signal(false);
-export const waiting = signal(false);      // buffering
-export const time    = signal(0);          // current position, seconds
-export const duration = signal(0);         // seconds (from metadata or the feed)
-export const error   = signal('');
+const current  = signal(null);   // the episode record being played, or null
+const playing  = signal(false);
+const waiting  = signal(false);   // buffering
+const time     = signal(0);       // current position, seconds
+const duration = signal(0);       // seconds (from metadata or the feed)
+const error    = signal('');
 
-export const rate = stored(1, 'podcasts:rate');
+const rate = stored(1, 'podcasts:rate');
 audio.playbackRate = rate.value;
 
 const DONE_AT = 0.95;      // fraction played that counts as finished
@@ -73,7 +78,7 @@ audio.addEventListener('error',   () => {
 // ── controls ─────────────────────────────────────────────────────────────
 
 /** play an episode from its saved position (or toggle if it is already loaded) */
-export function play (ep) {
+function play (ep) {
   if (current.value?.id === ep.id) { toggle(); return; }
 
   save(true);                       // flush the outgoing episode
@@ -91,23 +96,29 @@ export function play (ep) {
   audio.play().catch(() => { /* the error event reports it */ });
 }
 
-export function toggle () {
+function toggle () {
   if (!current.value) return;
   if (audio.paused) audio.play().catch(() => {}); else audio.pause();
 }
 
-export const pause = () => audio.pause();
+const pause = () => audio.pause();
 
-export function seek (seconds) {
+/** stop and drop the current episode (closes the player bar) */
+function close () {
+  audio.pause();
+  current.value = null;
+}
+
+function seek (seconds) {
   if (!current.value) return;
   audio.currentTime = Math.max(0, Math.min(seconds, audio.duration || seconds));
   time.value = audio.currentTime;
   save(true);
 }
 
-export const skip = delta => seek((audio.currentTime || 0) + delta);
+const skip = delta => seek((audio.currentTime || 0) + delta);
 
-export function setRate (value) {
+function setRate (value) {
   rate.value = value;
   audio.playbackRate = value;
 }
@@ -115,3 +126,32 @@ export function setRate (value) {
 // leaving the page: flush the last position so nothing is lost
 addEventListener('pagehide', () => save(true));
 addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(true); });
+
+// ── public facade (app.player) — no `.value` at call sites ────────────────────
+// getters read the internal signals, so a read inside render still subscribes.
+// status collapses the flags to one enum; the isX booleans are the same, read nicely.
+
+const player = {
+  // reactive state
+  get episode ()   { return current.value; },
+  get time ()      { return time.value; },
+  get duration ()  { return duration.value; },
+  get rate ()      { return rate.value; },
+  get error ()     { return error.value; },
+  get isPlaying () { return playing.value; },
+  get isWaiting () { return waiting.value; },
+  get isError ()   { return !!error.value; },
+  // 'idle' | 'waiting' | 'playing' | 'paused' | 'error' (waiting/error take priority)
+  get status () {
+    if (error.value)   return 'error';
+    if (waiting.value) return 'waiting';
+    if (playing.value) return 'playing';
+    return current.value ? 'paused' : 'idle';
+  },
+
+  // controls
+  play, toggle, pause, close, seek, skip, setRate,
+};
+
+export default player;
+export { player };
