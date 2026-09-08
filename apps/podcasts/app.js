@@ -70,6 +70,8 @@ async function refreshAll () {
   } finally { app.state.busy = ''; }
 }
 
+// :::::: ACTIONS
+
 app.actions = {
   'close-dialog'  : () => app.state.dialog = null,
   
