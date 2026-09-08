@@ -20,10 +20,10 @@ if (!currentScript) throw new Error('[boot] Must be executed synchronously as a 
 // ──────── TASKS ──────────────────────────────────
   
 // :::::: Task 1: Dev Tools Injection | ?dev
-function initDevTools () {
+function initDevTools (force = false) {
   try {
     const KEY = 'zugriff:devtools';
-    const dev = new URLSearchParams(location.search).get('dev');
+    const dev = force || new URLSearchParams(location.search).get('dev');
     if (dev !== null) {
       if (dev === 'off' || dev === '0') sessionStorage.removeItem(KEY);
       else sessionStorage.setItem(KEY, '1');
@@ -134,7 +134,7 @@ function applyTheme (theme) {
   const { preload, sw, theme } = config;
 
   // Run tasks sequentially
-  initDevTools();
+  initDevTools(true);
   applyTheme(config.theme);
   injectImportMapAndPreloads(config.imports, config.preload, currentScript.src);
   registerServiceWorker(config.sw);
