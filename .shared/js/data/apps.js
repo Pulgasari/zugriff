@@ -64,7 +64,7 @@ const entries = [
     categories  : ['docs', 'media'],
   },
   { // zugriff.dev/feeds/
-    build       : { android: 'bubblewrap' },
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'feeds',
     name        : 'RSS Reader',
@@ -84,7 +84,7 @@ const entries = [
     type        : 'app',
   },
   { // zugriff.dev/icons/
-    build       : { android: 'bubblewrap' },
+    build       : { android: 'capacitor' },
     categories  : ['design'],
     type        : 'app',
     slug        : 'icons',
@@ -148,7 +148,7 @@ const entries = [
     categories  : ['files', 'docs'],
   },
   { // zugriff.dev/podcasts/
-    build       : { android: 'bubblewrap' },
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
@@ -157,6 +157,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/prompts/
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'prompts',
     name        : 'Prompt Manager',
