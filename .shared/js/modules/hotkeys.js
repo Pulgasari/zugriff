@@ -14,6 +14,12 @@
 // in an input/textarea is left alone unless the spec is { global:true } or the combo holds a
 // modifier. `when` gates a binding behind a condition; `preventDefault` defaults to true.
 
+import { isFn, isString } from '/.shared/js/vendors.js';
+
+const isEditable = element   => !!element && (/^(INPUT|TEXTAREA|SELECT)$/.test(element.tagName) || element.isContentEditable);
+const  onEvent   = (...args) => (typeof window !== 'undefined') && window.   addEventListener(...args);
+const offEvent   = (...args) => (typeof window !== 'undefined') && window.removeEventListener(...args);
+
 const MOD_ORDER = ['ctrl', 'alt', 'shift', 'meta'];
 
 // friendly combo keyword -> the canonical key comboFromEvent produces
@@ -50,17 +56,10 @@ const comboFromEvent = event => {
   return normalize(parts.join('+'));
 };
 
-const isEditable = el =>
-  !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
-
 // `actions` (optional) is the app's action registry, so a string action is an action id
 export function createHotkeys (actions) {
-  const bindings = new Map();   // combo -> spec { action, when, global, preventDefault }
-
-  const resolve = action =>
-      typeof action === 'function'          ? action
-    : typeof action === 'string' && actions ? event => actions.run(action, event)
-    : null;
+  const bindings = new Map;   // combo -> spec { action, when, global, preventDefault }
+  const resolve  = action => isFn(action) ? action : isString(action) && actions ? event => actions.run(action, event) : null;     
 
   const onKeydown = event => {
     const spec = bindings.get(comboFromEvent(event));
@@ -76,23 +75,25 @@ export function createHotkeys (actions) {
     run(event);
   };
 
-  if (typeof window !== 'undefined') window.addEventListener('keydown', onKeydown);
+  onEvent('keydown', onKeydown);
 
   const api = {
     // declare the whole map: { 'ctrl + s': { action, when, global, preventDefault }, … }.
     // a bare action id / callback is accepted as the value shorthand.
     define (map = {}) {
       for (const [combo, spec] of Object.entries(map)) {
-        bindings.set(normalize(combo), spec && typeof spec === 'object' ? spec : { action: spec });
+        const normalizedCombo = normalize(combo);
+        const normalizedSpec  = (spec && typeof spec === 'object') ? spec : { action: spec };
+        bindings.set(normalizedCombo, normalizedSpec);
       }
       return api;
     },
-    remove (combo) { for (const c of [].concat(combo)) bindings.delete(normalize(c)); return api; },
-    list ()    { return [...bindings.keys()]; },
-    destroy () {
-      if (typeof window !== 'undefined') window.removeEventListener('keydown', onKeydown);
-      bindings.clear();
+    remove (combo) {
+      for (const c of [].concat(combo)) bindings.delete(normalize(c)); 
+      return api; 
     },
+    list    () { return [...bindings.keys()]; },
+    destroy () { offEvent('keydown', onKeydown); bindings.clear(); },
   };
   return api;
 }
