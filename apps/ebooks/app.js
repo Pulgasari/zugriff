@@ -17,6 +17,9 @@ IconButton = await zugriff.component('IconButton'),
 InstallTip = await zugriff.component('InstallTip'),
 Settings   = await zugriff.component('Settings');
 
+const // local
+LibraryView = await app.view('LibraryView');
+
 import { stored } from '/.shared/js/app/signals.js';
 import * as fs    from '/.shared/js/filesystem/fsaccess.js';
 
@@ -161,70 +164,7 @@ function SourceStatus () {
     </div>`;
 }
 
-function Library () {
-  const books = visibleBooks.value;
-  const cont  = continueReading.value;
-  const hasFolders = db.sources.value.length > 0;
 
-  return html`
-    <div class="library">
-      <header class="lib-head">
-        <${Brand} icon=${app.config.icon} name=${app.config.name} />
-        <div class="lib-tools">
-          ${db.pending.value > 0 && html`
-            <span class="scan-note"><${Icon} name="loading" /> ${db.pending.value} left</span>`}
-          <${IconButton} icon="refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
-          <button class="btn primary" onClick=${addFolder}>
-            <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
-          <${Settings} />
-        </div>
-      </header>
-
-      <${SourceStatus} />
-      <${InstallTip} show=${db.sources.value.length > 0}
-                     message="Install the app to keep your book folders connected between visits — no reconnecting." />
-
-      ${!hasFolders
-        ? html`<${Empty} icon="mdi:bookshelf" title="Your library is empty"
-                 hint="Add a folder of EPUB and PDF files. It stays on your device — only the folder permission is remembered."
-                 action=${html`<button class="btn primary" onClick=${addFolder}>
-                   <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>`} />`
-        : html`
-          <div class="lib-controls">
-            <div class="lib-search">
-              <${Icon} name="mdi:magnify" />
-              <input type="search" placeholder="Search title or author…" value=${app.state.search}
-                     onInput=${e => app.state.search = e.target.value} />
-              ${app.state.search && html`<button class="ibtn" aria-label="Clear" onClick=${() => app.state.search = ''}>
-                <${Icon} name="mdi:close" /></button>`}
-            </div>
-            <${SortPicker} value=${sort.value} onChange=${v => sort.value = v}
-               options=${[['recent', 'Recent'], ['title', 'Title'], ['author', 'Author'], ['added', 'Added']]} />
-          </div>
-
-          <${FolderBar} />
-
-          ${cont.length > 0 && !app.state.search && !app.state.folder && html`
-            <section class="shelf">
-              <h2 class="shelf-title">Continue reading</h2>
-              <div class="shelf-row">
-                ${cont.map(b => html`<${BookCard} book=${b} key=${b.key} />`)}
-              </div>
-            </section>`}
-
-          <section class="shelf">
-            <h2 class="shelf-title">${app.state.folder ? db.sourceById(app.state.folder)?.name : 'All books'}
-              <span class="shelf-count">${books.length}</span></h2>
-            ${books.length
-              ? html`<aufbau-index class="book-grid" viewmode="grid" item-size="150px" gap="1.5rem">
-                  ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
-                </aufbau-index>`
-              : html`<${Empty} icon=${app.state.search ? 'mdi:magnify-close' : 'mdi:book-outline'}
-                       title=${app.state.search ? 'Nothing matches your search' : 'No books here yet'}
-                       hint=${app.state.search ? '' : 'Scanning may still be running, or this folder has no EPUB/PDF files.'} />`}
-          </section>`}
-    </div>`;
-}
 
 // :::::: READER VIEW :::::::::::::::::::::::::::::::::::::::
 
