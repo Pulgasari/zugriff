@@ -18,12 +18,13 @@ html, body { height: 100%; }
 body {
   font-family        : var(--ui);
   font-size          : 14px;
-  background         : var(--bg);
-  color              : var(--fg);
   overflow           : hidden;
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
 }
+
+html { background : var(--bg); }
+body { background : var(--bg); color : var(--fg); }
 
 /* boot() renders the app straight into #app; make it the viewport frame */
 #app {
@@ -104,6 +105,3 @@ a { color: var(--accent); }
   --c-bool   : #56b6c2;
   --c-null   : #e06c75;
 }
-
-html { background : var(--bg); }
-body { background : var(--bg); color : var(--fg); }
