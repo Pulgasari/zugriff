@@ -1,14 +1,14 @@
 // .shared/js/launcher.js
-// the launcher shell for the non-app routes (home / apps / tools). imported for its
-// side effect by index.html once the runtime is ready; it reads the route from the
-// pathname and renders either the landing page (home) or the app/tool grid.
+// the launcher shell for the non-app routes (home / apps / tools).
+// imported for its side effect by index.html once the runtime is ready; 
+// it reads the route from the pathname and renders either the landing page (home) or the app/tool grid.
 
-import zugriff from './runtime.js';
-
+import zugriff               from './runtime.js';
 import aufbau                from '@aufbau/runtime';
 import { applyFilter }       from '@aufbau/filters';
 import { animatePattern }    from '@aufbau/patterns';
 import { computed, signal }  from '@aufbau/signals';
+import getStyleToken         from '@domina/methods/getStyleToken.js';
 import { render }            from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
@@ -46,8 +46,11 @@ if (route === 'home') {
 
   render(html`<${HomePage}/>`, document.body);
 
-  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#000000';
-  const fg = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
+  //const $root = document.documentElement;
+  const bg = getStyleToken('bg') || '#000000';
+  const fg = getStyleToken('fg') || '#c8d0e0';
+  //const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#000000';
+  //const fg = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
   applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
   animatePattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
 }
@@ -153,5 +156,8 @@ else {
 
   // :::::: BOOT
 
-  render(html`<${Launcher}/>`, document.getElementById('app'));
+  render(
+    html`<${Launcher}/>`, 
+    document.getElementById('app')
+  );
 }
