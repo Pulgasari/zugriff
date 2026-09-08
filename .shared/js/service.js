@@ -9,18 +9,17 @@ const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
 const VERSION = 'v3';
 
 const CACHE_APP     = `zugriff-${SLUG}-${VERSION}`;
-const CACHE_VENDOR  = `zugriff-vendor-${VERSION}`;
 const CACHE_DEV     = `zugriff-dev-${VERSION}`;
+const CACHE_VENDOR  = `zugriff-vendor-${VERSION}`;
 const IMMUTABLE_TTL = 365 * 24 * 60 * 60 * 1000;
 
-// the esm cdns. a url pinned to a full semver there is immutable and cached for a
-// year; a looser pin (music-metadata@11) is still cached but revalidated, since
-// that pin can move to a newer patch.
+// the esm cdns. a url pinned to a full semver there is immutable and cached for a year;
+// a looser pin (music-metadata@11) is still cached but revalidated, since that pin can move to a newer patch.
 const VENDOR_HOST = /^https:\/\/(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\//;
 const FULL_SEMVER = /@\d+\.\d+\.\d+/;
 
-// code.pulgasari.dev ships the in-development libs (@aufbau, @bunker, …); they move
-// often, so serve cached-first and revalidate on every request.
+// code.pulgasari.dev ships the in-development libs (@aufbau, @bunker, …);
+// they move often, so serve cached-first and revalidate on every request.
 const DEV_HOST = 'https://code.pulgasari.dev/';
 
 const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
@@ -29,14 +28,14 @@ const SHARED = ['./../css/index.css', './boot.js', './app.js'];
 
 const onError = ({ operation, key, error }) => console.warn(`[sw] cache ${operation} failed for ${key}`, error);
 const app     = createCache ({ onError, name: CACHE_APP    }); // same-origin, stale while revalidate
-const vendor  = createCache ({ onError, name: CACHE_VENDOR }); // esm cdns, immutable when versioned
 const dev     = createCache ({ onError, name: CACHE_DEV    }); // code.pulgasari.dev, stale while revalidate
+const vendor  = createCache ({ onError, name: CACHE_VENDOR }); // esm cdns, immutable when versioned
 
+const isDev        = url => url.startsWith(DEV_HOST);
+const isImmutable  = url => isVendor(url) && FULL_SEMVER.test(url);
 const isNested     = url => NESTED.some(root => url.startsWith(root) && !SCOPE.startsWith(root));
 const isSameOrigin = url => url.startsWith(self.location.origin + '/');
 const isVendor     = url => VENDOR_HOST.test(url);
-const isImmutable  = url => isVendor(url) && FULL_SEMVER.test(url);
-const isDev        = url => url.startsWith(DEV_HOST);
 
 // ── install ────────────────────────────────────────────────────────────────
 
@@ -94,8 +93,8 @@ self.addEventListener('fetch', event => {
   if (!url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
   if (isNested(url))           return;
 
-  // route per origin: versioned esm cdn urls are immutable, everything else we
-  // hold is served cached-first and revalidated in the background.
+  // versioned CDN URLs: cached once (immutable)
+  // everything else: served cached-first and revalidated in the background
   let store, ttl;
   if      (isImmutable(url))  { store = vendor; ttl = IMMUTABLE_TTL; }
   else if (isVendor(url))     { store = vendor; ttl = 0; }
