@@ -11,7 +11,7 @@ import { effect }        from '@aufbau/signals';
 import { createState }   from './app/state.js';
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
-import { toast }         from './app/toast.js';
+import { toast }         from './modules/toast.js';
 import * as pwa          from './app/pwa.js';
 
 import { registry }     from './data/apps.js';
