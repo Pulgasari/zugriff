@@ -11,7 +11,7 @@ import { ZugriffApp }    from './app.js';
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
-import { toast }         from './app/toast.js';
+import { toast }         from './modules/toast.js';
 
 // ::: the one fragment-aware html tag (see vendors.js), exposed as a global so
 //     components need no import and `<>...</>` works everywhere
