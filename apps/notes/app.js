@@ -200,7 +200,7 @@ const currentNote = computed(() => {
 });
 
 function NotesReader () {
-  return html`<${ReaderBody} note=${currentNote.value} />`;
+  return html`<${NotesReaderBody} note=${currentNote.value} />`;
 }
 
 // the open note: read its text off disk and hand it to <aufbau-reader>, which owns
@@ -237,9 +237,10 @@ function NoteView ({ note }) {
       const handle = await fs.resolveRelative(root, note.node.path, src);
       if (!handle) return;
       try {
-        const url = URL.createObjectURL(await handle.getFile());
+        const content = await handle.getFile()
+        const url     = URL.createObjectURL(content);
         urls.current.push(url);
-        img.src = url;
+        img.src     = url;
         img.loading = 'lazy';
       } catch {}
     }));
