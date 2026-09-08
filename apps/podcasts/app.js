@@ -1,46 +1,28 @@
 // apps/podcasts/app.js
-// the podcasts app assembled on the shared handle. the runtime binds zugriff (+
-// zugriff.app, html) to window before this runs, so nothing here imports the runtime.
-// this file hangs the app's modules on the handle (app.db / player / thumbs), seeds its
-// state on app.state, registers its actions + hotkeys, loads the views / panels /
-// components and mounts. the ui is split into:
-//   views/    routed main content (Latest, Podcasts, detail, Saved)
-//   panels/   chrome + overlays (Sidebar, Player, Search dock, Add/Settings dialogs)
-//   components/ small reusable pieces (rows, cards, artwork, …)
 
-// ::: vendors
+// :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
+
 import { useEffect } from 'preact/hooks';
 import { typedSignal, oneOf, text, local } from '@aufbau/signals';
-
-// ::: shared
 import { createThumbCache } from '/.shared/js/thumbs.js';
-
-// ::: app modules
-import * as db          from './modules/db.js';
-import player           from './modules/player.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
-// ::: the app handle
+const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
+
+// :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// ::: HANDLE
 const app = zugriff.app;
+app.db     = app.module('db');
+app.player = app.module('player');
 
-app.db     = db;
-app.player = player;
-
-// :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::::
-// ephemeral ui state on the shared deep signal (app.state) — no `.value`, read/written
-// directly, read INSIDE render to stay reactive (never destructure at module top).
-// durable prefs live in their own typed store (app.settings) below.
-
+// :::: STATE
 app.state.route  = { name: 'latest', id: null };   // { name, id }
 app.state.search = '';                             // shared episode filter
 app.state.dialog = null;                           // 'add' | 'settings' | null
 app.state.busy   = '';                             // a label while a long task runs
 
-// durable preferences — a typed, `.value`-free store (enum leaves reject off-list writes),
-// persisted as one blob under zugriff:podcasts:settings. its own store (not an app.state
-// subtree) because typedSignal persistence is whole-store while app.state stays ephemeral.
-const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
-
+// ::: SETTINGS
 app.settings = typedSignal({
   podcastSort : oneOf(['recent', 'alpha'], 'recent'),
   episodeSort : oneOf(['newest', 'oldest', 'alpha'], 'newest'),
@@ -63,20 +45,20 @@ app.thumbs = createThumbCache({ resizer: buildResizer });
 app.go    = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
 app.flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
-// :::::: ACTIONS ::::::::::::::::::::::::::::::::::::::::::::
-// named behaviours the ui and the keyboard share (see .shared/js/modules/actions.js)
+// :::::: ACTIONS
 
 async function refreshAll () {
   if (!app.db.podcasts.value.length) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
     const results = await app.db.refreshAll(app.settings.proxy, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
-    const added  = results.reduce((sum, r) => sum + (r.added || 0), 0);
-    const failed = results.filter(r => r.error).length;
-    app.flash(added ? `${added} new episode${added === 1 ? '' : 's'}` + (failed ? `, ${failed} feed${failed === 1 ? '' : 's'} failed` : '')
-                    : failed ? `${failed} feed${failed === 1 ? '' : 's'} failed` : 'Everything up to date',
-              failed ? 'err' : 'ok');
-  } finally { app.state.busy = ''; }
+    const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
+    const failed  = results.filter(r => r.error).length;
+    const type    = failed ? 'error' : 'success';
+    const message = `${added} new episode(s), ${failed} feed(s) failed.`;
+    app.toast({ message, type });
+  }
+  finally { app.state.busy = ''; }
 }
 
 app.actions = {
@@ -91,18 +73,17 @@ app.actions = {
   'skip-forward'  : () => app.player.skip(30),
 };
 
-// :::::: HOTKEYS ::::::::::::::::::::::::::::::::::::::::::::
+// :::::: HOTKEYS
 
-const hasPlayer = () => !!app.player.episode;
 app.hotKeys = {
   'escape'      : { action: 'close-dialog', when: () => !!app.state.dialog },
 
-  'space'       : { action: 'toggle-play',   when: hasPlayer },
-  'arrow-left'  : { action: 'skip-back',     when: hasPlayer },
-  'arrow-right' : { action: 'skip-forward',  when: hasPlayer },
+  'space'       : { action: 'toggle-play',   when: !!app.player.episode },
+  'arrow-left'  : { action: 'skip-back',     when: !!app.player.episode },
+  'arrow-right' : { action: 'skip-forward',  when: !!app.player.episode },
 };
 
-// :::::: EFFECTS ::::::::::::::::::::::::::::::::::::::::::::
+// :::::: EFFECTS
 // the frame reads menu/player placement off #app's data-attributes; keep them in sync
 // so the layout responds without an extra wrapper element
 
@@ -177,5 +158,4 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-// the app draws its own chrome, so it owns the whole #app root
 app.init({ App });
