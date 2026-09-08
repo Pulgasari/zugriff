@@ -9,17 +9,23 @@ import { signal, computed }  from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 
 // ::: shared
-import { Icon, IconButton, Empty, InstallTip, Settings } from '/.shared/js/components/index.js';
+const
+Brand      = await zugriff.component('Brand'),
+Empty      = await zugriff.component('Empty'),
+Icon       = await zugriff.component('Icon'),
+IconButton = await zugriff.component('IconButton'),
+InstallTip = await zugriff.component('InstallTip'),
+Settings   = await zugriff.component('Settings');
+
 import { stored } from '/.shared/js/app/signals.js';
 import * as fs    from '/.shared/js/filesystem/fsaccess.js';
 
 // ::: app modules
-import * as db                                  from './modules/db.js';
-import { createPdfReader, createEpubReader }    from './modules/reader.js';
+import { createPdfReader, createEpubReader } from './modules/reader.js';
 
 // ::: the app handle
 const app = zugriff.app;
-app.db = db;
+app.db = await app.module('db');
 
 // :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::
 // ephemeral ui state on app.state (no `.value`); the library is app.db (plain signals). sort
@@ -163,11 +169,11 @@ function Library () {
   return html`
     <div class="library">
       <header class="lib-head">
-        <div class="brand"><${Icon} name="mdi:bookshelf" /> <strong>eBooks</strong></div>
+        <${Brand} icon=${app.config.icon} name=${app.config.name} />
         <div class="lib-tools">
           ${db.pending.value > 0 && html`
-            <span class="scan-note"><${Icon} name="svg-spinners:bars-scale-middle" /> ${db.pending.value} left</span>`}
-          <${IconButton} icon="mdi:refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
+            <span class="scan-note"><${Icon} name="loading" /> ${db.pending.value} left</span>`}
+          <${IconButton} icon="refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
           <button class="btn primary" onClick=${addFolder}>
             <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
           <${Settings} />
