@@ -39,9 +39,6 @@ export const icons = {
   'folder-swap'       : 'mdi:folder-swap-outline',
   'fontsize'          : 'material-symbols:format-size',
   'fullscreen'        : 'mdi:fullscreen',
-  'git'               : 'brandico:github-text',
-  'github'            : 'cib:github',
-  'github-action'     : 'codicon:github-action',
   'grid'              : 'mdi:view-grid-outline',
   'home'              : 'mdi:home-outline',
   'image'             : 'mdi:image-outline',
@@ -87,7 +84,6 @@ export const icons = {
   'viewmode-list'     : 'mdi:view-list',
   'warning'           : 'mdi:alert-outline',
   'workspaces'        : 'grommet-icons:projects',
-  'youtube'           : 'mdi:youtube',
   'zoom-in'           : 'mdi:magnify-plus-outline',
   'zoom-out'          : 'mdi:magnify-minus-outline',
 
@@ -102,6 +98,12 @@ export const icons = {
   'move-lines-up'       : 'material-symbols:text-select-move-up',
   'move-selection-down' : 'material-symbols:move-selection-down',
   'move-selection-up'   : 'material-symbols:move-selection-up',
+
+  // brands
+  'git'           : 'brandico:github-text',
+  'github'        : 'cib:github',
+  'github-action' : 'codicon:github-action',
+  'youtube'       : 'mdi:youtube',
 };
 
 export const 
