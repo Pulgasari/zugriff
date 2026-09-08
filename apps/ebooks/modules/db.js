@@ -14,8 +14,7 @@
 // away with filename titles, then a bounded MetaQueue opens each new or changed
 // book to pull real metadata and a cover, updating the grid as each one lands.
 
-import { signal, computed } from '@aufbau/kits/preact-htm';
-import { zugriff }               from '/.shared/js/runtime.js';
+import { signal, computed }      from '@aufbau/signals';
 import { syncSource, MetaQueue } from '/.shared/js/filesystem/scan.js';
 import * as fs                   from '/.shared/js/filesystem/fsaccess.js';
 import { accept, kindOf, prettyName, extractMeta } from './library.js';
