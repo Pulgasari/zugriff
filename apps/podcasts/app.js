@@ -163,17 +163,16 @@ function App () {
   if (!app.db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   const dialog = app.state.dialog;
-  return html`
-    <>
-      <div id="app-main">
-        <${SidebarPanel} />
-        <main class="main"><${Body} /></main>
-      </div>
-      <${PlayerPanel} />
-      ${dialog === 'add'      && html`<${AddPodcastPanel} />`}
-      ${dialog === 'settings' && html`<${SettingsPanel} />`}
-      <${Busy} />
-    </>`;
+  return html`<>
+    <div id="app-main">
+      <${SidebarPanel} />
+      <main class="main"><${Body} /></main>
+    </div>
+    <${PlayerPanel} />
+    ${dialog === 'add'      && html`<${AddPodcastPanel} />`}
+    ${dialog === 'settings' && html`<${SettingsPanel} />`}
+    <${Busy} />
+  </>`;
 }
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::
