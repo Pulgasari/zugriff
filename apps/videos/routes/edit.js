@@ -3,7 +3,6 @@
 // not an NLE. rotate/flip/crop already exist on the player as live transforms; the
 // editor will bake them plus a trim into an exported clip. wired up later.
 
-import { html } from '@aufbau/kits/preact-htm';
 import { Icon } from '/.shared/js/components/index.js';
 import { src }  from '/.shared/js/media/videoplayer.js';
 

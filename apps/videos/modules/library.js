@@ -1,16 +1,14 @@
-// apps/videos/library.js
+// apps/videos/modules/library.js
 //
-// the folder-library data layer for the library route. like images/library.js it
-// leans on the shared FolderLibrary (zugriff.fs.FolderLibrary) — which owns the
-// granted-folder lifecycle (persisting handles in @bunker/db, resolving perms,
-// add / reconnect / re-pick / forget) — and calls back here only to turn a scanned
-// folder into clip records. the built instance is extended with the app-specific
-// surface (clips, accept, ensureLoaded, openFile, fs) and exported whole; context.js
-// binds it to the app handle, so the app code reaches it as `app.lib`. no covers
-// yet: a clip is shown as an icon in the ui.
+// the folder-library data layer for the library route. like images it leans on the shared
+// FolderLibrary (zugriff.fs.FolderLibrary) — which owns the granted-folder lifecycle
+// (persisting handles in @bunker/db, resolving perms, add / reconnect / re-pick / forget) —
+// and calls back here only to turn a scanned folder into clip records. the built instance is
+// extended with the app-specific surface (clips, accept, ensureLoaded, openFile, fs) and
+// exported whole; app.js binds it to the handle as app.lib. no covers yet: a clip shows as
+// an icon in the ui. zugriff is global, so no runtime import.
 
-import { signal }            from '@aufbau/kits/preact-htm';
-import { zugriff }           from '/.shared/js/runtime.js';
+import { signal }            from '@aufbau/signals';
 import { syncSource }        from '/.shared/js/filesystem/scan.js';
 import * as fs               from '/.shared/js/filesystem/fsaccess.js';
 import { createPosterCache } from '/.shared/js/media/poster.js';
@@ -50,9 +48,9 @@ const lib = new zugriff.fs.FolderLibrary({
 });
 
 // :::::: EXTEND
-// hang the app-facing surface straight off the instance; FolderLibrary already
-// carries sources / perms / scanning / ready / addFolder / reconnect / … so the
-// whole data layer is reachable through one object.
+// hang the app-facing surface straight off the instance; FolderLibrary already carries
+// sources / perms / scanning / ready / addFolder / reconnect / … so the whole data layer is
+// reachable through one object.
 
 lib.fs        = fs;
 lib.accept    = accept;
@@ -67,12 +65,12 @@ lib.ensureLoaded = () => {
   lib.load().catch(err => console.warn('[videos] library load failed:', err));
 };
 
-/** the live File for a clip record, opened fresh from its granted folder */
+// the live File for a clip record, opened fresh from its granted folder
 lib.openFile = async (clip) => {
   const source = lib.sourceById(clip.sourceId);
   if (!source) throw new Error('This clip’s folder is no longer open.');
-  // this runs after a click, inside an effect — no user gesture to prompt with,
-  // so if the folder isn't already granted, send them back to reconnect it
+  // this runs after a click, inside an effect — no user gesture to prompt with, so if the
+  // folder isn't already granted, send them back to reconnect it
   if (await fs.queryPermission(source.handle, 'read') !== 'granted') {
     lib.perms.value = { ...lib.perms.value, [source.id]: 'prompt' };
     throw new Error('Reconnect this folder in the library first.');

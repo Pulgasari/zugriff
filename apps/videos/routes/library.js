@@ -1,12 +1,14 @@
-// apps/videos/routes/app.lib.js
+// apps/videos/routes/library.js
 // the library route (video-manager): browse granted folders as galleries of clips
 // and open one into the player. clips show as an icon for now — poster frames are
 // a follow-up.
 
-import { html, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
-import { Icon, InstallTip } from '/.shared/js/components/index.js';
-import { app }      from '../context.js';
-import { loadFile } from '/.shared/js/media/videoplayer.js';
+import { signal, computed }            from '@aufbau/signals';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { Icon, InstallTip }            from '/.shared/js/components/index.js';
+import { loadFile }                    from '/.shared/js/media/videoplayer.js';
+
+const app = zugriff.app;
 
 const libMsg    = signal('');
 const libSearch = signal('');

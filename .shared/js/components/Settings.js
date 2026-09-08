@@ -1,9 +1,9 @@
 // components/Settings.js
 // the settings surface. `settingsOpen` is the single shared open-state signal;
-// `AppSettings` is the app-facing control — a gear button plus a panel built by
+// `Settings` is the app-facing control — a gear button plus a panel built by
 // @aufbau/runtime/gui.js straight from the app's settings schema, so every app
 // gets a settings ui from its registry entry with no per-app plumbing. a change
-// writes into zugriff.app.current.state, which drives the shared state effects
+// writes into zugriff.app.state, which drives the shared state effects
 // (theme/font/dir apply + persist).
 
 // :::::: IMPORTS
@@ -54,11 +54,11 @@ function SettingsButton () {
   `;
 }
 
-// reads the page's active app off the runtime (set by zugriff.app('<slug>')), so a
-// shared component reaches this app's state without prop-drilling. gui.controls
-// returns a live dom subtree, mounted into the panel via a ref.
+// reads the page's app handle off the global runtime (zugriff.app), so a shared
+// component reaches this app's state without prop-drilling. gui.controls returns a
+// live dom subtree, mounted into the panel via a ref.
 function SettingsPanel () {
-  const app  = globalThis.zugriff?.app?.current;
+  const app  = globalThis.zugriff?.app;
   const host = useRef(null);
 
   useEffect(() => {
