@@ -45,14 +45,6 @@ if (route === 'home') {
   `;}
 
   render(html`<${HomePage}/>`, document.body);
-
-  //const $root = document.documentElement;
-  const bg = getStyleToken('bg') || '#000000';
-  const fg = getStyleToken('fg') || '#c8d0e0';
-  //const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#000000';
-  //const fg = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#c8d0e0';
-  applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
-  animatePattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
 }
 
 // ::: Page: Apps | Tools
@@ -84,6 +76,12 @@ else {
       (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
     );
   });
+
+  //
+  const bg = getStyleToken('bg') || '#000000';
+  const fg = getStyleToken('fg') || '#c8d0e0';
+  applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
+  animatePattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
 
   // :::::: COMPONENTS
 
