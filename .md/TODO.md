@@ -15,3 +15,5 @@
 - [ ] signatur von `autopack: true` bzw. `capacitor: true` in `.shared/js/data/apps.js` ändern zu `build: { android: 'capacitor' }` bzw. `build: { android: 'bubblewrap' }`
 - [ ] generell mal kontrollieren, ob das aktuell überhaupt gebuildet wird. ich kanns zumindest nirgendwo ne apk finden. (finde das eh unübersichtlich. könnnen die apks nich irgendwo direkt gesammelt landen?)
 - [ ] dieses secret-key bzgl. app-signing einrichten (ich weiss nicht wie?)
+
+vermutlich werden die apps fortan aber fortan für android generell mit capacitor gebaut, weil das scheinbar vieles erleichtert. (ich habe aber noch nicht vollständig capacitor durchdrungen, aber bei dem was ich bisher so las...
