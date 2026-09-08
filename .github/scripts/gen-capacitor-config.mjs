@@ -31,7 +31,7 @@
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { registry } from './../../.shared/js/registry.js';
+import { registry } from './../../.shared/js/data/apps.js';
 
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-capacitor-config: APP_SLUG is required'); process.exit(1); }

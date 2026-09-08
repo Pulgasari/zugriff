@@ -35,8 +35,7 @@ const entries = [
 
   // ── apps
   { // zugriff.dev/audio-manager/
-    autopack    : true,
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'audio-manager',
     name        : 'Audio Manager',
@@ -46,7 +45,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/code/
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     categories  : ['code', 'files'],
     description : 'A mobile-first code editor — edit a local folder or your GitHub repos with Monaco, a code keyboard and a command palette.',    
     icon        : 'mdi:code-braces',
@@ -56,8 +55,7 @@ const entries = [
     type        : 'app',
   },
   { // zugriff.dev/ebooks/
-    autopack    : true,
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'ebooks',
     name        : 'eBooks',
@@ -66,7 +64,7 @@ const entries = [
     categories  : ['docs', 'media'],
   },
   { // zugriff.dev/feeds/
-    autopack    : true,
+    build       : { android: 'bubblewrap' },
     type        : 'app',
     slug        : 'feeds',
     name        : 'RSS Reader',
@@ -76,7 +74,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/files/
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     categories  : ['files'],
     description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
     icon        : 'mdi:folder-outline',
@@ -86,7 +84,7 @@ const entries = [
     type        : 'app',
   },
   { // zugriff.dev/icons/
-    autopack    : true,
+    build       : { android: 'bubblewrap' },
     categories  : ['design'],
     type        : 'app',
     slug        : 'icons',
@@ -96,8 +94,7 @@ const entries = [
     description : 'Browse and search the whole Iconify library by set, copy or download any icon, and keep favourites.',
   },
   { // zugriff.dev/images/
-    autopack    : true,
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'images',
     name        : 'Images',
@@ -142,8 +139,7 @@ const entries = [
     color       : '#1e1b2e',
   },
   { // zugriff.dev/notes/
-    autopack    : true,
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'notes',
     name        : 'Notes',
@@ -152,7 +148,7 @@ const entries = [
     categories  : ['files', 'docs'],
   },
   { // zugriff.dev/podcasts/
-    autopack    : true,
+    build       : { android: 'bubblewrap' },
     type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
@@ -170,8 +166,7 @@ const entries = [
     categories  : ['tool'],
   },
   { // zugriff.dev/videos/
-    autopack    : true,
-    capacitor   : true,
+    build       : { android: 'capacitor' },
     type        : 'app',
     slug        : 'videos',
     name        : 'Videos',
