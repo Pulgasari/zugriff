@@ -38,13 +38,29 @@
     {
       "action": "./",
       "accept": {
-        "video/mp4": [".mp4", ".m4v"],
-        "video/webm": [".webm"],
-        "video/quicktime": [".mov"],
-        "video/x-matroska": [".mkv"],
-        "video/x-msvideo": [".avi"],
-        "video/ogg": [".ogv"],
-        "video/mpeg": [".mpg", ".mpeg"]
+        "video/mp4": [
+          ".mp4",
+          ".m4v"
+        ],
+        "video/webm": [
+          ".webm"
+        ],
+        "video/quicktime": [
+          ".mov"
+        ],
+        "video/x-matroska": [
+          ".mkv"
+        ],
+        "video/x-msvideo": [
+          ".avi"
+        ],
+        "video/ogg": [
+          ".ogv"
+        ],
+        "video/mpeg": [
+          ".mpg",
+          ".mpeg"
+        ]
       }
     }
   ],
@@ -55,8 +71,20 @@
     ]
   },
   "shortcuts": [
-    { "name": "Library", "short_name": "Library", "url": "./?mode=library" },
-    { "name": "Player", "short_name": "Player", "url": "./?mode=player" },
-    { "name": "Edit", "short_name": "Edit", "url": "./?mode=edit" }
+    {
+      "name": "Library",
+      "short_name": "Library",
+      "url": "./?mode=library"
+    },
+    {
+      "name": "Player",
+      "short_name": "Player",
+      "url": "./?mode=player"
+    },
+    {
+      "name": "Edit",
+      "short_name": "Edit",
+      "url": "./?mode=edit"
+    }
   ]
 }
