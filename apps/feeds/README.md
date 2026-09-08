@@ -24,13 +24,11 @@ This is an *app*, not a *tool*: own chrome, own css (`app.css` over
 
 | file            | what it is |
 |-----------------|------------|
-| `app.js`        | the UI — sidebar, article list / video grid, add + settings dialogs |
-| `db.js`         | `@bunker/db`: `feeds`, `items`, and a `read` set; refresh + upsert logic |
-| `feed.js`       | fetch (direct→proxy) + parse (RSS/Atom, YouTube-aware) + channel-URL resolution |
-| `app.css`       | the app's own look |
-| `index.html`    | links `../base.css` + `app.css` and the importmap |
-| `manifest.json` | pwa manifest (generated from the registry) |
-| `sw.js`         | one-liner, pulls in `shared/js/sw-core.js` |
+| `app.js`             | the UI on `zugriff.app` — sidebar, article list / video grid, add + settings dialogs |
+| `modules/db.js`      | `@bunker/db`: `feeds`, `items`, and a `read` set; refresh + upsert logic |
+| `modules/feed.js`    | fetch (direct→proxy) + parse (RSS/Atom, YouTube-aware) + channel-URL resolution |
+| `app.css`            | the app's own look |
+| `manifest.json`      | pwa manifest (generated from the registry) |
 | `app.svg`       | the app icon |
 
 ### the CORS reality
