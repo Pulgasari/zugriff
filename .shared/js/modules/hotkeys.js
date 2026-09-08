@@ -1,24 +1,41 @@
 // .shared/js/modules/hotkeys.js
-// keyboard shortcuts behind zugriff.app.hotkeys. a binding maps a key combo to a
-// callback OR an action id (string) — resolved through the app's action registry, so
-// a shortcut and a button can share one behaviour:
+// keyboard shortcuts behind zugriff.app.hotKeys, declared as a map of combo -> spec:
 //
-//   app.hotkeys.bind('ctrl+r', 'refresh-episodes');   // fire an action by id
-//   app.hotkeys.bind(' ', () => app.player.toggle());  // or a callback
-//   app.hotkeys.bind(['j', 'arrowdown'], 'next');      // one or many combos
+//   app.hotKeys = {
+//     'ctrl + s'    : { action: 'save' },                    // spaces around + are optional
+//     'space'       : { action: 'toggle-play', when: hasPlayer },
+//     'arrow-left'  : { action: 'skip-back',   when: hasPlayer },
+//   };
 //
-// combos are modifier-order-independent ('shift+ctrl+k' === 'ctrl+shift+k'); ' ' is
-// 'space'. typing in an input/textarea is left alone unless the binding is { global:true }
-// or uses a modifier. scopes gate a set of bindings behind a condition.
+// a spec's `action` is an action id resolved through the app's action registry (so a
+// shortcut and a button share one behaviour), or a callback. combos are modifier-order
+// independent ('shift+ctrl+k' === 'ctrl+shift+k'); use the keywords space / arrow-left /
+// arrow-right / arrow-up / arrow-down / escape / … (a bare ' ' is NOT the spacebar). typing
+// in an input/textarea is left alone unless the spec is { global:true } or the combo holds a
+// modifier. `when` gates a binding behind a condition; `preventDefault` defaults to true.
 
 const MOD_ORDER = ['ctrl', 'alt', 'shift', 'meta'];
 
-// split on '+', trim each part (so 'ctrl + r' works) and map a lone space to 'space'
-// (a bare ' ' is the spacebar), then order modifiers so combos compare regardless of order
+// friendly combo keyword -> the canonical key comboFromEvent produces
+const KEYWORDS = {
+  'space'       : 'space',
+  'arrow-left'  : 'arrowleft',
+  'arrow-right' : 'arrowright',
+  'arrow-up'    : 'arrowup',
+  'arrow-down'  : 'arrowdown',
+  'esc'         : 'escape',
+  'del'         : 'delete',
+  'return'      : 'enter',
+};
+
+// split on '+', trim each part (so 'ctrl + s' works), map friendly keywords to their
+// canonical key, then order modifiers so combos compare regardless of order
 const normalize = combo => String(combo)
   .toLowerCase()
   .split('+')
-  .map(part => part.trim() === '' ? 'space' : part.trim())
+  .map(part => part.trim())
+  .filter(Boolean)
+  .map(part => KEYWORDS[part] ?? part)
   .sort((a, b) => MOD_ORDER.indexOf(a) - MOD_ORDER.indexOf(b))
   .join('+');
 
@@ -36,58 +53,41 @@ const comboFromEvent = event => {
 const isEditable = el =>
   !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
 
-// `actions` (optional) is the app's action registry, so a string target is an action id
+// `actions` (optional) is the app's action registry, so a string action is an action id
 export function createHotkeys (actions) {
-  const bindings = new Map();   // combo -> { target, options }
-  let activeScope = null;
+  const bindings = new Map();   // combo -> spec { action, when, global, preventDefault }
 
-  const resolve = target =>
-      typeof target === 'function'                 ? target
-    : typeof target === 'string' && actions        ? event => actions.run(target, event)
+  const resolve = action =>
+      typeof action === 'function'          ? action
+    : typeof action === 'string' && actions ? event => actions.run(action, event)
     : null;
 
   const onKeydown = event => {
-    const binding = bindings.get(comboFromEvent(event));
-    if (!binding) return;
-    const { options } = binding;
+    const spec = bindings.get(comboFromEvent(event));
+    if (!spec) return;
 
-    // don't hijack plain typing unless the binding opts in, or a modifier is held
-    if (!options.global && !(event.ctrlKey || event.metaKey || event.altKey) && isEditable(event.target)) return;
+    // don't hijack plain typing unless the spec opts in, or a modifier is held
+    if (!spec.global && !(event.ctrlKey || event.metaKey || event.altKey) && isEditable(event.target)) return;
+    if (spec.when && !spec.when()) return;
 
-    if (activeScope) {
-      if (!activeScope.enabled) return;
-      if (activeScope.condition && !activeScope.condition()) return;
-    }
-    if (options.when && !options.when()) return;
-
-    const run = resolve(binding.target);
+    const run = resolve(spec.action);
     if (!run) return;
-    if (options.preventDefault !== false) event.preventDefault();
+    if (spec.preventDefault !== false) event.preventDefault();
     run(event);
   };
 
   if (typeof window !== 'undefined') window.addEventListener('keydown', onKeydown);
 
   const api = {
-    /** bind one combo (or an array of them) to a callback or an action id */
-    bind (combo, target, options = {}) {
-      for (const c of [].concat(combo)) bindings.set(normalize(c), { target, options });
+    // declare the whole map: { 'ctrl + s': { action, when, global, preventDefault }, … }.
+    // a bare action id / callback is accepted as the value shorthand.
+    define (map = {}) {
+      for (const [combo, spec] of Object.entries(map)) {
+        bindings.set(normalize(combo), spec && typeof spec === 'object' ? spec : { action: spec });
+      }
       return api;
     },
-    unbind (combo) {
-      for (const c of [].concat(combo)) bindings.delete(normalize(c));
-      return api;
-    },
-    /** a named scope whose bindings only fire while it is enabled (and its condition holds) */
-    scope (name) {
-      const scope = {
-        name, enabled: false,
-        enable  ()   { scope.enabled = true;  activeScope = scope; return scope; },
-        disable ()   { scope.enabled = false; if (activeScope === scope) activeScope = null; return scope; },
-        when    (fn) { scope.condition = fn; return scope; },
-      };
-      return scope;
-    },
+    remove (combo) { for (const c of [].concat(combo)) bindings.delete(normalize(c)); return api; },
     list ()    { return [...bindings.keys()]; },
     destroy () {
       if (typeof window !== 'undefined') window.removeEventListener('keydown', onKeydown);

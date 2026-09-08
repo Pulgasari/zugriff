@@ -47,11 +47,16 @@ app.removeTag = async id => {
   if (app.state.activeTag === id) app.state.activeTag = null;
 };
 
-// :::::: ACTIONS + HOTKEYS
+// :::::: ACTIONS
+
+app.actions = { 'back': () => app.back() };
+
+// :::::: HOTKEYS
 // escape backs out of the edit form / the mobile detail pane
 
-app.actions = { back: () => app.back() };
-app.hotkeys.bind('escape', 'back', { global: true, when: () => app.state.editMode || app.state.mobilePane === 'detail' });
+app.hotKeys = {
+  'escape' : { action: 'back', global: true, when: () => app.state.editMode || app.state.mobilePane === 'detail' },
+};
 
 // :::::: UI
 
