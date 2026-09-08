@@ -105,7 +105,8 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     store.staleWhileRevalidate(request, {
       ttl,
-      keepAlive : pending => event.waitUntil(pending),
+      keepAlive    : pending => event.waitUntil(pending),
+      withDirtyFix : true,
     }).catch(async error => {
       // offline and never cached: let the failure be the real network failure
       console.warn('[sw] miss', url, error);
