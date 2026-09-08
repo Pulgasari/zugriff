@@ -18,6 +18,7 @@
 
 vermutlich werden die apps fortan aber fortan für android generell mit capacitor gebaut, weil das scheinbar vieles erleichtert. (ich habe aber noch nicht vollständig capacitor durchdrungen, aber bei dem was ich bisher so las...)
 
+- [ ] habe gerade testweise 3 der capacitor-apps installiert und bei allen kommt error von vercel vonwegen "nich gefunden". ich vermute mal,dass da die falsche url im build landet. es muss `https://zugriff.dev/<app>/` sein, nicht `https://zugriff.dev/apps/<app>/` oder irgendwas anderes.
 - [ ] beim runnen des capacitor-workflows kommen folgende warnungen:
 ```
 9 warnings
