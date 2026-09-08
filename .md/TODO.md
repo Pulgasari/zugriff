@@ -20,9 +20,8 @@ vermutlich werden die apps fortan aber fortan für android generell mit capacito
 
 - [ ] beim runnen des capacitor-workflows kommen folgende warnungen:
 ```
-Annotations
 9 warnings
-discover-apps
+
 Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
 build-capacitor (files)
 Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/setup-node@v4, actions/upload-artifact@v4, android-actions/setup-android@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
