@@ -41,7 +41,7 @@ class ZugriffApp {
 
     // ::: behaviour registries — actions (named callbacks) + hotkeys wired to them
     this._actions = createActions();
-    this.hotkeys  = createHotkeys(this._actions);
+    this._hotkeys = createHotkeys(this._actions);
   }
 
   // ::: loaders (app-relative). ui pieces resolve to a default export when present,
@@ -56,6 +56,11 @@ class ZugriffApp {
   // app.actions = { … } merges the object in rather than replacing the registry.
   get actions ()    { return this._actions; }
   set actions (obj) { for (const [id, fn] of Object.entries(obj ?? {})) this._actions.add(id, fn); }
+
+  // ::: hotkeys — a declarative combo -> spec map (see modules/hotkeys.js). assigning
+  // app.hotKeys = { … } defines the bindings; the getter is the manager (list/destroy).
+  get hotKeys ()    { return this._hotkeys; }
+  set hotKeys (map) { this._hotkeys.define(map); }
 
   // ::: state extension — the mechanism to grow app.state and wire effects.
   // scalar/plain-data leaves land on the deep signal; `effects` are plain

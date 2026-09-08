@@ -10,8 +10,7 @@
 // readNote, fs) and exported whole; app.js binds it to the app handle, so the app
 // code reaches it as `app.lib`.
 
-import { signal }  from '@aufbau/kits/preact-htm';
-import { zugriff } from '/.shared/js/runtime.js';
+import { signal }  from '@aufbau/signals';
 import * as fs     from '/.shared/js/filesystem/fsaccess.js';
 
 // what counts as a note. markdown and its usual spellings; a folder full of

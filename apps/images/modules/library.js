@@ -5,12 +5,11 @@
 // lifecycle (persisting handles in @bunker/db, resolving perms, add / reconnect /
 // re-pick / forget) and calls back here only to turn a scanned folder into image
 // records. the built instance is extended with the app-specific surface (pics,
-// accept, ensureLoaded, openFile, fs) and exported whole; context.js binds it to
-// the app handle, so the app code reaches it as `app.lib`. no covers: an image is
-// its own thumbnail, generated lazily in the ui.
+// accept, ensureLoaded, openFile, fs) and exported whole; app.js binds it to the
+// handle, so the app code reaches it as `app.lib`. no covers: an image is its own
+// thumbnail, generated lazily in the ui. zugriff is global, so no runtime import.
 
-import { signal }     from '@aufbau/kits/preact-htm';
-import { zugriff }    from '/.shared/js/runtime.js';
+import { signal }     from '@aufbau/signals';
 import { syncSource } from '/.shared/js/filesystem/scan.js';
 import * as fs        from '/.shared/js/filesystem/fsaccess.js';
 

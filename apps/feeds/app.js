@@ -1,37 +1,38 @@
 // apps/feeds/app.js
-
-// :::::: IMPORT
+// the feeds reader on the shared handle. the runtime binds zugriff (+ zugriff.app, html) to
+// window before this runs, so nothing here imports the runtime. the library lives in the db
+// module (app.db); ephemeral ui state on app.state; the CORS proxy is a persisted scalar.
 
 // ::: vendors
-import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { signal, computed }   from '@aufbau/signals';
+import { useEffect, useRef }  from 'preact/hooks';
 
 // ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('feeds');
-import { stored }       from '/.shared/js/app/signals.js';
-import {
-  Icon,
-  Image,
-  AppSettings
-} from '/.shared/js/components/index.js';
+import { stored }             from '/.shared/js/app/signals.js';
+import { Icon, Image, Settings } from '/.shared/js/components/index.js';
 
-// ::: local
-import * as db           from './db.js';
-import { DEFAULT_PROXY } from './feed.js';
+// ::: app modules
+import * as db           from './modules/db.js';
+import { DEFAULT_PROXY } from './modules/feed.js';
 
-// :::::: SETTINGS + UI STATE
+// ::: the app handle
+const app = zugriff.app;
+app.db = db;
 
-const proxy   = stored(DEFAULT_PROXY, 'feeds:proxy');
-const route   = signal({ name: 'latest' }); // { name:'latest'|'youtube'|'feed', id? }
-const dialog  = signal(null);  // 'add' | 'settings' | null
-const addVal  = signal('');
-const navOpen = signal(false); // mobile drawer
-const busy    = signal('');    // a label while a long task runs
+// :::::: STATE
+// ephemeral ui state on app.state (no `.value`); the library itself is app.db (plain
+// signals). the CORS proxy is the one durable pref — a persisted scalar via `stored`.
 
-const flash = (text, kind = 'ok') =>
-  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
+app.state.route   = { name: 'latest', id: null };   // { name:'latest'|'youtube'|'feed', id? }
+app.state.dialog  = null;    // 'add' | 'settings' | null
+app.state.addVal  = '';      // add-feed input draft
+app.state.navOpen = false;   // mobile drawer
+app.state.busy    = '';      // a label while a long task runs
 
-const go = (name, id) => { route.value = { name, id }; navOpen.value = false; };
+const proxy = stored(DEFAULT_PROXY, 'feeds:proxy');
+
+app.go    = (name, id = null) => { app.state.route = { name, id }; app.state.navOpen = false; };
+const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
 // :::::: DERIVED
 
@@ -40,7 +41,7 @@ const youtubeFeeds = computed(() => db.feeds.value.filter(f => f.kind === 'youtu
 
 // the list + heading for whatever the route points at
 const currentView = computed(() => {
-  const r = route.value;
+  const r = app.state.route;
   if (r.name === 'youtube') return { title: 'YouTube', icon: 'youtube', kind: 'youtube', list: db.latestVideos.value };
   if (r.name === 'feed') {
     const f = db.feedById(r.id);
@@ -68,46 +69,41 @@ function fmtWhen (ms) {
 const hostOf = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
 const feedName = it => db.feedById(it.feedId)?.title || hostOf(it.link);
 
-function openItem (it) {
-  db.markRead(it.key);
-  if (it.link) window.open(it.link, '_blank', 'noopener,noreferrer');
-}
-
 // :::::: ACTIONS
 
 async function submitAdd () {
-  const input = addVal.value.trim();
+  const input = app.state.addVal.trim();
   if (!input) return;
-  busy.value = 'Adding feed…';
+  app.state.busy = 'Adding feed…';
   try {
     const rec = await db.addFeed(input, proxy.value);
     flash(`Added ${rec.title}`);
-    addVal.value = '';
-    dialog.value = null;
-    go('feed', rec.id);
+    app.state.addVal = '';
+    app.state.dialog = null;
+    app.go('feed', rec.id);
   } catch (err) {
     flash(err.message || String(err), 'err');
-  } finally { busy.value = ''; }
+  } finally { app.state.busy = ''; }
 }
 
 async function refreshCurrent () {
-  const r = route.value;
-  busy.value = 'Refreshing…';
+  const r = app.state.route;
+  app.state.busy = 'Refreshing…';
   try {
     if (r.name === 'feed' && r.id) {
       const n = await db.refresh(r.id, proxy.value);
       flash(n ? `${n} new` : 'up to date');
     } else {
-      const n = await db.refreshAll(proxy.value, (d, t) => busy.value = `Refreshing ${d}/${t}…`);
+      const n = await db.refreshAll(proxy.value, (d, t) => app.state.busy = `Refreshing ${d}/${t}…`);
       flash(n ? `${n} new` : 'up to date');
     }
   } catch (err) { flash(err.message || String(err), 'err'); }
-  finally { busy.value = ''; }
+  finally { app.state.busy = ''; }
 }
 
 async function removeFeed (f) {
   if (!confirm(`Unfollow “${f.title}”? Its stored entries are removed too.`)) return;
-  if (route.value.id === f.id) go('latest');
+  if (app.state.route.id === f.id) app.go('latest');
   await db.removeFeed(f.id);
   flash('Unfollowed');
 }
@@ -118,13 +114,18 @@ function markAllRead () {
   flash(`Marked ${list.length} read`);
 }
 
+// :::::: HOTKEYS
+
+app.actions = { 'close-dialog': () => app.state.dialog = null };
+app.hotKeys = { 'escape': { action: 'close-dialog', when: () => !!app.state.dialog } };
+
 // :::::: SIDEBAR
 
 function NavItem ({ name, id, icon, label, count }) {
-  const r = route.value;
+  const r = app.state.route;
   const active = r.name === name && r.id === id;
   return html`
-    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => go(name, id)} title=${label}>
+    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name, id)} title=${label}>
       <${Icon} name=${icon} />
       <span class="nav-label">${label}</span>
       ${count > 0 && html`<span class="nav-count">${count}</span>`}
@@ -134,11 +135,11 @@ function NavItem ({ name, id, icon, label, count }) {
 function FeedItem ({ feed: f }) {
   const list   = db.itemsByFeed.value[f.id] || [];
   const unread = db.unreadIn(list);
-  const active = route.value.name === 'feed' && route.value.id === f.id;
+  const active = app.state.route.name === 'feed' && app.state.route.id === f.id;
   const spin   = db.refreshing.value[f.id];
   return html`
     <div class=${'feed-row' + (active ? ' active' : '')}>
-      <button class="feed-open" onClick=${() => go('feed', f.id)} title=${f.title}>
+      <button class="feed-open" onClick=${() => app.go('feed', f.id)} title=${f.title}>
         <span class="feed-ic">
           ${spin ? html`<${Icon} name="loading" />`
                  : f.image ? html`<img src=${f.image} alt="" loading="lazy" onError=${e => e.target.style.display = 'none'} />`
@@ -156,14 +157,14 @@ function FeedItem ({ feed: f }) {
 function Sidebar () {
   const arts = articleFeeds.value, tubes = youtubeFeeds.value;
   return html`
-    <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
+    <aside class=${'sidebar' + (app.state.navOpen ? ' open' : '')}>
       <div class="brand">
         <${Icon} name="rss"/> <span>Feeds</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}>
+        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.navOpen = false}>
           <${Icon} name="close"/></button>
       </div>
 
-      <button class="add-btn" onClick=${() => { addVal.value = ''; dialog.value = 'add'; }}>
+      <button class="add-btn" onClick=${() => { app.state.addVal = ''; app.state.dialog = 'add'; }}>
         <${Icon} name="plus" /> Add feed</button>
 
       <div class="nav-scroll">
@@ -191,9 +192,9 @@ function Sidebar () {
       </div>
 
       <div class="side-foot">
-        <button class="foot-btn" onClick=${refreshCurrent} disabled=${!!busy.value || !db.feeds.value.length}>
+        <button class="foot-btn" onClick=${refreshCurrent} disabled=${!!app.state.busy || !db.feeds.value.length}>
           <${Icon} name="refresh" /> Refresh</button>
-        <button class="foot-btn" onClick=${() => dialog.value = 'settings'}>
+        <button class="foot-btn" onClick=${() => app.state.dialog = 'settings'}>
           <${Icon} name="settings" /> Settings</button>
       </div>
     </aside>`;
@@ -225,7 +226,7 @@ function ArticleRow ({ item }) {
 function VideoCard ({ item }) {
   const unread = !db.isRead(item.key);
   return html`
-    <a class=${'vid' + (unread ? '' : ' read')} 
+    <a class=${'vid' + (unread ? '' : ' read')}
       href=${item.link} target="_blank" rel="noopener noreferrer"
       onClick=${() => db.markRead(item.key)}
       >
@@ -249,7 +250,7 @@ function Body () {
       <div class="empty">
         <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} />
         <p>${hasFeeds ? 'Nothing here yet — try Refresh.' : 'Follow a feed to see the latest here.'}</p>
-        ${!hasFeeds && html`<button class="cta" onClick=${() => { addVal.value = ''; dialog.value = 'add'; }}>
+        ${!hasFeeds && html`<button class="cta" onClick=${() => { app.state.addVal = ''; app.state.dialog = 'add'; }}>
           <${Icon} name="plus" /> Add your first feed</button>`}
       </div>`;
   }
@@ -263,18 +264,18 @@ function Header () {
   const v = currentView.value;
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}>
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => app.state.navOpen = true}>
         <${Icon} name="menu" /></button>
       <${Icon} name=${v.icon} className="topbar-ic" />
       <h1 class="topbar-title" title=${v.title}>${v.title}</h1>
       ${v.feed?.link && html`<a class="ibtn" href=${v.feed.link} target="_blank" rel="noopener noreferrer" title="Open site">
         <${Icon} name="mdi:open-in-new" /></a>`}
       <span class="topbar-spacer"></span>
-      ${busy.value && html`<span class="topbar-busy"><${Icon} name="loading" /> ${busy.value}</span>`}
+      ${app.state.busy && html`<span class="topbar-busy"><${Icon} name="loading" /> ${app.state.busy}</span>`}
       ${v.list.length > 0 && html`
         <button class="ibtn" title="Mark all read" onClick=${markAllRead}>
           <${Icon} name="mdi:check-all" /></button>`}
-      <button class="ibtn" title="Refresh" onClick=${refreshCurrent} disabled=${!!busy.value}>
+      <button class="ibtn" title="Refresh" onClick=${refreshCurrent} disabled=${!!app.state.busy}>
         <${Icon} name="refresh" /></button>
     </header>`;
 }
@@ -285,19 +286,19 @@ function AddDialog () {
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus(); }, []);
   return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) dialog.value = null; }}>
+    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.dialog = null; }}>
       <div class="modal" role="dialog" aria-modal="true">
         <h2>Add a feed</h2>
         <p class="modal-hint">Paste a feed URL, a site URL, or a YouTube channel /
            <code>@handle</code> / video link — YouTube channels are resolved to their feed.</p>
-        <input ref=${ref} class="modal-input" type="text" value=${addVal.value}
+        <input ref=${ref} class="modal-input" type="text" value=${app.state.addVal}
                placeholder="https://example.com/feed.xml"
-               onInput=${e => addVal.value = e.target.value}
+               onInput=${e => app.state.addVal = e.target.value}
                onKeyDown=${e => { if (e.key === 'Enter') submitAdd(); }} />
         <div class="modal-actions">
-          <button class="ghost" onClick=${() => dialog.value = null}>Cancel</button>
-          <button class="primary" disabled=${!!busy.value} onClick=${submitAdd}>
-            ${busy.value ? 'Adding…' : 'Add'}</button>
+          <button class="ghost" onClick=${() => app.state.dialog = null}>Cancel</button>
+          <button class="primary" disabled=${!!app.state.busy} onClick=${submitAdd}>
+            ${app.state.busy ? 'Adding…' : 'Add'}</button>
         </div>
       </div>
     </div>`;
@@ -306,7 +307,7 @@ function AddDialog () {
 function SettingsDialog () {
   const val = useRef(null);
   return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) dialog.value = null; }}>
+    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.dialog = null; }}>
       <div class="modal" role="dialog" aria-modal="true">
         <h2>Settings</h2>
         <label class="field">
@@ -321,9 +322,9 @@ function SettingsDialog () {
             <button class="btn ghost small" onClick=${() => proxy.value = ''}>Direct only</button>
           </div>
         </label>
-        <${AppSettings} />
+        <${Settings} />
         <div class="modal-actions">
-          <button class="primary" onClick=${() => { dialog.value = null; flash('Settings saved'); }}>Done</button>
+          <button class="primary" onClick=${() => { app.state.dialog = null; flash('Settings saved'); }}>Done</button>
         </div>
       </div>
     </div>`;
@@ -343,16 +344,16 @@ function App () {
   if (!db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   return html`
-    <${Fragment}>
+    <>
       <${Sidebar} />
-      ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
+      ${app.state.navOpen && html`<div class="scrim-mobile" onClick=${() => app.state.navOpen = false}></div>`}
       <main id="app-main">
         <${Header} />
         <div class="body-scroll"><${Body} /></div>
       </main>
-      ${dialog.value === 'add'      && html`<${AddDialog} />`}
-      ${dialog.value === 'settings' && html`<${SettingsDialog} />`}
-    </${Fragment}>`;
+      ${app.state.dialog === 'add'      && html`<${AddDialog} />`}
+      ${app.state.dialog === 'settings' && html`<${SettingsDialog} />`}
+    </>`;
 }
 
 // :::::: BOOT

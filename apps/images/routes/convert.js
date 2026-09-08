@@ -1,7 +1,7 @@
 // apps/images/routes/convert.js
 // convert route (ex image-converter): re-encode a batch of images.
 
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { signal } from '@aufbau/signals';
 import { Icon } from '/.shared/js/components/index.js';
 import { stored } from '/.shared/js/app/signals.js';
 import { dropEntries, ImgDrop, ToolFileItem } from './tools.js';

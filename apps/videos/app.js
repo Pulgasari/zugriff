@@ -1,17 +1,22 @@
 // apps/videos/app.js
 //
-// the videos app: one PWA, several routes switched by ?mode= via the shared
-// query-param router — a video-manager (library), a player (the shared engine)
-// and a hinted editor. the shell is a mode bar plus the router outlet. the OS
-// "open with" / launchQueue drops a launched clip into the player.
+// the videos app: one PWA, several routes switched by ?mode= via the shared query-param
+// router — a video-manager (library), a player (the shared engine) and a hinted editor. the
+// shell is a mode bar plus the router outlet. the OS "open with" / launchQueue drops a
+// launched clip into the player. the runtime binds zugriff (+ zugriff.app, html) to window
+// before this runs, so nothing here imports the runtime.
 
-import { html, Fragment, useEffect } from '@aufbau/kits/preact-htm';
-import { Icon, AppSettings }         from '/.shared/js/components/index.js';
-import { createRouter }              from '/.shared/js/app/router.js';
+import { Icon, Settings } from '/.shared/js/components/index.js';
+import { createRouter }   from '/.shared/js/app/router.js';
+import { useEffect }      from 'preact/hooks';
 
-import { app }      from './context.js';
+import lib          from './modules/library.js';
 import { routes }   from './routes/index.js';
 import { loadFile } from '/.shared/js/media/videoplayer.js';
+
+// ::: the app handle — the data layer hangs off it as app.lib
+const app = zugriff.app;
+app.lib = lib;
 
 const router = createRouter(app, { routes, param: 'mode', fallback: 'library' });
 
@@ -43,17 +48,17 @@ function ModeBar () {
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
-      <div class="im-modebar-actions"><${AppSettings} /></div>
+      <div class="im-modebar-actions"><${Settings} /></div>
     </header>`;
 }
 
 function App () {
   useEffect(() => { wireLaunchQueue(); }, []);
   return html`
-    <${Fragment}>
+    <>
       <${ModeBar} />
       <div id="app-main"><${router.Outlet} /></div>
-    </${Fragment}>`;
+    </>`;
 }
 
 // :::::: BOOT

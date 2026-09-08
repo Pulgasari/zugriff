@@ -1,33 +1,37 @@
 // apps/looksmaxx/app.js
-
-// :::::: IMPORTS
+// the on-device hair recolour + hairstyle try-on, on the shared handle. the runtime binds
+// zugriff (+ zugriff.app, html) to window before this runs, so nothing here imports the
+// runtime. ephemeral editor state on app.state; the heavy working data (canvases, mask, face
+// landmarks) is a plain object — it never renders directly. everything stays on the device.
 
 // ::: vendors
-import { html, signal, useRef, useEffect } from '@aufbau/kits/preact-htm';
+import { useRef, useEffect } from 'preact/hooks';
 
 // ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('looksmaxx');
-const config = app.config;
-import { Icon }         from '/.shared/js/components/index.js';
+import { Icon } from '/.shared/js/components/index.js';
 
-// ::: local
-import { segmentHair, detectFace }   from './vision.js';
-import { recolorHair, SWATCHES }     from './recolor.js';
-import { drawHairstyle }             from './overlay.js';
-import { HAIRSTYLES }                from './hairstyles/index.js';
+// ::: app modules
+import { segmentHair, detectFace } from './modules/vision.js';
+import { recolorHair, SWATCHES }   from './modules/recolor.js';
+import { drawHairstyle }           from './modules/overlay.js';
+import { HAIRSTYLES }              from './hairstyles/index.js';
+
+// ::: the app handle
+const app = zugriff.app;
+const config = app.config;
 
 // :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::
+// ephemeral editor state on app.state (no `.value`, read inside render).
 
-const MAX_DIM = 1400;                 // cap the working resolution for a smooth recolour
+const MAX_DIM = 1400;   // cap the working resolution for a smooth recolour
 
-const status    = signal('');         // '' | 'loading' | 'segmenting' | 'detecting' | 'error…'
-const hasPhoto  = signal(false);
-const color     = signal(null);       // { r, g, b } | null
-const strength  = signal(0.85);
-const styleId   = signal(null);       // hairstyle id | 'custom' | null
-const styleScale  = signal(1);
-const styleOffset = signal(0);        // fraction of head height, negative = up
+app.state.status      = '';     // '' | 'loading' | 'segmenting' | 'detecting' | 'error…'
+app.state.hasPhoto    = false;
+app.state.color       = null;   // { r, g, b } | null
+app.state.strength    = 0.85;
+app.state.styleId     = null;   // hairstyle id | 'custom' | null
+app.state.styleScale  = 1;
+app.state.styleOffset = 0;      // fraction of head height, negative = up
 
 // non-reactive working data (plain refs, not signals — they never render directly)
 const work = {
@@ -51,7 +55,7 @@ function loadImage (src) {
 
 /** take a photo File, size it down, draw it to the base canvas, segment the hair */
 async function usePhoto (file) {
-  status.value = 'loading';
+  app.state.status = 'loading';
   try {
     const url = URL.createObjectURL(file);
     const img = await loadImage(url);
@@ -67,17 +71,17 @@ async function usePhoto (file) {
 
     work.base = base;
     work.face = null;                     // re-detect lazily for this new photo
-    hasPhoto.value = true;
+    app.state.hasPhoto = true;
 
-    status.value = 'segmenting';
+    app.state.status = 'segmenting';
     const { mask, width, height } = await segmentHair(base);
     work.mask = { mask, maskW: width, maskH: height };
 
-    status.value = '';
+    app.state.status = '';
     compose();
   } catch (err) {
     console.error('[looksmaxx]', err);
-    status.value = err.message || 'Something went wrong.';
+    app.state.status = err.message || 'Something went wrong.';
   }
 }
 
@@ -91,45 +95,45 @@ function compose () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(base, 0, 0);
 
-  if (color.value && work.mask) {
-    recolorHair(ctx, { width: canvas.width, height: canvas.height }, work.mask, color.value, strength.value);
+  if (app.state.color && work.mask) {
+    recolorHair(ctx, { width: canvas.width, height: canvas.height }, work.mask, app.state.color, app.state.strength);
   }
-  if (styleId.value && work.styleImg && work.face) {
+  if (app.state.styleId && work.styleImg && work.face) {
     drawHairstyle(ctx, work.face, work.styleImg, {
       width: canvas.width, height: canvas.height,
-      scale: styleScale.value, offsetY: styleOffset.value,
+      scale: app.state.styleScale, offsetY: app.state.styleOffset,
     });
   }
 }
 
 /** pick a hairstyle (or 'custom' from a user image, or null to remove) */
 async function useStyle (entry, customImg) {
-  if (!entry && !customImg) { styleId.value = null; work.styleImg = null; compose(); return; }
+  if (!entry && !customImg) { app.state.styleId = null; work.styleImg = null; compose(); return; }
   try {
     work.styleImg = customImg ?? await loadImage(entry.src);
-    styleId.value = entry?.id ?? 'custom';
-    styleScale.value = 1; styleOffset.value = 0;
+    app.state.styleId = entry?.id ?? 'custom';
+    app.state.styleScale = 1; app.state.styleOffset = 0;
     if (!work.face) {                          // detect the face once, on first overlay
-      status.value = 'detecting';
+      app.state.status = 'detecting';
       work.face = await detectFace(work.base);
-      status.value = work.face ? '' : 'No face found — hairstyle needs a clear front-facing photo.';
+      app.state.status = work.face ? '' : 'No face found — hairstyle needs a clear front-facing photo.';
     }
     compose();
   } catch (err) {
     console.error('[looksmaxx]', err);
-    status.value = err.message || 'Could not apply that hairstyle.';
+    app.state.status = err.message || 'Could not apply that hairstyle.';
   }
 }
 
 function reset () {
-  color.value = null; strength.value = 0.85;
-  styleId.value = null; work.styleImg = null;
-  styleScale.value = 1; styleOffset.value = 0;
+  app.state.color = null; app.state.strength = 0.85;
+  app.state.styleId = null; work.styleImg = null;
+  app.state.styleScale = 1; app.state.styleOffset = 0;
   compose();
 }
 
 function download () {
-  const canvas = view.current; if (!canvas || !hasPhoto.value) return;
+  const canvas = view.current; if (!canvas || !app.state.hasPhoto) return;
   canvas.toBlob(blob => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -156,27 +160,27 @@ function Dropzone () {
 }
 
 function ColorRow () {
-  const onCustom = e => { const c = hexToRgb(e.target.value); if (c) { color.value = c; compose(); } };
+  const onCustom = e => { const c = hexToRgb(e.target.value); if (c) { app.state.color = c; compose(); } };
   return html`
     <div class="group">
       <div class="group-head"><span>Hair colour</span>
-        ${color.value && html`<button class="link" onClick=${() => { color.value = null; compose(); }}>none</button>`}
+        ${app.state.color && html`<button class="link" onClick=${() => { app.state.color = null; compose(); }}>none</button>`}
       </div>
       <div class="swatches">
         ${SWATCHES.map(s => html`
-          <button class=${'swatch' + (isSame(color.value, s) ? ' on' : '')}
+          <button class=${'swatch' + (isSame(app.state.color, s) ? ' on' : '')}
                   title=${s.name} style=${`background:rgb(${s.r},${s.g},${s.b})`}
-                  onClick=${() => { color.value = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
+                  onClick=${() => { app.state.color = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
         <label class="swatch custom" title="Custom colour">
           <${Icon} name="mdi:eyedropper-variant" />
           <input type="color" onInput=${onCustom} />
         </label>
       </div>
-      ${color.value && html`
+      ${app.state.color && html`
         <label class="slider">
           <span>Intensity</span>
-          <input type="range" min="0" max="1" step="0.01" value=${strength.value}
-                 onInput=${e => { strength.value = +e.target.value; compose(); }} />
+          <input type="range" min="0" max="1" step="0.01" value=${app.state.strength}
+                 onInput=${e => { app.state.strength = +e.target.value; compose(); }} />
         </label>`}
     </div>`;
 }
@@ -192,29 +196,29 @@ function StyleRow () {
     <div class="group">
       <div class="group-head"><span>Hairstyle</span></div>
       <div class="styles">
-        <button class=${'style none' + (!styleId.value ? ' on' : '')} onClick=${() => useStyle(null)}>
+        <button class=${'style none' + (!app.state.styleId ? ' on' : '')} onClick=${() => useStyle(null)}>
           <${Icon} name="mdi:cancel" /><span>None</span>
         </button>
         ${HAIRSTYLES.map(s => html`
-          <button class=${'style' + (styleId.value === s.id ? ' on' : '')} onClick=${() => useStyle(s)}>
+          <button class=${'style' + (app.state.styleId === s.id ? ' on' : '')} onClick=${() => useStyle(s)}>
             <img src=${s.src} alt=${s.name} /><span>${s.name}</span>
           </button>`)}
-        <label class=${'style upload' + (styleId.value === 'custom' ? ' on' : '')}>
+        <label class=${'style upload' + (app.state.styleId === 'custom' ? ' on' : '')}>
           <${Icon} name="mdi:tray-arrow-up" /><span>Your PNG</span>
           <input type="file" accept="image/png,image/*" hidden onChange=${onCustom} />
         </label>
       </div>
-      ${styleId.value && work.face && html`
+      ${app.state.styleId && work.face && html`
         <label class="slider">
           <span>Size</span>
-          <input type="range" min="0.6" max="1.8" step="0.01" value=${styleScale.value}
-                 onInput=${e => { styleScale.value = +e.target.value; compose(); }} />
+          <input type="range" min="0.6" max="1.8" step="0.01" value=${app.state.styleScale}
+                 onInput=${e => { app.state.styleScale = +e.target.value; compose(); }} />
         </label>`}
-      ${styleId.value && work.face && html`
+      ${app.state.styleId && work.face && html`
         <label class="slider">
           <span>Height</span>
-          <input type="range" min="-0.4" max="0.4" step="0.01" value=${styleOffset.value}
-                 onInput=${e => { styleOffset.value = +e.target.value; compose(); }} />
+          <input type="range" min="-0.4" max="0.4" step="0.01" value=${app.state.styleOffset}
+                 onInput=${e => { app.state.styleOffset = +e.target.value; compose(); }} />
         </label>`}
     </div>`;
 }
@@ -230,7 +234,7 @@ function App () {
       <${Icon} name=${config.icon} />
       <strong>${config.name}</strong>
       <div class="spacer"></div>
-      ${hasPhoto.value && html`
+      ${app.state.hasPhoto && html`
         <label class="ibtn" title="New photo">
           <${Icon} name="mdi:image-refresh-outline" />
           <input type="file" accept="image/*" hidden onChange=${onNew} />
@@ -240,16 +244,16 @@ function App () {
     </header>
 
     <main class="stage">
-      ${!hasPhoto.value ? html`<${Dropzone} />` : html`
+      ${!app.state.hasPhoto ? html`<${Dropzone} />` : html`
         <div class="canvas-wrap">
           <canvas ref=${canvasRef}></canvas>
-          ${status.value && html`<div class="overlay-status"><span class="spin"></span>${label(status.value)}</div>`}
+          ${app.state.status && html`<div class="overlay-status"><span class="spin"></span>${label(app.state.status)}</div>`}
         </div>`}
     </main>
 
-    ${hasPhoto.value && html`
+    ${app.state.hasPhoto && html`
       <footer class="controls">
-        ${status.value && !isBusy(status.value) && html`<div class="msg">${status.value}</div>`}
+        ${app.state.status && !isBusy(app.state.status) && html`<div class="msg">${app.state.status}</div>`}
         <${ColorRow} />
         <${StyleRow} />
       </footer>`}`;

@@ -39,12 +39,11 @@ image) and your reading position — never a copy of the book.
 
 | file            | what it is |
 |-----------------|------------|
-| `index.html`    | static shell — links `../base.css`, `app.css` and the importmap |
-| `app.js`        | the library grid + reader chrome, mounted via `boot({ shell:false })` |
-| `db.js`         | three `@bunker/db` stores: sources, books, progress; scan + queue |
-| `library.js`    | title / author / cover extraction (epub.js + pdf.js) |
-| `reader.js`     | the two reading engines (PDF continuous canvas, EPUB rendition) |
-| `app.css`       | the app's own look |
+| `app.js`             | the library grid + reader chrome on `zugriff.app` (the shared `index.html` shell serves the page) |
+| `modules/db.js`      | three `@bunker/db` stores: sources, books, progress; scan + queue |
+| `modules/library.js` | title / author / cover extraction (epub.js + pdf.js) |
+| `modules/reader.js`  | the two reading engines (PDF continuous canvas, EPUB rendition) |
+| `app.css`            | the app's own look |
 | `app.config.js` | registry entry + aufbau runtime options |
 | `manifest.json` | PWA manifest |
 | `sw.js`         | one-liner, pulls in `shared/js/sw-core.js` |

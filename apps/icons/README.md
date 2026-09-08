@@ -21,11 +21,11 @@ an old PHP-server app on the zugriff/aufbau webstack.
 
 | file          | what it is |
 |---------------|------------|
-| `app.js`      | the UI — sidebar + home / sets / set / search / favourites + detail sheet |
-| `iconify.js`  | the Iconify API (`collections`, `collection`, `search`, `svg`) with a `@bunker/db` cache |
-| `db.js`       | favourites, in `@bunker/db` |
-| `app.css`     | the app's own look |
-| `index.html` · `manifest.json` · `sw.js` · `app.svg` | shell, manifest (generated), worker, icon |
+| `app.js`             | the UI on `zugriff.app` — sidebar + home / sets / set / search / favourites + detail sheet |
+| `modules/iconify.js` | the Iconify API (`collections`, `collection`, `search`, `svg`) with a `@bunker/db` cache |
+| `modules/db.js`      | favourites, in `@bunker/db` |
+| `app.css`            | the app's own look |
+| `manifest.json` · `app.svg` | manifest (generated), icon (the shared `index.html` shell serves the page) |
 
 Icons in the grid render through the `<iconify-icon>` web component (loaded from
 `code.iconify.design`) — it batches the SVG requests per set and caches them, so

@@ -1,10 +1,12 @@
-// apps/images/routes/app.lib.js
+// apps/images/routes/library.js
 // library route: browse granted folders as galleries, open an image into view.
 
-import { html, signal, computed, useEffect, useRef, useState } from '@aufbau/kits/preact-htm';
-import { Icon, InstallTip } from '/.shared/js/components/index.js';
-import { app } from '../context.js';
-import { setFiles } from '../state.js';
+import { signal, computed }            from '@aufbau/signals';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { Icon, InstallTip }            from '/.shared/js/components/index.js';
+import { setFiles }                    from '../modules/state.js';
+
+const app = zugriff.app;
 
 const libMsg    = signal('');
 const libSearch = signal('');

@@ -11,7 +11,7 @@ query-param router (`.shared/js/app/router.js`, bound to `app.state.route`):
   uploaded. Each clip shows a poster frame decoded on device (lazy as the cell
   nears the viewport, then cached in IndexedDB via `.shared/js/media/poster.js`);
   a clip the browser can't decode falls back to an icon. Data
-  layer: [`library.js`](./library.js) over the shared `FolderLibrary`.
+  layer: [`modules/library.js`](./modules/library.js) over the shared `FolderLibrary`.
 - **Player** (`?mode=player`) — the shared video engine
   ([`.shared/js/media/videoplayer.js`](../../.shared/js/media/videoplayer.js)):
   play/pause, seek, frame-step, reverse, loop, and the live transforms (aspect,
@@ -24,11 +24,10 @@ query-param router (`.shared/js/app/router.js`, bound to `app.state.route`):
 
 | file | what it is |
 |------|------------|
-| `app.js`            | shell: mode bar + router outlet + launchQueue |
-| `context.js`        | the shared app handle (`zugriff.app('videos')`) |
-| `library.js`        | granted-folder data layer (clip records) |
-| `routes/index.js`   | the route table (id + nav metadata + component) |
-| `routes/*.js`       | library / player / edit routes |
+| `app.js`             | shell on `zugriff.app`: mode bar + router outlet + launchQueue, binds `app.lib` |
+| `modules/library.js` | granted-folder data layer (clip records) |
+| `routes/index.js`    | the route table (id + nav metadata + component) |
+| `routes/*.js`        | library / player / edit routes |
 
 The player state lives at module scope in the shared engine, so a page has one
 player instance; the library hands it a clip via `loadFile()` and navigates.

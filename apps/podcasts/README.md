@@ -56,7 +56,7 @@ components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
   `zugriff:podcasts:settings`. Its own store rather than an `app.state` subtree because
   `typedSignal` persistence is whole-store and `app.state` must stay ephemeral.
 - `app.go(name, id)` / `app.flash(text, kind)` — navigate / toast.
-- `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …), and `app.hotkeys` binds keys to them (space = play/pause, ←/→ = skip, esc = close). See `.shared/js/modules/{actions,hotkeys}.js`.
+- `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …); `app.hotKeys` is the declarative combo→spec map that binds keys to them (`space` = play/pause, `arrow-left`/`arrow-right` = skip, `escape` = close). See `.shared/js/modules/{actions,hotkeys}.js`.
 
 Views/panels/components reach all of this through `const app = zugriff.app` (+
 destructuring the stable module refs); shared components load from

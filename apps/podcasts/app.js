@@ -63,7 +63,7 @@ app.thumbs = createThumbCache({ resizer: buildResizer });
 app.go    = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
 app.flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
-// :::::: ACTIONS + HOTKEYS ::::::::::::::::::::::::::::::::::
+// :::::: ACTIONS ::::::::::::::::::::::::::::::::::::::::::::
 // named behaviours the ui and the keyboard share (see .shared/js/modules/actions.js)
 
 async function refreshAll () {
@@ -80,21 +80,27 @@ async function refreshAll () {
 }
 
 app.actions = {
+  'close-dialog'  : () => app.state.dialog = null,
+
   'refresh-all'   : refreshAll,
   'add-podcast'   : () => app.state.dialog = 'add',
   'open-settings' : () => app.state.dialog = 'settings',
-  'close-dialog'  : () => app.state.dialog = null,
+
   'toggle-play'   : () => app.player.toggle(),
   'skip-back'     : () => app.player.skip(-15),
   'skip-forward'  : () => app.player.skip(30),
 };
 
+// :::::: HOTKEYS ::::::::::::::::::::::::::::::::::::::::::::
+
 const hasPlayer = () => !!app.player.episode;
-app.hotkeys
-  .bind('escape',     'close-dialog',  { when: () => !!app.state.dialog })
-  .bind(' ',          'toggle-play',   { when: hasPlayer })
-  .bind('arrowleft',  'skip-back',     { when: hasPlayer })
-  .bind('arrowright', 'skip-forward',  { when: hasPlayer });
+app.hotKeys = {
+  'escape'      : { action: 'close-dialog', when: () => !!app.state.dialog },
+
+  'space'       : { action: 'toggle-play',   when: hasPlayer },
+  'arrow-left'  : { action: 'skip-back',     when: hasPlayer },
+  'arrow-right' : { action: 'skip-forward',  when: hasPlayer },
+};
 
 // :::::: EFFECTS ::::::::::::::::::::::::::::::::::::::::::::
 // the frame reads menu/player placement off #app's data-attributes; keep them in sync

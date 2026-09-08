@@ -11,7 +11,7 @@
 // everything is on-device; a "refresh" re-fetches feeds (feed.js) and upserts
 // the entries. nothing here talks to the network except through feed.js.
 
-import { signal, computed } from '@aufbau/kits/preact-htm';
+import { signal, computed } from '@aufbau/signals';
 import { createDb } from '@bunker/db';
 import * as feed from './feed.js';
 

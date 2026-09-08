@@ -1,30 +1,37 @@
 // apps/ebooks/app.js
-
-// :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
+// the ebook library + reader on the shared handle. the runtime binds zugriff (+ zugriff.app,
+// html) to window before this runs, so nothing here imports the runtime. the library lives
+// in the db module (app.db); ephemeral ui state on app.state; reading prefs are persisted
+// scalars. the reader engines come from modules/reader.js.
 
 // ::: vendors
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { signal, computed }  from '@aufbau/signals';
+import { useEffect, useRef } from 'preact/hooks';
 
 // ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('ebooks');
-import { Icon, IconButton, Empty, InstallTip, AppSettings } from '/.shared/js/components/index.js';
-import { stored }                                          from '/.shared/js/app/signals.js';
-import * as fs                                             from '/.shared/js/filesystem/fsaccess.js';
+import { Icon, IconButton, Empty, InstallTip, Settings } from '/.shared/js/components/index.js';
+import { stored } from '/.shared/js/app/signals.js';
+import * as fs    from '/.shared/js/filesystem/fsaccess.js';
 
-// ::: local
-import * as db                               from './db.js';
-import { createPdfReader, createEpubReader } from './reader.js';
+// ::: app modules
+import * as db                                  from './modules/db.js';
+import { createPdfReader, createEpubReader }    from './modules/reader.js';
+
+// ::: the app handle
+const app = zugriff.app;
+app.db = db;
 
 // :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::
+// ephemeral ui state on app.state (no `.value`); the library is app.db (plain signals). sort
+// + the reader prefs are persisted scalars via `stored`.
 
-const route  = signal({ name: 'library' });        // { name:'library' } | { name:'reader', key }
-const search = signal('');
-const sort   = stored('recent', 'ebooks:sort');    // recent | title | author | added
-const folder = signal('');                         // '' = all folders, else sourceId
+app.state.route  = { name: 'library', key: null };   // { name:'library' } | { name:'reader', key }
+app.state.search = '';
+app.state.folder = '';                               // '' = all folders, else sourceId
 
-const flash = (text, kind = 'ok') =>
-  kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
+const sort = stored('recent', 'ebooks:sort');        // recent | title | author | added
+
+const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -47,9 +54,9 @@ const sortBooks = (list, mode) => [...list].sort((a, b) =>
                         || (b.addedAt || 0) - (a.addedAt || 0));
 
 const visibleBooks = computed(() => {
-  const q = search.value.trim().toLowerCase();
+  const q = app.state.search.trim().toLowerCase();
   let list = db.books.value;
-  if (folder.value) list = list.filter(b => b.sourceId === folder.value);
+  if (app.state.folder) list = list.filter(b => b.sourceId === app.state.folder);
   if (q) list = list.filter(b =>
     b.title.toLowerCase().includes(q) || authorOf(b).toLowerCase().includes(q) || b.name.toLowerCase().includes(q));
   return sortBooks(list, sort.value);
@@ -116,10 +123,10 @@ function FolderBar () {
   if (list.length < 2) return null;
   return html`
     <div class="folder-bar">
-      <button class=${'chip' + (folder.value === '' ? ' active' : '')} onClick=${() => folder.value = ''}>All</button>
+      <button class=${'chip' + (app.state.folder === '' ? ' active' : '')} onClick=${() => app.state.folder = ''}>All</button>
       ${list.map(s => html`
-        <button key=${s.id} class=${'chip' + (folder.value === s.id ? ' active' : '')}
-                onClick=${() => folder.value = s.id}>${s.name}</button>`)}
+        <button key=${s.id} class=${'chip' + (app.state.folder === s.id ? ' active' : '')}
+                onClick=${() => app.state.folder = s.id}>${s.name}</button>`)}
     </div>`;
 }
 
@@ -163,7 +170,7 @@ function Library () {
           <${IconButton} icon="mdi:refresh" label="Rescan folders" onClick=${() => db.rescanAll()} />
           <button class="btn primary" onClick=${addFolder}>
             <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
-          <${AppSettings} />
+          <${Settings} />
         </div>
       </header>
 
@@ -180,9 +187,9 @@ function Library () {
           <div class="lib-controls">
             <div class="lib-search">
               <${Icon} name="mdi:magnify" />
-              <input type="search" placeholder="Search title or author…" value=${search.value}
-                     onInput=${e => search.value = e.target.value} />
-              ${search.value && html`<button class="ibtn" aria-label="Clear" onClick=${() => search.value = ''}>
+              <input type="search" placeholder="Search title or author…" value=${app.state.search}
+                     onInput=${e => app.state.search = e.target.value} />
+              ${app.state.search && html`<button class="ibtn" aria-label="Clear" onClick=${() => app.state.search = ''}>
                 <${Icon} name="mdi:close" /></button>`}
             </div>
             <${SortPicker} value=${sort.value} onChange=${v => sort.value = v}
@@ -191,7 +198,7 @@ function Library () {
 
           <${FolderBar} />
 
-          ${cont.length > 0 && !search.value && !folder.value && html`
+          ${cont.length > 0 && !app.state.search && !app.state.folder && html`
             <section class="shelf">
               <h2 class="shelf-title">Continue reading</h2>
               <div class="shelf-row">
@@ -200,15 +207,15 @@ function Library () {
             </section>`}
 
           <section class="shelf">
-            <h2 class="shelf-title">${folder.value ? db.sourceById(folder.value)?.name : 'All books'}
+            <h2 class="shelf-title">${app.state.folder ? db.sourceById(app.state.folder)?.name : 'All books'}
               <span class="shelf-count">${books.length}</span></h2>
             ${books.length
               ? html`<aufbau-index class="book-grid" viewmode="grid" item-size="150px" gap="1.5rem">
                   ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
                 </aufbau-index>`
-              : html`<${Empty} icon=${search.value ? 'mdi:magnify-close' : 'mdi:book-outline'}
-                       title=${search.value ? 'Nothing matches your search' : 'No books here yet'}
-                       hint=${search.value ? '' : 'Scanning may still be running, or this folder has no EPUB/PDF files.'} />`}
+              : html`<${Empty} icon=${app.state.search ? 'mdi:magnify-close' : 'mdi:book-outline'}
+                       title=${app.state.search ? 'Nothing matches your search' : 'No books here yet'}
+                       hint=${app.state.search ? '' : 'Scanning may still be running, or this folder has no EPUB/PDF files.'} />`}
           </section>`}
     </div>`;
 }
@@ -218,10 +225,10 @@ function Library () {
 const readerUi = signal({ ready: false });
 
 function openReader (key) {
-  route.value = { name: 'reader', key };
+  app.state.route = { name: 'reader', key };
   db.markOpened(key);
 }
-const closeReader = () => { route.value = { name: 'library' }; };
+const closeReader = () => { app.state.route = { name: 'library', key: null }; };
 
 function ReaderView ({ bookKey }) {
   const stageRef = useRef(null);
@@ -274,7 +281,7 @@ function ReaderView ({ bookKey }) {
     };
   }, [bookKey]);
 
-  // keyboard: page/chapter turn
+  // keyboard: page/chapter turn (component-scoped, tied to the live engine ref)
   useEffect(() => {
     const onKey = e => {
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
@@ -386,7 +393,7 @@ async function addFolder () {
   } catch (err) { flash(err.message, 'err'); }
 }
 
-// :::::: TOAST + APP :::::::::::::::::::::::::::::::::::::::
+// :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
   useEffect(() => {
@@ -397,7 +404,7 @@ function App () {
     return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   }
 
-  const r = route.value;
+  const r = app.state.route;
   return r.name === 'reader'
     ? html`<${ReaderView} bookKey=${r.key} key=${r.key} />`
     : html`<main id="app-main"><${Library} /></main>`;

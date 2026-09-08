@@ -5,8 +5,8 @@
 // streams each file straight off disk via an object url. state is mirrored into
 // signals the ui binds to.
 
-import { signal } from '@aufbau/kits/preact-htm';
-import { stored } from '/.shared/js/lib/signals.js';
+import { signal } from '@aufbau/signals';
+import { stored } from '/.shared/js/app/signals.js';
 import { fileAt } from './db.js';
 
 const audio = new Audio;

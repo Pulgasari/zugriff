@@ -1,44 +1,47 @@
 // apps/icons/app.js
 //
-// an Iconify browser: every set, every icon, search, favourites. the grid
-// renders through the <iconify-icon> web component (loaded in index.html) so a
-// page of hundreds of icons is a couple of batched requests; the app's own
-// chrome uses the shared aufbau-icon <Icon>. data comes from api.iconify.design
-// (iconify.js), favourites from @bunker/db (db.js).
-//
-// like every app under /apps it draws its own chrome — there is no tools Shell.
+// an Iconify browser: every set, every icon, search, favourites. the grid renders through
+// the <iconify-icon> web component (loaded by the shell for the icons route) so a page of
+// hundreds of icons is a couple of batched requests; the app's own chrome uses the shared
+// aufbau-icon <Icon>. data comes from api.iconify.design (modules/iconify.js), favourites
+// from @bunker/db (modules/db.js). the runtime binds zugriff (+ zugriff.app, html) to
+// window before this runs, so nothing here imports the runtime.
 
 // ::: vendors
-import { html, Fragment, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { signal, computed } from '@aufbau/signals';
+import { useEffect, useRef } from 'preact/hooks';
 
 // ::: shared
-import { zugriff } from '/.shared/js/runtime.js';
-const app = zugriff.app('icons');
-import { Icon, IconButton, Empty, AppSettings } from '/.shared/js/components/index.js';
+import { Icon, IconButton, Empty, Settings } from '/.shared/js/components/index.js';
 import { stored } from '/.shared/js/app/signals.js';
 
-// ::: local
-import * as api   from './iconify.js';
-import * as store from './db.js';
+// ::: app modules
+import * as api from './modules/iconify.js';
+import * as db  from './modules/db.js';
+
+// ::: the app handle
+const app = zugriff.app;
+app.db = db;
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
+// ui navigation on app.state (deep signal, no `.value`). the api results (collections /
+// set / search) stay as plain signals — a set is thousands of names, better not deep-wrapped.
 
-const route    = signal({ name: 'home' });   // home | sets | set | search | favorites
-const nav      = signal(false);              // mobile drawer
-const detail   = signal(null);               // selected icon name | null
-const itemSize = stored(88, 'icons:item-size');
+app.state.route     = { name: 'home', id: null };   // home | sets | set | search | favorites
+app.state.nav       = false;                          // mobile drawer
+app.state.detail    = null;                           // selected icon name | null
+app.state.setFilter = '';                             // filter on the sets list
+app.state.query     = '';                             // search box
 
-const collections = signal(null);            // [{ prefix, name, total, … }] | null
-const setFilter   = signal('');
-const setData     = signal(null);            // { prefix, title, total, icons } for route 'set'
+const collections = signal(null);   // [{ prefix, name, total, … }] | null
+const setData     = signal(null);   // { prefix, title, total, icons } for route 'set'
 const setLoading  = signal(false);
+const results     = signal([]);
+const searching   = signal(false);
+const itemSize    = stored(88, 'icons:item-size');   // persisted grid zoom
 
-const query   = signal('');
-const results = signal([]);
-const searching = signal(false);
-
-const flash = text => zugriff.toast(text);
-const go = (name, id) => { route.value = { name, id }; nav.value = false; };
+app.go = (name, id = null) => { app.state.route = { name, id }; app.state.nav = false; };
+const flash = text => app.toast(text);
 
 // :::::: DATA :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -49,7 +52,7 @@ async function ensureCollections () {
 }
 
 async function openSet (prefix) {
-  go('set', prefix);
+  app.go('set', prefix);
   setData.value = null;
   setLoading.value = true;
   try { setData.value = await api.collection(prefix); }
@@ -59,7 +62,7 @@ async function openSet (prefix) {
 
 let searchTimer = null;
 function onSearch (value) {
-  query.value = value;
+  app.state.query = value;
   clearTimeout(searchTimer);
   const q = value.trim();
   if (!q) { results.value = []; searching.value = false; return; }
@@ -71,13 +74,19 @@ function onSearch (value) {
   }, 250);
 }
 
+// :::::: ACTIONS + HOTKEYS ::::::::::::::::::::::::::::::::::
+// escape backs out of the open sheet, then the mobile drawer
+
+app.actions = { 'dismiss': () => { if (app.state.detail) app.state.detail = null; else app.state.nav = false; } };
+app.hotKeys = { 'escape': { action: 'dismiss', global: true } };
+
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
 const nfmt = n => n?.toLocaleString?.() ?? String(n ?? 0);
 
 const filteredSets = computed(() => {
   const list = collections.value || [];
-  const q = setFilter.value.trim().toLowerCase();
+  const q = app.state.setFilter.trim().toLowerCase();
   return q ? list.filter(c => c.name.toLowerCase().includes(q) || c.prefix.toLowerCase().includes(q)) : list;
 });
 
@@ -105,13 +114,13 @@ async function downloadSvg (name) {
 const IconGlyph = ({ name }) => html`<iconify-icon icon=${name}></iconify-icon>`;
 
 function IconCell ({ name }) {
-  const fav = store.favs.value.has(name);
+  const fav = db.favs.value.has(name);
   return html`
-    <button class="cell" onClick=${() => detail.value = name} title=${name}>
+    <button class="cell" onClick=${() => app.state.detail = name} title=${name}>
       <span class="glyph"><${IconGlyph} name=${name} /></span>
       <span class="cname">${name.split(':')[1]}</span>
       <button class=${'heart' + (fav ? ' on' : '')} title="Favourite"
-              onClick=${e => { e.stopPropagation(); store.toggleFav(name); }}>
+              onClick=${e => { e.stopPropagation(); db.toggleFav(name); }}>
         <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} />
       </button>
     </button>`;
@@ -140,17 +149,17 @@ function IconGrid ({ names }) {
 
 function NavItem ({ name, icon, label }) {
   return html`
-    <button class=${'nav-item' + (route.value.name === name ? ' active' : '')} onClick=${() => name === 'sets' ? (ensureCollections(), go('sets')) : go(name)}>
+    <button class=${'nav-item' + (app.state.route.name === name ? ' active' : '')} onClick=${() => name === 'sets' ? (ensureCollections(), app.go('sets')) : app.go(name)}>
       <${Icon} name=${icon} /> <span>${label}</span>
     </button>`;
 }
 
 function Sidebar () {
   return html`
-    <aside class=${'sidebar' + (nav.value ? ' open' : '')}>
+    <aside class=${'sidebar' + (app.state.nav ? ' open' : '')}>
       <div class="brand">
         <${Icon} name="mdi:emoticon-outline" /> <span>Icons</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => nav.value = false}><${Icon} name="mdi:close" /></button>
+        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.nav = false}><${Icon} name="mdi:close" /></button>
       </div>
       <nav class="nav-group">
         <${NavItem} name="home"      icon="mdi:home-outline"          label="Home" />
@@ -181,8 +190,8 @@ function Home () {
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <button class="btn primary" onClick=${() => { ensureCollections(); go('sets'); }}><${Icon} name="mdi:image-multiple-outline" /> Browse sets</button>
-          <button class="btn" onClick=${() => go('search')}><${Icon} name="mdi:magnify" /> Search</button>
+          <button class="btn primary" onClick=${() => { ensureCollections(); app.go('sets'); }}><${Icon} name="mdi:image-multiple-outline" /> Browse sets</button>
+          <button class="btn" onClick=${() => app.go('search')}><${Icon} name="mdi:magnify" /> Search</button>
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -234,20 +243,20 @@ function SearchView () {
   return html`
     <div class="searchview">
       ${searching.value ? html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`
-        : query.value.trim() ? html`<${IconGrid} names=${results.value} />`
+        : app.state.query.trim() ? html`<${IconGrid} names=${results.value} />`
         : html`<div class="empty"><${Icon} name="mdi:magnify" /><p>Search across every Iconify set.</p></div>`}
     </div>`;
 }
 
 function FavoritesView () {
-  const names = [...store.favs.value];
+  const names = [...db.favs.value];
   return names.length
     ? html`<${IconGrid} names=${names} />`
     : html`<div class="empty"><${Icon} name="mdi:heart-outline" /><p>No favourites yet — tap the heart on any icon.</p></div>`;
 }
 
 function Content () {
-  switch (route.value.name) {
+  switch (app.state.route.name) {
     case 'sets':      return html`<${SetsView} />`;
     case 'set':       return html`<${SetView} />`;
     case 'search':    return html`<${SearchView} />`;
@@ -268,50 +277,50 @@ function SizeControl () {
 }
 
 function TopBar () {
-  const r = route.value;
+  const r = app.state.route;
   const grid = r.name === 'set' || r.name === 'search' || r.name === 'favorites';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => nav.value = true}><${Icon} name="mdi:menu" /></button>
-      ${r.name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => go('sets')} />`}
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => app.state.nav = true}><${Icon} name="mdi:menu" /></button>
+      ${r.name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go('sets')} />`}
 
       ${r.name === 'search'
         ? html`<div class="searchbox big">
             <${Icon} name="mdi:magnify" />
-            <input type="search" placeholder="Search all of Iconify…" autofocus value=${query.value} onInput=${e => onSearch(e.target.value)} />
+            <input type="search" placeholder="Search all of Iconify…" autofocus value=${app.state.query} onInput=${e => onSearch(e.target.value)} />
           </div>`
         : r.name === 'sets'
         ? html`<div class="searchbox">
             <${Icon} name="mdi:magnify" />
-            <input type="search" placeholder="Filter sets…" value=${setFilter.value} onInput=${e => setFilter.value = e.target.value} />
+            <input type="search" placeholder="Filter sets…" value=${app.state.setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
         : html`<h1 class="topbar-title">${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
 
       <span class="spacer"></span>
       ${grid && html`<${SizeControl} />`}
-      <${AppSettings} />
+      <${Settings} />
     </header>`;
 }
 
 // ── detail sheet ─────────────────────────────────────────────────────────
 
 function Detail () {
-  const name = detail.value;
+  const name = app.state.detail;
   if (!name) return null;
   const [prefix, icon] = name.split(':');
-  const fav = store.favs.value.has(name);
+  const fav = db.favs.value.has(name);
   return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) detail.value = null; }}>
+    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.detail = null; }}>
       <div class="sheet" role="dialog" aria-modal="true">
-        <button class="sheet-x" aria-label="Close" onClick=${() => detail.value = null}><${Icon} name="mdi:close" /></button>
+        <button class="sheet-x" aria-label="Close" onClick=${() => app.state.detail = null}><${Icon} name="mdi:close" /></button>
         <div class="sheet-preview"><iconify-icon icon=${name}></iconify-icon></div>
         <div class="sheet-name">${icon}</div>
-        <div class="sheet-set"><button class="linkish" onClick=${() => { detail.value = null; openSet(prefix); }}>${prefix}</button></div>
+        <div class="sheet-set"><button class="linkish" onClick=${() => { app.state.detail = null; openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
           <button class="btn" onClick=${() => copy(name)}><${Icon} name="mdi:content-copy" /> Copy name</button>
           <button class="btn" onClick=${() => copySvg(name)}><${Icon} name="mdi:svg" /> Copy SVG</button>
           <button class="btn" onClick=${() => downloadSvg(name)}><${Icon} name="mdi:download" /> Download</button>
-          <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => store.toggleFav(name)}>
+          <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => db.toggleFav(name)}>
             <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
           </button>
         </div>
@@ -323,23 +332,22 @@ function Detail () {
 
 function App () {
   useEffect(() => {
-    store.loadFavs().catch(() => {});
+    db.loadFavs().catch(() => {});
     ensureCollections();   // warms the catalogue for home stats + sets
-    const onKey = e => { if (e.key === 'Escape') { if (detail.value) detail.value = null; else nav.value = false; } };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   return html`
-    <${Fragment}>
+    <>
       <${Sidebar} />
-      ${nav.value && html`<div class="scrim-mobile" onClick=${() => nav.value = false}></div>`}
+      ${app.state.nav && html`<div class="scrim-mobile" onClick=${() => app.state.nav = false}></div>`}
       <main id="app-main">
         <${TopBar} />
         <div class="content"><${Content} /></div>
       </main>
       <${Detail} />
-    </${Fragment}>`;
+    </>`;
 }
+
+// :::::: BOOT
 
 app.init({ App });

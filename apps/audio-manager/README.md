@@ -23,12 +23,12 @@ audio is streamed straight off disk on play.
 
 | file          | what it is |
 |---------------|------------|
-| `app.js`      | the UI — sidebar, songs/albums/artists views, player bar |
-| `db.js`       | `@bunker/db`: `sources` + `tracks`, two-phase scan through `shared/js/lib/pool.js` |
-| `library.js`  | tag + cover extraction via `music-metadata`, cover downscale |
-| `player.js`   | one shared `<audio>`, queue + controls mirrored into signals |
-| `app.css`     | the app's own look |
-| `index.html` · `manifest.json` · `sw.js` · `app.svg` | shell, manifest (generated), worker, icon |
+| `app.js`             | the UI on `zugriff.app` — sidebar, songs/albums/artists views, player bar |
+| `modules/db.js`      | `@bunker/db`: `sources` + `tracks`, two-phase scan through the shared `FolderLibrary` |
+| `modules/library.js` | tag + cover extraction via `music-metadata`, cover downscale |
+| `modules/player.js`  | one shared `<audio>`, queue + controls mirrored into signals |
+| `app.css`            | the app's own look |
+| `manifest.json` · `app.svg` | manifest (generated), icon (the shared `index.html` shell serves the page) |
 
 Reuses `shared/js/lib/fsaccess.js` (grant/scan folders, like notes/ebooks),
 `shared/js/lib/pool.js` (bounded extraction) and `@bunker/db` for storage.
