@@ -4,8 +4,7 @@
 
 // ::: vendors
 import { computed, local, signal as persisted } from '@aufbau/signals';
-import { Fragment } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState }          from 'preact/hooks';
 
 const // shared components
 Button     = await zugriff.component('Button'),
@@ -200,7 +199,7 @@ const currentNote = computed(() => {
   return node ? { sourceId: o.sourceId, node } : null;
 });
 
-function Reader () {
+function NotesReader () {
   return html`<${ReaderBody} note=${currentNote.value} />`;
 }
 
@@ -375,11 +374,11 @@ function App () {
   }
 
   return html`
-    <${Fragment}>
+    <>
       <${Sidebar} />
       ${app.state.isNavOpen && html`<div class="scrim-mobile" onClick=${() => app.state.isNavOpen = false}></div>`}
-      <main id="app-main"><${Reader} /></main>
-    <//>
+      <main id="app-main"><${NotesReader} /></main>
+    </>
   `;
 }
 
