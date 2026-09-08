@@ -366,10 +366,7 @@ async function addFolder () {
 // :::::: APP
 
 function App () {
-  useEffect(() => {
-    app.lib.load().catch(error => toast({ error }));
-    //app.lib.load().catch(toast);
-  }, []);
+  useEffect(() => { app.lib.load().catch(toast); }, []);
 
   if (!app.lib.ready.value) {
     return html`<div class="booting"><${Icon} name='loading' /></div>`;
