@@ -1,22 +1,31 @@
 // apps/images/app.js
+// the images app on the shared handle. the runtime binds zugriff (+ zugriff.app, html) to
+// window before this runs, so nothing here imports the runtime. several routes switch by
+// ?mode= via the shared query-param router; the folder-library data layer hangs off the
+// handle as app.lib, the open image tray lives in the state module.
 
-// :::::: IMPORT
-
-import { Fragment }  from 'preact';
+// ::: vendors
 import { useEffect } from 'preact/hooks';
 
-const // shared components
+// ::: app modules
+import lib                              from './modules/library.js';
+import { setFiles, revokeAll, vError }  from './modules/state.js';
+
+// ::: routes + router
+import { routes }       from './routes/index.js';
+import { editCurrent }  from './routes/edit.js';
+import { createRouter } from '/.shared/js/app/router.js';
+
+// ::: shared components
+const
 Brand    = await zugriff.component('Brand'),
 Icon     = await zugriff.component('Icon'),
 Settings = await zugriff.component('Settings');
 
-import { app } from './context.js';
+// ::: the app handle — the data layer hangs off it as app.lib
+const app = zugriff.app;
+app.lib = lib;
 
-import { setFiles, revokeAll, vError } from './state.js';
-
-import { routes }       from './routes/index.js';
-import { editCurrent }  from './routes/edit.js';
-import { createRouter } from '/.shared/js/app/router.js';
 const router = createRouter(app, { routes, param: 'mode', fallback: 'view' });
 
 // ::::::
@@ -57,10 +66,10 @@ function ModeBar () {
 function App () {
   useEffect(() => { wireLaunchQueue(); return () => revokeAll(); }, []);
   return html`
-    <${Fragment}>
+    <>
       <${ModeBar} />
       <div id="app-main"><${router.Outlet} /></div>
-    </${Fragment}>
+    </>
   `;
 }
 

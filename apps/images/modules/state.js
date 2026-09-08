@@ -3,7 +3,7 @@
 // browses it, edit loads the current one into a canvas, library opens files into
 // it. only setFiles mutates the set; viewer zoom/pan stay in the view route.
 
-import { signal, computed } from '@aufbau/kits/preact-htm';
+import { signal, computed } from '@aufbau/signals';
 
 export const shots   = signal([]);   // [{ name, size, type, file, url }]
 export const idx     = signal(0);     // index of the shown image

@@ -2,13 +2,15 @@
 // edit route (ex image-editor): load the tray's current image into a canvas and
 // adjust / crop / resize / export. editCurrent is the shared "open in editor".
 
-import { html, signal, computed, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { signal, computed }   from '@aufbau/signals';
+import { useEffect, useRef }  from 'preact/hooks';
 import { Icon, IconButton } from '/.shared/js/components/index.js';
 import { stored } from '/.shared/js/app/signals.js';
-import * as edit from '../edit.js';
-import * as fx   from '../filters.js';
-import { app } from '../context.js';
-import { current, isImageFile } from '../state.js';
+import * as edit from '../modules/edit.js';
+import * as fx   from '../modules/filters.js';
+import { current, isImageFile } from '../modules/state.js';
+
+const app = zugriff.app;
 
 const original = signal(null);     // the canvas as first loaded, for Reset
 const work     = signal(null);     // the current canvas (geometry baked in)
