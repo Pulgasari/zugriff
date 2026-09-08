@@ -20,25 +20,4 @@ vermutlich werden die apps fortan aber fortan für android generell mit capacito
 
 - [x] habe gerade testweise 3 der capacitor-apps installiert und bei allen kommt error von vercel vonwegen "nich gefunden". ich vermute mal,dass da die falsche url im build landet. es muss `https://zugriff.dev/<app>/` sein, nicht `https://zugriff.dev/apps/<app>/` oder irgendwas anderes. — genau: die generatoren bauten `.../apps/<slug>/`. vercel bedient apps öffentlich unter `/<slug>/` (rewrite mappt intern auf `/apps/<slug>/`); `/apps/<slug>/` trifft die falsche rewrite-regel → 404. `gen-capacitor-config.mjs` (server.url) + `gen-twa-manifest.mjs` (manifest-url) auf `/<slug>/` gefixt
 - [x] es wäre vermutlich noch praktisch, wenn man die builds auch einzeln pro app starten könnte — beide build-workflows haben jetzt einen optionalen `app`-input (Run workflow → slug eintragen); leer = ganze matrix
-- [x] beim runnen des capacitor-workflows kommen folgende warnungen: — actions auf node24-majors gehoben (checkout/setup-node/setup-java/upload-artifact → v5, download-artifact → v7, setup-android → v4; app-assets-workflow gleich mit)
-```
-9 warnings
-
-Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-build-capacitor (files)
-Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/setup-node@v4, actions/upload-artifact@v4, android-actions/setup-android@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-build-capacitor (files)
-setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
-build-capacitor (notes)
-Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/setup-node@v4, actions/upload-artifact@v4, android-actions/setup-android@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-build-capacitor (notes)
-setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
-build-capacitor (videos)
-Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/setup-node@v4, actions/upload-artifact@v4, android-actions/setup-android@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-build-capacitor (videos)
-setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
-build-capacitor (ebooks)
-Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-java@v4, actions/setup-node@v4, actions/upload-artifact@v4, android-actions/setup-android@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-build-capacitor (ebooks)
-setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
-```
+- [ ] aktuell sind die spaces ober- und unterhalb des app-screens bei den android-capacitor-apps schwarz anstatt bg-farbe des themes zu haben. wenn ich mich recht erinnere, sollte das gerade durch capacitor fixbar sein?
