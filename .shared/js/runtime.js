@@ -1,6 +1,6 @@
 // .shared/js/runtime.js
-// the global runtime — `zugriff` on window, with `zugriff.app` the current app
-// handle. boot.js imports this (blocking, in <head>) so every page has the runtime
+// the global runtime — `zugriff` on window, with `zugriff.app` the current app handle.
+// boot.js imports this (blocking, in <head>) so every page has the runtime
 // bound before its app module runs; an app therefore never imports the runtime, it
 // reaches everything through the `zugriff` / `zugriff.app` globals.
 
