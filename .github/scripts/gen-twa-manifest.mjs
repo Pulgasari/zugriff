@@ -15,7 +15,9 @@
 // env:
 //   APP_SLUG        (required)  the app's registry slug, e.g. "podcasts"
 //   SITE_BASE       base url the app is deployed at (default https://zugriff.dev)
-//   MANIFEST_URL    full manifest url (default `${SITE_BASE}/apps/${slug}/manifest.json`)
+//   MANIFEST_URL    full manifest url (default `${SITE_BASE}/${slug}/manifest.json`
+//                   — the public route; vercel rewrites /<slug>/ to /apps/<slug>/,
+//                   so requesting /apps/<slug>/ directly 404s)
 //   KEYSTORE_PATH   path to the signing keystore (default ./android.keystore)
 //   KEY_ALIAS       key alias inside the keystore (default android)
 //   APP_ID_PREFIX   reverse-dns prefix for the packageId
@@ -29,7 +31,7 @@ const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-twa-manifest: APP_SLUG is required'); process.exit(1); }
 
 const base        = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
-const manifestUrl = process.env.MANIFEST_URL || `${base}/apps/${slug}/manifest.json`;
+const manifestUrl = process.env.MANIFEST_URL || `${base}/${slug}/manifest.json`;
 const out         = process.argv[2] || 'twa-manifest.json';
 const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';
 const alias       = process.env.KEY_ALIAS || 'android';

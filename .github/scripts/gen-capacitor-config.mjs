@@ -7,7 +7,7 @@
 //
 // like the TWA, the app is wrapped around its *live* deployment URL rather than
 // bundling its static files: Capacitor's server.url points the webview at
-// https://zugriff.dev/apps/<slug>/, and Capacitor still injects its native
+// https://zugriff.dev/<slug>/, and Capacitor still injects its native
 // bridge into that remote page, so @capacitor/filesystem (and the SAF picker)
 // work — which is the whole point. that native filesystem is what the browser
 // File System Access API can't give a TWA on Android (it re-confirms every
@@ -23,7 +23,9 @@
 // env:
 //   APP_SLUG        (required)  the app's registry slug, e.g. "files"
 //   SITE_BASE       base url the app is deployed at (default https://zugriff.dev)
-//   APP_URL         full app url (default `${SITE_BASE}/apps/${slug}/`)
+//   APP_URL         full app url (default `${SITE_BASE}/${slug}/` — the public
+//                   route; vercel rewrites /<slug>/ to /apps/<slug>/, so the
+//                   /apps/ path is internal only and 404s if requested directly)
 //   APP_ID_PREFIX   reverse-dns prefix for the appId
 //                   (default dev.zugriff — appId is `${APP_ID_PREFIX}.${segment}`,
 //                    e.g. dev.zugriff.files, matching /.well-known/assetlinks.json
@@ -40,7 +42,7 @@ const app = registry.get(slug);
 if (!app || app.type !== 'app') { console.error(`gen-capacitor-config: no app "${slug}" in the registry`); process.exit(1); }
 
 const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
-const appUrl   = (process.env.APP_URL || `${base}/apps/${slug}/`).replace(/\/*$/, '/');
+const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');
 const idPrefix = process.env.APP_ID_PREFIX || 'dev.zugriff';
 const outDir   = process.argv[2] || '.';
 

@@ -15,7 +15,7 @@ name: Build Capacitor packages
 # native fs automatically (see platform.js + cap-fs.js).
 #
 # Like the TWA build, each app is wrapped around its LIVE deployment URL
-# (server.url = https://zugriff.dev/apps/<slug>/) rather than bundling its files —
+# (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —
 # Capacitor still injects its bridge into that remote page, so the plugins work.
 #
 # ── SIGNING ──────────────────────────────────────────────────────────────────
@@ -34,6 +34,11 @@ name: Build Capacitor packages
 
 on:
   workflow_dispatch:        # manual only — packaging never runs on a commit
+    inputs:
+      app:
+        description: 'single app slug to build (empty = all capacitor apps)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -49,12 +54,14 @@ jobs:
     outputs:
       apps: ${{ steps.parse.outputs.apps }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
       - name: Extract capacitor apps
         id: parse
+        env:
+          APP_FILTER: ${{ inputs.app }}
         run: node .github/scripts/get-capacitor-apps.js
 
   # Job 2 — one parallel build per app slug
@@ -75,20 +82,20 @@ jobs:
       STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'android' }}
       KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD || 'android' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Set up the Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Install Android SDK packages
         run: |
@@ -163,7 +170,7 @@ jobs:
             -storepass "$STORE_PASS" | grep -A1 'SHA256:' || true
 
       - name: Upload APK + AAB for ${{ matrix.app }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: capacitor-${{ matrix.app }}
           path: |
@@ -179,12 +186,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download every app's packages
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: capacitor
           pattern: capacitor-*
       - name: Bundle them into one artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: capacitor-all             # one download, a capacitor-<slug>/ folder per app
           path: capacitor
