@@ -3,13 +3,13 @@
 ## `gen-app-assets.mjs`
 
 - auto-generate each app's `assets` directory (icons)
-- auto-generate each app's `manifest.json` from its `shared/js/registry.js` entry
+- auto-generate each app's `manifest.json` from its `.shared/js/data/apps.js` entry
 
-## `get-autopack-apps.js`
+## `get-bubblewrap-apps.js`
 
-Gibt ein JSON-Array der App-Slugs aus, die in `shared/js/registry.js` mit
-`autopack: true` markiert sind — die Liste, die der Android-Build als Matrix
-verwendet. Aktuell: `podcasts`, `notes` (Testumfang).
+Gibt ein JSON-Array der App-Slugs aus, deren Registry-Eintrag in
+`.shared/js/data/apps.js` `build.android === 'bubblewrap'` setzt — die Matrix des
+TWA/Bubblewrap-Builds. Aktuell: `feeds`, `icons`, `podcasts`.
 
 ## `gen-twa-manifest.mjs`
 
@@ -21,11 +21,11 @@ Key. Wird vom Workflow pro App aufgerufen.
 
 ## `get-capacitor-apps.js`
 
-Gibt ein JSON-Array der App-Slugs aus, die in `shared/js/registry.js` mit
-`capacitor: true` markiert sind — die Matrix des **Capacitor**-Builds. Bewusst
-getrennt von `autopack` (dem TWA-Flag), sodass eine App als TWA, als
-Capacitor-App, als beides oder als keins gepackt werden kann. Aktuell: `files`,
-`notes` (Testumfang).
+Gibt ein JSON-Array der App-Slugs aus, deren Registry-Eintrag in
+`.shared/js/data/apps.js` `build.android === 'capacitor'` setzt — die Matrix des
+**Capacitor**-Builds. Jede App zielt auf genau einen Android-Builder
+(`capacitor` oder `bubblewrap`). Aktuell: `audio-manager`, `code`, `ebooks`,
+`files`, `images`, `notes`, `videos`.
 
 ## `gen-capacitor-config.mjs`
 
@@ -40,10 +40,25 @@ zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`
 
 ---
 
+## Das `build`-Feld in der Registry
+
+Der Ziel-Builder einer App steht in ihrem Eintrag in `.shared/js/data/apps.js`:
+
+```js
+build: { android: 'capacitor' }   // oder 'bubblewrap'
+```
+
+Fehlt das Feld, wird die App für Android nicht gebaut. Jede App zielt auf genau
+einen Builder — die beiden Discover-Skripte oben lesen dieses Feld und liefern
+die jeweilige Build-Matrix.
+
+---
+
 ## Capacitor-Build: `.github/workflows/build-capacitor.yml`
 
-Das Gegenstück zu `build-android.yml`. Verpackt die als `capacitor: true`
-markierten PWAs als Android-Apps (**APK + AAB**) — ein Matrix-Job pro App.
+Das Gegenstück zu `build-android.yml`. Verpackt die PWAs mit
+`build.android: 'capacitor'` als Android-Apps (**APK + AAB**) — ein Matrix-Job
+pro App.
 
 **Warum zusätzlich zur TWA:** Eine TWA ist nur Chrome, also gilt dort die
 Browser-**File System Access API** — und die lässt Android bei jedem Besuch jeden
@@ -54,28 +69,24 @@ stattdessen eine native Filesystem-Bridge (`@capacitor/filesystem`) mit, deren
 (`.shared/js/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt automatisch
 das native FS (siehe `platform.js` + `cap-fs.js`).
 
-**Ablauf** (pro App): JDK 17 + Android SDK → Wegwerf-Keystore → Capacitor-Projekt
-scaffolden (`gen-capacitor-config.mjs` → `npm i @capacitor/{core,cli,android,
-filesystem}` + `@capawesome/capacitor-file-picker` → `cap add android` →
-`cap sync`) → `gradlew bundleRelease assembleRelease` → APK/AAB **signieren**
-(Capacitor baut unsigniert: `zipalign`+`apksigner` für die APK, `jarsigner` für
-die AAB) → als Artefakt hochladen. Ausgelöst per `workflow_dispatch` und bei Push
-auf `main`, wenn Registry/Filesystem-Ebene/Build-Skripte sich ändern.
-
-Der **stabile Signing-Key**-TODO aus `build-android.yml` gilt hier genauso — die
-`appId`s folgen `dev.zugriff.<slug>`, teilen sich also die Root-Datei
-`/.well-known/assetlinks.json` mit den TWA-Builds.
+**Ablauf** (pro App): JDK 17 + Android SDK → Signing-Key bereitstellen →
+Capacitor-Projekt scaffolden (`gen-capacitor-config.mjs` → `npm i
+@capacitor/{core,cli,android,filesystem}` + `@capawesome/capacitor-file-picker` →
+`cap add android` → `cap sync`) → `gradlew bundleRelease assembleRelease` →
+APK/AAB **signieren** (Capacitor baut unsigniert: `zipalign`+`apksigner` für die
+APK, `jarsigner` für die AAB) → als Artefakt hochladen. Ausgelöst **manuell** per
+`workflow_dispatch`.
 
 ---
 
 ## Android-Build: `.github/workflows/build-android.yml`
 
-Verpackt die als `autopack: true` markierten PWAs als Android-Apps (**APK +
-AAB**) — eine Matrix-Job pro App.
+Verpackt die PWAs mit `build.android: 'bubblewrap'` als Android-Apps (**APK +
+AAB**) — ein Matrix-Job pro App.
 
 **Ablauf:**
 
-1. **`discover-apps`** — `get-autopack-apps.js` liest die Registry und gibt die
+1. **`discover-apps`** — `get-bubblewrap-apps.js` liest die Registry und gibt die
    Slugs als JSON aus.
 2. **`build-android`** (Matrix, ein Job je Slug) — jede App wird als **Trusted
    Web Activity** um ihre Live-Deployment-URL gewickelt, mit **Bubblewrap**
@@ -84,8 +95,8 @@ AAB**) — eine Matrix-Job pro App.
    via `gen-twa-manifest.mjs` erzeugen → `bubblewrap update` (Projekt
    scaffolden) → `bubblewrap build` → APK **und** AAB als Artefakt hochladen.
 
-Ausgelöst wird er per **`workflow_dispatch`** (manuell) und bei Push auf `main`,
-wenn Registry/Manifeste/Build-Skripte sich ändern.
+Ausgelöst wird er **manuell** per `workflow_dispatch` (Actions-Tab → Workflow
+auswählen → „Run workflow"). Ein Commit baut absichtlich nicht.
 
 > Hinweis: Das ursprünglich angedachte `pwa-builder/pwabuilder-action` existiert
 > nicht (404). Deshalb wird Bubblewrap direkt angesteuert.
@@ -96,22 +107,75 @@ Die TWA wird an die Origin des Manifest-URLs gebunden — aktuell
 `https://zugriff.dev` (im Workflow als `SITE_BASE`). Ändert sich der Deploy-Host,
 muss das dort angepasst werden.
 
-### ⚠️ TODO: stabiler Signing-Key
+### Wo landen die APKs?
 
-Der Test-Build erzeugt **pro Lauf einen Wegwerf-Keystore**. Die Artefakte taugen
-nur zum „baut es / lässt es sich zum Testen installieren" — **nicht** für den
-Play Store und **nicht** für stabile App-Identität / Digital Asset Links.
+Jeder Matrix-Job lädt sein `*-<slug>`-Artefakt hoch; ein abschließender
+`collect`-Job sammelt alle in **ein** Artefakt pro Lauf:
 
-Für echte Builds:
+- `android-all`   (Bubblewrap-Workflow) — je App ein `android-<slug>/`-Ordner
+- `capacitor-all` (Capacitor-Workflow)  — je App ein `capacitor-<slug>/`-Ordner
 
-- einen Android-Keystore je App (oder einen gemeinsamen) anlegen und
-  `base64`-kodiert + Passwörter als **Repo-Secrets** hinterlegen,
-- im Workflow den „throwaway keystore"-Schritt durch einen Decode-Schritt +
-  `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD` aus Secrets ersetzen,
-- die Signing-**SHA-256** jeder App in die **eine** Root-Datei
-  `/.well-known/assetlinks.json` eintragen (liegt im Repo-Root; enthält schon die
-  manuell gebauten `dev.zugriff.ebooks` + `dev.zugriff.notes`) — das entfernt die
-  Browser-URL-Leiste in der App. Die Package-IDs folgen `dev.zugriff.<slug>`.
+Zu finden unter dem jeweiligen Run im **Actions**-Tab, Abschnitt „Artifacts".
+Artefakte laufen nach der Retention ab (Einzel-Artefakte 14 Tage, das
+gesammelte 30 Tage) — für dauerhafte Ablage die APKs herunterladen oder auf ein
+GitHub Release heben.
+
+---
+
+## Signing-Key
+
+Beide Workflows signieren gleich. Ohne Secrets erzeugen sie **pro Lauf einen
+Wegwerf-Keystore** — die Artefakte taugen nur zum „baut es / lässt es sich zum
+Testen installieren", **nicht** für den Play Store und **nicht** für stabile
+App-Identität / Digital Asset Links (die SHA-256 ändert sich bei jedem Lauf).
+
+Für stabile, signierte Builds vier **Repo-Secrets** hinterlegen
+(Settings → Secrets and variables → Actions → New repository secret):
+
+| Secret | Inhalt |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64`   | der Keystore, base64-kodiert |
+| `ANDROID_KEYSTORE_PASSWORD` | Store-Passwort |
+| `ANDROID_KEY_PASSWORD`      | Key-Passwort |
+| `ANDROID_KEY_ALIAS`         | Alias im Keystore |
+
+Sind sie gesetzt, dekodiert der Schritt „Provide the signing key" den Keystore
+und signiert damit; fehlen sie, fällt er auf den Wegwerf-Key zurück (CI bleibt
+also grün, auch ohne Secrets).
+
+**Keystore einmalig erzeugen** (ein gemeinsamer Key für alle Apps reicht, da die
+`packageId`/`appId` je App unterschiedlich ist):
+
+```sh
+keytool -genkeypair -v \
+  -keystore zugriff-release.keystore -alias zugriff \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -storepass '<STORE_PASS>' -keypass '<KEY_PASS>' \
+  -dname "CN=zugriff, O=pulgasari, C=DE"
+
+# base64 für das Secret (eine Zeile)
+base64 -w0 zugriff-release.keystore   # linux
+base64      zugriff-release.keystore  # macos
+```
+
+Dann `ANDROID_KEY_ALIAS = zugriff`, `ANDROID_KEYSTORE_PASSWORD = <STORE_PASS>`,
+`ANDROID_KEY_PASSWORD = <KEY_PASS>`, und den base64-Blob als
+`ANDROID_KEYSTORE_BASE64`. Den Keystore **nicht** ins Repo committen, nur lokal
+sicher aufbewahren (Verlust = keine Updates der veröffentlichten Apps mehr).
+
+**Digital Asset Links** (entfernt die Browser-URL-Leiste in der App): Jeder Build
+loggt im Schritt „Print signing SHA-256" den Fingerprint des Signer-Zertifikats.
+Denselben Wert liefert lokal:
+
+```sh
+keytool -list -v -keystore zugriff-release.keystore -alias zugriff \
+  -storepass '<STORE_PASS>' | grep SHA256
+```
+
+Diese SHA-256 je App-`package_name` (`dev.zugriff.<slug>`) in die **eine**
+Root-Datei `/.well-known/assetlinks.json` eintragen (enthält schon die manuell
+gebauten `dev.zugriff.ebooks` + `dev.zugriff.notes`). Da alle Apps denselben Key
+teilen, ist die SHA-256 für alle Einträge identisch.
 
 ## `img-proxy.php`
 

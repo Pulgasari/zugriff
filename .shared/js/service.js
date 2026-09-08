@@ -10,20 +10,33 @@ const VERSION = 'v3';
 
 const CACHE_APP     = `zugriff-${SLUG}-${VERSION}`;
 const CACHE_VENDOR  = `zugriff-vendor-${VERSION}`;
+const CACHE_DEV     = `zugriff-dev-${VERSION}`;
 const IMMUTABLE_TTL = 365 * 24 * 60 * 60 * 1000;
-const VERSIONED     = /(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\/.*@\d+\.\d+\.\d+/;
+
+// the esm cdns. a url pinned to a full semver there is immutable and cached for a
+// year; a looser pin (music-metadata@11) is still cached but revalidated, since
+// that pin can move to a newer patch.
+const VENDOR_HOST = /^https:\/\/(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\//;
+const FULL_SEMVER = /@\d+\.\d+\.\d+/;
+
+// code.pulgasari.dev ships the in-development libs (@aufbau, @bunker, …); they move
+// often, so serve cached-first and revalidate on every request.
+const DEV_HOST = 'https://code.pulgasari.dev/';
 
 const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
 const OWN    = ['./', './app.js', './app.css', './manifest.json'];
 const SHARED = ['./../css/index.css', './boot.js', './app.js'];
 
-const onError = ({ operation, key, error }) => console.warn(`[sw] vendor ${operation} failed for ${key}`, error);    
-const app     = createCache ({ onError, name: CACHE_APP    }); // stale while revalidate
-const vendor  = createCache ({ onError, name: CACHE_VENDOR }); // loaded once
+const onError = ({ operation, key, error }) => console.warn(`[sw] cache ${operation} failed for ${key}`, error);
+const app     = createCache ({ onError, name: CACHE_APP    }); // same-origin, stale while revalidate
+const vendor  = createCache ({ onError, name: CACHE_VENDOR }); // esm cdns, immutable when versioned
+const dev     = createCache ({ onError, name: CACHE_DEV    }); // code.pulgasari.dev, stale while revalidate
 
 const isNested     = url => NESTED.some(root => url.startsWith(root) && !SCOPE.startsWith(root));
 const isSameOrigin = url => url.startsWith(self.location.origin + '/');
-const isVendor     = url => VERSIONED.test(url);
+const isVendor     = url => VENDOR_HOST.test(url);
+const isImmutable  = url => isVendor(url) && FULL_SEMVER.test(url);
+const isDev        = url => url.startsWith(DEV_HOST);
 
 // ── install ────────────────────────────────────────────────────────────────
 
@@ -50,10 +63,10 @@ self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
     await Promise.all(
-      keys.filter(key => key.startsWith('zugriff-') && key !== CACHE_APP && key !== CACHE_VENDOR)
-          // another app's cache is none of our business — only drop our own
-          // older versions, and the vendor cache when its version moved on
-          .filter(key => key.startsWith(`zugriff-${SLUG}-`) || key.startsWith('zugriff-vendor-'))
+      keys.filter(key => key.startsWith('zugriff-') && key !== CACHE_APP && key !== CACHE_VENDOR && key !== CACHE_DEV)
+          // another app's cache is none of our business — only drop our own older
+          // versions, and the shared vendor/dev caches when their version moved on
+          .filter(key => key.startsWith(`zugriff-${SLUG}-`) || key.startsWith('zugriff-vendor-') || key.startsWith('zugriff-dev-'))
           .map(key => caches.delete(key))
     );
     await self.clients.claim();
@@ -77,18 +90,26 @@ self.addEventListener('fetch', event => {
   // the sw still caches every subresource below, which is where the win is.
   if (request.mode === 'navigate') return;
 
-  if (!request.url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
-  if (isNested(request.url))           return;
-  if (!isVendor(request.url) && !isSameOrigin(request.url)) return;
-  const store = isVendor(request.url) ? vendor : app;
+  const { url } = request;
+  if (!url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
+  if (isNested(url))           return;
+
+  // route per origin: versioned esm cdn urls are immutable, everything else we
+  // hold is served cached-first and revalidated in the background.
+  let store, ttl;
+  if      (isImmutable(url))  { store = vendor; ttl = IMMUTABLE_TTL; }
+  else if (isVendor(url))     { store = vendor; ttl = 0; }
+  else if (isDev(url))        { store = dev;    ttl = 0; }
+  else if (isSameOrigin(url)) { store = app;    ttl = 0; }
+  else return;
 
   event.respondWith(
     store.staleWhileRevalidate(request, {
-      ttl       : isVendor(request.url) ? IMMUTABLE_TTL : 0,
+      ttl,
       keepAlive : pending => event.waitUntil(pending),
     }).catch(async error => {
       // offline and never cached: let the failure be the real network failure
-      console.warn('[sw] miss', request.url, error);
+      console.warn('[sw] miss', url, error);
       return fetch(request);
     })
   );

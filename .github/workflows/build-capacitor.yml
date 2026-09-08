@@ -1,8 +1,9 @@
 name: Build Capacitor packages
 
-# Packages the PWAs flagged `capacitor: true` in .shared/js/registry.js into
-# Android apps (APK + AAB), one matrix job per app — the Capacitor counterpart to
-# build-android.yml (which does the same with Bubblewrap/TWA).
+# Packages the PWAs whose registry entry sets build.android == 'capacitor' in
+# .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app —
+# the Capacitor counterpart to build-android.yml (which does the same with
+# Bubblewrap/TWA). An app targets exactly one android builder.
 #
 # Why both exist: a TWA is just Chrome, so an app wrapped that way is stuck with
 # the browser File System Access API — and on Android that API re-confirms every
@@ -17,16 +18,18 @@ name: Build Capacitor packages
 # (server.url = https://zugriff.dev/apps/<slug>/) rather than bundling its files —
 # Capacitor still injects its bridge into that remote page, so the plugins work.
 #
-# ── TEST-ONLY SIGNING ────────────────────────────────────────────────────────
-# Every run generates a THROWAWAY keystore, so the outputs only prove "does it
-# build / does it install to test". They are NOT Play-Store-uploadable and NOT
-# stable: the app identity changes every run and Digital Asset Links can't be set
-# up against an ephemeral key.
+# ── SIGNING ──────────────────────────────────────────────────────────────────
+# With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
+# ANDROID_KEY_PASSWORD / ANDROID_KEY_ALIAS set, the artifacts are signed with that
+# stable key — the same app identity every run, Play-uploadable and usable for
+# Digital Asset Links. Without the secrets the build falls back to a THROWAWAY
+# per-run keystore: good only for "does it build / install to test", not stable.
 #
-# TODO(stable key): same as build-android.yml — one keystore per app (or shared),
-#   stored base64 + passwords as repo secrets, decoded here; then add each app's
-#   SHA-256 to /.well-known/assetlinks.json (appIds follow dev.zugriff.<slug>, the
-#   same as the TWA package ids, so the file is shared).
+# To go stable: create one keystore (or share one across apps), add the four
+# secrets, then read the value the "Print signing SHA-256" step logs into the
+# single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>
+# package. appIds follow dev.zugriff.<slug>, the same as the TWA package ids, so
+# the file is shared. Exact commands: .github/scripts/README.md.
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
@@ -67,10 +70,10 @@ jobs:
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
       BUILD_TOOLS: '34.0.0'
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
-      KEY_ALIAS: android
-      # TEST-ONLY password for the throwaway keystore. Replace with secrets when a
-      # stable key lands.
-      STORE_PASS: android
+      # stable key from secrets when present, else the throwaway defaults below.
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'android' }}
+      STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'android' }}
+      KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD || 'android' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -94,13 +97,21 @@ jobs:
           # put zipalign + apksigner (used to sign the release artifacts) on PATH
           echo "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/build-tools/${BUILD_TOOLS}" >> "$GITHUB_PATH"
 
-      - name: Generate a throwaway signing key (TEST ONLY)
+      - name: Provide the signing key (stable secret, else throwaway)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          keytool -genkeypair -v \
-            -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
-            -keyalg RSA -keysize 2048 -validity 3650 \
-            -storepass "$STORE_PASS" -keypass "$STORE_PASS" \
-            -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "signing with the stable keystore from secrets"
+            echo "$KEYSTORE_B64" | base64 -d > "$KEYSTORE_PATH"
+          else
+            echo "no ANDROID_KEYSTORE_BASE64 secret — generating a throwaway TEST key"
+            keytool -genkeypair -v \
+              -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
+              -keyalg RSA -keysize 2048 -validity 3650 \
+              -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
+              -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
+          fi
 
       - name: Scaffold the Capacitor project for ${{ matrix.app }}
         run: |
@@ -126,7 +137,7 @@ jobs:
           chmod +x gradlew
           ./gradlew bundleRelease assembleRelease --stacktrace --console=plain --no-daemon
 
-      - name: Sign the APK + AAB (TEST key)
+      - name: Sign the APK + AAB
         run: |
           cd "build/${{ matrix.app }}/android"
           OUT="app/build/outputs"
@@ -138,13 +149,18 @@ jobs:
           zipalign -f 4 "$APK_IN" "aligned.apk"
           apksigner sign \
             --ks "$KEYSTORE_PATH" --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass "pass:$STORE_PASS" --key-pass "pass:$STORE_PASS" \
+            --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" \
             --out "${SLUG}-release.apk" "aligned.apk"
 
-          # AAB: jarsigner (bundles are signed with the same test key here)
+          # AAB: jarsigner (bundles are signed with the same key)
           jarsigner -keystore "$KEYSTORE_PATH" \
-            -storepass "$STORE_PASS" -keypass "$STORE_PASS" \
+            -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
             -signedjar "${SLUG}-release.aab" "$AAB_IN" "$KEY_ALIAS"
+
+      - name: Print signing SHA-256 (for assetlinks.json)
+        run: |
+          keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
+            -storepass "$STORE_PASS" | grep -A1 'SHA256:' || true
 
       - name: Upload APK + AAB for ${{ matrix.app }}
         uses: actions/upload-artifact@v4
@@ -155,3 +171,22 @@ jobs:
             build/${{ matrix.app }}/android/${{ matrix.app }}-release.aab
           if-no-files-found: error
           retention-days: 14
+
+  # Job 3 — gather every app's packages into one downloadable artifact
+  collect:
+    needs: build-capacitor
+    if: ${{ !cancelled() && needs.build-capacitor.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download every app's packages
+        uses: actions/download-artifact@v4
+        with:
+          path: capacitor
+          pattern: capacitor-*
+      - name: Bundle them into one artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: capacitor-all             # one download, a capacitor-<slug>/ folder per app
+          path: capacitor
+          if-no-files-found: warn
+          retention-days: 30

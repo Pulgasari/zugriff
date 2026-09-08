@@ -1,26 +1,26 @@
 name: Build Android packages
 
-# Packages the PWAs flagged `autopack: true` in .shared/js/registry.js into Android
-# apps (APK + AAB), one matrix job per app. Each app is wrapped as a Trusted Web
-# Activity pointing at its live deployment with Bubblewrap — Google's official TWA
-# tool, the same engine PWABuilder uses under the hood.
+# Packages the PWAs whose registry entry sets build.android == 'bubblewrap' in
+# .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
+# Each app is wrapped as a Trusted Web Activity pointing at its live deployment
+# with Bubblewrap — Google's official TWA tool, the same engine PWABuilder uses
+# under the hood.
 #
 # (The old plan used a `pwa-builder/pwabuilder-action` — that action does not
 #  exist, so this drives Bubblewrap directly instead.)
 #
-# ── TEST-ONLY SIGNING ────────────────────────────────────────────────────────
-# Every run generates a THROWAWAY keystore, so the outputs are only good for
-# "does it build / does it install to test". They are NOT Play-Store-uploadable
-# and NOT stable: the app identity changes every run and Digital Asset Links
-# (the /.well-known/assetlinks.json that removes the browser URL bar) can't be
-# set up against an ephemeral key.
+# ── SIGNING ──────────────────────────────────────────────────────────────────
+# With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
+# ANDROID_KEY_PASSWORD / ANDROID_KEY_ALIAS set, the artifacts are signed with that
+# stable key — the same app identity every run, Play-uploadable and usable for
+# Digital Asset Links. Without the secrets the build falls back to a THROWAWAY
+# per-run keystore: good only for "does it build / install to test", not stable
+# (the SHA-256 changes every run, so assetlinks can't be pinned to it).
 #
-# TODO(stable key): create one Android keystore per app (or one shared), store it
-#   base64 + its passwords as repo secrets, and swap the "generate keystore" step
-#   for a decode step + `BUBBLEWRAP_KEYSTORE_PASSWORD` / `BUBBLEWRAP_KEY_PASSWORD`
-#   from secrets. Then add each CI-signed app's SHA-256 to the site's single
-#   /.well-known/assetlinks.json (repo root — already holds the manually-built
-#   ebooks + notes apps).
+# To go stable: create one keystore (or share one across apps), add the four
+# secrets, then read the value the "Print signing SHA-256" step logs into the
+# single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>
+# package. Exact commands: .github/scripts/README.md.
 # ─────────────────────────────────────────────────────────────────────────────
 
 on:
@@ -34,7 +34,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Job 1 — read the registry, emit the list of autopack app slugs as JSON
+  # Job 1 — read the registry, emit the list of bubblewrap app slugs as JSON
   discover-apps:
     runs-on: ubuntu-latest
     outputs:
@@ -44,9 +44,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Extract autopack apps
+      - name: Extract bubblewrap apps
         id: parse
-        run: node .github/scripts/get-autopack-apps.js
+        run: node .github/scripts/get-bubblewrap-apps.js
 
   # Job 2 — one parallel build per app slug
   build-android:
@@ -60,11 +60,11 @@ jobs:
     env:
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into the TWA)
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
-      KEY_ALIAS: android
-      # TEST-ONLY passwords for the throwaway keystore — Bubblewrap reads these
-      # for non-interactive signing. Replace with secrets when a stable key lands.
-      BUBBLEWRAP_KEYSTORE_PASSWORD: android
-      BUBBLEWRAP_KEY_PASSWORD: android
+      # stable key from secrets when present, else the throwaway defaults below.
+      # bubblewrap reads the *_PASSWORD envs for non-interactive signing.
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'android' }}
+      BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'android' }}
+      BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'android' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -100,13 +100,21 @@ jobs:
             "$JAVA_HOME" "${ANDROID_SDK_ROOT:-$ANDROID_HOME}" > ~/.bubblewrap/config.json
           cat ~/.bubblewrap/config.json
 
-      - name: Generate a throwaway signing key (TEST ONLY)
+      - name: Provide the signing key (stable secret, else throwaway)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          keytool -genkeypair -v \
-            -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
-            -keyalg RSA -keysize 2048 -validity 3650 \
-            -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" -keypass "$BUBBLEWRAP_KEY_PASSWORD" \
-            -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "signing with the stable keystore from secrets"
+            echo "$KEYSTORE_B64" | base64 -d > "$KEYSTORE_PATH"
+          else
+            echo "no ANDROID_KEYSTORE_BASE64 secret — generating a throwaway TEST key"
+            keytool -genkeypair -v \
+              -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
+              -keyalg RSA -keysize 2048 -validity 3650 \
+              -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" -keypass "$BUBBLEWRAP_KEY_PASSWORD" \
+              -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
+          fi
 
       - name: Build ${{ matrix.app }}
         run: |
@@ -131,6 +139,11 @@ jobs:
 
           bubblewrap build --skipPwaValidation      # -> app-release-signed.apk + app-release-bundle.aab
 
+      - name: Print signing SHA-256 (for assetlinks.json)
+        run: |
+          keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
+            -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" | grep -A1 'SHA256:' || true
+
       - name: Upload APK + AAB for ${{ matrix.app }}
         uses: actions/upload-artifact@v4
         with:
@@ -140,3 +153,22 @@ jobs:
             build/${{ matrix.app }}/*.aab
           if-no-files-found: error
           retention-days: 14
+
+  # Job 3 — gather every app's packages into one downloadable artifact
+  collect:
+    needs: build-android
+    if: ${{ !cancelled() && needs.build-android.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download every app's packages
+        uses: actions/download-artifact@v4
+        with:
+          path: android
+          pattern: android-*
+      - name: Bundle them into one artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-all               # one download, an android-<slug>/ folder per app
+          path: android
+          if-no-files-found: warn
+          retention-days: 30
