@@ -76,13 +76,7 @@ else {
       (!q || app.name.toLowerCase().includes(q) || app.description?.toLowerCase().includes(q))
     );
   });
-
-  //
-  const bg = getStyleToken('bg') || '#000000';
-  const fg = getStyleToken('fg') || '#c8d0e0';
-  applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
-  animatePattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
-
+  
   // :::::: COMPONENTS
 
   function Filter () {
@@ -159,3 +153,9 @@ else {
     document.getElementById('app')
   );
 }
+
+// apply filter + pattern to <body>
+const bg = getStyleToken('bg') || '#000000';
+const fg = getStyleToken('fg') || '#c8d0e0';
+applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
+animatePattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
