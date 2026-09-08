@@ -85,17 +85,6 @@ function SettingsPanel () {
     </div>`;
 }
 
-/*
-function AppSettings () {
-  return html`
-    <${SettingsButton} />
-    ${settingsOpen.value && html`<${SettingsPanel} />`}`;
-}
-
-// tools mount this through Shell; the app panel is the live surface for now
-function Settings () { return settingsOpen.value ? html`<${SettingsPanel} />` : null; }
-*/
-
 function Settings () {
   return html`
     <${SettingsButton} />
