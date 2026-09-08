@@ -367,20 +367,19 @@ async function addFolder () {
 
 function App () {
   useEffect(() => {
-    app.lib.load().catch(err => toast.error('Could not open the library: ' + err.message));
+    app.lib.load().catch(error => toast({ error }));
+    //app.lib.load().catch(toast);
   }, []);
 
   if (!app.lib.ready.value) {
     return html`<div class="booting"><${Icon} name='loading' /></div>`;
   }
 
-  return html`
-    <>
-      <${Sidebar} />
-      ${app.state.isNavOpen && html`<div class="scrim-mobile" onClick=${() => app.state.isNavOpen = false}></div>`}
-      <main id="app-main"><${NotesReader} /></main>
-    </>
-  `;
+  return html`<>
+    <${Sidebar} />
+    ${app.state.isNavOpen && html`<div class="scrim-mobile" onClick=${() => app.state.isNavOpen = false}></div>`}
+    <main id="app-main"><${NotesReader} /></main>
+  </>`;
 }
 
 // :::::: BOOT
