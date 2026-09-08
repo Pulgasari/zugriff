@@ -11,8 +11,7 @@
 // cover off each new or changed file. nothing but the handles and the extracted
 // tags is stored — audio is streamed from disk on play (see player.js).
 
-import { signal, computed } from '@aufbau/kits/preact-htm';
-import { zugriff }                         from '/.shared/js/runtime.js';
+import { signal, computed }               from '@aufbau/signals';
 import { syncSource, MetaQueue }           from '/.shared/js/filesystem/scan.js';
 import * as fs                             from '/.shared/js/filesystem/fsaccess.js';
 import { accept, prettyName, extractMeta } from './library.js';
@@ -34,7 +33,7 @@ const cmp = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity
 export const // display helpers used across the ui
 displayArtist = track => track.artist || 'Unknown Artist',
 displayAlbum  = track => track.album  || 'Unknown Album',
-displayTitle  = track => track.title  || prettyName(t.name);
+displayTitle  = track => track.title  || prettyName(track.name);
 
 // ── the library ──────────────────────────────────────────────────────────
 

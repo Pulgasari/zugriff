@@ -1,35 +1,37 @@
 // apps/audio-manager/app.js
+// the music library on the shared handle. the runtime binds zugriff (+ zugriff.app, html)
+// to window before this runs, so nothing here imports the runtime. the library + the audio
+// engine live in modules (app.db / app.player); ephemeral ui state on app.state.
 
-// :::::: IMPORTS
+// ::: vendors
+import { computed }  from '@aufbau/signals';
+import { useEffect } from 'preact/hooks';
 
-import { zugriff }               from '/.shared/js/runtime.js';
-import { html, preact, signals } from '/.shared/js/vendors.js';
+// ::: shared
+import { Icon, IconButton, InstallTip, Settings } from '/.shared/js/components/index.js';
 
-const { Fragment, useEffect, useRef } = preact;
-const { computed, signal } = signals;
-const { Icon, IconButton, InstallTip, AppSettings } = zugriff.components;
-
-const app = zugriff.app('audio-manager');
-const fs  = zugriff.fs;
-
-// ::: local
-import * as db     from './db.js';
-import * as player from './player.js';
-//import { displayTitle, displayArtist, displayAlbum } from './db.js';
+// ::: app modules
+import * as db     from './modules/db.js';
+import * as player from './modules/player.js';
 const { displayTitle, displayArtist, displayAlbum } = db;
 
+// ::: the app handle
+const app = zugriff.app;
+const fs  = zugriff.fs;
 app.db     = db;
 app.player = player;
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
+// ephemeral ui state on app.state (no `.value`); the library + player keep their own plain
+// signals (app.db / app.player), read with `.value`.
 
-const route   = signal({ name: 'songs' });   // songs | albums | artists | album | artist
-const search  = signal('');
-const sort    = signal({ key: 'artist', dir: 1 });
-const navOpen = signal(false);
+app.state.route   = { name: 'songs', id: null };   // songs | albums | artists | album | artist
+app.state.search  = '';
+app.state.sort    = { key: 'artist', dir: 1 };
+app.state.navOpen = false;
 
-const flash = (text, kind = 'ok') => kind === 'err' ? zugriff.toast.error(text) : zugriff.toast.success(text);
-const go    = (name, id)          => { route.value = { name, id }; navOpen.value = false; };
+const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
+app.go = (name, id = null) => { app.state.route = { name, id }; app.state.navOpen = false; };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -57,15 +59,15 @@ function coverUrl (blob) {
 function dropCovers () { for (const u of coverUrls.values()) URL.revokeObjectURL(u); coverUrls.clear(); }
 
 // ── derived lists ───────────────────────────────────────────────────────────
-const matches = (t,q) => displayTitle(t).toLowerCase().includes(q) || displayArtist(t).toLowerCase().includes(q) || displayAlbum(t).toLowerCase().includes(q);
+const matches = (t, q) => displayTitle(t).toLowerCase().includes(q) || displayArtist(t).toLowerCase().includes(q) || displayAlbum(t).toLowerCase().includes(q);
 
 const filteredTracks = computed(() => {
-  const q = search.value.trim().toLowerCase();
+  const q = app.state.search.trim().toLowerCase();
   return q ? db.tracks.value.filter(t => matches(t, q)) : db.tracks.value;
 });
 
 const sortedTracks = computed(() => {
-  const { key, dir } = sort.value;
+  const { key, dir } = app.state.sort;
   const val = t => key === 'title'    ? displayTitle(t)
                  : key === 'album'    ? displayAlbum(t)
                  : key === 'duration' ? (t.duration ?? 0)
@@ -79,11 +81,11 @@ const sortedTracks = computed(() => {
 });
 
 const filteredAlbums = computed(() => {
-  const q = search.value.trim().toLowerCase();
+  const q = app.state.search.trim().toLowerCase();
   return q ? db.albums.value.filter(a => a.album.toLowerCase().includes(q) || a.artist.toLowerCase().includes(q)) : db.albums.value;
 });
 const filteredArtists = computed(() => {
-  const q = search.value.trim().toLowerCase();
+  const q = app.state.search.trim().toLowerCase();
   return q ? db.artists.value.filter(a => a.name.toLowerCase().includes(q)) : db.artists.value;
 });
 
@@ -98,7 +100,7 @@ async function removeFolder (s) {
   if (!confirm(`Remove “${s.name}”? Your files stay untouched — this only forgets the folder.`)) return;
   await db.removeFolder(s.id);
 }
-const setSort = key => sort.value = sort.value.key === key ? { key, dir: -sort.value.dir } : { key, dir: 1 };
+const setSort = key => app.state.sort = app.state.sort.key === key ? { key, dir: -app.state.sort.dir } : { key, dir: 1 };
 
 // :::::: SHARED BITS :::::::::::::::::::::::::::::::::::::::
 
@@ -118,9 +120,9 @@ function PlayGlyph ({ track }) {
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
 
 function NavItem ({ name, icon, label }) {
-  const active = route.value.name === name;
+  const active = app.state.route.name === name;
   return html`
-    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => go(name)}>
+    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)}>
       <${Icon} name=${icon} /> <span>${label}</span>
     </button>`;
 }
@@ -143,10 +145,10 @@ function SourceRow ({ source }) {
 function Sidebar () {
   const needAuth = db.sources.value.some(s => db.perms.value[s.id] !== 'granted');
   return html`
-    <aside class=${'sidebar' + (navOpen.value ? ' open' : '')}>
+    <aside class=${'sidebar' + (app.state.navOpen ? ' open' : '')}>
       <div class="brand">
         <${Icon} name="mdi:music-box-multiple-outline" /> <span>Music</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => navOpen.value = false}><${Icon} name="mdi:close" /></button>
+        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.navOpen = false}><${Icon} name="mdi:close" /></button>
       </div>
 
       <nav class="nav-group">
@@ -176,10 +178,10 @@ function Sidebar () {
 
 function SongsTable () {
   const rows = sortedTracks.value;
-  if (!rows.length) return html`<${Empty} q=${search.value} />`;
+  if (!rows.length) return html`<${Empty} q=${app.state.search} />`;
   const head = (key, label, cls = '') => html`
-    <button class=${'th ' + cls + (sort.value.key === key ? ' on' : '')} onClick=${() => setSort(key)}>
-      ${label}${sort.value.key === key ? html` <${Icon} name=${sort.value.dir > 0 ? 'mdi:menu-up' : 'mdi:menu-down'} size=${14} />` : ''}
+    <button class=${'th ' + cls + (app.state.sort.key === key ? ' on' : '')} onClick=${() => setSort(key)}>
+      ${label}${app.state.sort.key === key ? html` <${Icon} name=${app.state.sort.dir > 0 ? 'mdi:menu-up' : 'mdi:menu-down'} size=${14} />` : ''}
     </button>`;
   return html`
     <div class="songs">
@@ -202,11 +204,11 @@ function SongsTable () {
 
 function AlbumsGrid () {
   const rows = filteredAlbums.value;
-  if (!rows.length) return html`<${Empty} q=${search.value} />`;
+  if (!rows.length) return html`<${Empty} q=${app.state.search} />`;
   return html`
     <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
       ${rows.map(a => html`
-        <button class="album-card" key=${a.key} onClick=${() => go('album', a.key)}>
+        <button class="album-card" key=${a.key} onClick=${() => app.go('album', a.key)}>
           <div class="album-art">
             <${Cover} blob=${a.cover} size=${160} radius=${10} />
             <span class="album-play" onClick=${e => { e.stopPropagation(); player.play(a.tracks[0], a.tracks); }}><${Icon} name="mdi:play" /></span>
@@ -238,11 +240,11 @@ function AlbumDetail ({ id }) {
 
 function ArtistsList () {
   const rows = filteredArtists.value;
-  if (!rows.length) return html`<${Empty} q=${search.value} />`;
+  if (!rows.length) return html`<${Empty} q=${app.state.search} />`;
   return html`
     <div class="artists">
       ${rows.map(a => html`
-        <button class="artist-row" key=${a.name} onClick=${() => go('artist', a.name)}>
+        <button class="artist-row" key=${a.name} onClick=${() => app.go('artist', a.name)}>
           <${Cover} blob=${a.cover} size=${48} radius=${999} />
           <div class="artist-meta">
             <div class="artist-name">${a.name}</div>
@@ -270,7 +272,7 @@ function ArtistDetail ({ id }) {
       </header>
       <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
         ${albums.map(al => html`
-          <button class="album-card" key=${al.key} onClick=${() => go('album', al.key)}>
+          <button class="album-card" key=${al.key} onClick=${() => app.go('album', al.key)}>
             <div class="album-art"><${Cover} blob=${al.cover} size=${160} radius=${10} /></div>
             <div class="album-name" title=${al.album}>${al.album}</div>
             <div class="album-artist">${al.year || ''}</div>
@@ -311,31 +313,31 @@ function Empty ({ q }) {
 // :::::: HEADER + PLAYER :::::::::::::::::::::::::::::::::::
 
 function TopBar () {
-  const r = route.value;
+  const r = app.state.route;
   const title = r.name === 'album' ? 'Album' : r.name === 'artist' ? 'Artist' : r.name[0].toUpperCase() + r.name.slice(1);
   const back  = r.name === 'album' || r.name === 'artist';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => navOpen.value = true}><${Icon} name="mdi:menu" /></button>
-      ${back && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => go(r.name === 'album' ? 'albums' : 'artists')} />`}
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => app.state.navOpen = true}><${Icon} name="mdi:menu" /></button>
+      ${back && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go(r.name === 'album' ? 'albums' : 'artists')} />`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>
       <div class="searchbox">
         <${Icon} name="mdi:magnify" />
-        <input type="search" placeholder="Search…" value=${search.value} onInput=${e => search.value = e.target.value} />
+        <input type="search" placeholder="Search…" value=${app.state.search} onInput=${e => app.state.search = e.target.value} />
       </div>
       <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" /></button>
-      <${AppSettings} />
+      <${Settings} />
     </header>`;
 }
 
 function Content () {
-  switch (route.value.name) {
+  switch (app.state.route.name) {
     case 'albums'  : return html`<${AlbumsGrid} />`;
     case 'artists' : return html`<${ArtistsList} />`;
-    case 'album'   : return html`<${AlbumDetail} id=${route.value.id} />`;
-    case 'artist'  : return html`<${ArtistDetail} id=${route.value.id} />`;
+    case 'album'   : return html`<${AlbumDetail} id=${app.state.route.id} />`;
+    case 'artist'  : return html`<${ArtistDetail} id=${app.state.route.id} />`;
     default        : return html`<${SongsTable} />`;
   }
 }
@@ -350,7 +352,7 @@ function PlayerBar () {
         <${Cover} blob=${t.cover} size=${48} radius=${6} />
         <div class="np-meta">
           <div class="np-title" title=${displayTitle(t)}>${displayTitle(t)}</div>
-          <button class="np-artist" onClick=${() => go('artist', displayArtist(t))}>${displayArtist(t)}</button>
+          <button class="np-artist" onClick=${() => app.go('artist', displayArtist(t))}>${displayArtist(t)}</button>
         </div>
       </div>
 
@@ -413,17 +415,19 @@ function App () {
   if (!db.sources.value.length) return html`<div class="centered"><${Welcome} /></div>`;
 
   return html`
-    <${Fragment}>
+    <>
       <div id="app-main">
         <${Sidebar} />
-        ${navOpen.value && html`<div class="scrim-mobile" onClick=${() => navOpen.value = false}></div>`}
+        ${app.state.navOpen && html`<div class="scrim-mobile" onClick=${() => app.state.navOpen = false}></div>`}
         <main class="main">
           <${TopBar} />
           <div class="content"><${Content} /></div>
         </main>
       </div>
       <${PlayerBar} />
-    </${Fragment}>`;
+    </>`;
 }
+
+// :::::: BOOT
 
 app.init({ App });
