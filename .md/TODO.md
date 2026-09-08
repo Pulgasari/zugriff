@@ -18,9 +18,9 @@
 
 vermutlich werden die apps fortan aber fortan für android generell mit capacitor gebaut, weil das scheinbar vieles erleichtert. (ich habe aber noch nicht vollständig capacitor durchdrungen, aber bei dem was ich bisher so las...)
 
-- [ ] habe gerade testweise 3 der capacitor-apps installiert und bei allen kommt error von vercel vonwegen "nich gefunden". ich vermute mal,dass da die falsche url im build landet. es muss `https://zugriff.dev/<app>/` sein, nicht `https://zugriff.dev/apps/<app>/` oder irgendwas anderes.
-- [ ] es wäre vermutlich noch praktisch, wenn man die builds auch einzeln pro app starten könnte
-- [ ] beim runnen des capacitor-workflows kommen folgende warnungen:
+- [x] habe gerade testweise 3 der capacitor-apps installiert und bei allen kommt error von vercel vonwegen "nich gefunden". ich vermute mal,dass da die falsche url im build landet. es muss `https://zugriff.dev/<app>/` sein, nicht `https://zugriff.dev/apps/<app>/` oder irgendwas anderes. — genau: die generatoren bauten `.../apps/<slug>/`. vercel bedient apps öffentlich unter `/<slug>/` (rewrite mappt intern auf `/apps/<slug>/`); `/apps/<slug>/` trifft die falsche rewrite-regel → 404. `gen-capacitor-config.mjs` (server.url) + `gen-twa-manifest.mjs` (manifest-url) auf `/<slug>/` gefixt
+- [x] es wäre vermutlich noch praktisch, wenn man die builds auch einzeln pro app starten könnte — beide build-workflows haben jetzt einen optionalen `app`-input (Run workflow → slug eintragen); leer = ganze matrix
+- [x] beim runnen des capacitor-workflows kommen folgende warnungen: — actions auf node24-majors gehoben (checkout/setup-node/setup-java/upload-artifact → v5, download-artifact → v7, setup-android → v4; app-assets-workflow gleich mit)
 ```
 9 warnings
 

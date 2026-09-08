@@ -9,7 +9,9 @@
 
 Gibt ein JSON-Array der App-Slugs aus, deren Registry-Eintrag in
 `.shared/js/data/apps.js` `build.android === 'bubblewrap'` setzt — die Matrix des
-TWA/Bubblewrap-Builds. Aktuell: `feeds`, `icons`, `podcasts`.
+TWA/Bubblewrap-Builds. Die konkrete Liste ergibt sich aus der Registry (aktuell
+keine App — alle buildbaren zielen auf capacitor). Ist `APP_FILTER` gesetzt (der
+`app`-Dispatch-Input), wird auf genau diesen Slug eingegrenzt.
 
 ## `gen-twa-manifest.mjs`
 
@@ -24,8 +26,9 @@ Key. Wird vom Workflow pro App aufgerufen.
 Gibt ein JSON-Array der App-Slugs aus, deren Registry-Eintrag in
 `.shared/js/data/apps.js` `build.android === 'capacitor'` setzt — die Matrix des
 **Capacitor**-Builds. Jede App zielt auf genau einen Android-Builder
-(`capacitor` oder `bubblewrap`). Aktuell: `audio-manager`, `code`, `ebooks`,
-`files`, `images`, `notes`, `videos`.
+(`capacitor` oder `bubblewrap`). Die konkrete Liste ergibt sich aus der Registry.
+Ist `APP_FILTER` gesetzt (der `app`-Dispatch-Input), wird auf genau diesen Slug
+eingegrenzt.
 
 ## `gen-capacitor-config.mjs`
 
@@ -33,7 +36,7 @@ Das Capacitor-Gegenstück zu `gen-twa-manifest.mjs`: schreibt für **eine** App
 ein `capacitor.config.json` (+ ein `www/index.html` als Offline-Fallback, weil
 Capacitor ein nicht-leeres `webDir` verlangt) — deterministisch und ohne
 interaktives `cap init`. Wie die TWA wird die App um ihre **Live-URL** gewickelt
-(`server.url = https://zugriff.dev/apps/<slug>/`) statt ihre Dateien zu bundlen;
+(`server.url = https://zugriff.dev/<slug>/`) statt ihre Dateien zu bundlen;
 Capacitor injiziert seine native Bridge trotzdem in die Remote-Seite, sodass
 `@capacitor/filesystem` funktioniert. `appId` ist `dev.zugriff.<slug>` — identisch
 zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
@@ -75,7 +78,8 @@ Capacitor-Projekt scaffolden (`gen-capacitor-config.mjs` → `npm i
 `cap add android` → `cap sync`) → `gradlew bundleRelease assembleRelease` →
 APK/AAB **signieren** (Capacitor baut unsigniert: `zipalign`+`apksigner` für die
 APK, `jarsigner` für die AAB) → als Artefakt hochladen. Ausgelöst **manuell** per
-`workflow_dispatch`.
+`workflow_dispatch`; der optionale `app`-Input baut nur einen einzelnen Slug
+statt der ganzen Matrix.
 
 ---
 
@@ -96,7 +100,8 @@ AAB**) — ein Matrix-Job pro App.
    scaffolden) → `bubblewrap build` → APK **und** AAB als Artefakt hochladen.
 
 Ausgelöst wird er **manuell** per `workflow_dispatch` (Actions-Tab → Workflow
-auswählen → „Run workflow"). Ein Commit baut absichtlich nicht.
+auswählen → „Run workflow"). Der optionale `app`-Input baut nur einen einzelnen
+Slug statt der ganzen Matrix. Ein Commit baut absichtlich nicht.
 
 > Hinweis: Das ursprünglich angedachte `pwa-builder/pwabuilder-action` existiert
 > nicht (404). Deshalb wird Bubblewrap direkt angesteuert.
