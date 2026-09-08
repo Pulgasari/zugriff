@@ -7,6 +7,7 @@ export const icons = {
   'arrow-left'        : 'material-symbols:arrow-back',
   'arrow-right'       : 'material-symbols:arrow-forward',
   'arrow-up'          : 'material-symbols:arrow-upward',
+  'books'             : 'mdi:bookshelf',
   'capslock'          : 'material-symbols:keyboard-capslock',
   'check'             : 'mdi:check',
   'check-circle'      : 'mdi:check-circle-outline',
