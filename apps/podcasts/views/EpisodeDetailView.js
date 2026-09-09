@@ -28,19 +28,26 @@ export default function EpisodeDetailView ({ id }) {
   const isPlaying = isCurrent && player.isPlaying;
 
   const actions = [
-    { primary  : true,
+    {
       icon     : isPlaying ? 'mdi:pause' : 'mdi:play',
       label    : isPlaying ? 'Pause' : st.position && !st.done ? 'Resume' : 'Play',
-      onClick  : () => player.play(episode) },
-    { iconOnly : true, active: st.saved,
+      onClick  : () => player.play(episode)
+    },
+    { 
       icon     : st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline',
       label    : st.saved ? 'Remove from list' : 'Save for later',
-      onClick  : () => db.toggleSaved(id) },
-    { iconOnly : true, active: st.done,
+      onClick  : () => db.toggleSaved(id) 
+    },
+    { 
       icon     : st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline',
       label    : st.done ? 'Mark unplayed' : 'Mark as done',
-      onClick  : () => db.toggleDone(id) },
-    episode.link && { icon: 'mdi:open-in-new', label: 'Episode page', href: episode.link },
+      onClick  : () => db.toggleDone(id)
+    },
+    episode.link && { 
+      icon: 'mdi:open-in-new', 
+      label: 'Episode page', 
+      href: episode.link
+    },
   ].filter(Boolean);
 
   const back = {
@@ -49,8 +56,8 @@ export default function EpisodeDetailView ({ id }) {
   };
 
   return html`
-    <${View} back=${back}>
-      <header class="ed-head">
+    <${View} id='episode' back=${back}>
+      <header>
         <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
         <div class="ed-info">
           ${podcast && html`<button class="ed-podcast" onClick=${() => go('podcast', podcast.id)}>${podcast.title}</button>`}
@@ -62,14 +69,7 @@ export default function EpisodeDetailView ({ id }) {
           </div>
 
           <${ActionMenu} items=${actions} />
-
-          ${(st.position > 0 || st.done) && html`
-            <div class="ed-progress">
-              <aufbau-progress class="ep-progress" value=${pct}></aufbau-progress>
-              <span class="ed-progress-label">
-                ${st.done ? 'Finished' : `${fmtDuration(st.position)}${dur ? ' / ' + fmtDuration(dur) : ''}`}
-              </span>
-            </div>`}
+          <aufbau-progress value=${pct}></aufbau-progress>
         </div>
       </header>
 
