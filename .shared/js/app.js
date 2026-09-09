@@ -47,11 +47,15 @@ class ZugriffApp {
   // ::: loaders (app-relative). ui pieces resolve to a default export when present,
   // else the namespace: component() from ./components, view() from ./views,
   // panel() from ./panels, dialog() from ./dialogs; module() from the app root.
+  import    = path => import(new URL(`${path}`, this.baseURL)).then(pick);
+  
+  module    = name => import(new URL(`modules/${name}.js`,    this.baseURL)).then(pick);
   component = name => import(new URL(`components/${name}.js`, this.baseURL)).then(pick);
-  view      = name => import(new URL(`views/${name}.js`,      this.baseURL)).then(pick);
+  dialog    = name => import(new URL(`dialogs/${name}.js`,    this.baseURL)).then(pick)
   panel     = name => import(new URL(`panels/${name}.js`,     this.baseURL)).then(pick);
-  dialog    = name => import(new URL(`dialogs/${name}.js`,    this.baseURL)).then(pick);
-  module    = name => import(new URL(`${name}.js`,            this.baseURL)).then(pick);
+  view      = name => import(new URL(`views/${name}.js`,      this.baseURL)).then(pick);
+  
+  
 
   // ::: actions — app.actions is the registry (add/run/get + property access); assigning
   // app.actions = { … } merges the object in rather than replacing the registry.
