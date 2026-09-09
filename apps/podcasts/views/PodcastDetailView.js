@@ -1,13 +1,16 @@
 // apps/podcasts/views/PodcastDetailView.js
 // one podcast: header, actions (refresh / website / unsubscribe) and its episodes.
 
-import Empty      from '/.shared/js/components/Empty.js';
-import Icon       from '/.shared/js/components/Icon.js';
-import View       from '/.shared/js/components/View.js';
-import Art        from './../components/Artwork.js';
+import Button from '/.shared/js/components/Button.js';
+import Empty  from '/.shared/js/components/Empty.js';
+import Icon   from '/.shared/js/components/Icon.js';
+import Link   from '/.shared/js/components/Link.js';
+import View   from '/.shared/js/components/View.js';
+
+import Art           from './../components/Artwork.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
-import SortPicker from './../components/SortPicker.js';
-import SearchPanel from '/.shared/js/components/SearchPanel.js';
+import SortPicker    from './../components/SortPicker.js';
+import SearchPanel   from '/.shared/js/components/SearchPanel.js';
 import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -43,20 +46,17 @@ export default function PodcastDetailView ({ id }) {
 
   return html`
     <${View} back=${back}>
-      <header class="pd-head">
-        <${Art} src=${podcast.image} size=${140} className="pd-art" />
+      <header>
+        <${Art} src=${podcast.image} size=${140} />
         <div class="pd-info">
           <h1>${podcast.title}</h1>
           ${podcast.author && html`<div class="pd-author">${podcast.author}</div>`}
           <div class="pd-stats">${eps.length} episodes · ${doneCount} done</div>
           ${podcast.description && html`<p class="pd-desc">${plain(podcast.description).slice(0, 400)}</p>`}
           <div class="pd-actions">
-            <button class="btn" onClick=${refreshOne} disabled=${!!app.state.busy}>
-              <${Icon} name="mdi:refresh" /> Refresh</button>
-            ${podcast.link && html`<a class="btn ghost" href=${podcast.link} target="_blank" rel="noopener">
-              <${Icon} name="mdi:web" /> Website</a>`}
-            <button class="btn danger" onClick=${remove}>
-              <${Icon} name="mdi:trash-can-outline" /> Unsubscribe</button>
+            <${Button} icon='refresh' label='refresh' onClick=${refreshOne} disabled=${!!app.state.busy} />
+            ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
+            <${Button} class="danger" icon='trash' label='Unsubscribe' onClick=${remove} />
           </div>
         </div>
       </header>
