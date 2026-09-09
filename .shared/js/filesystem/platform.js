@@ -19,7 +19,13 @@
 // keeps them correct no matter what, and makes the web path a pure identity — so
 // existing browser records and behaviour are completely untouched.
 
-import { isCapacitor, CapDirHandle, pickDirectory as capPick, hydrate as capHydrate, dehydrate as capDehydrate } from './cap-fs.js';
+import {
+  isCapacitor, 
+  CapDirHandle, 
+  pickDirectory as capPick, 
+  hydrate       as capHydrate, 
+  dehydrate     as capDehydrate
+} from './cap-fs.js';
 
 /** running inside the native Capacitor wrapper (vs a plain browser)? */
 export const isNative = isCapacitor;
