@@ -3,9 +3,11 @@
 
 import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
+import Progress   from '/.shared/js/components/Progress.js';
 import View       from '/.shared/js/components/View.js';
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
 import Art        from './../components/Artwork.js';
+
 import { fmtDate, fmtDuration, paragraphs } from './../modules/methods.js';
 
 const app = zugriff.app;
