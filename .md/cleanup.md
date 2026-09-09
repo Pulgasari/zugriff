@@ -1,7 +1,5 @@
 # cleanup
 
-ich will in `zugriff/apps` mal gründlich aufräumen. ich hab bissl chaotisch notiert hier. lies dir hier erstmal gründlich durch, fokus auf was ich im sinn habe, danndie ganzen genannten stellen udn verzeicznisse usw gründlich untersuchen, dann plan, dann feuer frei!
-
 ## Buttons
 
 ```javascript
@@ -22,17 +20,18 @@ viele apps bauen ne eigene `IconBtn` component. in `zugriff/.shared/js/component
 
 in `.shared/js/data/icons.js` ist schon ne liste mit standard-icons, dessen namen verwendet werden sollen möglichst. und die liste kann gern erweitert werden. wird von `.shared/js/components/Icon.js` verstanden.
 
-## toasts
-
-viele apps bauen ne eigene toasts-logik. fortan hängt an de globalen runtime (muss nicht extra importiert werden) direkt ein toast-system, das getriggert werden kann.
+## Toasts
 
 ```javascript
-zugriff.toast.error('...');
-zugriff.toast.success('...');
+app.toast('...');
+app.toast({ error: '...' });
+app.toast({ info: '...' });
+app.toast({ success: '...' });
+app.toast({ warn: '...' });
 ```
 
 
-## app wrapper
+## App Wrapper
 
 die apps wrappen sich selbst komplett sinnlos selbst innerhalb von `#app` und obendrein noch als eigener class-name. zum beispiel:
 
