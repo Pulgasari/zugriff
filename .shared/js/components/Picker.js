@@ -2,16 +2,21 @@
 
 import { html } from './../vendors.js';
 
-const isObject = v => typeof v === 'object' && v !== null;
+const isObject = v => typeof v === 'object' && v !== null && !Array.isArray(v);
 
-const normalize = opt => isObject(opt)
-  ? {
-      value : opt.value,
-      label : opt.label ?? (opt.icon ? '' : String(opt.value)),
-      icon  : opt.icon ?? null,
-      title : opt.title ?? opt.label ?? String(opt.value),
-    }
-  : { value: opt, label: String(opt), icon: null, title: String(opt) };
+const normalize = opt => {
+  if (Array.isArray(opt)) {
+    const [value, label = String(value)] = opt;
+    return { value, label, icon: null, title: label };
+  }
+  if (isObject(opt)) return {
+    value : opt.value,
+    label : opt.label ?? (opt.icon ? '' : String(opt.value)),
+    icon  : opt.icon ?? null,
+    title : opt.title ?? opt.label ?? String(opt.value),
+  };
+  return { value: opt, label: String(opt), icon: null, title: String(opt) };
+};
 
 function Picker ({ options = [], sig, value, onChange, look = 'segments', multiple }) {
   const current = sig ? sig.value : value;
