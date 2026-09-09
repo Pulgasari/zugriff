@@ -7,7 +7,7 @@ import Button     from '/.shared/js/components/Button.js';
 import Art        from './../components/Artwork.js';
 import EpisodeRow from './../components/EpisodeRow.js';
 import SortPicker from './../components/SortPicker.js';
-import SearchBar  from './../panels/SearchPanel.js';
+import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -71,5 +71,5 @@ export default function PodcastDetailView ({ id }) {
         ? html`<div class="ep-list">${eps.map(ep => html`<${EpisodeRow} episode=${ep} key=${ep.id} />`)}</div>`
         : html`<${Empty} icon="mdi:magnify-close" title="Nothing matches your filter" />`}
     </div>
-    ${all.length > 0 && html`<${SearchBar} placeholder=${`Filter ${podcast.title}…`} />`}`;
+    ${all.length > 0 && html`<${SearchPanel} placeholder=${`Filter ${podcast.title}…`} />`}`;
 }

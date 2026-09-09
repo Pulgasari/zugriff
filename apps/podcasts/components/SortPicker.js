@@ -1,10 +1,7 @@
+import Picker from '/.shared/js/components/Picker.js';
+
 function SortPicker ({ value, options, onChange }) {
-  return html`
-    <div class="seg">
-      ${options.map(([val, label]) => html`
-        <button key=${val} class=${'seg-btn' + (value === val ? ' active' : '')}
-                onClick=${() => onChange(val)}>${label}</button>`)}
-    </div>`;
+  return html`<${Picker} look='segments' options=${options} value=${value} onChange=${onChange} />`;
 }
 
 export default SortPicker;
