@@ -3,9 +3,9 @@
 
 import Icon        from '/.shared/js/components/Icon.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
+import Progress    from '/.shared/js/components/Progress.js';
 import Art         from './Artwork.js';
 import PlayToggle  from './PlayToggle.js';
-import ProgressBar from './ProgressBar.js';
 import { fmtDate, fmtDuration, plain } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -15,6 +15,8 @@ export default function EpisodeRow ({ episode, showPodcast = false }) {
   const st      = db.stateOf(episode.id);
   const podcast = db.podcastById.value[episode.podcastId];
   const teaser  = plain(episode.description).slice(0, 200);
+  const dur     = st.duration || 0;
+  const pct     = st.done ? 100 : (dur ? Math.min(100, st.position / dur * 100) : 0);
 
   return html`
     <div class=${'ep' + (st.done ? ' done' : '') + (player.episode?.id === episode.id ? ' playing' : '')}>
@@ -30,7 +32,7 @@ export default function EpisodeRow ({ episode, showPodcast = false }) {
         </div>
         <button class="ep-title" onClick=${() => go('episode', episode.id)}>${episode.title}</button>
         ${teaser && html`<div class="ep-teaser">${teaser}</div>`}
-        <${ProgressBar} state=${st} />
+        ${(st.position || st.done) && html`<${Progress} value=${pct} />`}
       </div>
       <div class="ep-actions">
         <${PlayToggle} episode=${episode} />

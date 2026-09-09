@@ -5,7 +5,7 @@ import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
 import IconButton from '/.shared/js/components/IconButton.js';
 import EpisodeRow from './../components/EpisodeRow.js';
-import SearchBar  from './../panels/SearchPanel.js';
+import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import { filterEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -38,6 +38,6 @@ export default function LatestView () {
                  hint=${app.state.search ? '' : 'Try refreshing your feeds.'} />`
         : html`<div class="ep-list">${recent.map(ep => html`<${EpisodeRow} episode=${ep} showPodcast key=${ep.id} />`)}</div>`}
     </div>
-    ${hasSubs && html`<${SearchBar} placeholder="Filter episodes…" />`}
+    ${hasSubs && html`<${SearchPanel} placeholder="Filter episodes…" />`}
   `;
 }
