@@ -3,6 +3,12 @@
 // the filter reads the shared search query + podcast lookup through the zugriff.app
 // global (app.state.search, app.db.podcastById), so call sites stay filterEpisodes(list).
 
+export function format ({ date, duration }) {
+  if (date)     return fmtDate     (date);
+  if (duration) return fmtDuration (duration);
+  return '';
+}
+
 export function fmtDuration (sec) {
   if (!sec || sec < 0) return '';
   sec = Math.round(sec);
