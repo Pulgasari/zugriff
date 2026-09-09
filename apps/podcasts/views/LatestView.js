@@ -3,6 +3,7 @@
 
 import Icon        from '/.shared/js/components/Icon.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
+import View        from '/.shared/js/components/View.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
 import { filterEpisodes } from './../modules/methods.js';
@@ -27,16 +28,17 @@ export default function LatestView () {
         hint: app.state.search ? '' : 'Try refreshing your feeds.' };
 
   return html`
-    <div class="view">
-      <div class="view-head">
+    <${View}>
+      <header>
         <h1>Latest episodes</h1>
         <div class="view-tools">
           <${IconButton} icon="refresh" label="Refresh all feeds"
                          onClick=${() => app.actions.run('refresh-all')} disabled=${!!app.state.busy} />
         </div>
-      </div>
+      </header>
+
       <${EpisodesIndex} episodes=${recent} showPodcast empty=${empty} />
-    </div>
+    </${View}>
     ${hasSubs && html`<${SearchPanel} placeholder="Filter episodes…" />`}
   `;
 }

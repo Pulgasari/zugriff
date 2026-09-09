@@ -19,8 +19,10 @@ function Item ({ episode, showPodcast }) {
   const dur     = st.duration || 0;
   const pct     = st.done ? 100 : (dur ? Math.min(100, st.position / dur * 100) : 0);
 
+  const cls = [st.done && 'done', player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');
+
   return html`
-    <div class=${'ep' + (st.done ? ' done' : '') + (player.episode?.id === episode.id ? ' playing' : '')}>
+    <aufbau-item class=${cls}>
       <button class="ep-art" onClick=${() => go('episode', episode.id)} aria-label="Open episode">
         <${Art} src=${episode.image || podcast?.image} size=${48} />
       </button>
@@ -48,7 +50,7 @@ function Item ({ episode, showPodcast }) {
             <${Icon} name="mdi:open-in-new" />
           </a>`}
       </div>
-    </div>`;
+    </aufbau-item>`;
 }
 
 export default function EpisodesIndex ({ episodes, showPodcast = false, empty }) {

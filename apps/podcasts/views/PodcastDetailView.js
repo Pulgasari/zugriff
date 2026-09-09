@@ -3,7 +3,7 @@
 
 import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
-import Button     from '/.shared/js/components/Button.js';
+import View       from '/.shared/js/components/View.js';
 import Art        from './../components/Artwork.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
 import SortPicker from './../components/SortPicker.js';
@@ -14,8 +14,10 @@ const app = zugriff.app;
 const { db, go, thumbs } = app;
 
 export default function PodcastDetailView ({ id }) {
+  const back = { label: 'Podcasts', onClick: () => go('podcasts') };
+
   const podcast = db.podcastById.value[id];
-  if (!podcast) return html`<${Empty} icon="mdi:alert-outline" title="Podcast not found" />`;
+  if (!podcast) return html`<${View} back=${back}><${Empty} icon="mdi:alert-outline" title="Podcast not found" /></${View}>`;
 
   const all = sortEpisodes(db.episodesByPodcast.value[id] ?? [], app.settings.episodeSort);
   const eps = filterEpisodes(all, false);
@@ -40,9 +42,7 @@ export default function PodcastDetailView ({ id }) {
   };
 
   return html`
-    <div class="view">
-      <${Button} class="back" icon="arrow-left" label="Podcasts" onClick=${() => go('podcasts')} />
-
+    <${View} back=${back}>
       <header class="pd-head">
         <${Art} src=${podcast.image} size=${140} className="pd-art" />
         <div class="pd-info">
@@ -71,6 +71,6 @@ export default function PodcastDetailView ({ id }) {
         episodes=${eps}
         empty=${{ icon: 'mdi:magnify-close', title: 'Nothing matches your filter' }}
         />
-    </div>
+    </${View}>
     ${all.length > 0 && html`<${SearchPanel} placeholder=${`Filter ${podcast.title}…`} />`}`;
 }
