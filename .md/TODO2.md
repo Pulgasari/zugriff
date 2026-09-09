@@ -19,3 +19,11 @@
 ```
 
 - [ ] create `./shared/js/components/View.js' als rahmen für die views der apps
+
+Du fängst wieder an den alten messy dreck zu reproduzieren.
+du triffst falsche annahmen. Und du scheisst wieder den code mit sinnlosen kommentaren voll.
+
+ich finde den aktuellen code so schlimm, weil überall unnötig komplex ist, deswegeb refactore ich.
+
+und so n scheiss wie "primary button" schaff ich ab
+dieses icon only​ is völlig sinnlos. Wenns icon obly sein soll lässt man halt label weg.
