@@ -5,6 +5,7 @@ import Button from '/.shared/js/components/Button.js';
 import Empty  from '/.shared/js/components/Empty.js';
 import Icon   from '/.shared/js/components/Icon.js';
 import Link   from '/.shared/js/components/Link.js';
+import Picker from '/.shared/js/components/Picker.js';
 import View   from '/.shared/js/components/View.js';
 
 import Art           from './../components/Artwork.js';
@@ -45,7 +46,7 @@ export default function PodcastDetailView ({ id }) {
   };
 
   return html`
-    <${View} back=${back}>
+    <${View} id='podcast' back=${back}>
       <header>
         <${Art} src=${podcast.image} size=${140} />
         <div class="pd-info">
@@ -53,6 +54,7 @@ export default function PodcastDetailView ({ id }) {
           ${podcast.author && html`<div class="pd-author">${podcast.author}</div>`}
           <div class="pd-stats">${eps.length} episodes · ${doneCount} done</div>
           ${podcast.description && html`<p class="pd-desc">${plain(podcast.description).slice(0, 400)}</p>`}
+          
           <div class="pd-actions">
             <${Button} icon='refresh' label='refresh' onClick=${refreshOne} disabled=${!!app.state.busy} />
             ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
@@ -61,15 +63,21 @@ export default function PodcastDetailView ({ id }) {
         </div>
       </header>
 
-      <div class="pd-tools">
-        <span class="pd-tools-label">Episodes</span>
-        <${SortPicker} value=${app.settings.episodeSort} onChange=${v => app.settings.episodeSort = v}
-           options=${[['newest', 'Newest'], ['oldest', 'Oldest'], ['alpha', 'A–Z']]} />
+      <div>
+        <span>Episodes</span>
+        <${Picker}
+          value=${app.settings.episodeSort}
+          onChange=${v => app.settings.episodeSort = v}
+          options=${['newest', 'oldest', 'alpha']}
+          />
       </div>
 
       <${EpisodesIndex}
         episodes=${eps}
-        empty=${{ icon: 'mdi:magnify-close', title: 'Nothing matches your filter' }}
+        empty=${{ 
+          icon  : 'mdi:magnify-close', 
+          title : 'Nothing matches your filter' 
+        }}
         />
     </${View}>
     ${all.length > 0 && html`<${SearchPanel} placeholder=${`Filter ${podcast.title}…`} />`}`;
