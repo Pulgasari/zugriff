@@ -40,7 +40,7 @@ modules/       app logic — db, player, feed, methods (pure helpers)
 views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail, Saved
 panels/        chrome + overlays — Sidebar, Player, Search dock, Settings
 dialogs/       modal dialogs — Add podcast
-components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
+components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, …
 ```
 
 `app.js` hangs the modules on the handle and seeds the state:
