@@ -10,7 +10,7 @@ import { sortPodcasts } from './../modules/methods.js';
 const app = zugriff.app;
 
 export default function PodcastsView () {
-  const list = sortPodcasts(app.db.podcasts.value, app.settings.podcastSort);
+  const list = sortPodcasts(app.db.podcasts.all, app.settings.podcastSort);
 
   return html`
     <${View}>

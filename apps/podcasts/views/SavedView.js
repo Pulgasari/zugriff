@@ -8,7 +8,7 @@ const app = zugriff.app;
 const { db } = app;
 
 export default function SavedView () {
-  const list = db.savedEpisodes.value;
+  const list = db.savedEpisodes;
 
   const empty = {
     icon  : 'bookmarks',

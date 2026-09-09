@@ -8,7 +8,7 @@ import { fmtDate } from './../modules/methods.js';
 const app = zugriff.app;
 
 function Item ({ podcast }) {
-  const episodes = app.db.episodesByPodcast.value[podcast.id] ?? [];
+  const episodes = app.db.episodes.where({ podcastId: podcast.id });
   return html`
     <aufbau-item onClick=${() => app.go('podcast', podcast.id)}>
       <${Art} src=${podcast.image} />

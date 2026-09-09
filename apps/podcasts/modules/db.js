@@ -1,17 +1,17 @@
 // apps/podcasts/modules/db.js
 // storage layer. one @bunker/db (indexeddb) is the durable store; three reactive
-// maps mirror it so the ui stays live without touching indexeddb. every write is
-// write-through — it updates the map and the store together.
+// maps mirror it so the ui stays live. the public surface is `default` (app.db):
+// two collections + a handful of actions, all reactive without touching .value.
 //
 //   podcasts  id                   -> podcast record
 //   episodes  `${podcastId}:${h}`  -> episode record   (prefix-scannable per podcast)
 //   state     episodeId            -> { position, done, saved, ... }
 
-import { computed, makeMap, signal } from '@aufbau/signals';
-import { createDb }                  from '@bunker/db';
-import { fetchFeed, parseFeed }      from './feed.js';
+import { makeMap, signal }     from '@aufbau/signals';
+import { createDb }            from '@bunker/db';
+import { fetchFeed, parseFeed } from './feed.js';
 
-const db = createDb('zugriff-podcasts');
+const store = createDb('zugriff-podcasts');
 
 // ── ids ──
 // cyrb53: a short, stable base-36 hash, so long urls/guids stay out of the keys.
@@ -29,83 +29,88 @@ function hash (str = '') {
   return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
 }
 
-export const
-podcastId = url         => 'p' + hash(url),
-episodeId = (pid, guid) => `${pid}:${hash(guid)}`;
+const podcastId = url         => 'p' + hash(url);
+const episodeId = (pid, guid) => `${pid}:${hash(guid)}`;
 
-// ── reactive mirror (the source the ui reads) ──
+// ── reactive mirror ──
 
 const podcastMap = makeMap();   // id        -> podcast
 const episodeMap = makeMap();   // episodeId -> episode
 const stateMap   = makeMap();   // episodeId -> state
+const readySig   = signal(false);
 
-export const ready = signal(false);
+// a reactive view over a makeMap keyed by id. reads go through the map's signal,
+// so `.all`, `.get`, `.where` and iteration all track without a .value in sight.
+function collection (map) {
+  const list  = () => [...map.values()];
+  const match = q => typeof q === 'function' ? q : rec => Object.keys(q).every(k => rec[k] === q[k]);
 
-// public views derived from the maps, so consumers keep their array/lookup shape
-export const podcasts    = computed(() => [...podcastMap.values()]);
-export const episodes    = computed(() => [...episodeMap.values()]);
-export const states      = computed(() => stateMap.toObject());
-export const podcastById = computed(() => podcastMap.toObject());
-export const episodeById = computed(() => episodeMap.toObject());
+  return {
+    get all  () { return list(); },
+    get size () { return map.size; },
+    get   : q => q == null                                                  ? undefined
+               : typeof q === 'string'                                      ? map.get(q)
+               : typeof q === 'object' && Object.keys(q).length === 1 && 'id' in q ? map.get(q.id)
+               :                                                              list().find(match(q)),
+    where : q => q == null ? list() : list().filter(match(q)),
+    [Symbol.iterator] : () => map.values(),
+  };
+}
 
-// episodes grouped by podcast, so a podcast view is a lookup instead of a filter
-export const episodesByPodcast = computed(() => {
-  const map = {};
-  for (const ep of episodeMap.values()) (map[ep.podcastId] ??= []).push(ep);
-  return map;
-});
-
-// every saved episode, newest-saved first, joined to its episode record
-export const savedEpisodes = computed(() =>
-  [...stateMap.entries()]
-    .filter(([, s]) => s.saved)
-    .sort((a, b) => b[1].savedAt - a[1].savedAt)
-    .map(([id]) => episodeMap.get(id))
-    .filter(Boolean));
+const podcasts = collection(podcastMap);
+const episodes = collection(episodeMap);
 
 // merge entries into a map in one publish (per-key set would copy the map each time)
 const merge = (map, entries) => map.replace([...map.entries(), ...entries]);
 
 // ── loading ──
 
-export async function load () {
+async function load () {
   // create all three stores in ONE upgrade before reading them; otherwise the three
   // reads each trigger their own lazy upgrade and those cycles race on a cold db
   // ("upgrade blocked by another connection"). setup() is idempotent afterwards.
-  await db.setup({ podcasts: {}, episodes: {}, state: {} });
+  await store.setup({ podcasts: {}, episodes: {}, state: {} });
 
   const [pods, eps, st] = await Promise.all([
-    db.podcasts.getAll(),
-    db.episodes.getAll(),
-    db.state.getAll(),
+    store.podcasts.getAll(),
+    store.episodes.getAll(),
+    store.state.getAll(),
   ]);
   podcastMap.replace(pods);
   episodeMap.replace(eps);
   stateMap.replace(st);
-  ready.value = true;
+  readySig.value = true;
 }
 
 // ── state (progress / done / saved) ──
 
 const EMPTY_STATE = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
 
-export const stateOf = id => stateMap.get(id) ?? EMPTY_STATE;
+const stateOf = id => stateMap.get(id) ?? EMPTY_STATE;
 
 /** merge `patch` into an episode's state, persist it and refresh the mirror */
-export async function patchState (id, patch) {
+async function patchState (id, patch) {
   const next = { ...EMPTY_STATE, ...stateMap.get(id), ...patch, updatedAt: Date.now() };
   stateMap.set(id, next);
-  await db.state.set(id, next);
+  await store.state.set(id, next);
   return next;
 }
 
-export const setProgress = (id, position, duration) => patchState(id, { position, duration });
-export const markDone     = (id, done = true)        => patchState(id, { done, doneAt: done ? Date.now() : 0 });
-export const toggleDone   = id => markDone(id, !stateOf(id).done);
-export const toggleSaved  = id => {
+const setProgress = (id, position, duration) => patchState(id, { position, duration });
+const markDone    = (id, done = true)        => patchState(id, { done, doneAt: done ? Date.now() : 0 });
+const toggleDone  = id => markDone(id, !stateOf(id).done);
+const toggleSaved = id => {
   const cur = stateOf(id);
   return patchState(id, { saved: !cur.saved, savedAt: !cur.saved ? Date.now() : 0 });
 };
+
+// every saved episode, newest-saved first, joined to its episode record
+const savedList = () =>
+  [...stateMap.entries()]
+    .filter(([, s]) => s.saved)
+    .sort((a, b) => b[1].savedAt - a[1].savedAt)
+    .map(([id]) => episodeMap.get(id))
+    .filter(Boolean);
 
 // ── subscriptions ──
 
@@ -149,13 +154,13 @@ function toRecords (url, parsed) {
 
 /** batch-write episodes in one transaction */
 const writeEpisodes = eps =>
-  eps.length && db.task('episodes', 'readwrite', store => { for (const ep of eps) store.put(ep, ep.id); });
+  eps.length && store.task('episodes', 'readwrite', s => { for (const ep of eps) s.put(ep, ep.id); });
 
 /**
  * subscribe to a feed by url. fetches, parses and stores it. throws on a bad feed
  * or an unreachable url so the caller can surface the message.
  */
-export async function subscribe (rawUrl, proxy) {
+async function subscribe (rawUrl, proxy) {
   const url = normalizeUrl(rawUrl);
   const pid = podcastId(url);
   if (podcastMap.has(pid)) throw new Error('already subscribed to this feed');
@@ -165,7 +170,7 @@ export async function subscribe (rawUrl, proxy) {
 
   const { podcast, eps } = toRecords(url, parsed);
 
-  await db.podcasts.set(pid, podcast);
+  await store.podcasts.set(pid, podcast);
   await writeEpisodes(eps);
 
   podcastMap.set(pid, podcast);
@@ -174,7 +179,7 @@ export async function subscribe (rawUrl, proxy) {
 }
 
 /** re-fetch one subscription and merge in any new episodes */
-export async function refresh (pid, proxy) {
+async function refresh (pid, proxy) {
   const podcast = podcastMap.get(pid);
   if (!podcast) return;
 
@@ -188,7 +193,7 @@ export async function refresh (pid, proxy) {
   // rewrite every episode (metadata may have changed) but keep the podcast's addedAt
   await writeEpisodes(eps);
   const merged = { ...podcast, ...fresh, addedAt: podcast.addedAt, lastFetched: Date.now() };
-  await db.podcasts.set(pid, merged);
+  await store.podcasts.set(pid, merged);
 
   const others = [...episodeMap.entries()].filter(([k]) => !k.startsWith(prefix));
   episodeMap.replace([...others, ...eps.map(ep => [ep.id, ep])]);
@@ -196,7 +201,7 @@ export async function refresh (pid, proxy) {
   return { added };
 }
 
-export async function refreshAll (proxy, onProgress) {
+async function refreshAll (proxy, onProgress) {
   const all = [...podcastMap.values()];
   const results = [];
   let done = 0;
@@ -209,13 +214,13 @@ export async function refreshAll (proxy, onProgress) {
 }
 
 /** drop a subscription along with its episodes and their state */
-export async function unsubscribe (pid) {
+async function unsubscribe (pid) {
   const prefix = pid + ':';
-  const keys   = await db.episodes.keys(prefix);   // every stored episode of this podcast
+  const keys   = await store.episodes.keys(prefix);   // every stored episode of this podcast
 
-  await db.podcasts.delete(pid);
-  await db.task('episodes', 'readwrite', store => { for (const id of keys) store.delete(id); });
-  await db.task('state',    'readwrite', store => { for (const id of keys) store.delete(id); });
+  await store.podcasts.delete(pid);
+  await store.task('episodes', 'readwrite', s => { for (const id of keys) s.delete(id); });
+  await store.task('state',    'readwrite', s => { for (const id of keys) s.delete(id); });
 
   podcastMap.delete(pid);
   episodeMap.replace([...episodeMap.entries()].filter(([k]) => !k.startsWith(prefix)));
@@ -228,7 +233,7 @@ export async function unsubscribe (pid) {
 
 const stateKey = (url, guid) => `${url}\n${guid}`;
 
-export function exportData () {
+function exportData () {
   const state = {};
   for (const [id, s] of stateMap.entries()) {
     if (!s.saved && !s.done && !s.position) continue;   // nothing worth keeping
@@ -250,14 +255,14 @@ export function exportData () {
   };
 }
 
-export async function importData (data, proxy, onProgress) {
+async function importData (data, proxy, onProgress) {
   if (!data || !Array.isArray(data.feeds)) throw new Error('not a podcasts export file');
 
   const results = [];
   let done = 0;
   for (const feed of data.feeds) {
     const url = normalizeUrl(feed.url || '');
-    if (!url)                          results.push({ url: feed.url, skipped: 'no url' });
+    if (!url)                                results.push({ url: feed.url, skipped: 'no url' });
     else if (podcastMap.has(podcastId(url))) results.push({ url, skipped: 'already subscribed' });
     else {
       try { await subscribe(url, proxy); results.push({ url, added: true }); }
@@ -279,7 +284,7 @@ export async function importData (data, proxy, onProgress) {
       if (id) patch.push([id, { ...EMPTY_STATE, ...s, updatedAt: Date.now() }]);
     }
     if (patch.length) {
-      await db.task('state', 'readwrite', store => { for (const [id, s] of patch) store.put(s, id); });
+      await store.task('state', 'readwrite', s => { for (const [id, rec] of patch) s.put(rec, id); });
       merge(stateMap, patch);
     }
   }
@@ -290,10 +295,30 @@ export async function importData (data, proxy, onProgress) {
 // ── helpers ──
 
 /** tidy a pasted feed url — trim, add https://, drop a leading podcast:// */
-export function normalizeUrl (raw) {
+function normalizeUrl (raw) {
   let url = (raw || '').trim();
   if (!url) return '';
   url = url.replace(/^podcast:\/\//i, 'https://').replace(/^feed:\/\//i, 'https://');
   if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
   return url;
 }
+
+// ── public surface ──
+
+// named exports for direct importers (player.js reads state)
+export { stateOf, setProgress, markDone, podcastId, episodeId };
+
+// default handle is app.db — collections + actions, all reactive, no .value
+export default {
+  podcasts,
+  episodes,
+  stateOf,
+  get savedEpisodes () { return savedList(); },
+  get ready ()        { return readySig.value; },
+
+  load,
+  subscribe, refresh, refreshAll, unsubscribe,
+  toggleDone, toggleSaved, setProgress, markDone,
+  exportData, importData,
+  normalizeUrl,
+};

@@ -1,7 +1,7 @@
 // apps/podcasts/modules/methods.js
 // pure view helpers — formatting, html→text and the episode/podcast list transforms.
 // the filter reads the shared search query + podcast lookup through the zugriff.app
-// global (app.state.search, app.db.podcastById), so call sites stay filterEpisodes(list).
+// global (app.state.search, app.db.podcasts), so call sites stay filterEpisodes(list).
 
 export function format ({ date, duration }) {
   if (date)     return fmtDate     (date);
@@ -58,7 +58,7 @@ export function filterEpisodes (list, withPodcast = false) {
   if (!q) return list;
   return list.filter(ep =>
     ep.title.toLowerCase().includes(q) ||
-    (withPodcast && db.podcastById.value[ep.podcastId]?.title.toLowerCase().includes(q)));
+    (withPodcast && db.podcasts.get({ id: ep.podcastId })?.title.toLowerCase().includes(q)));
 }
 
 export const sortEpisodes = (list, mode) => [...list].sort((a, b) =>

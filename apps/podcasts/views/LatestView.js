@@ -13,9 +13,9 @@ const app = zugriff.app;
 const { db } = app;
 
 export default function LatestView () {
-  const hasSubs = db.podcasts.value.length > 0;
+  const hasSubs = db.podcasts.size > 0;
   const recent = filterEpisodes(
-    [...db.episodes.value].sort((a, b) => (b.pubDate || 0) - (a.pubDate || 0)),
+    db.episodes.all.sort((a, b) => (b.pubDate || 0) - (a.pubDate || 0)),
     true,
   ).slice(0, 200);
 
