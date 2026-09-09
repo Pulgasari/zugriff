@@ -13,6 +13,8 @@ wird erst nach dem struktur-refactoring ausgearbeitet.
   bottom: 0;
 }
 
+aufbau-index > * { background-color: var(--bgd-10); }
+
 .Brand {}
 
 .ActionMenu {}
