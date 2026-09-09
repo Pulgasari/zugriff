@@ -27,9 +27,7 @@ one explorer is live at a time (an app embeds a single browser),
 which keeps the sub-views free of prop-drilling.
 */
 
-import {  }  from './../vendors.js';
-import {         }  from './../vendors.js';
-import { html, useEffect, useRef, computed, signal, signal as persist, local } from '@aufbau/signals';
+//import { html, useEffect, useRef, computed, signal, signal as persist, local } from '@/vendors';     
 
 import { html, useEffect, useRef }  from './../vendors.js';
 import { computed, signal        }  from './../vendors.js';
