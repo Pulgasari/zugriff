@@ -13,30 +13,29 @@ const { thumbs } = app;
 
 export default function Artwork ({ src, size = 48, className = '' }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
-  const st = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
+  const state = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
 
   useEffect(() => {
-    if (!src) { st.value = { url: null, phase: 'none', broken: false }; return; }
+    if (!src) { state = { url: null, phase: 'none', broken: false }; return; }
     const cached = thumbs.peek(src);
-    if (cached) { st.value = { url: cached, phase: 'ready', broken: false }; return; }
+    if (cached) { state = { url: cached, phase: 'ready', broken: false }; return; }
 
-    st.value = { url: null, phase: 'pending', broken: false };
+    state = { url: null, phase: 'pending', broken: false };
     let alive = true;
-    thumbs.request(src).then(u => {
+    thumbs.request(src).then(url => {
       if (!alive) return;
-      st.value = u ? { url: u,   phase: 'ready', broken: false }
-                   : { url: src, phase: 'orig',  broken: false };
+      state = url ? { url: url, phase: 'ready', broken: false }
+                  : { url: src, phase: 'orig',  broken: false };
     });
     return () => { alive = false; };
   }, [src]);
 
-  const s = st.value;
-  const showImg = (s.phase === 'ready' || s.phase === 'orig') && !s.broken;
+  const showImg = (state.phase === 'ready' || state.phase === 'orig') && !state.broken;
 
   return showImg
-    ? html`<img class=${'art ' + className} src=${s.url} alt="" loading="lazy"
+    ? html`<img class=${'art ' + className} src=${state.url} alt="" loading="lazy"
                 width=${size} height=${size}
-                onError=${() => { st.value = { ...st.value, broken: true }; }} />`
+                onError=${() => state = { broken: true }} />`
     : html`<span class=${'art art-fallback ' + className} style=${`width:${size}px;height:${size}px`}>
              <${Icon} name="mdi:podcast" />
            </span>`;
