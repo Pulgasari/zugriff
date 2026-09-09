@@ -6,7 +6,7 @@ import { fmtDate } from './../modules/methods.js';
 
 const app = zugriff.app;
 
-export default function PodcastCard ({ podcast }) {
+export default function PodcastIndexItem ({ podcast }) {
   const episodes = app.db.episodesByPodcast.value[podcast.id] ?? [];
   return html`
     <button class='PodcastCard' onClick=${() => app.go('podcast', podcast.id)}>
