@@ -114,6 +114,20 @@ SettingsPanel = await app.panel('SettingsPanel');
 const // dialogs
 AddPodcastDialog = await app.dialog('AddPodcastDialog');
 
+/*
+const // local imports
+AddPodcastDialog = await app.import('components/AddPodcastDialog.js'),
+SidebarPanel     = await app.import('components/SidebarPanel.js'),
+PlayerPanel      = await app.import('components/PlayerPanel.js'),
+SettingsPanel    = await app.import('components/SettingsPanel.js');
+
+const // local imports
+AddPodcastDialog = await import('./components/AddPodcastDialog.js'),
+SidebarPanel     = await import('./components/SidebarPanel.js'),
+PlayerPanel      = await import('./components/PlayerPanel.js'),
+SettingsPanel    = await import('./components/SettingsPanel.js');
+*/
+
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
