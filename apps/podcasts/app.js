@@ -13,8 +13,8 @@ const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
 // ::: HANDLE
 const app = zugriff.app;
-app.db     = app.module('db');
-app.player = app.module('player');
+app.db     = await app.module('db');
+app.player = await app.module('player');
 
 // :::: STATE
 app.state.route  = { name: 'latest', id: null };   // { name, id }
@@ -48,7 +48,7 @@ app.go = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.s
 // :::::: ACTIONS
 
 async function refreshAll () {
-  if (!app.db.podcasts.value.length) { app.state.dialog = 'add'; return; }
+  if (!app.db.podcasts.size) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
     const results = await app.db.refreshAll(app.settings.proxy, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
@@ -119,11 +119,11 @@ AddPodcastDialog = await app.dialog('AddPodcastDialog');
 function App () {
   useEffect(() => {
     app.db.load()
-      .then(() => app.thumbs.prewarm(app.db.podcasts.value.map(p => p.image)))
+      .then(() => app.thumbs.prewarm(app.db.podcasts.all.map(p => p.image)))
       .catch(err => app.toast.error('Could not open the library: ' + err.message));
   }, []);
 
-  if (!app.db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+  if (!app.db.ready) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   const route  = app.state.route;
   const dialog = app.state.dialog;

@@ -15,7 +15,7 @@ export default function PlayerPanel () {
   const ep = player.episode;
   if (!ep) return null;
 
-  const podcast = db.podcastById.value[ep.podcastId];
+  const podcast = db.podcasts.get({ id: ep.podcastId });
   const dur     = player.duration || ep.duration || 0;
   const t       = player.time;
 

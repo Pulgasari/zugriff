@@ -8,14 +8,14 @@ const app = zugriff.app;
 const { db } = app;
 
 export default function SidebarPanel () {
-  const saved = db.savedEpisodes.value.length;
+  const saved = db.savedEpisodes.length;
   return html`
     <aside class="sidebar">
       <div class="brand"><${Icon} name="mdi:podcast" /> <span>Podcasts</span></div>
 
       <nav class="nav">
         <${NavItem} icon="mdi:playlist-play"     label="Latest"       name="latest" />
-        <${NavItem} icon="mdi:view-grid-outline" label="Podcasts"     name="podcasts" count=${db.podcasts.value.length} />
+        <${NavItem} icon="mdi:view-grid-outline" label="Podcasts"     name="podcasts" count=${db.podcasts.size} />
         <${NavItem} icon="mdi:bookmark-outline"  label="Listen later" name="saved"    count=${saved} />
       </nav>
 

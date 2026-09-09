@@ -14,7 +14,7 @@ const { db, player, go } = app;
 
 function Item ({ episode, showPodcast }) {
   const st      = db.stateOf(episode.id);
-  const podcast = db.podcastById.value[episode.podcastId];
+  const podcast = db.podcasts.get({ id: episode.podcastId });
   const teaser  = plain(episode.description).slice(0, 200);
   const dur     = st.duration || 0;
   const pct     = st.done ? 100 : (dur ? Math.min(100, st.position / dur * 100) : 0);
