@@ -18,7 +18,8 @@ aufbau-index > * { background-color: var(--bgd-10); }
 .Brand {}
 
 .ActionMenu {}
-.ContextMenu {}
+.ContextMenu {
+}
 .NavMenu {}
 
 .Modal {}
@@ -44,3 +45,13 @@ aufbau-index > * { background-color: var(--bgd-10); }
     > * { display: flex; flex-flow: row; gap: 1rem; }
   }
 }
+
+/* */
+
+.col, .flow-y  { display: flex; flex-direction: column; }
+.row, .flow-x  { display: flex; flex-direction: row; }
+.sticky-bottom { position: sticky; bottom: 0; }
+.sticky-top    { position: sticky; top:    0; }
+.sticky-left   { position: sticky; left:   0; }
+.sticky-right  { position: sticky; right:  0; }
+
