@@ -71,7 +71,7 @@ export default function EpisodeDetailView ({ id }) {
           </div>
 
           <${ActionMenu} items=${actions} />
-          <${Progess} value=${pct} />
+          <${Progress} value=${pct} />
         </div>
       </header>
 
