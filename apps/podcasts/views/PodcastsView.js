@@ -1,13 +1,13 @@
 // apps/podcasts/views/PodcastsView.js
 // the subscriptions grid / list.
 
-import Empty          from '/.shared/js/components/Empty.js';
-import Icon           from '/.shared/js/components/Icon.js';
-import IconButton     from '/.shared/js/components/IconButton.js';
-import PodcastCard    from './../components/PodcastCard.js';
-import PodcastListRow from './../components/PodcastListRow.js';
-import SortPicker     from './../components/SortPicker.js';
-import View           from '/.shared/js/components/View.js';
+import Empty            from '/.shared/js/components/Empty.js';
+import Icon             from '/.shared/js/components/Icon.js';
+import IconButton       from '/.shared/js/components/IconButton.js';
+import PodcastIndexItem from './../components/PodcastIndexItem.js';
+import PodcastListRow   from './../components/PodcastListRow.js';
+import SortPicker       from './../components/SortPicker.js';
+import View             from '/.shared/js/components/View.js';
 import { sortPodcasts } from './../modules/methods.js';
 
 const app = zugriff.app;
