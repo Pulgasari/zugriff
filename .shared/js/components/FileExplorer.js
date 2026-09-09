@@ -1,25 +1,35 @@
 // shared/js/components/FileExplorer.js
-//
-// a reusable file browser, the way Settings is a reusable panel: an app drops
-// in `<${FileExplorer} backend=${backend} />` and gets a full explorer —
-// breadcrumb navigation, list/grid views, a filter, an inline preview panel,
-// and (when the backend is writable) create / upload / rename / delete.
-//
-// it is deliberately backend-agnostic. anything that can hand back a
-// FileSystemDirectoryHandle root works: the private OPFS (opfsBackend, in
-// dirfs.js) or a folder the user grants off their disk (what the files app
-// app builds). the component itself knows nothing about *where* the tree lives.
-//
-//   import { FileExplorer } from './../../shared/js/components/index.js';
-//   import { opfsBackend }  from './../../shared/js/filesystem/dirfs.js';
-//   html`<${FileExplorer} backend=${opfsBackend} />`
-//
-// styles live in shared/css/explorer.css (opt-in, scoped under .fx) — a host
-// links it the way it opts into panes.css or inspector.css.
-//
-// like Settings, the working state here is a module singleton: one explorer is
-// live at a time (an app embeds a single browser), which keeps the sub-views
-// free of prop-drilling.
+/*
+a reusable file browser: 
+an app drops in `<${FileExplorer} backend=${backend} />` and gets:
+- a full explorer —
+- breadcrumb navigation, 
+- list/grid views, 
+- a filter, 
+- an inline preview panel,
+- and (when the backend is writable) create / upload / rename / delete.
+
+it is deliberately backend-agnostic. anything that can hand back a
+FileSystemDirectoryHandle root works: 
+- the private OPFS (opfsBackend, in dirfs.js) 
+- or a folder the user grants off their disk (what the files app app builds). 
+the component itself knows nothing about *where* the tree lives.
+
+import { FileExplorer } from './../../shared/js/components/index.js';
+import { opfsBackend }  from './../../shared/js/filesystem/dirfs.js';
+html`<${FileExplorer} backend=${opfsBackend} />`
+
+styles live in shared/css/explorer.css (opt-in, scoped under .fx) 
+— a host links it the way it opts into panes.css or inspector.css.
+
+like Settings, the working state here is a module singleton: 
+one explorer is live at a time (an app embeds a single browser), 
+which keeps the sub-views free of prop-drilling.
+*/
+
+import {  }  from './../vendors.js';
+import {         }  from './../vendors.js';
+import { html, useEffect, useRef, computed, signal, signal as persist, local } from '@aufbau/signals';
 
 import { html, useEffect, useRef }  from './../vendors.js';
 import { computed, signal        }  from './../vendors.js';
