@@ -1,28 +1,34 @@
 // components/Modal.js
+// a centered dialog on a dimming backdrop. `children` are the body, `actions`
+// become footer buttons, `onClose` fires on a backdrop click. header and footer
+// are only rendered when there is something to put in them.
 
-import Button from './Button.js';
+import { html } from './../vendors.js';
+import Button   from './Button.js';
 
-function ModalScrim ({ children, ...rest }) {
-  return html`<div class='ModalScrim' ...${rest}>${children}</div>`;
-}
+function Modal ({ children, headline, info, actions, onClose, ...rest }) {
+  // only the backdrop itself dismisses — clicks inside the dialog bubble up too
+  const onBackdrop = e => { if (e.target === e.currentTarget) onClose?.(); };
 
-function Modal ({ children, headline, info, actions, ...rest }) {
   return html`
-    <${ModalScrim}>
+    <div class='ModalScrim' onClick=${onBackdrop}>
       <div class='Modal' ...${rest}>
-        <header>
-          ${headline && html`<h2>${headline}</h2>`}
-          ${info     && html`<i>${info}</i>`}
-        </header>
-        
+        ${(headline || info) && html`
+          <header>
+            ${headline && html`<h2>${headline}</h2>`}
+            ${info     && html`<i>${info}</i>`}
+          </header>`}
+
         <main>${children}</main>
-        
-        <footer>
-          ${actions && actions.map(Button)}
-        </footer>
+
+        ${actions?.length && html`
+          <footer>
+            ${actions.map((action, i) => html`<${Button} key=${i} ...${action} />`)}
+          </footer>`}
       </div>
-    </${ModalScrim}>
+    </div>
   `;
 }
 
+export       { Modal };
 export default Modal;

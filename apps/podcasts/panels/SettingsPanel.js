@@ -12,7 +12,7 @@ import { DEFAULT_PROXY } from './../modules/feed.js';
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
 const app = zugriff.app;
-const { db, flash } = app;
+const { db } = app;
 
 export default function SettingsPanel () {
   const proxyVal   = useSignal(app.settings.proxy);
@@ -28,22 +28,22 @@ export default function SettingsPanel () {
     });
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    flash(`Exported ${data.feeds.length} subscription${data.feeds.length === 1 ? '' : 's'}`);
+    app.toast.success(`Exported ${data.feeds.length} subscription${data.feeds.length === 1 ? '' : 's'}`);
   };
 
   const doImport = async file => {
     if (!file) return;
     let data;
     try { data = JSON.parse(await file.text()); }
-    catch { flash('Could not read that file', 'err'); return; }
+    catch { app.toast.error('Could not read that file'); return; }
     app.state.dialog = null;
     app.state.busy = 'Importing…';
     try {
       const results = await db.importData(data, app.settings.proxy, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
       const added   = results.filter(r => r.added).length;
       const failed  = results.filter(r => r.error).length;
-      flash(`Imported ${added} new` + (failed ? `, ${failed} failed` : ''), failed ? 'err' : 'ok');
-    } catch (err) { flash(err.message, 'err'); }
+      app.toast({ message: `Imported ${added} new` + (failed ? `, ${failed} failed` : ''), type: failed ? 'error' : 'success' });
+    } catch (err) { app.toast.error(err); }
     finally { app.state.busy = ''; }
   };
 
@@ -102,7 +102,7 @@ export default function SettingsPanel () {
           <button class="btn primary" onClick=${() => {
             app.settings.proxy      = proxyVal.value.trim();
             app.settings.imgResizer = resizerVal.value.trim();
-            app.state.dialog = null; flash('Settings saved');
+            app.state.dialog = null; app.toast.success('Settings saved');
           }}>Done</button>
         </div>
       </div>

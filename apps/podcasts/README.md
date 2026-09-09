@@ -38,7 +38,8 @@ reference point (see `.shared/js/app.js`).
 app.js         assembles the handle: modules, state, actions, hotkeys, mount
 modules/       app logic — db, player, feed, methods (pure helpers)
 views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail, Saved
-panels/        chrome + overlays — Sidebar, Player, Search dock, Add + Settings dialogs
+panels/        chrome + overlays — Sidebar, Player, Search dock, Settings
+dialogs/       modal dialogs — Add podcast
 components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
 ```
 
@@ -55,13 +56,13 @@ components/    small reusable pieces — Artwork, EpisodeRow, PodcastCard, …
   writes are ignored), `proxy` / `imgResizer` are text. Persisted as one blob under
   `zugriff:podcasts:settings`. Its own store rather than an `app.state` subtree because
   `typedSignal` persistence is whole-store and `app.state` must stay ephemeral.
-- `app.go(name, id)` / `app.flash(text, kind)` — navigate / toast.
+- `app.go(name, id)` — navigate. For toasts call `app.toast(…)` directly (see `.shared/js/modules/toast.js`).
 - `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …); `app.hotKeys` is the declarative combo→spec map that binds keys to them (`space` = play/pause, `arrow-left`/`arrow-right` = skip, `escape` = close). See `.shared/js/modules/{actions,hotkeys}.js`.
 
 Views/panels/components reach all of this through `const app = zugriff.app` (+
 destructuring the stable module refs); shared components load from
 `/.shared/js/components`, app pieces through `app.view()` / `app.panel()` /
-`app.component()`.
+`app.dialog()` / `app.component()`.
 
 ### modules
 

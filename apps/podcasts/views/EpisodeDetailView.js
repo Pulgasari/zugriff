@@ -3,8 +3,8 @@
 
 import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
-import Button     from '/.shared/js/components/Button.js';
-import IconButton from '/.shared/js/components/IconButton.js';
+import View       from '/.shared/js/components/View.js';
+import ActionMenu from '/.shared/js/components/ActionMenu.js';
 import Art        from './../components/Artwork.js';
 import { fmtDate, fmtDuration, paragraphs } from './../modules/methods.js';
 
@@ -14,10 +14,9 @@ const { db, player, go } = app;
 export default function EpisodeDetailView ({ id }) {
   const episode = db.episodeById.value[id];
   if (!episode) return html`
-    <div class="view">
-      <${Button} class="back" icon="arrow-left" label="Back" onClick=${() => go('latest')} />
+    <${View} back=${{ label: 'Back', onClick: () => go('latest') }}>
       <${Empty} icon="mdi:alert-outline" title="Episode not found" />
-    </div>`;
+    <//>`;
 
   const podcast = db.podcastById.value[episode.podcastId];
   const st      = db.stateOf(id);
@@ -28,11 +27,29 @@ export default function EpisodeDetailView ({ id }) {
   const isCurrent = player.episode?.id === id;
   const isPlaying = isCurrent && player.isPlaying;
 
-  return html`
-    <div class="view">
-      <${Button} class="back" icon="arrow-left" label=${podcast ? podcast.title : 'Back'}
-                 onClick=${() => podcast ? go('podcast', podcast.id) : go('latest')} />
+  const actions = [
+    { primary  : true,
+      icon     : isPlaying ? 'mdi:pause' : 'mdi:play',
+      label    : isPlaying ? 'Pause' : st.position && !st.done ? 'Resume' : 'Play',
+      onClick  : () => player.play(episode) },
+    { iconOnly : true, active: st.saved,
+      icon     : st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline',
+      label    : st.saved ? 'Remove from list' : 'Save for later',
+      onClick  : () => db.toggleSaved(id) },
+    { iconOnly : true, active: st.done,
+      icon     : st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline',
+      label    : st.done ? 'Mark unplayed' : 'Mark as done',
+      onClick  : () => db.toggleDone(id) },
+    episode.link && { icon: 'mdi:open-in-new', label: 'Episode page', href: episode.link },
+  ].filter(Boolean);
 
+  const back = {
+    label   : podcast ? podcast.title : 'Back',
+    onClick : () => podcast ? go('podcast', podcast.id) : go('latest'),
+  };
+
+  return html`
+    <${View} back=${back}>
       <header class="ed-head">
         <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
         <div class="ed-info">
@@ -44,20 +61,7 @@ export default function EpisodeDetailView ({ id }) {
             ${st.done && html`<span class="ed-done">· <${Icon} name="mdi:check-circle" /> done</span>`}
           </div>
 
-          <div class="ed-actions">
-            <button class="btn primary" onClick=${() => player.play(episode)}>
-              <${Icon} name=${isPlaying ? 'mdi:pause' : 'mdi:play'} />
-              ${isPlaying ? 'Pause' : st.position && !st.done ? 'Resume' : 'Play'}
-            </button>
-            <${IconButton} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
-                        label=${st.saved ? 'Remove from list' : 'Save for later'}
-                        active=${st.saved} size=${20} onClick=${() => db.toggleSaved(id)} />
-            <${IconButton} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
-                        label=${st.done ? 'Mark unplayed' : 'Mark as done'}
-                        active=${st.done} size=${20} onClick=${() => db.toggleDone(id)} />
-            ${episode.link && html`<a class="btn ghost" href=${episode.link} target="_blank" rel="noopener">
-              <${Icon} name="mdi:open-in-new" /> Episode page</a>`}
-          </div>
+          <${ActionMenu} items=${actions} />
 
           ${(st.position > 0 || st.done) && html`
             <div class="ed-progress">
@@ -72,5 +76,5 @@ export default function EpisodeDetailView ({ id }) {
       ${paras.length
         ? html`<div class="ed-desc">${paras.map((p, i) => html`<p key=${i}>${p}</p>`)}</div>`
         : html`<p class="ed-desc empty-hint">No description.</p>`}
-    </div>`;
+    <//>`;
 }
