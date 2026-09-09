@@ -60,12 +60,12 @@ export default function EpisodeDetailView ({ id }) {
       <header>
         <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
         <div class="info">
-          ${podcast && html`<button class="ed-podcast" onClick=${() => go('podcast', podcast.id)}>${podcast.title}</button>`}
+          ${podcast && html`<button onClick=${() => go('podcast', podcast.id)}>${podcast.title}</button>`}
           <h1>${episode.title}</h1>
           <div class="meta">
             <span>${fmtDate(episode.pubDate)}</span>
-            ${episode.duration && html`<span>· ${fmtDuration(episode.duration)}</span>`}
-            ${st.done && html`<span class="ed-done">· <${Icon} name="mdi:check-circle" /> done</span>`}
+            ${episode.duration && html`<span> ${fmtDuration(episode.duration)}</span>`}
+            ${st.done && html`<span>· <${Icon} name="mdi:check-circle" /> done</span>`}
           </div>
 
           <${ActionMenu} items=${actions} />
@@ -74,7 +74,7 @@ export default function EpisodeDetailView ({ id }) {
       </header>
 
       ${paras.length
-        ? html`<div class="ed-desc">${paras.map((p, i) => html`<p key=${i}>${p}</p>`)}</div>`
-        : html`<p class="ed-desc empty-hint">No description.</p>`}
+        ? html`<div>${paras.map((p,i) => html`<p key=${i}>${p}</p>`)}</div>`
+        : html`<i>No description.</i>`}
     <//>`;
 }
