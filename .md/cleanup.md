@@ -2,16 +2,16 @@
 
 ich will in `zugriff/apps` mal gründlich aufräumen. ich hab bissl chaotisch notiert hier. lies dir hier erstmal gründlich durch, fokus auf was ich im sinn habe, danndie ganzen genannten stellen udn verzeicznisse usw gründlich untersuchen, dann plan, dann feuer frei!
 
-## buttons
+## Buttons
 
 ```javascript
 // aktuell oft:
-<button class="back" onClick=${() => go('latest')}>
+<button class="btn back" onClick=${() => go('latest')}>
   <${Icon} name="mdi:arrow-left" /> Back
 </button>
 
 // besser
-<${Button} class='back' icon='arrow-left' label='Back' onClick=${() => go('latest')} />
+<${Button} class='back' icon='arrow-left' label='Back' onClick=${() => app.go('latest')} />
 ```
 
 ### `IconButton`
