@@ -43,13 +43,9 @@ export default function PodcastsView () {
           <aufbau-index 
             viewmode=${app.settings.view}
             item-size="150px" 
-            gap='1rem'>
-            ${list.map(p => html`
-              <aufbau-item key=${p.id}>
-                ${app.settings.view === 'grid'
-                  ? html`<${PodcastCard}    podcast=${p} />`
-                  : html`<${PodcastListRow} podcast=${p} />`}
-              </aufbau-item>`)}
+            gap='1rem'
+          >
+            ${list.map(p => html`<${PodcastIndexItem} podcast=${p} />`)}
           </aufbau-index>`}
     </${View}>`;
 }
