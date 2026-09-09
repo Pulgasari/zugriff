@@ -219,7 +219,7 @@ function applyTheme (theme) {
       "preact"             : `https://esm.sh/preact@${PREACT}`,
       "preact/hooks"       : `https://esm.sh/preact@${PREACT}/hooks`,
       "preact/jsx-runtime" : `https://esm.sh/preact@${PREACT}/jsx-runtime`, // wie kommt das hier rein lol
-      "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact", // deprecated
+      "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact", // resolved transitively by @aufbau/signals; do not import directly
 
       // ::: syntax highlighting
       "hljs"                    : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
