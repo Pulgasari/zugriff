@@ -4,9 +4,9 @@
 
 import { useSignal }     from '@aufbau/signals';
 import { useRef }        from 'preact/hooks';
-import Icon       from '/.shared/js/components/Icon.js';
-import Scrim      from './../components/Scrim.js';
-import SortPicker from './../components/SortPicker.js';
+import Icon   from '/.shared/js/components/Icon.js';
+import Modal  from '/.shared/js/components/Modal.js';
+import Picker from '/.shared/js/components/Picker.js';
 import { DEFAULT_PROXY } from './../modules/feed.js';
 
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
@@ -48,20 +48,26 @@ export default function SettingsPanel () {
   };
 
   return html`
-    <${Scrim}>
-      <div class="modal wide">
+    <${Modal}>
+      
         <h2>Settings</h2>
 
         <div class="field">
           <span class="field-label">Menu position</span>
-          <${SortPicker} value=${app.settings.menuPos} onChange=${v => app.settings.menuPos = v}
-             options=${[['top', 'Top'], ['bottom', 'Bottom'], ['left', 'Left'], ['right', 'Right']]} />
+          <${Picker} 
+            value=${app.settings.menuPos} 
+            onChange=${v => app.settings.menuPos = v}
+            options=${['top', 'bottom', 'left', 'right']} 
+            />
         </div>
 
         <div class="field">
           <span class="field-label">Player position</span>
-          <${SortPicker} value=${app.settings.playerPos} onChange=${v => app.settings.playerPos = v}
-             options=${[['top', 'Top'], ['bottom', 'Bottom']]} />
+          <${Picker}
+            value=${app.settings.playerPos}
+            onChange=${v => app.settings.playerPos = v}
+            options=${['top', 'bottom']}
+            />
         </div>
 
         <label class="field">
@@ -71,8 +77,8 @@ export default function SettingsPanel () {
                  placeholder=${DEFAULT_PROXY}
                  onInput=${e => proxyVal.value = e.target.value} />
           <span class="field-row">
-            <button class="btn ghost small" onClick=${() => proxyVal.value = DEFAULT_PROXY}>Reset to default</button>
-            <button class="btn ghost small" onClick=${() => proxyVal.value = ''}>Direct only</button>
+            <button class="ghost small" onClick=${() => proxyVal.value = DEFAULT_PROXY}>Reset to default</button>
+            <button class="ghost small" onClick=${() => proxyVal.value = ''}>Direct only</button>
           </span>
         </label>
         <label class="field">
@@ -91,21 +97,20 @@ export default function SettingsPanel () {
           <span class="field-label">Subscriptions</span>
           <span class="field-hint">Back up your subscriptions and listening progress as JSON, or restore from a file.</span>
           <span class="field-row">
-            <button class="btn" onClick=${doExport}><${Icon} name="mdi:download" /> Export JSON</button>
-            <button class="btn" onClick=${() => fileRef.current?.click()}><${Icon} name="mdi:upload" /> Import JSON</button>
+            <button onClick=${doExport}><${Icon} name="download" /> Export JSON</button>
+            <button onClick=${() => fileRef.current?.click()}><${Icon} name="mdi:upload" /> Import JSON</button>
             <input ref=${fileRef} type="file" accept="application/json,.json" hidden
                    onChange=${e => { doImport(e.target.files[0]); e.target.value = ''; }} />
           </span>
         </div>
 
         <div class="modal-actions">
-          <button class="btn primary" onClick=${() => {
+          <button onClick=${() => {
             app.settings.proxy      = proxyVal.value.trim();
             app.settings.imgResizer = resizerVal.value.trim();
             app.state.dialog = null; app.toast.success('Settings saved');
           }}>Done</button>
         </div>
-      </div>
-    <//>
+    <${Modal}>
   `;
 }
