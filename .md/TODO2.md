@@ -1,6 +1,6 @@
 # TODO2
 
-- [] create `.shared/components/ActionMenu.js` nach dem vorbild von `ContextMenu.js` damit fortan so nachfolgender messy code vergangenheit ist:
+- [ ] create `.shared/js/components/ActionMenu.js` nach dem vorbild von `ContextMenu.js` damit fortan so nachfolgender messy code vergangenheit ist:
 ```javascript
 <div class="ed-actions">
             <button class="btn primary" onClick=${() => player.play(episode)}>
@@ -17,3 +17,5 @@
               <${Icon} name="mdi:open-in-new" /> Episode page</a>`}
           </div>
 ```
+
+- [ ] create `./shared/js/components/View.js' als rahmen für die views der apps
