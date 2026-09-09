@@ -20,7 +20,7 @@ function DockNavItem ({ icon, label, dialog, panel, route, onClick, ...rest }) {
   return html`<${Button} class='DockNavItem' ...${{ icon, label, onClick, ...rest }} />`;
 }
 
-function Dock ({ items, ...rest }) {
+function Dock ({ items = [], ...rest }) {
   return html`
     <aside id='app-dock' class='Dock' ...${rest}>
       ${items.map(DockNavItem)}
