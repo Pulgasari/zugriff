@@ -47,7 +47,7 @@ class ZugriffApp {
   // ::: loaders (app-relative). ui pieces resolve to a default export when present,
   // else the namespace: component() from ./components, view() from ./views,
   // panel() from ./panels, dialog() from ./dialogs; module() from the app root.
-  import    = path => import(new URL(`${path}`, this.baseURL)).then(pick);
+  import    = path => import(new URL(path, this.baseURL)).then(pick);
   
   module    = name => import(new URL(`modules/${name}.js`,    this.baseURL)).then(pick);
   component = name => import(new URL(`components/${name}.js`, this.baseURL)).then(pick);
