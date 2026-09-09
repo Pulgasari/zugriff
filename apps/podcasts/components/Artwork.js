@@ -9,7 +9,7 @@ const { thumbs } = app;
 
 export default function Artwork ({ src, size = 48, className = '' }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
-  const state = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
+  let state = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
 
   useEffect(() => {
     if (!src) { state = { url: null, phase: 'none', broken: false }; return; }
