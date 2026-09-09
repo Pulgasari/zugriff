@@ -166,4 +166,19 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::
 
+/*
+app.registerDialog({
+  add      : 'AddPodcastDialog',
+  settings : 'SettingsPanel',
+);
+
+app.registerView({
+  home     : 'LatestView',
+  episode  : 'EpisodeDetailView',
+  podcasts : 'PodcastsView',
+  podcast  : 'PodcastDetailView',
+  saved    : 'SavedView',
+);
+*/
+
 app.init({ App });
