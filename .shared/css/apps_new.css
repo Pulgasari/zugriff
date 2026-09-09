@@ -3,6 +3,14 @@ neue apps.css file.
 wird erst nach dem struktur-refactoring ausgearbeitet.
 */
 
+.Dock {
+  background-color: var(--bgd-10);
+  display: flex;
+  flex-direction: row;
+
+  position: sticky: bottom: 0;
+}
+
 .Brand {}
 
 .ActionMenu {}
