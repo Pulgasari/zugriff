@@ -2,9 +2,7 @@
 // the "add a podcast" dialog — paste a feed url, subscribe, open the new podcast.
 
 import { useSignal } from '@aufbau/signals';
-import Icon  from '/.shared/js/components/Icon.js';
 import Modal from '/.shared/js/components/Modal.js';
-
 
 const app = zugriff.app;
 
