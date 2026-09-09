@@ -1,10 +1,7 @@
 @import url('./theme.css');
-@import url('./typo.css');
 @import url('./layout.css');
 @import url('./components.css');
 @import url('./apps.css');
-@import url('./apps_new.css');
-
 
 /* TYPO */
 :root {
