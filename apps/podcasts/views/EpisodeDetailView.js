@@ -34,7 +34,7 @@ export default function EpisodeDetailView ({ id }) {
       onClick  : () => player.play(episode)
     },
     { 
-      icon     : st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline',
+      icon     : 'bookmark',
       label    : st.saved ? 'Remove from list' : 'Save for later',
       onClick  : () => db.toggleSaved(id) 
     },
@@ -59,17 +59,17 @@ export default function EpisodeDetailView ({ id }) {
     <${View} id='episode' back=${back}>
       <header>
         <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
-        <div class="ed-info">
+        <div class="info">
           ${podcast && html`<button class="ed-podcast" onClick=${() => go('podcast', podcast.id)}>${podcast.title}</button>`}
           <h1>${episode.title}</h1>
-          <div class="ed-meta">
+          <div class="meta">
             <span>${fmtDate(episode.pubDate)}</span>
             ${episode.duration && html`<span>· ${fmtDuration(episode.duration)}</span>`}
             ${st.done && html`<span class="ed-done">· <${Icon} name="mdi:check-circle" /> done</span>`}
           </div>
 
           <${ActionMenu} items=${actions} />
-          <aufbau-progress value=${pct}></aufbau-progress>
+          <${Progess} value=${pct} />
         </div>
       </header>
 
