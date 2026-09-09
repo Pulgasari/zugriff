@@ -9,11 +9,11 @@ const app = zugriff.app;
 export default function PodcastIndexItem ({ podcast }) {
   const episodes = app.db.episodesByPodcast.value[podcast.id] ?? [];
   return html`
-    <button class='PodcastCard' onClick=${() => app.go('podcast', podcast.id)}>
+    <aufbau-item key=${podcast.id} onClick=${() => app.go('podcast', podcast.id)}>
       <${Art} src=${podcast.image} />
       <div class="title">${podcast.title}</div>
       <div class="sub">${episodes.length} episode(s) · ${fmtDate(podcast.lastEpisodeAt)}</div>
-    </button>
+    </aufbau-item>
   `;
 }
 
