@@ -97,6 +97,7 @@ app.effect(() => {
 // :::::: UI ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const // shared components
+Dock = await zugriff.component('Dock');
 Icon = await zugriff.component('Icon');
 
 const // views
@@ -153,11 +154,11 @@ function App () {
   };
 
   return html`<>
-    <div id="app-main">
-      <${SidebarPanel} />
-      <main class="main">${body()}</main>
-    </div>
+    <main id="app-main">
+      ${body()}
+    </main>
     <${PlayerPanel} />
+    <${Dock} />
     ${dialog === 'add'      && html`<${AddPodcastDialog} />`}
     ${dialog === 'settings' && html`<${SettingsPanel} />`}
   </>`;
