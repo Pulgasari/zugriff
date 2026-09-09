@@ -1,28 +1,24 @@
 // apps/podcasts/views/PodcastsView.js
 // the subscriptions grid / list.
 
-import Empty            from '/.shared/js/components/Empty.js';
-import Icon             from '/.shared/js/components/Icon.js';
-import IconButton       from '/.shared/js/components/IconButton.js';
-import PodcastIndexItem from './../components/PodcastIndexItem.js';
-import PodcastListRow   from './../components/PodcastListRow.js';
-import SortPicker       from './../components/SortPicker.js';
-import View             from '/.shared/js/components/View.js';
+import IconButton    from '/.shared/js/components/IconButton.js';
+import View          from '/.shared/js/components/View.js';
+import SortPicker    from './../components/SortPicker.js';
+import PodcastsIndex from './../components/PodcastsIndex.js';
 import { sortPodcasts } from './../modules/methods.js';
 
 const app = zugriff.app;
 
 export default function PodcastsView () {
-  const list = sortPodcasts(app.db.podcasts, app.settings.podcastSort);
+  const list = sortPodcasts(app.db.podcasts.value, app.settings.podcastSort);
 
   return html`
     <${View}>
-    
       <header>
         <h1>Podcasts</h1>
         <div class="view-tools">
-          <${SortPicker} 
-            value=${app.settings.podcastSort} 
+          <${SortPicker}
+            value=${app.settings.podcastSort}
             onChange=${v => app.settings.podcastSort = v}
             options=${['recent', 'alpha']}
             />
@@ -33,19 +29,10 @@ export default function PodcastsView () {
           <${IconButton} icon="add" label="Add podcast" onClick=${() => app.state.dialog = 'add'} />
         </div>
       </header>
-      
-      ${!list.length
-        ? html`<${Empty} 
-            icon="rss" title="No subscriptions yet"
-            hint="Paste a podcast's RSS feed URL to subscribe."
-            />`
-        : html`
-          <aufbau-index 
-            viewmode=${app.settings.view}
-            item-size="150px" 
-            gap='1rem'
-          >
-            ${list.map(p => html`<${PodcastIndexItem} podcast=${p} />`)}
-          </aufbau-index>`}
+
+      <${PodcastsIndex}
+        podcasts=${list}
+        empty=${{ icon: 'rss', title: 'No subscriptions yet', hint: "Paste a podcast's RSS feed URL to subscribe." }}
+        />
     </${View}>`;
 }

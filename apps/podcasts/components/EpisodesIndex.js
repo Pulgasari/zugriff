@@ -1,25 +1,28 @@
-// apps/podcasts/components/EpisodeRow.js
-// one episode in a list — artwork, meta, teaser, progress and the row actions.
+// apps/podcasts/components/EpisodesIndex.js
 
-import Icon        from '/.shared/js/components/Icon.js';
-import IconButton  from '/.shared/js/components/IconButton.js';
-import Progress    from '/.shared/js/components/Progress.js';
-import Art         from './Artwork.js';
-import PlayToggle  from './PlayToggle.js';
+import Empty      from '/.shared/js/components/Empty.js';
+import Index      from '/.shared/js/components/Index.js';
+import Icon       from '/.shared/js/components/Icon.js';
+import IconButton from '/.shared/js/components/IconButton.js';
+import Progress   from '/.shared/js/components/Progress.js';
+import Art        from './Artwork.js';
+import PlayToggle from './PlayToggle.js';
 import { fmtDate, fmtDuration, plain } from './../modules/methods.js';
 
 const app = zugriff.app;
 const { db, player, go } = app;
 
-export default function EpisodeRow ({ episode, showPodcast = false }) {
+function Item ({ episode, showPodcast }) {
   const st      = db.stateOf(episode.id);
   const podcast = db.podcastById.value[episode.podcastId];
   const teaser  = plain(episode.description).slice(0, 200);
   const dur     = st.duration || 0;
   const pct     = st.done ? 100 : (dur ? Math.min(100, st.position / dur * 100) : 0);
 
+  const cls = [st.done && 'done', player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');
+
   return html`
-    <div class=${'ep' + (st.done ? ' done' : '') + (player.episode?.id === episode.id ? ' playing' : '')}>
+    <aufbau-item class=${cls}>
       <button class="ep-art" onClick=${() => go('episode', episode.id)} aria-label="Open episode">
         <${Art} src=${episode.image || podcast?.image} size=${48} />
       </button>
@@ -47,6 +50,14 @@ export default function EpisodeRow ({ episode, showPodcast = false }) {
             <${Icon} name="mdi:open-in-new" />
           </a>`}
       </div>
-    </div>
-  `;
+    </aufbau-item>`;
+}
+
+export default function EpisodesIndex ({ episodes, showPodcast = false, empty }) {
+  if (!episodes.length) return html`<${Empty} ...${empty} />`;
+
+  return html`
+    <${Index} viewmode='list'>
+      ${episodes.map(ep => html`<${Item} key=${ep.id} episode=${ep} showPodcast=${showPodcast} />`)}
+    </${Index}>`;
 }
