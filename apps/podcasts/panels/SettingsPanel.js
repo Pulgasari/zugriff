@@ -111,6 +111,6 @@ export default function SettingsPanel () {
             app.state.dialog = null; app.toast.success('Settings saved');
           }}>Done</button>
         </div>
-    <${Modal}>
+    <//>
   `;
 }

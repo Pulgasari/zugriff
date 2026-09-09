@@ -4,9 +4,10 @@
 import { html } from './../vendors.js';
 import Icon     from './Icon.js';
 
-function Link ({ children, className, class: klass, icon, label, text, title, ...rest }) {
+function Link ({ children, className, class: klass, icon, label, text, ...rest }) {
+  const cls = ['Link', className, klass].filter(Boolean).join(' ');
   return html`
-    <a class=${'Link ' + className || klass} ...${{ href, target, title, ...rest }}>
+    <a class=${cls} target="_blank" rel="noopener" ...${rest}>
       ${icon && html`<${Icon} name=${icon} />`}
       ${children || label || text}
     </a>

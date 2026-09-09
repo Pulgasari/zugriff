@@ -21,15 +21,20 @@ export * from '@pulgasari/timing';
 
 
 // ::: preact + htm
-import htm from 'htm'; 
-import * as preactCore    from 'preact';
-import * as preactHooks   from 'preact/hooks';
-import * as preactSignals from '@preact/signals';
+import htm from 'htm';
+import * as preactCore  from 'preact';
+import * as preactHooks from 'preact/hooks';
+// signal primitives route through @aufbau/signals (which wraps @preact/signals);
+// `signal` here stays preact's plain leaf (preactSignal), the base the carriers build on.
+import { preactSignal, PreactSignal, computed, effect, batch, untracked } from '@aufbau/signals';
+
+const signal = preactSignal;
+const Signal = PreactSignal;
 
 const preact = {
   ...preactCore,
   ...preactHooks,
-  ...preactSignals,
+  signal, Signal, computed, effect, batch, untracked,
 };
 
 // fragment-aware binding: htm emits an empty-string tag for `<>...</>`, which plain
@@ -40,7 +45,7 @@ const html = htm.bind((type, props, ...children) => h(type || Fragment, props, .
 
 export * from 'preact';
 export * from 'preact/hooks';
-export * from '@preact/signals';
+export { signal, Signal, computed, effect, batch, untracked };
 export { htm, html, preact };
 
 

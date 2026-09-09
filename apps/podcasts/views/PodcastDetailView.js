@@ -10,7 +10,6 @@ import View   from '/.shared/js/components/View.js';
 
 import Art           from './../components/Artwork.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
-import SortPicker    from './../components/SortPicker.js';
 import SearchPanel   from '/.shared/js/components/SearchPanel.js';
 import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
