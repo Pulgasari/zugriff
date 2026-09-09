@@ -9,7 +9,7 @@ wird erst nach dem struktur-refactoring ausgearbeitet.
   display: flex;
   flex-direction: row;
 
-  position: sticky: 
+  position: sticky;
   bottom: 0;
 }
 
