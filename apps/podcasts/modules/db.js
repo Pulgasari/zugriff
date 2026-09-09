@@ -16,7 +16,7 @@
 // truth the components read; every mutation writes IndexedDB *and* updates the
 // signal, so a change shows up everywhere at once and survives a reload.
 
-import { signal, computed }     from '@preact/signals';
+import { signal, computed }     from '@aufbau/signals';
 import { createDb }             from '@bunker/db';
 import { fetchFeed, parseFeed } from './feed.js';
 
