@@ -11,7 +11,7 @@ import SearchBar  from './../panels/SearchPanel.js';
 import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
-const { db, go, flash, thumbs } = app;
+const { db, go, thumbs } = app;
 
 export default function PodcastDetailView ({ id }) {
   const podcast = db.podcastById.value[id];
@@ -26,7 +26,7 @@ export default function PodcastDetailView ({ id }) {
     const artwork = [podcast.image, ...all.map(e => e.image)].filter(Boolean);
     await db.unsubscribe(id);
     thumbs.evict(artwork).catch(() => {});
-    flash('Unsubscribed');
+    app.toast.success('Unsubscribed');
     go('podcasts');
   };
 
@@ -34,8 +34,8 @@ export default function PodcastDetailView ({ id }) {
     app.state.busy = 'Refreshing…';
     try {
       const { added } = await db.refresh(id, app.settings.proxy);
-      flash(added ? `${added} new episode${added === 1 ? '' : 's'}` : 'Up to date');
-    } catch (err) { flash(err.message, 'err'); }
+      app.toast.success(added ? `${added} new episode${added === 1 ? '' : 's'}` : 'Up to date');
+    } catch (err) { app.toast.error(err); }
     finally { app.state.busy = ''; }
   };
 

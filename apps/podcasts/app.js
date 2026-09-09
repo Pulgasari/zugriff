@@ -41,9 +41,9 @@ const buildResizer = (url, w) => {
 };
 app.thumbs = createThumbCache({ resizer: buildResizer });
 
-// ::: navigation + toast — navigating always clears the current filter
-app.go    = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
-app.flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
+// ::: navigation — navigating always clears the current filter. for toasts call
+// app.toast directly (see .shared/js/modules/toast.js).
+app.go = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
 
 // :::::: ACTIONS
 
@@ -107,52 +107,45 @@ EpisodeDetailView  = await app.view('EpisodeDetailView'),
 SavedView          = await app.view('SavedView');
 
 const // panels
-SidebarPanel    = await app.panel('SidebarPanel'),
-PlayerPanel     = await app.panel('PlayerPanel'),
-AddPodcastPanel = await app.panel('AddPodcastPanel'),
-SettingsPanel   = await app.panel('SettingsPanel');
+SidebarPanel  = await app.panel('SidebarPanel'),
+PlayerPanel   = await app.panel('PlayerPanel'),
+SettingsPanel = await app.panel('SettingsPanel');
+
+const // dialogs
+AddPodcastDialog = await app.dialog('AddPodcastDialog');
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
-
-function Busy () {
-  const b = app.state.busy;
-  if (!b) return null;
-  return html`
-    <div class="toasts">
-      <div class="toast busy"><${Icon} name="svg-spinners:bars-scale-middle" /> ${b}</div>
-    </div>`;
-}
-
-function Body () {
-  const r = app.state.route;
-  switch (r.name) {
-    case 'podcasts': return html`<${PodcastsView} />`;
-    case 'podcast':  return html`<${PodcastDetailView} id=${r.id} />`;
-    case 'episode':  return html`<${EpisodeDetailView} id=${r.id} />`;
-    case 'saved':    return html`<${SavedView} />`;
-    default:         return html`<${LatestView} />`;
-  }
-}
 
 function App () {
   useEffect(() => {
     app.db.load()
       .then(() => app.thumbs.prewarm(app.db.podcasts.value.map(p => p.image)))
-      .catch(err => app.flash('Could not open the library: ' + err.message, 'err'));
+      .catch(err => app.toast.error('Could not open the library: ' + err.message));
   }, []);
 
   if (!app.db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
+  const route  = app.state.route;
   const dialog = app.state.dialog;
+
+  const body = () => {
+    switch (route.name) {
+      case 'podcasts': return html`<${PodcastsView} />`;
+      case 'podcast':  return html`<${PodcastDetailView} id=${route.id} />`;
+      case 'episode':  return html`<${EpisodeDetailView} id=${route.id} />`;
+      case 'saved':    return html`<${SavedView} />`;
+      default:         return html`<${LatestView} />`;
+    }
+  };
+
   return html`<>
     <div id="app-main">
       <${SidebarPanel} />
-      <main class="main"><${Body} /></main>
+      <main class="main">${body()}</main>
     </div>
     <${PlayerPanel} />
-    ${dialog === 'add'      && html`<${AddPodcastPanel} />`}
+    ${dialog === 'add'      && html`<${AddPodcastDialog} />`}
     ${dialog === 'settings' && html`<${SettingsPanel} />`}
-    <${Busy} />
   </>`;
 }
 
