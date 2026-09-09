@@ -9,12 +9,12 @@ wird erst nach dem struktur-refactoring ausgearbeitet.
 
 
 .Dock {
-  background-color: var(--bgd-10);
+  background-color: var(--mix-800);
   display: flex;
   flex-direction: row;
 }
 
-aufbau-index > * { background-color: var(--bgd-10); }
+aufbau-index > * { background-color: var(--mix-800); }
 
 .Brand {}
 
