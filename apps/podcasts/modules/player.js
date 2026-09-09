@@ -3,7 +3,7 @@
 import { signal } from '@aufbau/signals';
 import { stateOf, setProgress, markDone } from './db.js';
 
-const audio = new Audio();
+const audio = new Audio;
 audio.preload = 'metadata';
 
 // ── internal signals ─────────────────────────────────────────────────────────
@@ -22,10 +22,10 @@ const state = signal({
 });
 
 
-audio.playbackRate = rate.value;
+audio.playbackRate = state.rate;
 
-const DONE_AT = 0.95;      // fraction played that counts as finished
-let   lastSaved = 0;       // throttle db writes
+const DONE_AT     = 0.95;  // fraction played that counts as finished
+let   lastSaved   = 0;     // throttle db writes
 let   pendingSeek = null;  // position to jump to once metadata is in
 
 // ── persistence ────────────────────────────────────────────────────────────
@@ -40,7 +40,7 @@ function save (force = false) {
 }
 
 function finish () {
-  const ep = current.value;
+  const ep = state.episode;
   if (ep) markDone(ep.id, true);
 }
 
