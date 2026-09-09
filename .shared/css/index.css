@@ -6,6 +6,15 @@
 @import url('./apps_new.css');
 
 
+/* TYPO */
+:root {
+  --font      : "Manrope";
+  --font-code : 'Fira Code', 'Cascadia Code', "JetBrains Mono", monospace;
+  --fontSize  : 12px;
+}
+* { font-family: var(--font); }
+html, body { font-size: var(--fontSize); }
+
 @view-transition {
   navigation: auto;
 }
