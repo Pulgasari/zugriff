@@ -148,6 +148,9 @@ function applyTheme (theme) {
     const HLJS   = '11.10.0';
 
     return {
+      '@/components/' : '/.shared/js/components/', // do not use
+      '@/modules/'    : '/.shared/js/modules/',    // do not use
+      
       "@aufbau/builders/docs"   : `${pkg}/aufbau/builders/docs/index.js`,
       "@aufbau/builders/docs/"  : `${pkg}/aufbau/builders/docs/`,
       "@aufbau/elements"        : `${pkg}/aufbau/elements/index.js`,
@@ -215,8 +218,8 @@ function applyTheme (theme) {
       "htm/preact"         : `https://esm.sh/htm@3.1.1/preact?deps=preact@${PREACT}`,
       "preact"             : `https://esm.sh/preact@${PREACT}`,
       "preact/hooks"       : `https://esm.sh/preact@${PREACT}/hooks`,
-      "preact/jsx-runtime" : `https://esm.sh/preact@${PREACT}/jsx-runtime`,
-      "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact",
+      "preact/jsx-runtime" : `https://esm.sh/preact@${PREACT}/jsx-runtime`, // wie kommt das hier rein lol
+      "@preact/signals"    : "https://esm.sh/@preact/signals@1.2.2?external=preact", // deprecated
 
       // ::: syntax highlighting
       "hljs"                    : "https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/+esm",
