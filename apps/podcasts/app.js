@@ -130,11 +130,11 @@ function App () {
 
   const body = () => {
     switch (route.name) {
-      case 'podcasts': return html`<${PodcastsView} />`;
-      case 'podcast':  return html`<${PodcastDetailView} id=${route.id} />`;
-      case 'episode':  return html`<${EpisodeDetailView} id=${route.id} />`;
-      case 'saved':    return html`<${SavedView} />`;
-      default:         return html`<${LatestView} />`;
+      case 'podcasts' : return html`<${PodcastsView} />`;
+      case 'podcast'  : return html`<${PodcastDetailView} id=${route.id} />`;
+      case 'episode'  : return html`<${EpisodeDetailView} id=${route.id} />`;
+      case 'saved'    : return html`<${SavedView} />`;
+      default         : return html`<${LatestView} />`;
     }
   };
 
