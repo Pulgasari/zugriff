@@ -1,27 +1,27 @@
-// apps/icons/app.js
-//
-// an Iconify browser: every set, every icon, search, favourites. the grid renders through
-// the <iconify-icon> web component (loaded by the shell for the icons route) so a page of
-// hundreds of icons is a couple of batched requests; the app's own chrome uses the shared
-// aufbau-icon <Icon>. data comes from api.iconify.design (modules/iconify.js), favourites
-// from @bunker/db (modules/db.js). the runtime binds zugriff (+ zugriff.app, html) to
-// window before this runs, so nothing here imports the runtime.
+// icons :: app.js
+
+// an Iconify browser: every set, every icon, search, favourites. 
+// the grid renders through the <iconify-icon> webcomponent 
+// so a page of hundreds of icons is a couple of batched requests;
+// the app's own chrome uses the shared aufbau-icon <Icon>. 
+// data comes from api.iconify.design (modules/iconify.js),
+// favourites from @bunker/db (modules/db.js).
 
 // ::: vendors
 import { signal, computed } from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
-
-// ::: shared
-import { Icon, IconButton, Empty, Settings } from '/.shared/js/components/index.js';
 import { stored } from '/.shared/js/app/signals.js';
 
-// ::: app modules
-import * as api from './modules/iconify.js';
-import * as db  from './modules/db.js';
+const // ::: shared components
+Empty      = await zugriff.component('Empty'),
+Icon       = await zugriff.component('Icon'),
+IconButton = await zugriff.component('IconButton'),
+Settings   = await zugriff.component('Settings');
 
 // ::: the app handle
 const app = zugriff.app;
-app.db = db;
+app.api = await app.module('iconify');
+app.db  = await app.module('db');
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 // ui navigation on app.state (deep signal, no `.value`). the api results (collections /
@@ -38,10 +38,7 @@ const setData     = signal(null);   // { prefix, title, total, icons } for route
 const setLoading  = signal(false);
 const results     = signal([]);
 const searching   = signal(false);
-const itemSize    = stored(88, 'icons:item-size');   // persisted grid zoom
-
-app.go = (name, id = null) => { app.state.route = { name, id }; app.state.nav = false; };
-const flash = text => app.toast(text);
+const itemSize    = stored(88, 'icons:item-size'); // persisted grid zoom
 
 // :::::: DATA :::::::::::::::::::::::::::::::::::::::::::::::
 
