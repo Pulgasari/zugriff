@@ -1,10 +1,14 @@
-# apps/files
+# files
 
-A file explorer over a folder from your **own disk**. You grant one folder with
-the [File System Access API](./../../shared/js/lib/fsaccess.js) and it becomes
-the root of the explorer — browse the tree, preview files, download them back
-out. Nothing is uploaded and nothing is copied; only the directory handle is
-persisted, and only so we can re-ask for it on the next visit.
+A file explorer over a folder from your **own disk**. 
+
+**in web:**
+
+You grant one folder with.the [File System Access API](./../../shared/js/lib/fsaccess.js) and it becomes the root of the explorer — browse the tree, preview files, download them back out. Nothing is uploaded and nothing is copied; only the directory handle is persisted, and only so we can re-ask for it on the next visit.
+
+**in the android app:**
+- global mode
+- scoped mode
 
 ## what it does
 
@@ -20,11 +24,6 @@ Browsing is read-only for now (the folder is picked with `mode:'read'`) — this
 is the “grant a folder as root” sketch; granting write is a later step.
 
 ## how it's built
-
-This is an *app*, not a *tool*: it draws its own chrome and brings its own css
-(`app.css` over `apps/base.css`), instead of the tools' `Shell` and
-`shared/css/index.css`. It still shares the theme tokens, the import map, the
-aufbau runtime and the service worker with the rest of zugriff.
 
 The browsing surface itself is the shared
 [`FileExplorer`](./../../shared/js/components/FileExplorer.js) component. This
