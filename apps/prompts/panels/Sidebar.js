@@ -1,12 +1,15 @@
-// apps/prompts/panels/Sidebar.js
+// prompts :: panels/Sidebar.js
+
 // the list pane: new-prompt button, search, tag filter + manager, sort, and the filtered
 // prompt list. reads ui state off app.state, the library off app.db.
 
 import Icon        from '/.shared/js/components/Icon.js';
 import Picker      from '/.shared/js/components/Picker.js';
-import TagManager  from './../components/TagManager.js';
-import PromptItem  from './../components/PromptItem.js';
+
+import TagManager          from './../components/TagManager.js';
+import PromptItem          from './../components/PromptItem.js';
 import { filteredPrompts } from './../modules/methods.js';
+
 import { useState } from 'preact/hooks';
 
 const app = zugriff.app;
