@@ -12,7 +12,7 @@ const items = [
 ];
 */
 
-function DockNavItem ({ icon, label, dialog, panel, route, onClick, ...rest }) {
+function DockNavItem ({ icon, label, dialog, panel, route, view, onClick, ...rest }) {
   if (dialog) onClick = () => zugriff.app.toggleDialog(dialog);
   if (panel)  onClick = () => zugriff.app.togglePanel(panel);
   if (route)  onClick = () => zugriff.app.go(route); // go(route)
