@@ -1,4 +1,4 @@
-// apps/podcasts/panels/PlayerPanel.js
+// podcasts :: panels/PlayerPanel.js
 // the docked player bar — artwork/meta, transport, scrubber and speed/done/close.
 
 import Icon            from '/.shared/js/components/Icon.js';
@@ -23,7 +23,7 @@ export default function PlayerPanel () {
   };
 
   return html`
-    <footer class="player">
+    <div class="player">
       <div class="pl-meta">
         <${Art} src=${episode.image || podcast?.image} size=${52} />
         <div class="pl-info">
@@ -84,5 +84,6 @@ export default function PlayerPanel () {
           onClick=${() => app.player.close()}
           />
       </div>
-    </footer>`;
+    </div>
+  `;
 }
