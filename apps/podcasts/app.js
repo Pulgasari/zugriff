@@ -132,10 +132,10 @@ SettingsPanel    = await import('./components/SettingsPanel.js');
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
 const dockItems = [
-  { title: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
-  { title: 'Episodes', icon: 'mdi:playlist-play',     view: 'episodes'  },
-  { title: 'Later',    icon: 'bookmarks',             view: 'episodes'  },     
-  { title: 'Settings', icon: 'settings',             dialog: 'settings' },
+  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
+  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'episodes'  },
+  { label: 'Later',    icon: 'bookmarks',             view: 'episodes'  },     
+  { label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
 function App () {
