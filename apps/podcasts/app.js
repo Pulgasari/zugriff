@@ -138,6 +138,11 @@ const dockItems = [
   { label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
+app.dialogs: {
+  add      : 'AddPodcastDialog',
+  settings : 'SettingsPanel',
+};
+
 app.views = {
   home     : 'LatestView',
   episode  : 'EpisodeDetailView',
@@ -187,23 +192,6 @@ function App () {
 }
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::::
-
-/*
-app.init({
-  dialogs: {
-    add      : 'AddPodcastDialog',
-    settings : 'SettingsPanel',
-  },
-  views: {
-    home     : 'LatestView',
-    episode  : 'EpisodeDetailView',
-    podcasts : '||$&&&&',
-    podcast  : 'PodcastDetailView',
-    saved    : 'SavedView',
-  },
-});
-*/
-
 
 app.init({ App });
 
