@@ -7,7 +7,9 @@ import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
-const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
+const 
+URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}',
+URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -18,9 +20,9 @@ app.player = await app.module('player');
 
 // :::: STATE
 app.state.route  = { name: 'latest', id: null };   // { name, id }
-app.state.search = '';                             // shared episode filter
-app.state.dialog = null;                           // 'add' | 'settings' | null
-app.state.busy   = '';                             // a label while a long task runs
+app.state.search = '';   // shared episode filter
+app.state.dialog = null; // 'add' | 'settings' | null
+app.state.busy   = '';   // a label while a long task runs
 
 // ::: SETTINGS
 app.settings = typedSignal({
@@ -29,8 +31,8 @@ app.settings = typedSignal({
   view        : oneOf(['grid', 'list'], 'grid'),
   menuPos     : oneOf(['top', 'bottom', 'left', 'right'], 'bottom'),
   playerPos   : oneOf(['top', 'bottom'], 'bottom'),
-  proxy       : text(DEFAULT_PROXY),
-  imgResizer  : text(DEFAULT_IMG_RESIZER),
+  //proxy       : text(DEFAULT_PROXY),
+  //imgResizer  : text(DEFAULT_IMG_RESIZER),
 }, { key: 'zugriff:podcasts:settings', store: local });
 
 // on-device artwork thumbnail cache, resized through the configured endpoint
@@ -51,7 +53,7 @@ async function refreshAll () {
   if (!app.db.podcasts.size) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
-    const results = await app.db.refreshAll(app.settings.proxy, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.db.refreshAll(URL_PROXY_RSS, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
     const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed  = results.filter(r => r.error).length;
     const type    = failed ? 'error' : 'success';
@@ -66,7 +68,7 @@ app.actions = {
 
   'refresh-all'   : refreshAll,
   'add-podcast'   : () => app.state.dialog = 'add',
-  'open-settings' : () => app.state.dialog = 'settings',
+  'open-settings' : () => app.state.dialog = 'settings',ü
 
   'toggle-play'   : () => app.player.toggle(),
   'skip-back'     : () => app.player.skip(-15),
@@ -87,11 +89,10 @@ app.hotKeys = {
 // the frame reads menu/player placement off #app's data-attributes; keep them in sync
 // so the layout responds without an extra wrapper element
 
+const $app = document.getElementById('app');
 app.effect(() => {
-  const el = document.getElementById('app');
-  if (!el) return;
-  el.dataset.menu   = app.settings.menuPos;
-  el.dataset.player = app.settings.playerPos;
+  $app.dataset.menu   = app.settings.menuPos;
+  $app.dataset.player = app.settings.playerPos;
 });
 
 // :::::: UI ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -142,10 +143,10 @@ function App () {
   useEffect(() => {
     app.db.load()
       .then(() => app.thumbs.prewarm(app.db.podcasts.all.map(p => p.image)))
-      .catch(err => app.toast.error('Could not open the library: ' + err.message));
+      .catch(app.toast);
   }, []);
 
-  if (!app.db.ready) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+  if (!app.db.ready) return html`<div class="booting"><${Icon} name='loading' /></div>`;
 
   const route  = app.state.route;
   const dialog = app.state.dialog;
@@ -182,7 +183,7 @@ app.init({
   views: {
     home     : 'LatestView',
     episode  : 'EpisodeDetailView',
-    podcasts : 'PodcastsView',
+    podcasts : '||$&&&&',
     podcast  : 'PodcastDetailView',
     saved    : 'SavedView',
   },
@@ -191,3 +192,4 @@ app.init({
 
 
 app.init({ App });
+
