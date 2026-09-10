@@ -285,8 +285,19 @@ function applyTheme (theme) {
 
       "@domina/core"     : `${pkg}/domina/core/index.js`,
       "@domina/core/"    : `${pkg}/domina/core/`,
-      "@domina/methods"  : `${pkg}/domina/core/methods/index.js`,
-      "@domina/methods/" : `${pkg}/domina/core/methods/`,
+    //"@domina/methods"  : `${pkg}/domina/core/methods/index.js`,
+    //"@domina/methods/" : `${pkg}/domina/core/methods/`,
+
+      "@domina/element"      : `${pkg}/domina/packages/element/index.js`,
+      "@domina/element/lazy" : `${pkg}/domina/packages/element/lazy.js`,
+      "@domina/fonts"        : `${pkg}/domina/packages/fonts/index.js`,
+      "@domina/form"         : `${pkg}/domina/packages/form/index.js`,
+      "@domina/meta"         : `${pkg}/domina/packages/meta/index.js`,
+      "@domina/methods"      : `${pkg}/domina/packages/methods/index.js`,
+      "@domina/methods/"     : `${pkg}/domina/packages/methods/`,
+      "@domina/observer"     : `${pkg}/domina/packages/observer/index.js`,
+      "@domina/raf"          : `${pkg}/domina/packages/raf/index.js`,
+      "@domina/stylesheet"   : `${pkg}/domina/packages/stylesheet/index.js`,
 
       "@poo/compiler" : `${pkg}/poo/js-packages/compiler/index.js`,
       "@poo/hljs"     : `${pkg}/poo/js-packages/hljs/index.js`,
