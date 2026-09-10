@@ -7,9 +7,7 @@ import Art             from './../components/Artwork.js';
 import { fmtDuration } from './../modules/methods.js';
 
 const RATES = [0.8, 1, 1.2, 1.5, 1.75, 2];
-
 const app = zugriff.app;
-const { db, player } = app;
 
 export default function PlayerPanel () {
   const episode = app.player.episode; if (!episode) return null;
