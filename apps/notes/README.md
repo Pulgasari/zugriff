@@ -1,6 +1,6 @@
-# apps/notes
+# notes
 
-web: https://zugriff.dev/apps/notes
+web: <https://zugriff.dev/notes/>
 
 A Markdown notebook that reads a folder straight off your disk. You grant one
 or more folders with the browser's **File System Access API**; each folder is
@@ -11,7 +11,7 @@ Nothing is uploaded or copied. The only thing kept in the database is the
 directory *handle* — a permission token — so the app can re-open the same
 folder next time instead of asking you to pick it again.
 
-## What it does
+## features
 
 - **Open a folder** — `showDirectoryPicker()`. Add several; each is its own
   root in the tree. Your files are never modified.
