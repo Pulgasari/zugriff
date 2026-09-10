@@ -77,7 +77,7 @@ app.actions = {
 
 // :::::: HOTKEYS
 
-app.hotKeys = {
+app.hotkeys = {
   'escape'      : { action: 'close-dialog', when: () => !!app.state.dialog },
 
   'space'       : { action: 'toggle-play',   when: !!app.player.episode },
