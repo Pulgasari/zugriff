@@ -3,7 +3,7 @@
 .Dock { background-color: var(--bg-d-2); }
 
 aufbau-index[viewmode="grid"],
-aufbau-index[viewmode="list"] > *:nth-child(odd) { background-color: #0002; }
+aufbau-index[viewmode="list"] > *:nth-child(odd) { background-color: #0001; }
 
 /* spacings */
 
