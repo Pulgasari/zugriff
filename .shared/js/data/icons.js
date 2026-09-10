@@ -3,7 +3,7 @@
 export const icons = {
   'add'               : 'material-symbols:add',
   'alert'             : 'mdi:alert-circle-outline',
-  'arrow-down'        : 'material-symbols:arrow-downward',
+  'arrow-down'        : 'mdi:arrow-down-bold',
   'arrow-left'        : 'material-symbols:arrow-back',
   'arrow-right'       : 'material-symbols:arrow-forward',
   'arrow-up'          : 'material-symbols:arrow-upward',
