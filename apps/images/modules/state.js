@@ -1,15 +1,17 @@
-// apps/images/state.js
-// the shared image tray — the open set of images every route works off. view
-// browses it, edit loads the current one into a canvas, library opens files into
-// it. only setFiles mutates the set; viewer zoom/pan stay in the view route.
+// zugriff images :: modules/state.js
+
+// the shared image tray — the open set of images every route works off.
+// view browses it, edit loads the current one into a canvas, library opens files into it. 
+// only setFiles mutates the set; viewer zoom/pan stay in the view route.
 
 import { signal, computed } from '@aufbau/signals';
 
-export const shots   = signal([]);   // [{ name, size, type, file, url }]
-export const idx     = signal(0);     // index of the shown image
-export const current = computed(() => shots.value[idx.value] ?? null);
-export const many    = computed(() => shots.value.length > 1);
-export const vError  = signal('');    // the open-set error (bad file, load failure)
+export const 
+shots   = signal([]), // [{ name, size, type, file, url }]
+idx     = signal(0),  // index of the shown image
+current = computed(() => shots.value[idx.value] ?? null),
+many    = computed(() => shots.value.length > 1),
+vError  = signal(''); // the open-set error (bad file, load failure)
 
 const IMAGE_RE = /\.(png|jpe?g|jfif|gif|webp|avif|bmp|svg|ico|heic|heif|tiff?)$/i;
 export const isImageFile = f => f && (f.type?.startsWith('image/') || IMAGE_RE.test(f.name || ''));
