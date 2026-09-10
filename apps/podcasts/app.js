@@ -138,7 +138,7 @@ const dockItems = [
   { label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
-app.dialogs: {
+app.dialogs = {
   add      : 'AddPodcastDialog',
   settings : 'SettingsPanel',
 };
