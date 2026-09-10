@@ -19,7 +19,7 @@ function Item ({ podcast }) {
 }
 
 function PodcastsIndex ({ podcasts, empty }) {
-  return !podcasts.length;
+  return !podcasts.length
   ? html`<${Empty} ...${empty} />`
   : html`
     <${Index} viewmode=${zugriff.app.settings.view} itemSize='150px' gap='1rem'>
