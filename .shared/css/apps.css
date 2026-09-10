@@ -7,15 +7,30 @@ wird erst nach dem struktur-refactoring ausgearbeitet.
 #app-main { flex: 1; overflow-y: auto; }
 .Dock { flex-shrink: 0; }
 
-
+#app {
+  padding: 0.75rem;
+}
 .Dock {
-  background-color: var(--mix-800);
+  background-color: var(--mix-900);
   display: flex;
   flex-direction: row;
-  padding: 1rem;
+  padding: 0.75rem;
 }
 
-aufbau-index > * { background-color: var(--mix-800); }
+aufbau-index > * { 
+  background-color: var(--mix-900);
+  padding: 0.75rem;
+}
+aufbau-item .art {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+
+  aufbau-icon {
+    font-size: 2rem;
+    opacity: 0.25;
+  }
+}
 
 .Brand {}
 
@@ -56,4 +71,3 @@ aufbau-index > * { background-color: var(--mix-800); }
 .sticky-top    { position: sticky; top:    0; }
 .sticky-left   { position: sticky; left:   0; }
 .sticky-right  { position: sticky; right:  0; }
-
