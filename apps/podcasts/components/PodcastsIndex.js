@@ -6,6 +6,7 @@ import Artwork from './Artwork.js';
 import { fmtDate } from './../modules/methods.js';
 
 //const viewmode = enumSignal('list', ['grid', 'list']);
+const viewmode = 'list';
 
 function Item ({ podcast }) {
   const episodes = zugriff.app.db.episodes.where({ podcastId: podcast.id });
@@ -22,7 +23,7 @@ function PodcastsIndex ({ podcasts, empty }) {
   return !podcasts.length
   ? html`<${Empty} ...${empty} />`
   : html`
-    <${Index} viewmode=${zugriff.app.settings.view} itemSize='150px' gap='1rem'>
+    <${Index} viewmode=${viewmode} itemSize='150px' gap='1rem'>
       ${podcasts.map(p => html`<${Item} key=${p.id} podcast=${p} />`)}
     </${Index}>
   `;
