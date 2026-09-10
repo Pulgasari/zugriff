@@ -2,6 +2,7 @@
 
 .Dock            { background-color: var(--bg-d-3); }
 aufbau-index > * { background-color: var(--bg-d-1); }
+aufbau-index > *:nth-child(even) { background-color: color-mix(in oklch, white 2%, var(--bg-d-1)); }
 
 /* spacings */
 
