@@ -1,12 +1,13 @@
-// apps/prompts/modules/db.js
-// the prompt library: a BunkerDB store of prompts + tags, exposed as two plain signals
-// (app.db.prompts / app.db.tags, read with `.value`) plus the crud helpers that keep them
-// in sync. no runtime import — this module only needs @bunker/db.
+// prompts :: modules/lib.js
+
+// a BunkerDB store of prompts + tags,
+// exposed as two plain signals (app.lib.prompts / app.lib.tags) 
+// plus the crud helpers that keep them in sync.
 
 import { signal } from '@aufbau/signals';
 import { BunkerDB } from '@bunker/db';
 
-const db = new BunkerDB('promptmanagerx');
+const db = new BunkerDB('zugriff:prompts');
 await db.setup({ prompts: {}, tags: {} });
 
 // ── signals ────────────────────────────────────────────────────────────────
