@@ -93,7 +93,7 @@ export const icons = {
   'zoom-out'          : 'mdi:magnify-minus-outline',
 
   // specific for apps/code
-  'backspace'           : 'material-symbols:backspace',
+  'backspace'           : 'mdi:backspace',
   'blockindent'         : 'material-symbols:keyboard-tab',
   'blockoutdent'        : 'material-symbols:keyboard-tab-rtl',
   'copy-lines-down'     : 'material-symbols:move-down',
