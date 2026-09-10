@@ -109,7 +109,6 @@ EpisodeDetailView  = await app.view('EpisodeDetailView'),
 SavedView          = await app.view('SavedView');
 
 const // panels
-SidebarPanel  = await app.panel('SidebarPanel'),
 PlayerPanel   = await app.panel('PlayerPanel'),
 SettingsPanel = await app.panel('SettingsPanel');
 
