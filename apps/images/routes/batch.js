@@ -1,10 +1,10 @@
-// apps/images/routes/batch.js
+// zugriff images :: routes/batch.js
 // batch route (ex image-batch-processor): a pipeline of tasks over many images.
 
 import { signal } from '@aufbau/signals';
-import { Icon } from '/.shared/js/components/index.js';
+import { Icon }   from '/.shared/js/components/index.js';
 import { stored } from '/.shared/js/app/signals.js';
-import * as fx from '../modules/filters.js';
+import * as fx    from '../modules/filters.js';
 import { dropEntries, ImgDrop, ToolFileItem } from './tools.js';
 
 const bpFiles = signal([]);
