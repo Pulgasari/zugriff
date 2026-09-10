@@ -1,8 +1,9 @@
 /* colors */
 
-.Dock            { background-color: var(--bg-d-3); }
-aufbau-index > * { background-color: var(--bg-d-1); }
-aufbau-index > *:nth-child(even) { background-color: color-mix(in oklch, white 2%, var(--bg-d-1)); }
+.Dock { background-color: var(--bg-d-2); }
+
+aufbau-index[viewmode="grid"],
+aufbau-index[viewmode="list"] > *:nth-child(odd) { background-color: #0002; }
 
 /* spacings */
 
@@ -15,11 +16,7 @@ aufbau-item { padding: 0.75rem; }
 
 
 
-.Dock {
-  background-color: var(--mix-900);
-  display: flex;
-  flex-direction: row;
-}
+.Dock { display: flex; flex-direction: row; }
 
 
 aufbau-item .art {
