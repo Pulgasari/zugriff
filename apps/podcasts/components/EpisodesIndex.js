@@ -19,10 +19,10 @@ function Item ({ episode, showPodcast }) {
   const dur     = st.duration || 0;
   const pct     = st.done ? 100 : (dur ? Math.min(100, st.position / dur * 100) : 0);
 
-  const cls = [st.done && 'done', player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');
+  const classNames = [st.done && 'done', player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');
 
   return html`
-    <aufbau-item class=${cls}>
+    <aufbau-item class=${classNames}>
       <button class="ep-art" onClick=${() => go('episode', episode.id)} aria-label="Open episode">
         <${Art} src=${episode.image || podcast?.image} size=${48} />
       </button>
@@ -39,16 +39,20 @@ function Item ({ episode, showPodcast }) {
       </div>
       <div class="ep-actions">
         <${PlayToggle} episode=${episode} />
-        <${IconButton} icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
-                    label=${st.saved ? 'Remove from list' : 'Save for later'}
-                    active=${st.saved} onClick=${() => db.toggleSaved(episode.id)} />
-        <${IconButton} icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
-                    label=${st.done ? 'Mark unplayed' : 'Mark as done'}
-                    active=${st.done} onClick=${() => db.toggleDone(episode.id)} />
-        ${episode.link && html`
-          <a class="ibtn" href=${episode.link} target="_blank" rel="noopener" title="Open episode page">
-            <${Icon} name="mdi:open-in-new" />
-          </a>`}
+        
+        <${IconButton}
+          active=${st.saved}
+          icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
+          label=${st.saved ? 'Remove from list' : 'Save for later'}
+          onClick=${() => db.toggleSaved(episode.id)} />
+          
+        <${IconButton}
+          active=${st.done}
+          icon=${st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+          label=${st.done ? 'Mark unplayed' : 'Mark as done'}
+          onClick=${() => db.toggleDone(episode.id)} />
+          
+        ${episode.link && html`<${Link} href=${episode.link} icon='mdi:open-in-new' title="Open episode page" />`}
       </div>
     </aufbau-item>`;
 }
