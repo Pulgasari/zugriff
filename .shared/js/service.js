@@ -18,18 +18,9 @@ const IMMUTABLE_TTL = 365 * 24 * 60 * 60 * 1000;
 // a looser pin (music-metadata@11) is still cached but revalidated, since that pin can move to a newer patch.
 const VENDOR_HOST = /^https:\/\/(?:esm\.sh|unpkg\.com|cdn\.jsdelivr\.net)\//;
 const FULL_SEMVER = /@\d+\.\d+\.\d+/;
-
-// code.pulgasari.dev ships the in-development libs (@aufbau, @bunker, …);
-// they move often, so serve cached-first and revalidate on every request.
-const DEV_HOST = 'https://code.pulgasari.dev/';
-
-// the iconify svg api serves one file per `prefix:name`, and a given name is effectively
-// immutable. cache each icon hard (long ttl, no network within it) so the public api is hit
-// once and then not again — uncached, every <aufbau-icon> re-requests it on each render until
-// the api answers 429, and a 429 carries no access-control-allow-origin, which is what makes a
-// mask-image (loaded cross-origin in cors mode) fail its cors check in the console.
-const ICON_HOST = 'https://api.iconify.design/';
-const ICON_TTL  = 30 * 24 * 60 * 60 * 1000;
+const DEV_HOST    = 'https://code.pulgasari.dev/'; // stale while revalidate
+const ICON_HOST   = 'https://api.iconify.design/';
+const ICON_TTL    = 30 * 24 * 60 * 60 * 1000;
 
 const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
 const OWN    = ['./', './app.js', './app.css', './manifest.json'];
