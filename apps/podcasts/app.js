@@ -165,7 +165,7 @@ function App () {
       ${body()}
     </main>
     <${PlayerPanel} />
-    <${Dock items=${dockItems} />
+    <${Dock} items=${dockItems} />
     ${dialog === 'add'      && html`<${AddPodcastDialog} />`}
     ${dialog === 'settings' && html`<${SettingsPanel} />`}
   </>`;
