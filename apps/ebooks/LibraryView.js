@@ -1,9 +1,8 @@
 // ebooks :: views/LibraryView.js
 
-import Brand      from '/.shared/js/components/Brand.js';
-import IconButton from '/.shared/js/components/IconButton.js';
-import InstallTip from '/.shared/js/components/InstallTip.js';
-
+import Brand       from '/.shared/js/components/Brand.js';
+import IconButton  from '/.shared/js/components/IconButton.js';
+import InstallTip  from '/.shared/js/components/InstallTip.js';
 import SearchInput from '/.shared/js/components/SearchInput.js';
 import SortPicker  from '/.shared/js/components/SortPicker.js';
 
@@ -39,13 +38,17 @@ function LibraryView () {
             />`
         : html`
           <div class="lib-controls">
-            <div class="lib-search">
-              <${Icon} name="search" />
-              <input type="search" placeholder="Search title or author…" value=${app.state.search} onInput=${e => app.state.search = e.target.value} />     
-              ${app.state.search && html`<${IconButton} aria-label="Clear" icon='close' onClick=${() => app.state.search = ''}/>`}      
-            </div>
-            <${SortPicker} value=${sort.value} onChange=${v => sort.value = v}
-               options=${[['recent', 'Recent'], ['title', 'Title'], ['author', 'Author'], ['added', 'Added']]} />
+            <${SearchInput} 
+              placeholder="Search title or author…" 
+              value=${app.state.search} 
+              onInput=${e => app.state.search = e.target.value} 
+              />     
+              
+            <${SortPicker} 
+              value=${sort.value} 
+              onChange=${v => sort.value = v}
+              options=${['recent', 'title', 'author', 'added']}
+              />
           </div>
 
           <${FolderBar} />
@@ -62,7 +65,7 @@ function LibraryView () {
             <h2 class="shelf-title">${app.state.folder ? db.sourceById(app.state.folder)?.name : 'All books'}
               <span class="shelf-count">${books.length}</span></h2>
             ${books.length
-              ? html`<aufbau-index class="book-grid" viewmode="grid" item-size="150px" gap="1.5rem">
+              ? html`<aufbau-index class="book-grid" viewmode="grid" item-size="150px" gap="1rem">
                   ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
                 </aufbau-index>`
               : html`<${Empty} icon=${app.state.search ? 'mdi:magnify-close' : 'mdi:book-outline'}
