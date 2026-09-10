@@ -23,7 +23,7 @@ function PodcastsIndex ({ podcasts, empty }) {
   return !podcasts.length
   ? html`<${Empty} ...${empty} />`
   : html`
-    <${Index} viewmode=${viewmode} itemSize='150px' gap='1rem'>
+    <${Index} viewmode=${viewmode} itemSize='150px'>
       ${podcasts.map(p => html`<${Item} key=${p.id} podcast=${p} />`)}
     </${Index}>
   `;
