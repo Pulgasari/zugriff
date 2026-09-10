@@ -1,9 +1,9 @@
 // apps/podcasts/panels/PlayerPanel.js
 // the docked player bar — artwork/meta, transport, scrubber and speed/done/close.
 
-import Icon       from '/.shared/js/components/Icon.js';
-import IconButton from '/.shared/js/components/IconButton.js';
-import Art        from './../components/Artwork.js';
+import Icon            from '/.shared/js/components/Icon.js';
+import IconButton      from '/.shared/js/components/IconButton.js';
+import Art             from './../components/Artwork.js';
 import { fmtDuration } from './../modules/methods.js';
 
 const RATES = [0.8, 1, 1.2, 1.5, 1.75, 2];
@@ -12,12 +12,10 @@ const app = zugriff.app;
 const { db, player } = app;
 
 export default function PlayerPanel () {
-  const ep = player.episode;
-  if (!ep) return null;
-
-  const podcast = db.podcasts.get({ id: ep.podcastId });
-  const dur     = player.duration || ep.duration || 0;
-  const t       = player.time;
+  const episode = app.player.episode; if (!episode) return null;
+  const podcast = app.db.podcasts.get({ id: ep.podcastId });
+  const dur     = app.player.duration || episode.duration || 0;
+  const time    = app.player.time;
 
   const cycleRate = () => {
     const i = RATES.indexOf(player.rate);
@@ -27,33 +25,64 @@ export default function PlayerPanel () {
   return html`
     <footer class="player">
       <div class="pl-meta">
-        <${Art} src=${ep.image || podcast?.image} size=${52} />
+        <${Art} src=${episode.image || podcast?.image} size=${52} />
         <div class="pl-info">
-          <div class="pl-title" title=${ep.title}>${ep.title}</div>
+          <div class="pl-title" title=${episode.title}>${episode.title}</div>
           <div class="pl-podcast">${podcast?.title || ''}</div>
         </div>
       </div>
 
       <div class="pl-controls">
-        <${IconButton} icon="mdi:rewind-15" label="Back 15s" size=${22} onClick=${() => player.skip(-15)} />
-        <button class="pl-play" title=${player.isPlaying ? 'Pause' : 'Play'} onClick=${player.toggle}>
-          <${Icon} name=${player.isWaiting ? 'svg-spinners:bars-scale-middle' : player.isPlaying ? 'mdi:pause' : 'mdi:play'} />
-        </button>
-        <${IconButton} icon="mdi:fast-forward-30" label="Forward 30s" size=${22} onClick=${() => player.skip(30)} />
+        <${IconButton}
+          icon="mdi:rewind-15"
+          label="Back 15s"
+          onClick=${() => app.player.skip(-15)} 
+          />
+          
+        <${IconButton} 
+          class="pl-play" title=${app.player.isPlaying ? 'Pause' : 'Play'} 
+          onClick=${app.player.toggle}
+          icon=${app.player.isWaiting ? 'loading' : app.player.isPlaying ? 'mdi:pause' : 'mdi:play'}
+          />
+          
+        <${IconButton}
+          icon="mdi:fast-forward-30"
+          label="Forward 30s"
+          onClick=${() => app.player.skip(30)}
+          />
       </div>
 
       <div class="pl-scrub">
         <span class="pl-time">${fmtDuration(t)}</span>
-        <input class="pl-range" type="range" min="0" max=${Math.max(dur, 1)} step="1" value=${Math.min(t, dur || t)}
-               onInput=${e => player.seek(Number(e.target.value))} />
-        <span class="pl-time">${dur ? '-' + fmtDuration(dur - t) : ''}</span>
+        <input class="pl-range"
+          type="range" 
+          min="0" max=${Math.max(dur, 1)} 
+          step="1" 
+          value=${Math.min(time, dur || time)}
+          onInput=${e => app.player.seek(Number(e.target.value))}
+          />
+        <span class="pl-time">${dur ? '-' + fmtDuration(dur - time) : ''}</span>
       </div>
 
       <div class="pl-right">
-        <button class="rate" title="Playback speed" onClick=${cycleRate}>${player.rate}×</button>
-        <${IconButton} icon=${db.stateOf(ep.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
-                    label="Mark as done" active=${db.stateOf(ep.id).done} onClick=${() => db.toggleDone(ep.id)} />
-        <${IconButton} icon="mdi:close" label="Close player" onClick=${() => player.close()} />
+        <button class="rate"
+          title="Playback speed"
+          onClick=${cycleRate}>
+          ${player.rate}×
+        </button>
+        
+        <${IconButton} 
+          icon=${app.db.stateOf(episode.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+          label="Mark as done"
+          active=${app.db.stateOf(episode.id).done}
+          onClick=${() => app.db.toggleDone(episode.id)} 
+          />
+          
+        <${IconButton}
+          icon="mdi:close"
+          label="Close player"
+          onClick=${() => app.player.close()}
+          />
       </div>
     </footer>`;
 }
