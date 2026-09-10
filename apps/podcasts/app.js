@@ -138,6 +138,14 @@ const dockItems = [
   { label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
+app.views = {
+  home     : 'LatestView',
+  episode  : 'EpisodeDetailView',
+  podcasts : 'PodcastsView',
+  podcast  : 'PodcastDetailView',
+  saved    : 'SavedView',
+};
+
 function App () {
   useEffect(() => {
     app.db.load()
@@ -150,7 +158,7 @@ function App () {
   const route  = app.state.route;
   const dialog = app.state.dialog;
 
-  const body = () => {
+  const ViewSlot = () => {
     switch (route.name) {
       case 'podcasts' : return html`<${PodcastsView} />`;
       case 'podcast'  : return html`<${PodcastDetailView} id=${route.id} />`;
@@ -160,9 +168,16 @@ function App () {
     }
   };
 
+  const ViewSlot2 = () => {
+    const id  = route.name;
+    const idx = app.views[id] || 'home';
+    const ViewComponent = await app.view(idx);
+    return html`<${ViewComponent}/>`;
+  };
+
   return html`<>
     <main id="app-main">
-      ${body()}
+      ${ViewSlot()}
     </main>
     <${PlayerPanel} />
     <${Dock} items=${dockItems} />
