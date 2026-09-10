@@ -68,7 +68,7 @@ app.actions = {
 
   'refresh-all'   : refreshAll,
   'add-podcast'   : () => app.state.dialog = 'add',
-  'open-settings' : () => app.state.dialog = 'settings',ü
+  'open-settings' : () => app.state.dialog = 'settings',
 
   'toggle-play'   : () => app.player.toggle(),
   'skip-back'     : () => app.player.skip(-15),
