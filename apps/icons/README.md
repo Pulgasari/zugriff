@@ -2,8 +2,8 @@
 
 Browse and search the whole [Iconify](https://iconify.design) library.
 
-web: <https://zugriff.dev/icons/>
-android:
+- web: <https://zugriff.dev/icons/>
+- android:
 
 ## features
 
@@ -16,7 +16,9 @@ android:
 - click an icon for a detail sheet: big preview, copy the name, copy the SVG,
   download the SVG, favourite it
 
-## how it's built
+---
+
+# under the hood
 
 *App*, not a *tool*: own chrome, own css.
 
