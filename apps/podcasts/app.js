@@ -131,6 +131,13 @@ SettingsPanel    = await import('./components/SettingsPanel.js');
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
+const dockItems = [
+  { title: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
+  { title: 'Episodes', icon: 'mdi:playlist-play',     view: 'episodes'  },
+  { title: 'Later',    icon: 'bookmarks',             view: 'episodes'  },     
+  { title: 'Settings', icon: 'settings',             dialog: 'settings' },
+];
+
 function App () {
   useEffect(() => {
     app.db.load()
@@ -158,7 +165,7 @@ function App () {
       ${body()}
     </main>
     <${PlayerPanel} />
-    <${Dock} />
+    <${Dock items=${dockItems} />
     ${dialog === 'add'      && html`<${AddPodcastDialog} />`}
     ${dialog === 'settings' && html`<${SettingsPanel} />`}
   </>`;
