@@ -11,7 +11,7 @@ const app = zugriff.app;
 
 export default function PlayerPanel () {
   const episode = app.player.episode; if (!episode) return null;
-  const podcast = app.db.podcasts.get({ id: ep.podcastId });
+  const podcast = app.db.podcasts.get({ id: episode.podcastId });
   const dur     = app.player.duration || episode.duration || 0;
   const time    = app.player.time;
 
@@ -38,7 +38,7 @@ export default function PlayerPanel () {
           />
           
         <${IconButton} 
-          class="pl-play" 
+          class="play" 
           title=${app.player.isPlaying ? 'Pause' : 'Play'} 
           onClick=${app.player.toggle}
           icon=${app.player.isWaiting ? 'loading' : app.player.isPlaying ? 'mdi:pause' : 'mdi:play'}
