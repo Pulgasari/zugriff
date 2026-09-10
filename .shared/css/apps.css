@@ -5,7 +5,6 @@ aufbau-index > * { background-color: var(--bg-d-1); }
 
 /* spacings */
 
-#app        { padding: 0.75rem; }
 .Dock       { padding: 0.75rem; }
 aufbau-item { padding: 0.75rem; }
 
