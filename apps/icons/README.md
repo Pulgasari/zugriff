@@ -1,10 +1,11 @@
-# [icons](https://zugriff.dev/icons/)
+# icons
 
-Browse and search the whole [Iconify](https://iconify.design) library — every
-set, every icon — copy or download any icon, and keep favourites. A rebuild of
-an old PHP-server app on the zugriff/aufbau webstack.
+Browse and search the whole [Iconify](https://iconify.design) library.
 
-## what it does
+web: <https://zugriff.dev/icons/>
+android:
+
+## features
 
 - **Sets** — every Iconify collection as a card (name, total, samples); filter
   by name, open a set to see all its icons
