@@ -1,10 +1,24 @@
 # todo
 
 ## `apps/code`
-
 - [ ] geteilter editor-panel um mehrere files nebeneinander einzusehen/bearbeiten
 - [ ] files in der fileList sticky machen können
 - [ ] editor-settings je filetype/ext setzbar
+
+## `apps/icons`
+- [ ] icons favorisieren
+- [ ] iconsets favorisieren
+- [ ] toggle on/off um bei suchergebnissen icons von favorisierten iconsets gesondert/zuerst anzuzeigen
+- [ ] icon-farbe + bg des containers in vorschau setzen
+- [ ] nach mehreren icons gleichzeitig suchen durch komma
+- [ ] icons merken (nicht das selbe wie favorisieren), bin mir noch unsicher bzgl genauer umsetzung
+- [ ] startseite bestehend aus mehreren panels:
+  - [ ] fav icons
+  - [ ] fav iconsets
+  - [ ] search-input (autofokusiert)
+  - [ ] iconsets 
+
+---
 
 ```
 // the iconify svg api serves one file per `prefix:name`, and a given name is effectively
