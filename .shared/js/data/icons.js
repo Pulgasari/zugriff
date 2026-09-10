@@ -70,7 +70,7 @@ export const icons = {
   'select'            : 'boxicons:select',
   'select-all'        : 'boxicons:select-all',
   'select-none'       : 'boxicons:select-none',
-  'settings'          : 'material-symbols:settings',
+  'settings'          : 'mdi:cog',
   'shift'             : 'material-symbols:shift',
   'skip-next'         : 'mdi:skip-next',
   'skip-previous'     : 'mdi:skip-previous',
