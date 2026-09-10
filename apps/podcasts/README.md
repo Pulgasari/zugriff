@@ -23,7 +23,7 @@ Subscribe by RSS feed URL, play episodes with a docked player, and keep progress
 - **import / export** — back up your subscriptions and listening state as JSON
   and restore them on another device.
 
-## planned featuees
+## planned features
 - [ ] download episodes
 - [ ] sync subscriptions
 
