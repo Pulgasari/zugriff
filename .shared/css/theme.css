@@ -89,15 +89,15 @@ a { color: var(--accent); }
   --bg-800: color-mix(in oklch, black 50%, var(--bg));
   --bg-900: color-mix(in oklch, black 75%, var(--bg));
 
-  --mix-100 : color-mix(in oklch, var(--bg) 10%, var(--fg));
-  --mix-200 : color-mix(in oklch, var(--bg) 20%, var(--fg));
-  --mix-300 : color-mix(in oklch, var(--bg) 30%, var(--fg));
-  --mix-400 : color-mix(in oklch, var(--bg) 40%, var(--fg));
-  --mix-500 : color-mix(in oklch, var(--bg) 50%, var(--fg));
-  --mix-600 : color-mix(in oklch, var(--bg) 60%, var(--fg));
-  --mix-700 : color-mix(in oklch, var(--bg) 70%, var(--fg));
-  --mix-800 : color-mix(in oklch, var(--bg) 80%, var(--fg));
-  --mix-900 : color-mix(in oklch, var(--bg) 90%, var(--fg));
+  --mix-100 : color-mix(in oklch, var(--bg) 10%, var(--fg) 90%);
+  --mix-200 : color-mix(in oklch, var(--bg) 20%, var(--fg) 80%);
+  --mix-300 : color-mix(in oklch, var(--bg) 30%, var(--fg) 70%);
+  --mix-400 : color-mix(in oklch, var(--bg) 40%, var(--fg) 60%);
+  --mix-500 : color-mix(in oklch, var(--bg) 50%, var(--fg) 50%);
+  --mix-600 : color-mix(in oklch, var(--bg) 60%, var(--fg) 40%);
+  --mix-700 : color-mix(in oklch, var(--bg) 70%, var(--fg) 30%);
+  --mix-800 : color-mix(in oklch, var(--bg) 80%, var(--fg) 20%);
+  --mix-900 : color-mix(in oklch, var(--bg) 90%, var(--fg) 10%);
   
   --accent-5  : hsl(from var(--accent) h s l / 0.05);
   --accent-10 : hsl(from var(--accent) h s l / 0.10);
