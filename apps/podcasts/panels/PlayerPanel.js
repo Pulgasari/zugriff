@@ -24,15 +24,15 @@ export default function PlayerPanel () {
 
   return html`
     <div class="player">
-      <div class="pl-meta">
+      <div class="meta">
         <${Art} src=${episode.image || podcast?.image} size=${52} />
-        <div class="pl-info">
-          <div class="pl-title" title=${episode.title}>${episode.title}</div>
-          <div class="pl-podcast">${podcast?.title || ''}</div>
+        <div class="info">
+          <div class="title" title=${episode.title}>${episode.title}</div>
+          <div class="podcast">${podcast?.title || ''}</div>
         </div>
       </div>
 
-      <div class="pl-controls">
+      <div class="controls">
         <${IconButton}
           icon="mdi:rewind-15"
           label="Back 15s"
@@ -40,7 +40,8 @@ export default function PlayerPanel () {
           />
           
         <${IconButton} 
-          class="pl-play" title=${app.player.isPlaying ? 'Pause' : 'Play'} 
+          class="pl-play" 
+          title=${app.player.isPlaying ? 'Pause' : 'Play'} 
           onClick=${app.player.toggle}
           icon=${app.player.isWaiting ? 'loading' : app.player.isPlaying ? 'mdi:pause' : 'mdi:play'}
           />
@@ -52,11 +53,12 @@ export default function PlayerPanel () {
           />
       </div>
 
-      <div class="pl-scrub">
-        <span class="pl-time">${fmtDuration(t)}</span>
-        <input class="pl-range"
+      <div class="scrub">
+        <span class="time">${fmtDuration(t)}</span>
+        <input class="range"
           type="range" 
-          min="0" max=${Math.max(dur, 1)} 
+          min="0"
+          max=${Math.max(dur, 1)} 
           step="1" 
           value=${Math.min(time, dur || time)}
           onInput=${e => app.player.seek(Number(e.target.value))}
@@ -65,7 +67,8 @@ export default function PlayerPanel () {
       </div>
 
       <div class="pl-right">
-        <button class="rate"
+        <button
+          class="rate"
           title="Playback speed"
           onClick=${cycleRate}>
           ${player.rate}×
@@ -79,7 +82,7 @@ export default function PlayerPanel () {
           />
           
         <${IconButton}
-          icon="mdi:close"
+          icon="close"
           label="Close player"
           onClick=${() => app.player.close()}
           />
