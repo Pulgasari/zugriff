@@ -1,11 +1,10 @@
 # podcasts
 
-A podcast client that runs entirely on the device. Subscribe by RSS feed URL,
-play episodes with a docked player, and keep progress, done-marks and a
-listen-later list — all stored locally, nothing leaves the browser except the
-feed requests themselves.
+A podcast client that runs entirely on the device.
 
-## what it does
+Subscribe by RSS feed URL, play episodes with a docked player, and keep progress, done-marks and a listen-later list — all stored locally, nothing leaves the browser except the feed requests themselves.
+
+## features
 
 - **subscribe by RSS** — paste a feed URL; RSS 2.0 and Atom are both parsed.
 - **latest episodes** — a combined, newest-first stream across every subscription.
@@ -24,7 +23,13 @@ feed requests themselves.
 - **import / export** — back up your subscriptions and listening state as JSON
   and restore them on another device.
 
-## under the hood
+## planned featuees
+- [ ] download episodes
+- [ ] sync subscriptions
+
+---
+
+# under the hood
 
 Everything is a static ES module — no build step, in keeping with the rest of
 zugriff. The app runs on the shared **global runtime**: the page is the unified
@@ -32,7 +37,7 @@ zugriff. The app runs on the shared **global runtime**: the page is the unified
 `html`) to `window`, so nothing here imports the runtime — `zugriff.app` is the
 reference point (see `.shared/js/app.js`).
 
-### structure
+## structure
 
 ```
 app.js         assembles the handle: modules, state, actions, hotkeys, mount
@@ -64,7 +69,7 @@ destructuring the stable module refs); shared components load from
 `/.shared/js/components`, app pieces through `app.view()` / `app.panel()` /
 `app.dialog()` / `app.component()`.
 
-### modules
+## modules
 
 - **`modules/db.js`** — the storage layer over [`@bunker/db`](https://github.com/pulgasari/bunker/)
   (IndexedDB). Three tables — `podcasts`, `episodes`, `state` — mirrored into
@@ -85,7 +90,9 @@ destructuring the stable module refs); shared components load from
 The grid/list podcasts view is laid out by `<aufbau-index viewmode="grid|list">`
 with each podcast in an `<aufbau-item>`.
 
-## notes
+---
+
+# notes
 
 - Feeds load through the configured CORS proxy by default (`api.allorigins.win`).
   Change or clear it in Settings if you'd rather use your own.
