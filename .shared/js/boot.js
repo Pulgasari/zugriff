@@ -17,6 +17,12 @@ set before this script runs (data-sw="./sw.js" to opt back into sw here).
 const currentScript = document.currentScript;
 if (!currentScript) throw new Error('[boot] Must be executed synchronously as a classic script in <head>');
 
+
+// :::::: HELPERS + REFS
+const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
+const $head = document.head;
+const $root = document.documentElement;
+
 // ──────── TASKS ──────────────────────────────────
   
 // :::::: Task 1: Dev Tools Injection | ?dev
@@ -26,7 +32,8 @@ function initDevCss () {
     const KEY = 'zugriff:dev-css';
 
     // Inject style tag immediately so saved CSS applies before paint
-    const $style = createElement('style', { id: 'dev-live-css' });$style.textContent = localStorage.getItem(KEY) || '';
+    const $style = createElement('style', { id: 'dev-live-css' });
+    $style.textContent = localStorage.getItem(KEY) || '';
     document.head.append($style);
 
     // Render floating panel once DOM is ready
@@ -62,10 +69,7 @@ function initDevCss () {
         justifyContent: 'space-between'
       });
 
-      const $textarea = createElement('textarea', {
-        placeholder: '/* Insert live CSS rules here... */',
-        value: localStorage.getItem(KEY) || ''
-      });
+      const $textarea = createElement('textarea', { placeholder: '/* live css */', value: localStorage.getItem(KEY) || '' });
 
       Object.assign($textarea.style, {
         width: '100%',
@@ -194,8 +198,7 @@ function applyTheme (theme) {
   }
 
   
-  const createElement = (tag, props) => Object.assign(document.createElement(tag), props);
-  const $root = document.documentElement;
+  
 
   $root.classList.add('is-loading');
   window.addEventListener('load', () => {
