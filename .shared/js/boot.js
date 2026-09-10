@@ -20,6 +20,93 @@ if (!currentScript) throw new Error('[boot] Must be executed synchronously as a 
 // ──────── TASKS ──────────────────────────────────
   
 // :::::: Task 1: Dev Tools Injection | ?dev
+// :::::: Task 1b: Live Dev CSS Injector
+function initDevCss () {
+  try {
+    const KEY = 'zugriff:dev-css';
+
+    // Inject style tag immediately so saved CSS applies before paint
+    const $style = createElement('style', { id: 'dev-live-css' });$style.textContent = localStorage.getItem(KEY) || '';
+    document.head.append($style);
+
+    // Render floating panel once DOM is ready
+    const mountPanel = () => {
+      if (!document.body || document.getElementById('dev-css-panel')) return;
+
+      const $panel = createElement('div', { id: 'dev-css-panel' });
+      Object.assign($panel.style, {
+        position: 'fixed',
+        bottom: '12px',
+        right: '12px',
+        zIndex: '999999',
+        width: '320px',
+        background: '#18181b',
+        border: '1px solid #3f3f46',
+        borderRadius: '8px',
+        padding: '8px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+        fontFamily: 'monospace',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px'
+      });
+
+      const $header = createElement('div', { textContent: '⚡ Dev Live CSS' });
+      Object.assign($header.style, {
+        color: '#a1a1aa',
+        fontSize: '11px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        userSelect: 'none',
+        display: 'flex',
+        justifyContent: 'space-between'
+      });
+
+      const $textarea = createElement('textarea', {
+        placeholder: '/* Insert live CSS rules here... */',
+        value: localStorage.getItem(KEY) || ''
+      });
+
+      Object.assign($textarea.style, {
+        width: '100%',
+        height: '160px',
+        background: '#09090b',
+        color: '#4ade80',
+        border: '1px solid #27272a',
+        borderRadius: '4px',
+        padding: '8px',
+        fontSize: '12px',
+        fontFamily: 'inherit',
+        resize: 'vertical',
+        boxSizing: 'border-box',
+        outline: 'none'
+      });
+
+      // Update live style tag and sync to storage
+      $textarea.addEventListener('input', (e) => {
+        const val = e.target.value;
+        $style.textContent = val;
+        localStorage.setItem(KEY, val);
+      });
+
+      // Collapse / expand panel on header click
+      let isCollapsed = false;
+      $header.addEventListener('click', () => {
+        isCollapsed = !isCollapsed;
+        $textarea.style.display = isCollapsed ? 'none' : 'block';
+      });
+
+      $panel.append($header,$textarea);
+      document.body.append($panel);
+    };
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', mountPanel);
+    } else {
+      mountPanel();
+    }
+  } catch {}
+}
 function initDevTools (force = false) {
   try {
     const KEY = 'zugriff:devtools';
@@ -33,6 +120,8 @@ function initDevTools (force = false) {
         src    : 'https://cdn.jsdelivr.net/npm/eruda@3',
         onload : () => { try { window.eruda?.init(); } catch {} },
       }));
+      //
+      initDevCss();
     }
   } catch {} // storage may be blocked in incognito
 }
