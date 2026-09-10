@@ -1,26 +1,27 @@
+/* colors */
 
-/*
-neue apps.css file.
-wird erst nach dem struktur-refactoring ausgearbeitet.
-*/
+.Dock            { background-color: var(--bg-d-3); }
+aufbau-index > * { background-color: var(--bg-d-1); }
+
+/* spacings */
+
+#app        { padding: 0.75rem; }
+.Dock       { padding: 0.75rem; }
+aufbau-item { padding: 0.75rem; }
+
 
 #app-main { flex: 1; overflow-y: auto; }
 .Dock { flex-shrink: 0; }
 
-#app {
-  padding: 0.75rem;
-}
+
+
 .Dock {
   background-color: var(--mix-900);
   display: flex;
   flex-direction: row;
-  padding: 0.75rem;
 }
 
-aufbau-index > * { 
-  background-color: var(--mix-900);
-  padding: 0.75rem;
-}
+
 aufbau-item .art {
   display: grid;
   align-items: center;
