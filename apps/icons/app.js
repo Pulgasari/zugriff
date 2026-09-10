@@ -11,6 +11,7 @@
 import { signal, computed } from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { stored } from '/.shared/js/app/signals.js';
+import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
 Empty      = await zugriff.component('Empty'),
@@ -44,16 +45,16 @@ const itemSize    = stored(88, 'icons:item-size'); // persisted grid zoom
 
 async function ensureCollections () {
   if (collections.value) return;
-  try { collections.value = await api.collections(); }
-  catch { collections.value = []; flash('Could not reach the Iconify API'); }
+  try   { collections.value = await app.api.collections(); }
+  catch { collections.value = []; app.toast({ error: 'Could not reach the Iconify API' }); }
 }
 
 async function openSet (prefix) {
   app.go('set', prefix);
   setData.value = null;
   setLoading.value = true;
-  try { setData.value = await api.collection(prefix); }
-  catch { flash('Could not load that set'); }
+  try     { setData.value = await api.collection(prefix); }
+  catch   { flash('Could not load that set'); }
   finally { setLoading.value = false; }
 }
 
@@ -65,8 +66,8 @@ function onSearch (value) {
   if (!q) { results.value = []; searching.value = false; return; }
   searching.value = true;
   searchTimer = setTimeout(async () => {
-    try { results.value = await api.search(q); }
-    catch { flash('Search failed'); }
+    try     { results.value = await app.api.search(q); }
+    catch   { flash('Search failed'); }
     finally { searching.value = false; }
   }, 250);
 }
@@ -88,22 +89,33 @@ const filteredSets = computed(() => {
 });
 
 async function copy (text) {
-  try { await navigator.clipboard.writeText(text); flash('Copied'); }
-  catch { flash('Copy failed'); }
+  try {
+    await navigator.clipboard.writeText(text);
+    app.toast({ success: 'Copied' });
+  }
+  catch { app.toast({ error: 'Copy failed' }); }
 }
 async function copySvg (name) {
-  try { await navigator.clipboard.writeText(await api.svgText(name)); flash('SVG copied'); }
-  catch { flash('Could not copy the SVG'); }
+  try {
+    const text = await app.api.svgText(name);
+    await navigator.clipboard.writeText(text);
+    app.toast({ success: 'SVG copied' });
+  }
+  catch { app.toast({ error: 'Could not copy the SVG' }); }
 }
 async function downloadSvg (name) {
   try {
-    const blob = new Blob([await api.svgText(name)], { type: 'image/svg+xml' });
-    const url  = URL.createObjectURL(blob);
-    const a = Object.assign(document.createElement('a'), { href: url, download: name.replace(':', '-') + '.svg' });
+    const blob = new Blob([await app.api.svgText(name)], { type: 'image/svg+xml' });
+    const href = URL.createObjectURL(blob);
+    const a    = createElement('a', { href, download: name.replace(':', '-') + '.svg' });
     document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  } catch { flash('Could not download the SVG'); }
+    setTimeout(() => URL.revokeObjectURL(href), 1000);
+  } 
+  catch { app.toast({ error: 'Could not download the SVG' }); }
 }
+
+const z = {};
+z.clipboard = {};
 
 // :::::: COMPONENTS ::::::::::::::::::::::::::::::::::::::::
 
@@ -333,16 +345,15 @@ function App () {
     ensureCollections();   // warms the catalogue for home stats + sets
   }, []);
 
-  return html`
-    <>
-      <${Sidebar} />
-      ${app.state.nav && html`<div class="scrim-mobile" onClick=${() => app.state.nav = false}></div>`}
-      <main id="app-main">
-        <${TopBar} />
-        <div class="content"><${Content} /></div>
-      </main>
-      <${Detail} />
-    </>`;
+  return html`<>
+    <${Sidebar} />
+    ${app.state.nav && html`<div class="scrim-mobile" onClick=${() => app.state.nav = false}></div>`}
+    <main id="app-main">
+      <${TopBar} />
+      <div class="content"><${Content}/></div>
+    </main>
+    <${Detail} />
+  </>`;
 }
 
 // :::::: BOOT
