@@ -79,11 +79,15 @@ a { color: var(--accent); }
 /* ── derived tokens ─────────────────────────────────────────────────────── */
 
 :root {
-  --accent-5  : hsl(from var(--accent) h s l / 0.05);
-  --accent-10 : hsl(from var(--accent) h s l / 0.10);
-  --accent-25 : hsl(from var(--accent) h s l / 0.25);
-  --accent-50 : hsl(from var(--accent) h s l / 0.50);
-  --accent-75 : hsl(from var(--accent) h s l / 0.75);
+  --bg-100: color-mix(in oklch, white 75%, var(--bg));
+  --bg-200: color-mix(in oklch, white 50%, var(--bg));
+  --bg-300: color-mix(in oklch, white 25%, var(--bg));
+  --bg-400: color-mix(in oklch, white 10%, var(--bg));
+  --bg-500: var(--bg);
+  --bg-600: color-mix(in oklch, black 10%, var(--bg));
+  --bg-700: color-mix(in oklch, black 25%, var(--bg));
+  --bg-800: color-mix(in oklch, black 50%, var(--bg));
+  --bg-900: color-mix(in oklch, black 75%, var(--bg));
 
   --mix-100 : color-mix(in oklch, var(--bg) 10%, var(--fg));
   --mix-200 : color-mix(in oklch, var(--bg) 20%, var(--fg));
@@ -94,6 +98,14 @@ a { color: var(--accent); }
   --mix-700 : color-mix(in oklch, var(--bg) 70%, var(--fg));
   --mix-800 : color-mix(in oklch, var(--bg) 80%, var(--fg));
   --mix-900 : color-mix(in oklch, var(--bg) 90%, var(--fg));
+  
+  --accent-5  : hsl(from var(--accent) h s l / 0.05);
+  --accent-10 : hsl(from var(--accent) h s l / 0.10);
+  --accent-25 : hsl(from var(--accent) h s l / 0.25);
+  --accent-50 : hsl(from var(--accent) h s l / 0.50);
+  --accent-75 : hsl(from var(--accent) h s l / 0.75);
+
+
 
   --bgd-10  : hsl(from var(--bg) h s calc(l - 10%));
   --bgd-20  : hsl(from var(--bg) h s calc(l - 20%));
