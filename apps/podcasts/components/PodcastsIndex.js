@@ -14,7 +14,8 @@ function Item ({ podcast }) {
       <${Art} src=${podcast.image} />
       <div class="title">${podcast.title}</div>
       <div class="sub">${episodes.length} episode(s) · ${fmtDate(podcast.lastEpisodeAt)}</div>
-    </aufbau-item>`;
+    </aufbau-item>
+  `;
 }
 
 export default function PodcastsIndex ({ podcasts, empty }) {
