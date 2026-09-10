@@ -1,4 +1,4 @@
-# apps/icons
+# zugriff icons
 
 Browse and search the whole [Iconify](https://iconify.design) library — every
 set, every icon — copy or download any icon, and keep favourites. A rebuild of
