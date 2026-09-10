@@ -114,6 +114,7 @@ function initDevCss () {
 function initDevTools (force = false) {
   try {
     const KEY = 'zugriff:devtools';
+    const css =          new URLSearchParams(location.search).get('css');
     const dev = force || new URLSearchParams(location.search).get('dev');
     if (dev !== null) {
       if (dev === 'off' || dev === '0') sessionStorage.removeItem(KEY);
@@ -125,7 +126,7 @@ function initDevTools (force = false) {
         onload : () => { try { window.eruda?.init(); } catch {} },
       }));
       //
-      initDevCss();
+      if (css) initDevCss();
     }
   } catch {} // storage may be blocked in incognito
 }
