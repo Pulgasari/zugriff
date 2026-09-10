@@ -167,13 +167,13 @@ function App () {
       default         : return html`<${LatestView} />`;
     }
   };
-
-  const ViewSlot2 = () => {
+  
+  /*const ViewSlot2 = () => {
     const id  = route.name;
     const idx = app.views[id] || 'home';
     const ViewComponent = await app.view(idx);
     return html`<${ViewComponent}/>`;
-  };
+  };*/
 
   return html`<>
     <main id="app-main">
