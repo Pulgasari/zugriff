@@ -7,7 +7,7 @@ import Icon from '/.shared/js/components/Icon.js';
 const app = zugriff.app;
 const { thumbs } = app;
 
-export default function Artwork ({ src, size = 48, className = '' }) {
+export default function Artwork ({ src, size = 48, className = '', onClick }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
   let state = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
 
@@ -28,18 +28,26 @@ export default function Artwork ({ src, size = 48, className = '' }) {
 
   const showImg = (state.phase === 'ready' || state.phase === 'orig') && !state.broken;
 
-  return showImg
+  const tag = onClick ? 'button' : 'div';
+  if (onClick) className += ' not-a-button';
+  
+  const pic
     ? html`<img 
-              class=${'art ' + className}
-              src=${state.url}
-              alt="" 
-              loading="lazy"
+              alt='' loading='lazy' src=${state.url}
               width=${size} height=${size}
               onError=${() => state = { broken: true }} 
               />`
-    : html`<span 
-            class=${'art art-fallback ' + className}
-            style=${`width:${size}px;height:${size}px`}>
+    : html`<span style=${`width:${size}px; height:${size}px`}>
              <${Icon} name="mdi:podcast" />
            </span>`;
+
+  return onClick
+    ? html`<button class=${'art ' + className + ' not-a-button'}>${pic}</button>`          
+    : html`<div    class=${'art ' + className                  }>${pic}</div>`
 }
+
+/*
+<button onClick=${() => app.go('episode', episode.id)} aria-label="Open episode">
+  <${Art} src=${episode.image || podcast?.image} size=${48} />
+</button>
+*/
