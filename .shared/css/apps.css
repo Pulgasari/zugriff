@@ -41,7 +41,18 @@ aufbau-item { padding: 0.75rem; }
 }
 
 
-
+.View header {
+  background-color: var(--bg-d-2);
+  display: flex; justify-content: space-between;
+  gap: 0.5rem; padding: 0.75rem;
+  position: sticky; top: 0;
+  /*
+  aufbau-bg       : darken(--bg, 10%);
+  aufbau-flow     : flex row space-between;
+  aufbau-sticky   : top;
+  aufbau-spacing  : small normal
+  */
+}
 
 
 
