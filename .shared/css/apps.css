@@ -37,6 +37,7 @@ aufbau-index[viewmode="list"] > * {
   border: none;
   border-radius: 0;
   padding: unset;
+  display: contents;
 }
 
 /* spacings */
