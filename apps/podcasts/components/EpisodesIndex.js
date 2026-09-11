@@ -1,5 +1,6 @@
 // apps/podcasts/components/EpisodesIndex.js
 
+import Button     from '/.shared/js/components/Button.js';
 import Empty      from '/.shared/js/components/Empty.js';
 import Index      from '/.shared/js/components/Index.js';
 import Icon       from '/.shared/js/components/Icon.js';
@@ -24,29 +25,38 @@ function Item ({ episode, showPodcast }) {
   const showTeaser = false;
 
   const classNames = [st.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');
+/*
+<button >
+  <${Art} src=${episode.image || podcast?.image} size=${48} />
+</button>
+*/
 
   return html`
     <aufbau-item class=${classNames}>
-      <${Artwork} src=${episode.image || podcast?.image} size=${48} />
+      <${Artwork}
+        aria-label='open episode'
+        onClick=${() => app.go('episode', episode.id)}
+        src=${episode.image || podcast?.image} 
+        />
       
       <div class="meta">
-        ${showPodcast && podcast && html`<button class='podcast' onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
+        ${showPodcast && podcast && html`<${Button} class='podcast' label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}       
         <span class='date'>${fmtDate(episode.pubDate)}</span>
         ${episode.duration && html`<span class='dur'>· ${fmtDuration(episode.duration)}</span>`}
       </div>
       
-      <button class='title' onClick=${() => app.go('episode', episode.id)}>${episode.title}</button>
+      <${Button} class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
       
       ${showTeaser && teaser && html`<div class="teaser">${teaser}</div>`}
         
       ${(st.position || isDone) && html`<${Progress} value=${pct} />`}
       
-      <div class="actions">
+      <div class='actions'>
         <${PlayToggle} episode=${episode} />
         
         <${IconButton}
           active=${st.saved}
-          icon=${st.saved ? 'mdi:bookmark' : 'mdi:bookmark-outline'}
+          icon=${st.saved ? 'bookmark' : 'bookmark-outline'}
           label=${st.saved ? 'Remove from list' : 'Save for later'}
           onClick=${() => app.db.toggleSaved(episode.id)}
           />
