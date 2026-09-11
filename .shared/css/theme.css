@@ -79,14 +79,7 @@ a { color: var(--accent); }
 /* ── derived tokens ─────────────────────────────────────────────────────── */
 
 :root {
-  --bg-d-1: color-mix(in oklch, black 10%, var(--bg));
-  --bg-d-2: color-mix(in oklch, black 25%, var(--bg));
-  --bg-d-3: color-mix(in oklch, black 50%, var(--bg));
-  --bg-d-4: color-mix(in oklch, black 75%, var(--bg));
-  --bg-l-1: color-mix(in oklch, white 10%, var(--bg));
-  --bg-l-2: color-mix(in oklch, white 25%, var(--bg));
-  --bg-l-3: color-mix(in oklch, white 50%, var(--bg));
-  --bg-l-4: color-mix(in oklch, white 75%, var(--bg));
+  
 
   --fg-d-1: color-mix(in oklch, black 10%, var(--fg));
   --fg-d-2: color-mix(in oklch, black 25%, var(--fg));
