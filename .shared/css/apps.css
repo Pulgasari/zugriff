@@ -1,6 +1,7 @@
 /* colors */
 
-.Dock { background-color: var(--bg-d-2); }
+.Dock     { background-color: var(--bg-d-1); }
+.Dock > * { background-color: var(--bg-d-2); border: none; border-radius: 0; }
 
 aufbau-index[viewmode="grid"],
 aufbau-index[viewmode="list"] > *:nth-child(odd) { background-color: #0001; }
@@ -14,19 +15,10 @@ aufbau-item { padding: 0.75rem; }
 .Dock     { flex-shrink: 0; }
 
 .Dock     { display: flex; flex-direction: row; }
-.Dock > * { flex: 1 1 auto; }
+.Dock > * { flex: 1 1 0; }
 
-.Dock {
-  gap: 2px;
-}
-
-.Dock > * {
-  background: #0002;
-  border: none;
-  border-radius: 0;
-  padding: 0.75rem;
-  gap: 0.5rem;
-}
+.Dock     { gap: 0.125rem; }
+.Dock > * { gap: 0.5rem; padding: 0.75rem; }
 
 .Dock aufbau-icon {
   font-size: 2rem;
@@ -83,6 +75,8 @@ aufbau-item .art {
 
 .col, .flow-y  { display: flex; flex-direction: column; }
 .row, .flow-x  { display: flex; flex-direction: row; }
+.scroll-x      { overflow-x: auto; }
+.scroll-y      { overflow-y: auto; }
 .sticky-bottom { position: sticky; bottom: 0; }
 .sticky-top    { position: sticky; top:    0; }
 .sticky-left   { position: sticky; left:   0; }
