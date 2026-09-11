@@ -21,6 +21,7 @@ function Item ({ episode, showPodcast }) {
   const teaser  = plain(episode.description).slice(0, 200);
   const dur     = st.duration || 0;
   const pct     = isDone ? 100 : (dur ? Math.min(100, st.position / dur * 100) : 0);
+  const showTeaser = false;
 
   const classNames = [st.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');
 
@@ -30,16 +31,17 @@ function Item ({ episode, showPodcast }) {
         <${Art} src=${episode.image || podcast?.image} size=${48} />
       </button>
       
-      <div class="ep-body">
-        <div class="meta">
-          ${showPodcast && podcast && html`<button class='podcast' onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
-          <span class='date'>${fmtDate(episode.pubDate)}</span>
-          ${episode.duration && html`<span class='dur'>· ${fmtDuration(episode.duration)}</span>`}
-        </div>
-        <button class='title' onClick=${() => app.go('episode', episode.id)}>${episode.title}</button>
-        ${teaser && html`<div class="teaser">${teaser}</div>`}
-        ${(st.position || isDone) && html`<${Progress} value=${pct} />`}
+      <div class="meta">
+        ${showPodcast && podcast && html`<button class='podcast' onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
+        <span class='date'>${fmtDate(episode.pubDate)}</span>
+        ${episode.duration && html`<span class='dur'>· ${fmtDuration(episode.duration)}</span>`}
       </div>
+      
+      <button class='title' onClick=${() => app.go('episode', episode.id)}>${episode.title}</button>
+      
+      ${showTeaser && teaser && html`<div class="teaser">${teaser}</div>`}
+        
+      ${(st.position || isDone) && html`<${Progress} value=${pct} />`}
       
       <div class="actions">
         <${PlayToggle} episode=${episode} />
