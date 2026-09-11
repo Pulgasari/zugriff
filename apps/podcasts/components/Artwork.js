@@ -1,4 +1,4 @@
-// apps/podcasts/components/Artwork.js
+// podcasts :: components/Artwork.js
 
 import { useSignal } from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
@@ -32,13 +32,12 @@ export default function Artwork ({ src, size = 48, className = '', onClick }) {
   if (onClick) className += ' not-a-button';
 
   const onError = () => state = { broken: true };
-  const style   = `width:${size}px; height:${size}px`;
   
   const pic = onClick
     ? html`<img loading='lazy' src=${state.url} onError=${onError} />`     
     : html`<${Icon} name='mdi:podcast' />`;
 
   return onClick
-    ? html`<button class=${'art ' + className} style=${style}>${pic}</button>`          
-    : html`<div    class=${'art ' + className} style=${style}>${pic}</div>`
+    ? html`<button class=${'art ' + className}>${pic}</button>`          
+    : html`<div    class=${'art ' + className}>${pic}</div>`
 }
