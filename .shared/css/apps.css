@@ -26,12 +26,18 @@ aufbau-index[viewmode="list"] > * {
   display: grid;
   gap: 0.75rem;
   grid-template-columns : 100px auto;
-  grid-template-rows    : 1fr 1fr;
+  grid-template-rows    : 1fr;
   /* grid: 1fr 1fr / 1fr 2fr; */
-  
-  > *:first-child { grid-row: span 2; }
+  > *             { grid-column: 2; }
+  > *:first-child { grid-column: 1; grid-row: span 2; }
 }
 
+.naked {
+  background: unset;
+  border: none;
+  border-radius: 0;
+  padding: unset;
+}
 
 /* spacings */
 
