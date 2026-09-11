@@ -54,7 +54,10 @@ aufbau-item { padding: 0.75rem; }
   */
 }
 
+.Dock        { text-transform: uppercase; }
+.View header { text-transform: uppercase; }
 
+.date { font-family: monospace; }
 
 aufbau-item .art {
   display: grid;
