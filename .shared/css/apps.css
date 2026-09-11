@@ -24,7 +24,7 @@ aufbau-index[viewmode="list"] { gap: 0; }
 
 /* spacings */
 
-aufbau-item { padding: 0.75rem; }
+aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 
 
 #app-main { flex: 1; overflow-y: auto; }
