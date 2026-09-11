@@ -26,10 +26,10 @@ aufbau-index[viewmode="list"] > * {
   display: grid;
   grid-template-columns : 1fr 2fr;
   grid-template-rows    : 1fr 1fr;
+  /* grid: 1fr 1fr / 1fr 2fr; */
   
   > *:first-child { grid-row: span 2; }
 }
-
 
 
 /* spacings */
