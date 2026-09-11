@@ -131,3 +131,23 @@ aufbau-item .art {
 .sticky-top    { position: sticky; top:    0; }
 .sticky-left   { position: sticky; left:   0; }
 .sticky-right  { position: sticky; right:  0; }
+
+/*
+contain: layout;
+contain: paint;
+
+​contain: strict;  // = layout, paint, size, style
+​contain: content; // = layout, paint, style
+
+content-visibility: auto;
+contain-intrinsic-size: 1px 500px;
+
+will-change: transform, opacity;
+
+pointer-events: none;
+
+transform & opacity laufen auf GPU
+
+*/
+
+
