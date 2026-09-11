@@ -34,7 +34,7 @@ export default function Artwork ({ src, size = 48, className = '', onClick }) {
   const onError = () => state = { broken: true };
   const style   = `width:${size}px; height:${size}px`;
   
-  const pic
+  const pic = onClick
     ? html`<img loading='lazy' src=${state.url} onError=${onError} />`     
     : html`<${Icon} name='mdi:podcast' />`;
 
@@ -42,9 +42,3 @@ export default function Artwork ({ src, size = 48, className = '', onClick }) {
     ? html`<button class=${'art ' + className} style=${style}>${pic}</button>`          
     : html`<div    class=${'art ' + className} style=${style}>${pic}</div>`
 }
-
-/*
-<button onClick=${() => app.go('episode', episode.id)} aria-label="Open episode">
-  <${Art} src=${episode.image || podcast?.image} size=${48} />
-</button>
-*/
