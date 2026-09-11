@@ -7,7 +7,7 @@ import IconButton from '/.shared/js/components/IconButton.js';
 import Link       from '/.shared/js/components/Link.js';
 import Progress   from '/.shared/js/components/Progress.js';
 
-import Art        from './Artwork.js';
+import Artwork    from './Artwork.js';
 import PlayToggle from './PlayToggle.js';
 import { fmtDate, fmtDuration, plain } from './../modules/methods.js';
 
@@ -27,9 +27,7 @@ function Item ({ episode, showPodcast }) {
 
   return html`
     <aufbau-item class=${classNames}>
-      <button onClick=${() => app.go('episode', episode.id)} aria-label="Open episode">
-        <${Art} src=${episode.image || podcast?.image} size=${48} />
-      </button>
+      <${Artwork} src=${episode.image || podcast?.image} size=${48} />
       
       <div class="meta">
         ${showPodcast && podcast && html`<button class='podcast' onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
