@@ -59,7 +59,7 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .View header        { text-transform: uppercase; }
 .View header button { text-transform: uppercase; }
 
-.date { font-family: monospace; }
+.date, .datetime, .time { font-family: monospace; }
 
 aufbau-item .art {
   display: grid;
