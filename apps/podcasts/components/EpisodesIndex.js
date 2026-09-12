@@ -2,6 +2,7 @@
 
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
 import Button     from '/.shared/js/components/Button.js';
+import Date       from '/.shared/js/components/Date.js';
 import Empty      from '/.shared/js/components/Empty.js';
 import Index      from '/.shared/js/components/Index.js';
 import Progress   from '/.shared/js/components/Progress.js';
