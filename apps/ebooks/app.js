@@ -137,7 +137,7 @@ const readerUi = signal({ ready: false });
 
 function openReader (key) {
   app.state.route = { name: 'reader', key };
-  db.markOpened(key);
+  app.db.markOpened(key);
 }
 const closeReader = () => { app.state.route = { name: 'library', key: null }; };
 
@@ -169,24 +169,23 @@ async function addFolder () {
   if (!fs.supported()) { flash('This browser can’t open folders — try Chrome, Edge or another Chromium browser.', 'err'); return; }
   try {
     const rec = await db.addFolder();
-    if (rec) flash(`Added ${rec.name}`);
-  } catch (err) { flash(err.message, 'err'); }
+    if (rec) app.toast({ success: `Added ${rec.name}` });
+  }
+  catch (e) { app.toast(e); }
 }
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
-  useEffect(() => {
-    db.load().catch(err => flash('Could not open the library: ' + err.message, 'err'));
-  }, []);
+  useEffect(() => { db.load().catch(app.toast); }, []);
 
   if (!db.ready.value) {
     return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   }
 
-  const r = app.state.route;
-  return r.name === 'reader'
-    ? html`<${ReaderView} bookKey=${r.key} key=${r.key} />`
+  const route = app.state.route;
+  return route.name === 'reader'
+    ? html`<${ReaderView} bookKey=${route.key} key=${route.key} />`
     : html`<main id="app-main"><${Library} /></main>`;
 }
 
