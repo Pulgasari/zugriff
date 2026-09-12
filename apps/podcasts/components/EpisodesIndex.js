@@ -28,7 +28,7 @@ function Item ({ episode }) {
       
       <div class='meta'>
         <${Button} label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />       
-        <${Date value=${episode.pubDate} />
+        <${Date} value=${episode.pubDate} />
         <span class='dur'>${zugriff.fmt.duration(episode.duration)}</span>
       </div>
       
