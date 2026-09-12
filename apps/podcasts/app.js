@@ -101,33 +101,9 @@ const // shared components
 Dock = await zugriff.component('Dock'),
 Icon = await zugriff.component('Icon');
 
-const // views
-LatestView         = await app.view('LatestView'),
-PodcastsView       = await app.view('PodcastsView'),
-PodcastDetailView  = await app.view('PodcastDetailView'),
-EpisodeDetailView  = await app.view('EpisodeDetailView'),
-SavedView          = await app.view('SavedView');
-
 const // panels
 PlayerPanel   = await app.panel('PlayerPanel'),
 SettingsPanel = await app.panel('SettingsPanel');
-
-const // dialogs
-AddPodcastDialog = await app.dialog('AddPodcastDialog');
-
-/*
-const // local imports
-AddPodcastDialog = await app.import('components/AddPodcastDialog.js'),
-SidebarPanel     = await app.import('components/SidebarPanel.js'),
-PlayerPanel      = await app.import('components/PlayerPanel.js'),
-SettingsPanel    = await app.import('components/SettingsPanel.js');
-
-const // local imports
-AddPodcastDialog = await import('./components/AddPodcastDialog.js'),
-SidebarPanel     = await import('./components/SidebarPanel.js'),
-PlayerPanel      = await import('./components/PlayerPanel.js'),
-SettingsPanel    = await import('./components/SettingsPanel.js');
-*/
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -138,17 +114,17 @@ const dockItems = [
   { label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
-app.dialogs = {
-  add      : 'AddPodcastDialog',
-  settings : 'SettingsPanel',
-};
-
 app.views = {
-  home     : 'LatestView',
+  latest   : 'LatestView',
   episode  : 'EpisodeDetailView',
   podcasts : 'PodcastsView',
   podcast  : 'PodcastDetailView',
   saved    : 'SavedView',
+};
+
+app.dialogs = {
+  add      : 'AddPodcastDialog',
+  //settings : 'panels/SettingsPanel',
 };
 
 function App () {
@@ -160,37 +136,16 @@ function App () {
 
   if (!app.db.ready) return html`<div class="booting"><${Icon} name='loading' /></div>`;
 
-  const route  = app.state.route;
-  const dialog = app.state.dialog;
-
-  const ViewSlot = () => {
-    switch (route.name) {
-      case 'podcasts' : return html`<${PodcastsView} />`;
-      case 'podcast'  : return html`<${PodcastDetailView} id=${route.id} />`;
-      case 'episode'  : return html`<${EpisodeDetailView} id=${route.id} />`;
-      case 'saved'    : return html`<${SavedView} />`;
-      default         : return html`<${LatestView} />`;
-    }
-  };
-  
-  /*const ViewSlot2 = () => {
-    const id  = route.name;
-    const idx = app.views[id] || 'home';
-    const ViewComponent = await app.view(idx);
-    return html`<${ViewComponent}/>`;
-  };*/
-
-  // <${Slot} for=${dialogs} />
-  // <${Slot} for=${views} />
+  const route = app.state.route;
+  const view  = route.name in app.views ? route.name : 'latest';
 
   return html`<>
     <main id='app-main'>
-      ${ViewSlot()}
+      <${Slot} map=${app.views} name=${view} load='view' id=${route.id} />
     </main>
     <${PlayerPanel} />
     <${Dock} items=${dockItems} />
-    ${dialog === 'add'      && html`<${AddPodcastDialog} />`}
-    ${dialog === 'settings' && html`<${SettingsPanel}    />`}
+    <${Slot} map=${app.dialogs} name=${app.state.dialog} load='dialog' />
   </>`;
 }
 
