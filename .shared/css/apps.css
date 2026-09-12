@@ -49,6 +49,8 @@ aufbau-index[viewmode="list"] > * {
   display: contents;
 }
 
+button.unreal { display: contents; }
+
 /* spacings */
 
 aufbau-item { gap: 0.5rem; padding: 0.75rem; }
