@@ -7,6 +7,15 @@ import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
+const // shared components
+Dock = await zugriff.component('Dock'),
+Icon = await zugriff.component('Icon'),
+Slot = await zugriff.component('Slot');
+
+const // panels
+PlayerPanel   = await app.panel('PlayerPanel'),
+SettingsPanel = await app.panel('SettingsPanel');
+
 const 
 URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}',
 URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
@@ -94,17 +103,6 @@ app.effect(() => {
   $app.dataset.menu   = app.settings.menuPos;
   $app.dataset.player = app.settings.playerPos;
 });
-
-// :::::: UI ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-const // shared components
-Dock = await zugriff.component('Dock'),
-Icon = await zugriff.component('Icon'),
-Slot = await zugriff.component('Slot');
-
-const // panels
-PlayerPanel   = await app.panel('PlayerPanel'),
-SettingsPanel = await app.panel('SettingsPanel');
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
