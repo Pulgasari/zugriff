@@ -39,9 +39,11 @@ export default function PodcastDetailView ({ id }) {
     app.state.busy = 'Refreshing…';
     try {
       const { added } = await db.refresh(id, app.settings.proxy);
-      app.toast.success(added ? `${added} new episode${added === 1 ? '' : 's'}` : 'Up to date');
-    } catch (err) { app.toast.error(err); }
-    finally { app.state.busy = ''; }
+      const message = added ? `${added} new episode(s)` : 'Up to date';
+      app.toast.success(message);
+    }
+    catch (e) { app.toast(e); }
+    finally   { app.state.busy = ''; }
   };
 
   return html`
@@ -56,9 +58,9 @@ export default function PodcastDetailView ({ id }) {
 
       <div class='info'>
         <${Art} src=${podcast.image} size=${140} />
-        ${podcast.author && html`<div class="pd-author">${podcast.author}</div>`}
-        <div class="pd-stats">${eps.length} episodes · ${doneCount} done</div>
-        ${podcast.description && html`<p class="pd-desc">${plain(podcast.description).slice(0, 400)}</p>`}
+        ${podcast.author && html`<div class='author'>${podcast.author}</div>`}
+        <div class='stats'>${eps.length} episodes · ${doneCount} done</div>
+        ${podcast.description && html`<p class='about'>${plain(podcast.description).slice(0, 400)}</p>`}
         ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
       </div>
 
