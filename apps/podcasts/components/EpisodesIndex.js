@@ -48,29 +48,24 @@ function Item ({ episode, showPodcast }) {
       
       <${Button} class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
       
-      ${showTeaser && teaser && html`<div class="teaser">${teaser}</div>`}
-        
       ${(st.position || isDone) && html`<${Progress} value=${pct} />`}
-      
-      <div class='actions'>
-        <${PlayToggle} episode=${episode} />
-        
-        <${IconButton}
-          active=${st.saved}
-          icon=${st.saved ? 'bookmark' : 'bookmark-outline'}
-          label=${st.saved ? 'Remove from list' : 'Save for later'}
-          onClick=${() => app.db.toggleSaved(episode.id)}
-          />
-          
-        <${IconButton}
-          active=${isDone}
-          icon=${isDone ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
-          label=${isDone ? 'Mark unplayed' : 'Mark as done'}
-          onClick=${() => app.db.toggleDone(episode.id)}
-          />
-          
-        ${episode.link && html`<${Link} href=${episode.link} icon='mdi:open-in-new' title="Open episode page" />`}
-      </div>
+
+      <${ActionMenu} items=${[
+        html`<${PlayToggle} episode=${episode} />`,
+        { 
+          icon    : st.saved ? 'bookmark'         : 'bookmark-outline', 
+          label   : st.saved ? 'Remove from list' : 'Save for later',
+          onClick : () => app.db.toggleSaved(episode.id)
+        },{
+          icon    : isDone ? 'mdi:check-circle' : 'mdi:check-circle-outline',
+          label   : isDone ? 'Mark unplayed'    : 'Mark as done',
+          onClick : () => app.db.toggleDone(episode.id),
+        },{
+          icon  : 'mdi:open-in-new',
+          href  : episode.link,
+          title : 'open episode page',
+        }
+      ]}/>
     </aufbau-item>
   `;
 }
