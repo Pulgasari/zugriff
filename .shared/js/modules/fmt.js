@@ -1,35 +1,38 @@
 // .shared/js/modules/fmt.js
 
-function fmt ({ date, duration }) {
-  if (date)     return fmt.date     (date);
-  if (duration) return fmt.duration (duration);
+function fmt ({ date, duration } = {}) {
+  if (date     !== undefined && date     !== null) return fmt.date     (date);
+  if (duration !== undefined && duration !== null) return fmt.duration (duration);
   return '';
 }
 
 fmt.date = function (sec) {
-  if (!sec || sec < 0) return '';
+  if (sec === null || sec === undefined || isNaN(sec) || sec < 0) return '';
   
-  sec = Math.round(sec);
+  const totalSeconds = Math.round(sec);
+  const h  = Math.floor(totalSeconds / 3600);
+  const m  = Math.floor((totalSeconds % 3600) / 60);
+  const s  = totalSeconds % 60;
+  const mm = String(m).padStart(2, '0');
+  const ss = String(s).padStart(2, '0');
   
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-  
-  return h ? `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-           : `${m}:${String(s).padStart(2, '0')}`;
-}
+  return h ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
+};
 
 fmt.duration = function (ms) {
   if (!ms) return '';
   
-  const d = new Date(ms);
-  const diff = (Date.now() - ms) / 86400000;
+  const timestamp = ms instanceof Date ? ms.getTime() : Number(ms);
+  if (isNaN(timestamp)) return '';
   
-  if (diff < 1) return 'today';
-  if (diff < 2) return 'yesterday';
-  if (diff < 7) return `${Math.floor(diff)} days ago`;
+  const diffInDays = (Date.now() - timestamp) / 86400000;
   
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
+  if (diffInDays < 0) return new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });      
+  if (diffInDays < 1) return 'today';
+  if (diffInDays < 2) return 'yesterday';
+  if (diffInDays < 7) return `${Math.floor(diffInDays)} days ago`;
+  
+  return new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+};
 
 export default fmt;
