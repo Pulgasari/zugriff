@@ -11,6 +11,7 @@ import { ZugriffApp }    from './app.js';
 import { FolderLibrary } from './filesystem/folders.js';
 import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
+import fmt               from './modules/fmt.js';
 import { toast }         from './modules/toast.js';
 
 // ::: the one fragment-aware html tag (see vendors.js), exposed as a global so
@@ -61,6 +62,7 @@ const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
 
 const zugriff = {
   // namespaces
+  fmt,
   fs: Object.assign({ FolderLibrary }, fsaccess),
   opfs,
   registry,
