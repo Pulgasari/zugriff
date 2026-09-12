@@ -37,6 +37,10 @@ aufbau-index[viewmode="list"] > * {
   aspect-ratio: 1 / 1;
 }
 
+.title {
+  text-align: center;
+}
+
 .naked {
   background: unset;
   border: none;
