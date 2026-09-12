@@ -9,3 +9,5 @@ function Date ({ value }) {
     </span>
   `;
 }
+
+export default Date;
