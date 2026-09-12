@@ -1,20 +1,25 @@
-// apps/podcasts/components/PlayToggle.js
+// podcasts :: components/PlayToggle.js
 // the play/pause control for one episode, reflecting the live player state.
 
-import Icon from '/.shared/js/components/Icon.js';
+import Button from '/.shared/js/components/Button.js';
 
 const app = zugriff.app;
-const { player } = app;
 
-export default function PlayToggle ({ episode, size = 20 }) {
-  const isCurrent = player.episode?.id === episode.id;
-  const isPlaying = isCurrent && player.isPlaying;
-  const icon = isCurrent && player.isWaiting ? 'svg-spinners:bars-scale-middle'
-             : isPlaying ? 'mdi:pause' : 'mdi:play';
+function PlayToggle ({ episode, size = 20 }) {
+  const isCurrent = app.player.episode?.id === episode.id;
+  const isPlaying = isCurrent && app.player.isPlaying;
+  const icon      = isCurrent && app.player.isWaiting ? 'loading' : isPlaying ? 'mdi:pause' : 'mdi:play';     
+  const title     = isPlaying ? 'Pause' : 'Play';
+  
   return html`
-    <button class=${'play-toggle' + (isCurrent ? ' current' : '')}
-            title=${isPlaying ? 'Pause' : 'Play'} aria-label=${isPlaying ? 'Pause' : 'Play'}
-            onClick=${() => player.play(episode)}>
-      <${Icon} name=${icon} />
-    </button>`;
+    <${Button}
+      aria-label=${title}
+      class=${'play-toggle' + (isCurrent ? ' current' : '')}
+      icon=${icon}
+      title=${title}
+      onClick=${() => app.player.play(episode)}
+    />
+  `;
 }
+
+export default PlayToggle;
