@@ -17,28 +17,27 @@ const app = zugriff.app;
 const { db, go, thumbs } = app;
 
 export default function PodcastDetailView ({ id }) {
-  const back = { label: 'Podcasts', onClick: () => go('podcasts') };
+  const back    = { label: 'Podcasts', onClick: () => app.go('podcasts') };
+  const podcast = app.db.podcasts.get({ id });
+  if (!podcast) return html`<${View} back=${back}><${Empty} icon='alert' title='Podcast not found' /></${View}>`;      
 
-  const podcast = db.podcasts.get({ id });
-  if (!podcast) return html`<${View} back=${back}><${Empty} icon="mdi:alert-outline" title="Podcast not found" /></${View}>`;
-
-  const all = sortEpisodes(db.episodes.where({ podcastId: id }), app.settings.episodeSort);
-  const eps = filterEpisodes(all, false);
-  const doneCount = all.filter(e => db.stateOf(e.id).done).length;
+  const all       = sortEpisodes(app.db.episodes.where({ podcastId: id }), app.settings.episodeSort);
+  const episodes  = filterEpisodes(all, false);
+  const doneCount = all.filter(e => app.db.stateOf(e.id).done).length;
 
   const remove = async () => {
     if (!confirm(`Unsubscribe from “${podcast.title}”? This removes its episodes and their progress.`)) return;
     const artwork = [podcast.image, ...all.map(e => e.image)].filter(Boolean);
-    await db.unsubscribe(id);
-    thumbs.evict(artwork).catch(() => {});
+    await app.db.unsubscribe(id);
+    app.thumbs.evict(artwork).catch(() => {});
     app.toast.success('Unsubscribed');
-    go('podcasts');
+    app.go('podcasts');
   };
 
   const refreshOne = async () => {
     app.state.busy = 'Refreshing…';
     try {
-      const { added } = await db.refresh(id, app.settings.proxy);
+      const { added } = await app.db.refresh(id, app.settings.proxy);
       const message = added ? `${added} new episode(s)` : 'Up to date';
       app.toast.success(message);
     }
@@ -59,7 +58,7 @@ export default function PodcastDetailView ({ id }) {
       <div class='info'>
         <${Art} src=${podcast.image} size=${140} />
         ${podcast.author && html`<div class='author'>${podcast.author}</div>`}
-        <div class='stats'>${eps.length} episodes · ${doneCount} done</div>
+        <div class='stats'>${episodes.length} episodes · ${doneCount} done</div>
         ${podcast.description && html`<p class='about'>${plain(podcast.description).slice(0, 400)}</p>`}
         ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
       </div>
@@ -74,7 +73,7 @@ export default function PodcastDetailView ({ id }) {
       </div>
 
       <${EpisodesIndex}
-        episodes=${eps}
+        episodes=${episodes}
         empty=${{ 
           icon  : 'mdi:magnify-close', 
           title : 'Nothing matches your filter' 
