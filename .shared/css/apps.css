@@ -32,9 +32,10 @@ aufbau-index[viewmode="list"] > * {
   > *:first-child { grid-column: 1; grid-row: span 4; }
 }
 
-.art, .art > img,
-.artwork, .artwork ≠ img {
+.art, .artwork {
   aspect-ratio: 1 / 1;
+  object-fit: cover;
+  
 }
 
 .title {
