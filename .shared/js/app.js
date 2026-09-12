@@ -1,9 +1,4 @@
 // .shared/js/app.js
-// the app handle behind zugriff.app — one instance per slug (memoized in runtime.js).
-// `state` is the shared reactive base (createState → an @aufbau/signals deep signal);
-// an app extends it with its own leaves + effects, hangs its modules on the handle
-// (app.commands, app.editor, …) and mounts with app.init({ App }). the runtime and
-// the handle are the single reference point, so an app never imports the runtime.
 
 // :::::: IMPORTS
 
