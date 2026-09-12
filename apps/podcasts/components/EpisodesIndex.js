@@ -42,7 +42,7 @@ function Item ({ episode, showPodcast }) {
       
       <div class="meta">
         ${showPodcast && podcast && html`<${Button} class='podcast' label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}       
-        <span class='date'>${fmtDate(episode.pubDate)}</span>
+        <${Date value=${episode.pubDate} />
         ${episode.duration && html`<span class='dur'>· ${fmtDuration(episode.duration)}</span>`}
       </div>
       
