@@ -9,10 +9,13 @@ import Button from './Button.js';
 import Icon   from './Icon.js';
 import Link   from './Link.js';
 
-function ActionMenuItem ({ href, ...rest }) {
+const isFn = sth => typeof sth === 'function';
+
+function ActionMenuItem (props) {
   //rest.className = ['ActionMenuItem'].filter(Boolean).join(' ');
-  return href ? html`<${Link}   href=${href} ...${rest}>`
-                html`<${Button} ...${rest}>`
+  return isFn(props) ? props()
+       : props.href  ? html`<${Link}   ...${props}>`
+                       html`<${Button} ...${props}>`
 }
 
 function ActionMenu ({ items, ...rest }) {
