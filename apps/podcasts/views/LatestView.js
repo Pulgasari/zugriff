@@ -33,10 +33,9 @@ export default function LatestView () {
         <div class="view-tools">
           <${IconButton}
             icon="refresh" 
-            label="Refresh all feeds"
             onClick=${() => app.actions.run('refresh-all')} 
             disabled=${!!app.state.busy} 
-            />
+          />
         </div>
       </header>
 
