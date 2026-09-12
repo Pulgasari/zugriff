@@ -15,7 +15,7 @@ function Item ({ episode }) {
   const state      = app.db.stateOf(episode.id);
   const podcast    = app.db.podcasts.get({ id: episode.podcastId });
   const dur        = state.duration || 0;
-  const pct        = isDone ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
+  const pct        = stae.done ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
   const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     
 
   return html`
