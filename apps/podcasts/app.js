@@ -99,7 +99,8 @@ app.effect(() => {
 
 const // shared components
 Dock = await zugriff.component('Dock'),
-Icon = await zugriff.component('Icon');
+Icon = await zugriff.component('Icon'),
+Slot = await zugriff.component('Slot');
 
 const // panels
 PlayerPanel   = await app.panel('PlayerPanel'),
