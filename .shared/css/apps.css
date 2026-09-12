@@ -29,7 +29,12 @@ aufbau-index[viewmode="list"] > * {
   grid-template-rows    : 1fr;
   /* grid: 1fr 1fr / 1fr 2fr; */
   > *             { grid-column: 2; }
-  > *:first-child { grid-column: 1; grid-row: span 2; }
+  > *:first-child { grid-column: 1; grid-row: span 4; }
+}
+
+.art, .art > img,
+.artwork, .artwork ≠ img {
+  aspect-ratio: 1 / 1;
 }
 
 .naked {
