@@ -15,7 +15,7 @@ function ActionMenuItem (props) {
   //rest.className = ['ActionMenuItem'].filter(Boolean).join(' ');
   return isFn(props) ? props()
        : props.href  ? html`<${Link}   ...${props}>`
-                       html`<${Button} ...${props}>`
+       :               html`<${Button} ...${props}>`;
 }
 
 function ActionMenu ({ items, ...rest }) {
