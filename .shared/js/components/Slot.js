@@ -11,15 +11,18 @@ or an already imported component.
 
 import { useState, useEffect } from 'preact/hooks';
 
-const loaded  = new Map;   // 'view:LatestView' -> component
-const loading = new Map;   // 'view:LatestView' -> promise
+const isFn     = sth => typeof sth === 'function';
+const isString = sth => typeof sth === 'string';
+
+const loaded  = new Map; // 'view:LatestView' -> component
+const loading = new Map; // 'view:LatestView' -> promise
 
 const resolve = (kind, name) => name.includes('/')
   ? zugriff.app.import(`${name}.js`)
   : zugriff.app[kind](name);
 
 function useSlot (kind, entry) {
-  const key = typeof entry === 'string' ? `${kind}:${entry}` : null;
+  const key = isString(entry) ? `${kind}:${entry}` : null;
   const [, bump] = useState(0);
 
   useEffect(() => {
@@ -32,7 +35,7 @@ function useSlot (kind, entry) {
     return () => { alive = false; };
   }, [key]);
 
-  if (typeof entry === 'function') return entry;   // already imported, nothing to load
+  if (isFn(entry)) return entry;   // already imported, nothing to load
   return key ? loaded.get(key) ?? null : null;
 }
 
