@@ -47,20 +47,20 @@ export default function PodcastDetailView ({ id }) {
   return html`
     <${View} id='podcast' back=${back}>
       <header>
-        <${Art} src=${podcast.image} size=${140} />
-        <div class="pd-info">
-          <h1>${podcast.title}</h1>
-          ${podcast.author && html`<div class="pd-author">${podcast.author}</div>`}
-          <div class="pd-stats">${eps.length} episodes · ${doneCount} done</div>
-          ${podcast.description && html`<p class="pd-desc">${plain(podcast.description).slice(0, 400)}</p>`}
-          
-          <div class="pd-actions">
-            <${Button} icon='refresh' label='refresh' onClick=${refreshOne} disabled=${!!app.state.busy} />
-            ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
-            <${Button} class="danger" icon='trash' label='Unsubscribe' onClick=${remove} />
-          </div>
+        <h1>${podcast.title}</h1>
+        <div class='actions'>
+          <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.busy} />
+          <${Button} icon='trash'   onClick=${remove} class='danger' />
         </div>
       </header>
+
+      <div class='info'>
+        <${Art} src=${podcast.image} size=${140} />
+        ${podcast.author && html`<div class="pd-author">${podcast.author}</div>`}
+        <div class="pd-stats">${eps.length} episodes · ${doneCount} done</div>
+        ${podcast.description && html`<p class="pd-desc">${plain(podcast.description).slice(0, 400)}</p>`}
+        ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
+      </div>
 
       <div>
         <span>Episodes</span>
