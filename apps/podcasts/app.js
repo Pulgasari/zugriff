@@ -180,14 +180,17 @@ function App () {
     return html`<${ViewComponent}/>`;
   };*/
 
+  // <${Slot} for=${dialogs} />
+  // <${Slot} for=${views} />
+
   return html`<>
-    <main id="app-main">
+    <main id='app-main'>
       ${ViewSlot()}
     </main>
     <${PlayerPanel} />
     <${Dock} items=${dockItems} />
     ${dialog === 'add'      && html`<${AddPodcastDialog} />`}
-    ${dialog === 'settings' && html`<${SettingsPanel} />`}
+    ${dialog === 'settings' && html`<${SettingsPanel}    />`}
   </>`;
 }
 
