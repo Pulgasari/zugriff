@@ -1,5 +1,7 @@
 // apps/podcasts/app.js
 
+const app = zugriff.app;
+
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
 import { useEffect } from 'preact/hooks';
@@ -23,7 +25,7 @@ URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
-const app = zugriff.app;
+
 app.db     = await app.module('db');
 app.player = await app.module('player');
 
