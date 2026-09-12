@@ -1,8 +1,4 @@
 // .shared/js/runtime.js
-// the global runtime — `zugriff` on window, with `zugriff.app` the current app handle.
-// boot.js imports this (blocking, in <head>) so every page has the runtime
-// bound before its app module runs; an app therefore never imports the runtime, it
-// reaches everything through the `zugriff` / `zugriff.app` globals.
 
 // :::::: IMPORTS
 
@@ -13,9 +9,6 @@ import * as fsaccess     from './filesystem/fsaccess.js';
 import { opfs }          from './filesystem/opfs.js';
 import fmt               from './modules/fmt.js';
 import { toast }         from './modules/toast.js';
-
-// ::: the one fragment-aware html tag (see vendors.js), exposed as a global so
-//     components need no import and `<>...</>` works everywhere
 import { html }          from './vendors.js';
 
 // :::::: CONSTS
