@@ -8,13 +8,14 @@ const app = zugriff.app;
 function PlayToggle ({ episode, size = 20 }) {
   const isCurrent = app.player.episode?.id === episode.id;
   const isPlaying = isCurrent && app.player.isPlaying;
-  const icon      = isCurrent && app.player.isWaiting ? 'loading' : isPlaying ? 'mdi:pause' : 'mdi:play';     
+  const isWaiting = isCurrent && app.player.isWaiting;
+  const icon      = isWaiting ? 'loading' : isPlaying ? 'mdi:pause' : 'mdi:play';     
   const title     = isPlaying ? 'Pause' : 'Play';
   
   return html`
     <${Button}
       aria-label=${title}
-      class=${'play-toggle' + (isCurrent ? ' current' : '')}
+      class='play-toggle'
       icon=${icon}
       title=${title}
       onClick=${() => app.player.play(episode)}
