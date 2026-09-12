@@ -48,28 +48,29 @@ class ZugriffApp {
   // else the namespace: component() from ./components, view() from ./views,
   // panel() from ./panels, dialog() from ./dialogs; module() from the app root.
   import    = path => import(new URL(path, this.baseURL)).then(pick);
-  
-  module    = name => import(new URL(`modules/${name}.js`,    this.baseURL)).then(pick);
+  component = name => this.import('components' + `/${name}.js`);
+  dialog    = name => this.import('dialogs'    + `/${name}.js`);
+  module    = name => this.import('modules'    + `/${name}.js`);
+  panel     = name => this.import('panels'     + `/${name}.js`);
+  view      = name => this.import('views'      + `/${name}.js`);
+  /*
   component = name => import(new URL(`components/${name}.js`, this.baseURL)).then(pick);
+  module    = name => import(new URL(`modules/${name}.js`,    this.baseURL)).then(pick);
   dialog    = name => import(new URL(`dialogs/${name}.js`,    this.baseURL)).then(pick)
   panel     = name => import(new URL(`panels/${name}.js`,     this.baseURL)).then(pick);
   view      = name => import(new URL(`views/${name}.js`,      this.baseURL)).then(pick);
-  
-  
-
-  // ::: actions — app.actions is the registry (add/run/get + property access); assigning
-  // app.actions = { … } merges the object in rather than replacing the registry.
+  */
+  // ::: actions
   get actions ()    { return this._actions; }
   set actions (obj) { for (const [id, fn] of Object.entries(obj ?? {})) this._actions.add(id, fn); }
 
-  // ::: hotkeys — a declarative combo -> spec map (see modules/hotkeys.js). assigning
-  // app.hotKeys = { … } defines the bindings; the getter is the manager (list/destroy).
-  get hotKeys ()    { return this._hotkeys; }
-  set hotKeys (map) { this._hotkeys.define(map); }
+  // ::: hotkeys
+  get hotkeys ()    { return this._hotkeys; }
+  set hotkeys (map) { this._hotkeys.define(map); }
 
   // ::: state extension — the mechanism to grow app.state and wire effects.
-  // scalar/plain-data leaves land on the deep signal; `effects` are plain
-  // @aufbau/signals effects the caller passes as functions.
+  // scalar/plain-data leaves land on the deep signal;
+  // `effects` are plain @aufbau/signals effects the caller passes as functions.
   extend = (seed = {}, effects = []) => {
     for (const [key, value] of Object.entries(seed)) this.state[key] = value;
     for (const fn of [].concat(effects)) if (fn) effect(fn);
