@@ -4,7 +4,7 @@ import Brand       from '/.shared/js/components/Brand.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
 import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Index       from '/.shared/js/components/Index.js';
-import Picker      from '/.shared/js/components/SortPicker.js';
+import Picker      from '/.shared/js/components/Picker.js';
 import SearchInput from '/.shared/js/components/SearchInput.js';
 
 const app = zugriff.app;
@@ -35,10 +35,8 @@ function LibraryView () {
   const hasFolders = app.db.sources.value.length > 0;
 
   return html`
-    <div class="library">
-      <header class="lib-head">
-        <${Brand} icon=${app.config.icon} name=${app.config.name} />
-        
+    <${View} class='library'>
+      <header>
         <div class="lib-tools">
           ${db.pending.value > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${db.pending.value} left</span>`}
           <${IconButton} icon="refresh"    label="Rescan folders" onClick=${() => db.rescanAll()} />
@@ -58,33 +56,12 @@ function LibraryView () {
             />`
         : html`
           <div class="lib-controls">
-            <${SearchInput} 
-              placeholder="Search title or author…" 
-              value=${app.state.search} 
-              onInput=${e => app.state.search = e.target.value} 
-              />     
-              
-            <${Picker} 
-              value=${sort.value} 
-              onChange=${v => sort.value = v}
-              options=${['recent', 'title', 'author', 'added']}
-              />
+            <${SearchInput} signal=${app.state.search} placeholder='Search title or author…' />
+            <${Picker}      signal=${sort.value} options=${['recent', 'title', 'author', 'added']} />
           </div>
 
-          <${FolderBar} />
-
-          ${cont.length > 0 && !app.state.search && !app.state.folder && html`
-            <section class="shelf">
-              <h2 class="shelf-title">Continue reading</h2>
-              <div class="shelf-row">
-                ${cont.map(b => html`<${BookCard} book=${b} key=${b.key} />`)}
-              </div>
-            </section>`}
-
           <section class="shelf">
-            <h2 class="shelf-title">${app.state.folder ? db.sourceById(app.state.folder)?.name : 'All books'}
-              <span class="shelf-count">${books.length}</span>
-            </h2>
+            <h2>All books <span>${books.length}</span></h2>
             
             ${books.length
               ? html`<${BooksIndex}/>`
@@ -93,7 +70,8 @@ function LibraryView () {
                 : html`<${EmptyLibrary}/>`
             }
           </section>`}
-    </div>`;
+    </${View}>
+  `;
 }
 
 export       { LibraryView };
