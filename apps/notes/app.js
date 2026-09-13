@@ -2,8 +2,8 @@
 
 // :::::: IMPORT
 
-import { computed, local, signal }     from '@aufbau/signals';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { computed, local, signal } from '@aufbau/signals';
+import { useEffect, useState }     from 'preact/hooks';
 
 const // shared components
 Button      = await zugriff.component('Button'),
@@ -13,7 +13,6 @@ Icon        = await zugriff.component('Icon'),
 IconButton  = await zugriff.component('IconButton'),
 InstallTip  = await zugriff.component('InstallTip'),
 Reader      = await zugriff.component('Reader'),
-Settings    = await zugriff.component('Settings'),
 TOC         = await zugriff.component('TOC'),
 Tree        = await zugriff.component('Tree');
 
@@ -32,11 +31,6 @@ const open       = signal({ value: null, key: 'notes:open',     store: local });
 const expanded   = signal({ value: [],   key: 'notes:expanded', store: local });   // ['sourceId:dir/path', …]
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
-
-function openNote (sourceId, node) {
-  open.value = { sourceId, path: node.path };
-  app.state.isNavOpen = false;
-}
 
 // :::::: TREE HELPERS
 
@@ -131,7 +125,6 @@ function SourceBlock ({ source }) {
         </div>
       </div>`;
   } else if (busy && !tree) {
-    //body = html`<${Loading} text='Scanning...' />`;
     body = html`<div class="src-loading"><${Icon} name='loading' /> Scanning…</div>`;
   } else {
     const view = q && tree ? filterTree(tree, q) : tree;
@@ -198,13 +191,10 @@ function NotesReader () {
   return html`<${NotesReaderBody} note=${currentNote.value} />`;
 }
 
-// the open note: read its text off disk and hand it to <aufbau-reader>, which owns
-// the markdown pipeline. the transform hook resolves folder-relative images to blob
-// urls (before the reader paints, so no broken-image flash) and tags links;
-// <aufbau-toc> builds the "on this page" list off the rendered headings.
+// the open note: read its text off disk and hand it to the shared <${Reader}>,
+// which owns the markdown pipeline (via <aufbau-reader>); <${TOC}> builds the
+// "on this page" list off the rendered headings.
 function NoteView ({ note }) {
-  const root = app.lib.sourceById(note.sourceId)?.handle;
-  const urls = useRef([]);
   const [text, setText] = useState(null);
 
   useEffect(() => {
@@ -213,49 +203,21 @@ function NoteView ({ note }) {
     app.lib.readNote(note.node.handle)
       .then(({ text }) => { if (alive) setText(text); })
       .catch(err => { toast({ error: 'Could not read that note: ' + err.message }); if (alive) setText(''); });
-    return () => {
-      alive = false;
-      urls.current.forEach(URL.revokeObjectURL);
-      urls.current = [];
-    };
+    return () => { alive = false; };
   }, [note.sourceId, note.node.path, note.node.handle]);
-
-  // in-app navigation for note-to-note and anchor links (delegated on the reader)
-  const onClick = e => {
-    const a = e.target.closest('a');
-    if (!a) return;
-    if (a.classList.contains('anchor-link')) {
-      e.preventDefault();
-      document.getElementById('notes-reader')?.querySelector(decodeURIComponent(a.getAttribute('href')))
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else if (a.classList.contains('note-link')) {
-      e.preventDefault();
-      navigateRelative(note, a.dataset.href);
-    }
-  };
 
   if (text == null) return html`<div class="reader-scroll"><div class="reader-grid"><div class="md-loading">…</div></div></div>`;
 
   return html`
     <div class="reader-scroll">
       <div class="reader-grid">
-      
-        <aufbau-reader 
-          id="notes-reader" 
-          class="md" 
-          format="markdown"
-          raw=${text}
-          transform=${transform}
-          onClick=${onClick}>
-        </aufbau-reader>
-        
+
+        <${Reader} id="notes-reader" class="md" format="markdown" text=${text} />
+
         <aside class="toc">
-          <aufbau-toc
-            target="#notes-reader" 
-            selector="h1, h2, h3">
-          </aufbau-toc>
+          <${TOC} target="#notes-reader" selector="h1, h2, h3" />
         </aside>
-        
+
       </div>
     </div>
   `;
@@ -283,22 +245,6 @@ function NotesReaderBody ({ note }) {
           </div>`
       }
     </div>`;
-}
-
-// open a note reached through a relative link inside another note
-function navigateRelative (from, href) {
-  const clean = decodeURI(href.split(/[?#]/)[0]);
-  const base  = from.node.path.split('/').slice(0, -1);
-  const parts = [...base];
-  for (const seg of clean.split('/')) {
-    if (!seg || seg === '.') continue;
-    if (seg === '..') parts.pop(); else parts.push(seg);
-  }
-  const target = parts.join('/');
-  const tree   = app.lib.trees.value[from.sourceId];
-  const node   = tree && findByPath(tree, target);
-  if (node) openNote(from.sourceId, node);
-  else app.toast({ error: 'Linked note not found' });
 }
 
 // :::::: ACTIONS
