@@ -2,14 +2,15 @@
 
 // :::::: IMPORT
 
-import { computed, local, signal as persisted } from '@aufbau/signals';
-import { useEffect, useRef, useState }          from 'preact/hooks';
+import { computed, local, signal }     from '@aufbau/signals';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
 const // shared components
 Button      = await zugriff.component('Button'),
 Breadcrumbs = await zugriff.component('Breadcrumbs'),
 Empty       = await zugriff.component('Empty'),
 Icon        = await zugriff.component('Icon'),
+IconButton  = await zugriff.component('IconButton'),
 InstallTip  = await zugriff.component('InstallTip'),
 Reader      = await zugriff.component('Reader'),
 Settings    = await zugriff.component('Settings'),
@@ -27,8 +28,8 @@ app.state.filter    = '';    // tree filter query
 app.state.isNavOpen = false; // mobile: is the tree drawer showing
 
 // durable state — kept apart, hydrates from + persists to localStorage
-const open       = persisted({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
-const expanded   = persisted({ value: [],   key: 'notes:expanded', store: local });   // ['sourceId:dir/path', …]
+const open       = signal({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
+const expanded   = signal({ value: [],   key: 'notes:expanded', store: local });   // ['sourceId:dir/path', …]
 const keyOf      = (sourceId, path) => `${sourceId}:${path}`;
 const isExpanded = (sourceId, path) => expanded.value.includes(keyOf(sourceId, path));
 
@@ -268,7 +269,7 @@ function NotesReaderBody ({ note }) {
   return html`
     <div class="reader">
       <header class=${'reader-head' + (note ? '' : ' empty')}>
-        <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
+        <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
         <${Breadcrumbs} segments=${segs} />
       </header>
 
@@ -321,7 +322,7 @@ function App () {
 
   return html`<>
     <${Sidebar} />
-    <main id="app-main"><${NotesReader} /></main>
+    <main id='app-main'><${NotesReader} /></main>
   </>`;
 }
 
