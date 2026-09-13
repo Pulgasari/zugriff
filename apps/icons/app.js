@@ -275,7 +275,8 @@ function SizeControl () {
       <${Icon} name='zoom-out' />
       <input type="range" min="56" max="200" step="1" value=${itemSize.value} onInput=${e => itemSize.value = +e.target.value} />
       <${Icon} name='zoom-in' />
-    </div>`;
+    </div>
+  `;
 }
 
 function TopBar () {
