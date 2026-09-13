@@ -5,6 +5,7 @@ export * from './CopyIcon.js';
 export * from './Dropzone.js';
 export * from './Empty.js';
 export * from './FileExplorer.js';
+export * from './FolderTree.js';
 export * from './GhostButton.js';
 export * from './Icon.js';
 export * from './IconButton.js';
