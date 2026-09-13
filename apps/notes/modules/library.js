@@ -8,8 +8,11 @@ import * as fs     from '/.shared/js/filesystem/fsaccess.js';
 const MD = /\.(md|markdown|mdown|mkd|mdwn|mdtxt)$/i;
 const accept = name => MD.test(name);
 
-// sourceId -> scanned tree node | null
-const trees = signal({});
+// sourceId -> scanned tree node | null. note: the betterSignal factory reads a
+// plain object as config, so an initial map value must be wrapped in { value } —
+// `signal({})` would leave `.value` undefined, and a read before the first scan
+// (e.g. currentNote hydrating from a persisted open) would throw.
+const trees = signal({ value: {} });
 
 const lib = new zugriff.fs.FolderLibrary({
   db       : 'zugriff-notes',
