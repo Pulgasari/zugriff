@@ -247,7 +247,7 @@ function Content () {
     case 'set':       return html`<${SetView} />`;
     case 'search':    return html`<${SearchView} />`;
     case 'favorites': return html`<${FavoritesView} />`;
-    default:          return html`<${Home} />`;
+    default:          return html`<${HomeView} />`;
   }
 }
 
