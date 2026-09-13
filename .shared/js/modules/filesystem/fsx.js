@@ -62,9 +62,23 @@ copyDir = async (srcHandle, dstHandle) => {
 }
 
 // ::: CREATE
-createDir = async (root, path, name) {
+createDir = async (root, path, name) => {
   const dir = await dirAt(root, path);
   await dir.getDirectoryHandle(name, { create: true });
+}
+
+// ::: DELETE
+delete = (root, path, name) => {
+  const dir = await dirAt(root, path);
+  await dir.removeEntry(name, { recursive: true });
+}
+
+// ::: EXISTS
+exists = async (root, path, name) => {
+  const dir = await dirAt(root, path);
+  try { await dir.getFileHandle(name);      return true; } catch {}
+  try { await dir.getDirectoryHandle(name); return true; } catch {}
+  return false;
 }
 
 // ::: READ
