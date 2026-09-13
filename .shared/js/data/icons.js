@@ -50,6 +50,7 @@ export const icons = {
   'home'              : 'mdi:home-outline',
   'image'             : 'mdi:image-outline',
   'images'            : 'mdi:image-multiple-outline',
+  'image-search'      : 'mdi:image-search-outline',
   'import'            : 'mdi:import',
   'info'              : 'mdi:information-outline',
   'keyboard'          : 'tdesign:keyboard',
