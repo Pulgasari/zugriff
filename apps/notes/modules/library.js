@@ -1,14 +1,4 @@
 // apps/notes/library.js
-//
-// notes is a live view onto folders the user grants: the only durable state is the
-// set of granted directory handles, and the folder lifecycle around them is the
-// shared FolderLibrary (shared/js/filesystem/folders.js). the one app-owned bit is
-// the scanned tree per source — everything shown on screen (the tree, a note's
-// text) is read straight from disk on demand and never copied into a store.
-//
-// the built instance is extended with the app-specific surface (trees, accept,
-// readNote, fs) and exported whole; app.js binds it to the app handle, so the app
-// code reaches it as `app.lib`.
 
 import { signal }  from '@aufbau/signals';
 import * as fs     from '/.shared/js/filesystem/fsaccess.js';
@@ -22,9 +12,9 @@ const accept = name => MD.test(name);
 const trees = signal({});
 
 const lib = new zugriff.fs.FolderLibrary({
-  db:       'zugriff-notes',
-  pickerId: 'zugriff-notes',
-  stores:   { sources: {} },
+  db       : 'zugriff-notes',
+  pickerId : 'zugriff-notes',
+  stores   : { sources: {} },
 
   // a scan just (re)builds this source's tree; on a lost grant, flip it back to
   // "prompt" and surface the error on the node, then rethrow (rescanAll swallows)
@@ -46,9 +36,6 @@ const lib = new zugriff.fs.FolderLibrary({
 });
 
 // :::::: EXTEND
-// hang the app-facing surface straight off the instance; FolderLibrary already
-// carries sources / perms / scanning / ready / sourceById / load / addFolder /
-// reconnect / repick / removeFolder / scan / rescanAll.
 
 lib.fs     = fs;
 lib.accept = accept;
