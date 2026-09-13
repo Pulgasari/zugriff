@@ -27,8 +27,7 @@ function EmptySearch () {
   return html`<${Empty} icon='mdi:magnify-close' title='Nothing matches your search' hint='' />`;
 }
 
-
-
+// :::::: MAIN COMPONENT
 
 function LibraryView () {
   const books      = visibleBooks.value;
@@ -88,12 +87,10 @@ function LibraryView () {
             </h2>
             
             ${books.length
-              ? html`<aufbau-index class="book-grid" viewmode="grid" item-size="150px" gap="1rem">
-                  ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
-                </aufbau-index>`
-              : html`<${Empty} icon=${app.state.search ? 'mdi:magnify-close' : 'mdi:book-outline'}
-                       title=${app.state.search ? 'Nothing matches your search' : 'No books here yet'}
-                       hint=${app.state.search ? '' : 'Scanning may still be running, or this folder has no EPUB/PDF files.'} />`
+              ? html`<${BooksIndex}/>`
+              : app.state.search 
+                ? html`<${EmptySearch}/>`
+                : html`<${EmptyLibrary}/>`
             }
           </section>`}
     </div>`;
