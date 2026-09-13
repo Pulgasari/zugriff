@@ -99,6 +99,12 @@ async function copy (text) {
   }
   catch { app.toast({ error: 'Copy failed' }); }
 }
+/*
+const copySvg = (name) => {
+  const text = await app.api.svgText(name);
+  copy(text);
+};
+*/
 async function copySvg (name) {
   try {
     const text = await app.api.svgText(name);
@@ -112,7 +118,7 @@ async function downloadSvg (name) {
     const blob = new Blob([await app.api.svgText(name)], { type: 'image/svg+xml' });
     const href = URL.createObjectURL(blob);
     const a    = createElement('a', { href, download: name.replace(':', '-') + '.svg' });
-    document.body.appendChild(a); a.click(); a.remove();
+    document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(href), 1000);
   } 
   catch { app.toast({ error: 'Could not download the SVG' }); }
@@ -316,7 +322,7 @@ function Detail () {
           <button onClick=${() => copy(name)}><${Icon} name="copy" /> Copy name</button>
           <button onClick=${() => copySvg(name)}><${Icon} name="svg" /> Copy SVG</button>
           <button onClick=${() => downloadSvg(name)}><${Icon} name="download" /> Download</button>
-          <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => db.toggleFav(name)}>
+          <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => app.db.toggleFav(name)}>
             <${Icon} name=${fav ? 'heart' : 'heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
           </button>
         </div>
@@ -335,7 +341,7 @@ const dockItems = [
 
 function App () {
   useEffect(() => {
-    db.loadFavs().catch(() => {});
+    app.db.loadFavs().catch(() => {});
     ensureCollections(); // warms the catalogue for home stats + sets
   }, []);
 
