@@ -4,9 +4,11 @@
 
 import registry          from './data/apps.js';
 import { ZugriffApp }    from './app.js';
-import { FolderLibrary } from './filesystem/folders.js';
-import * as fsaccess     from './filesystem/fsaccess.js';
-import { opfs }          from './filesystem/opfs.js';
+import { FolderLibrary } from './modules/filesystem/folders.js';
+import * as fsPlatform   from './modules/filesystem/platform.js';
+import * as fsHandles    from './modules/filesystem/handles.js';
+import * as fsScan       from './modules/filesystem/scan.js';
+import { opfs }          from './modules/filesystem/opfs.js';
 import fmt               from './modules/fmt.js';
 import { toast }         from './modules/toast.js';
 import { html }          from './vendors.js';
@@ -56,7 +58,9 @@ const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
 const zugriff = {
   // namespaces
   fmt,
-  fs: Object.assign({ FolderLibrary }, fsaccess),
+  // the whole filesystem layer, app-agnostic: platform seam + handle ops +
+  // FolderLibrary + scan helpers. opfs stays separate, below.
+  fs: { FolderLibrary, ...fsPlatform, ...fsHandles, ...fsScan },
   opfs,
   registry,
   toast,

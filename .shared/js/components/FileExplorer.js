@@ -10,14 +10,13 @@ an app drops in `<${FileExplorer} backend=${backend} />` and gets:
 - and (when the backend is writable) create / upload / rename / delete.
 
 it is deliberately backend-agnostic. anything that can hand back a
-FileSystemDirectoryHandle root works: 
-- the private OPFS (opfsBackend, in dirfs.js) 
-- or a folder the user grants off their disk (what the files app app builds). 
+FileSystemDirectoryHandle root works:
+- the private OPFS (zugriff.opfs.backend)
+- or a folder the user grants off their disk (what the files app app builds).
 the component itself knows nothing about *where* the tree lives.
 
 import { FileExplorer } from './../../shared/js/components/index.js';
-import { opfsBackend }  from './../../shared/js/filesystem/dirfs.js';
-html`<${FileExplorer} backend=${opfsBackend} />`
+html`<${FileExplorer} backend=${zugriff.opfs.backend} />`
 
 styles live in shared/css/explorer.css (opt-in, scoped under .fx) 
 — a host links it the way it opts into panes.css or inspector.css.
@@ -33,8 +32,10 @@ import { html, useEffect, useRef }  from './../vendors.js';
 import { computed, signal        }  from './../vendors.js';
 import { signal as persist, local } from '@aufbau/signals';
 
-import * as dirfs  from './../filesystem/dirfs.js';
 import Icon        from './Icon.js';
+
+// tree ops over the backend's root handle come from the runtime fs layer
+const dirfs = zugriff.fs;
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
@@ -535,8 +536,8 @@ function StatusBar () {
 
 /**
  * <${FileExplorer} backend=${backend} />
- *   backend — a descriptor from dirfs.js (opfsBackend), or one an app builds
- *             around a granted on-disk folder. see dirfs.js for the shape.
+ *   backend — the OPFS descriptor (zugriff.opfs.backend), or one an app builds
+ *             around a granted on-disk folder. see opfs.js for the shape.
  */
 
 function FileExplorer ({ backend: be }) {

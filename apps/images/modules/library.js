@@ -10,8 +10,9 @@
 // thumbnail, generated lazily in the ui. zugriff is global, so no runtime import.
 
 import { signal }     from '@aufbau/signals';
-import { syncSource } from '/.shared/js/filesystem/scan.js';
-import * as fs        from '/.shared/js/filesystem/fsaccess.js';
+
+// the filesystem layer, uniformly via the runtime
+const fs = zugriff.fs;
 
 const IMAGE_RE = /\.(png|jpe?g|jfif|gif|webp|avif|bmp|svg|ico|heic|heif|tiff?)$/i;
 const accept = name => IMAGE_RE.test(name);
@@ -31,7 +32,7 @@ const lib = new zugriff.fs.FolderLibrary({
 
   scan: async (s, { db }) => {
     const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    pics.value = await syncSource({
+    pics.value = await fs.syncSource({
       db, store: 'pics', sourceId: s.id, files, rows: pics.value, keyOf,
       makeRecord: (f, { key, sourceId, sig, prev }) => ({
         key, sourceId, path: f.path, name: f.name, ext: f.ext,

@@ -69,8 +69,8 @@ freigegebenen Ordner neu bestätigen, was das „Ordner einmal freigeben und
 browsen"-Modell der Folder-Apps kaputt macht. Ein Capacitor-Wrapper bringt
 stattdessen eine native Filesystem-Bridge (`@capacitor/filesystem`) mit, deren
 **SAF-Freigabe persistiert** wird. Die geteilte Filesystem-Ebene
-(`.shared/js/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt automatisch
-das native FS (siehe `platform.js` + `cap-fs.js`).
+(`.shared/js/modules/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt
+automatisch das native FS (siehe `platform.js`).
 
 **Ablauf** (pro App): JDK 17 + Android SDK → Signing-Key bereitstellen →
 Capacitor-Projekt scaffolden (`gen-capacitor-config.mjs` → `npm i

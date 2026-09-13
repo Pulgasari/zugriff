@@ -10,7 +10,9 @@
 // `db.workspace.*` api; here it uses the shared @bunker/db store instead.
 
 import { db, setup } from './db.js';
-import * as platform from '/.shared/js/filesystem/platform.js';
+
+// hydrate/dehydrate (the browser<->capacitor persistence seam) via the runtime
+const platform = zugriff.fs;
 
 const ROOT_ID = 'root-dir';
 

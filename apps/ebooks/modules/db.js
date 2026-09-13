@@ -2,7 +2,7 @@
 //
 // storage for the library. the granted-folder lifecycle (the `sources` store,
 // permissions, scanning) is the shared FolderLibrary
-// (shared/js/filesystem/folders.js); this module owns the two app stores it
+// (shared/js/modules/filesystem/folders.js); this module owns the two app stores it
 // scans into:
 //
 //   books     one record per book file — path, extracted title/author, a cover
@@ -15,9 +15,10 @@
 // book to pull real metadata and a cover, updating the grid as each one lands.
 
 import { signal, computed }      from '@aufbau/signals';
-import { syncSource, MetaQueue } from '/.shared/js/filesystem/scan.js';
-import * as fs                   from '/.shared/js/filesystem/fsaccess.js';
 import { accept, kindOf, prettyName, extractMeta } from './library.js';
+
+// the filesystem layer, uniformly via the runtime
+const fs = zugriff.fs;
 
 const SEP   = '/';   // key = sourceId + '/' + path; sourceIds are UUIDs, so this never collides
 const keyOf = (sourceId, path) => sourceId + SEP + path;
@@ -32,8 +33,8 @@ progress = signal({});        // key -> { location, page, pages, percent, update
 
 // extraction (unzip / pdf-parse / cover render) is the slow part of a scan, so a
 // few books go at once through a bounded gate while the fast listing is already
-// on screen. see shared/js/filesystem/scan.js.
-const meta = new MetaQueue(3);
+// on screen. see shared/js/modules/filesystem/scan.js.
+const meta = new fs.MetaQueue(3);
 export const pending = meta.pending;   // books still queued for metadata extraction
 
 export const bookByKey  = key => books.value.find(b => b.key === key) ?? null;
@@ -58,7 +59,7 @@ const lib = new zugriff.fs.FolderLibrary({
 
   scan: async (s, { db }) => {
     const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    const next  = await syncSource({
+    const next  = await fs.syncSource({
       db, store: 'books', sourceId: s.id, files, rows: books.value, keyOf,
       makeRecord: (f, { key, sourceId, sig, prev }) => ({
         key, sourceId, path: f.path, name: f.name, kind: kindOf(f.name),

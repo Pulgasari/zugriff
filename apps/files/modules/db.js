@@ -2,7 +2,7 @@
 
 // the files app's only durable state is the one folder the user grants as the explorer's root:
 // persist the handle, re-ask for permission next visit instead of re-picking, forget it on demand 
-// — the single-root shape of the shared FolderLibrary (see '.shared/js/filesystem/folders.js').    
+// — the single-root shape of the shared FolderLibrary (see '.shared/js/modules/filesystem/folders.js').    
 // nothing on disk is copied; the app is a live view.
 
 const lib = new zugriff.fs.FolderLibrary({

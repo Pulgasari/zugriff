@@ -1,7 +1,9 @@
 // apps/notes/library.js
 
 import { signal }  from '@aufbau/signals';
-import * as fs     from '/.shared/js/filesystem/fsaccess.js';
+
+// the filesystem layer, uniformly via the runtime
+const fs = zugriff.fs;
 
 // what counts as a note. markdown and its usual spellings; a folder full of
 // anything else simply scans to nothing.

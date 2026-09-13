@@ -1,48 +1,46 @@
-// shared/js/filesystem/cap-fs.js
+// .shared/js/modules/filesystem/platform.js
 //
-// the Capacitor side of the filesystem seam — the native counterpart to a
-// browser FileSystemDirectoryHandle. everything downstream (dirfs.js, scanTree,
-// FolderLibrary, syncSource, the code + files apps) is written against the
-// File System Access *handle interface*: getDirectoryHandle / getFileHandle /
-// entries / values / getFile / createWritable / removeEntry / isSameEntry /
-// queryPermission / requestPermission / .kind / .name. so instead of forking all
-// of that per platform, we implement one pair of shim classes here that speak the
-// exact same interface but are backed by the native @capacitor/filesystem plugin.
-// then nothing downstream needs to know which platform it is on.
+// the one place that knows which platform we run on, so the rest of the fs layer
+// does not have to. a zugriff app runs off its https origin either in a plain
+// browser or inside the Capacitor wrapper (android). two things genuinely differ:
 //
-// why the plugin is reached through the bridge, not imported: a zugriff app runs
-// off its live https origin even inside the Capacitor wrapper (server.url points
-// at zugriff.dev — see the build-capacitor workflow), so the npm @capacitor/*
-// packages are never bundled into what the webview loads. what *is* there is the
-// native bridge Capacitor injects as globalThis.Capacitor, with every installed
-// plugin auto-registered under Capacitor.Plugins. so we call those directly and
-// keep the web import map free of capacitor entries.
+//   1. picking a folder   — showDirectoryPicker() vs the native SAF picker
+//   2. persisting a root  — a browser handle is structured-cloneable and round-
+//                           trips through IndexedDB as-is; a native handle is not,
+//                           so we store a plain { uri } descriptor and rebuild it.
 //
-// android folder grants come from the Storage Access Framework: a directory is
-// picked with the file-picker plugin, which hands back a *persisted* content://
-// tree URI. that persisted grant is exactly what fixes the pain the browser File
-// System Access API causes on android (a fresh confirmation every visit) — the
-// URI keeps working across app restarts, so re-granting is silent.
+// everything else (walking, reading, writing) is the shared File System Access
+// *handle interface* — getDirectoryHandle / getFileHandle / entries / values /
+// getFile / createWritable / removeEntry / isSameEntry / query+requestPermission /
+// .kind / .name. the Capacitor shim below implements that exact interface backed
+// by the native @capacitor/filesystem plugin, so nothing downstream branches on
+// platform: handles.js / FolderLibrary / the apps all speak one interface.
 //
-// a handle's identity here is its URI (a content:// or file:// string). the read
-// path (readdir / readFile / stat) is robust and drives every folder app (notes,
-// ebooks, audio-manager, files — all read-only). writes on a SAF tree are
-// best-effort (see createWritable / getFileHandle below).
+// hydrate/dehydrate key off the *value* (is this a cap handle / a { __capfs }
+// descriptor?), not off isNative(), so the web path stays a pure identity and
+// existing browser records are untouched.
 
-// ── the bridge ─────────────────────────────────────────────────────────────
+// :::::: THE BRIDGE
+//
+// the npm @capacitor/* packages are never bundled into what the webview loads
+// (server.url points at the live origin — see the build-capacitor workflow). what
+// *is* there is the bridge Capacitor injects as globalThis.Capacitor, with every
+// installed plugin under Capacitor.Plugins. so we reach the plugins through that
+// and keep the import map free of capacitor entries.
 
-export const isCapacitor = () => !!globalThis.Capacitor?.isNativePlatform?.();
+/** running inside the native Capacitor wrapper (vs a plain browser)? */
+export const isNative = () => !!globalThis.Capacitor?.isNativePlatform?.();
 
 const plugin = name => {
   const p = globalThis.Capacitor?.Plugins?.[name];
-  if (!p) throw new Error(`[cap-fs] the "${name}" Capacitor plugin is not available`);
+  if (!p) throw new Error(`[fs/platform] the "${name}" Capacitor plugin is not available`);
   return p;
 };
 
 const Filesystem = () => plugin('Filesystem');
-const FilePicker = () => plugin('FilePicker');   // @capawesome/capacitor-file-picker
+const FilePicker  = () => plugin('FilePicker');   // @capawesome/capacitor-file-picker
 
-// ── base64 <-> binary (the plugin speaks base64 for file bodies) ─────────────
+// :::::: base64 <-> binary (the plugin speaks base64 for file bodies)
 
 function b64ToArrayBuffer (b64) {
   const bin = atob(b64);
@@ -85,14 +83,21 @@ const mimeOf = name => {
   return dot > 0 ? (MIME[name.slice(dot + 1).toLowerCase()] ?? '') : '';
 };
 
-// content:// URIs cannot be reliably extended by string concatenation, but
-// file:// ones can, and that is the only place a joined child URI is used (create
-// paths). readdir returns each child's real URI, so the read path never joins.
+// content:// URIs cannot be reliably extended by string concatenation, but file://
+// ones can, and that is the only place a joined child URI is used (create paths).
+// readdir returns each child's real URI, so the read path never joins.
 const joinUri = (parent, name) => `${parent.replace(/\/+$/, '')}/${encodeURIComponent(name)}`;
 
-// ── file handle ──────────────────────────────────────────────────────────────
+// :::::: THE CAPACITOR HANDLE SHIM
+//
+// android folder grants come from the Storage Access Framework: a directory is
+// picked with the file-picker plugin, which hands back a *persisted* content://
+// tree URI — the fix for the browser File System Access pain on android (a fresh
+// confirmation every visit). a handle's identity here is its URI. the read path
+// (readdir / readFile / stat) drives every folder app; writes on a SAF tree are
+// best-effort (see createWritable / getFileHandle).
 
-export class CapFileHandle {
+class CapFileHandle {
   kind = 'file';
   constructor (uri, name) { this._uri = uri; this.name = name; }
 
@@ -106,10 +111,10 @@ export class CapFileHandle {
   }
 
   /**
-   * a writable that buffers writes and flushes once on close, since the plugin
-   * has no streaming write. good enough for the small files the apps produce.
-   * NOTE: creating a brand-new file under a SAF content:// tree this way is
-   * best-effort — overwriting an existing file (the common case) is reliable.
+   * a writable that buffers writes and flushes once on close, since the plugin has
+   * no streaming write. good enough for the small files the apps produce. creating
+   * a brand-new file under a SAF content:// tree this way is best-effort;
+   * overwriting an existing file (the common case) is reliable.
    */
   async createWritable () {
     const uri = this._uri; const chunks = [];
@@ -123,14 +128,12 @@ export class CapFileHandle {
     };
   }
 
-  async isSameEntry (other)      { return other?._uri === this._uri; }
-  async queryPermission ()       { return 'granted'; }   // the SAF grant is persisted at pick time
-  async requestPermission ()     { return 'granted'; }
+  async isSameEntry (other)  { return other?._uri === this._uri; }
+  async queryPermission ()   { return 'granted'; }   // the SAF grant is persisted at pick time
+  async requestPermission () { return 'granted'; }
 }
 
-// ── directory handle ─────────────────────────────────────────────────────────
-
-export class CapDirHandle {
+class CapDirHandle {
   kind = 'directory';
   constructor (uri, name) { this._uri = uri; this.name = name; }
 
@@ -184,10 +187,8 @@ export class CapDirHandle {
   async requestPermission () { return 'granted'; }
 }
 
-// ── picking ──────────────────────────────────────────────────────────────────
-
-// name a tree URI for display: decode its last path segment, which for a SAF
-// tree URI is the document id (e.g. "primary:Music") — take the part after ':'.
+// name a tree URI for display: decode its last path segment, which for a SAF tree
+// URI is the document id (e.g. "primary:Music") — take the part after ':'.
 function nameFromUri (uri) {
   try {
     const last = decodeURIComponent(uri.replace(/\/+$/, '').split('/').pop() || '');
@@ -196,22 +197,53 @@ function nameFromUri (uri) {
   } catch { return 'folder'; }
 }
 
-/** open the native SAF directory picker → a live CapDirHandle, or null if cancelled */
-export async function pickDirectory () {
+async function capPick () {
   try {
     const res = await FilePicker().pickDirectory();          // persists the grant on android
     const uri = res?.path ?? res?.uri;
     if (!uri) return null;
     return new CapDirHandle(uri, nameFromUri(uri));
   } catch (err) {
-    // the picker throws / rejects on user cancel — normalise that to null
-    if (/cancel/i.test(err?.message || '')) return null;
+    if (/cancel/i.test(err?.message || '')) return null;     // normalise user-cancel to null
     throw err;
   }
 }
 
-/** rebuild a live handle from what dehydrate() persisted */
-export const hydrate = ref => new CapDirHandle(ref.uri, ref.name);
+const isCapRef    = v => v && typeof v === 'object' && v.__capfs === true;
+const capHydrate  = ref    => new CapDirHandle(ref.uri, ref.name);
+const capDehydrate = handle => ({ __capfs: true, uri: handle._uri, name: handle.name });
 
-/** the structured-cloneable descriptor we store for a CapDirHandle */
-export const dehydrate = handle => ({ __capfs: true, uri: handle._uri, name: handle.name });
+// :::::: THE PUBLIC SEAM
+
+/** can this platform grant a folder at all? */
+export function supported () {
+  return isNative()
+    ? true
+    : (typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function');
+}
+
+/**
+ * open the folder picker → a live directory handle, or null if cancelled. on the
+ * web this is showDirectoryPicker (must run inside a user gesture); on native the
+ * SAF picker, which persists the grant so it survives restarts. either way the
+ * result satisfies the shared handle interface.
+ */
+export async function pick ({ id, mode = 'read', startIn } = {}) {
+  if (isNative()) return capPick();
+  if (!supported()) throw new Error('This browser cannot open a folder — try a Chromium-based one.');
+  try {
+    return await window.showDirectoryPicker({ id, mode, startIn });
+  } catch (err) {
+    if (err?.name === 'AbortError') return null;   // the user dismissed the picker
+    throw err;
+  }
+}
+
+/** the public name apps call — an alias of pick() */
+export const pickDirectory = pick;
+
+/** a stored root descriptor -> a live handle (web: identity) */
+export const hydrate = ref => (isCapRef(ref) ? capHydrate(ref) : ref);
+
+/** a live handle -> the structured-cloneable thing we persist (web: identity) */
+export const dehydrate = handle => (handle instanceof CapDirHandle ? capDehydrate(handle) : handle);

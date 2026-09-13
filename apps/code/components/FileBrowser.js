@@ -3,10 +3,12 @@
 
 import { html, useEffect } from './../vendors.js';
 import { signal }          from '@aufbau/signals';
-import * as fsaccess from '/.shared/js/filesystem/fsaccess.js';   // picks via the platform seam (browser picker or native SAF)
 import Modal    from './Modal.js';
 import Icon     from '/.shared/js/components/Icon.js';
 import TreeNode from './TreeNode.js';
+
+// picks via the runtime fs layer (browser picker or native SAF seam)
+const fsaccess = zugriff.fs;
 
 const app = zugriff.app;
 const { local: fs, fsops, clipboard, version, bump, ask, validName } = app.workspaces;

@@ -9,9 +9,10 @@
 // an icon in the ui. zugriff is global, so no runtime import.
 
 import { signal }            from '@aufbau/signals';
-import { syncSource }        from '/.shared/js/filesystem/scan.js';
-import * as fs               from '/.shared/js/filesystem/fsaccess.js';
 import { createPosterCache } from '/.shared/js/media/poster.js';
+
+// the filesystem layer, uniformly via the runtime
+const fs = zugriff.fs;
 
 const VIDEO_RE = /\.(mp4|m4v|webm|mov|mkv|avi|ogv|ogg|3gp|flv|wmv|mpe?g|ts)$/i;
 const accept = name => VIDEO_RE.test(name);
@@ -31,7 +32,7 @@ const lib = new zugriff.fs.FolderLibrary({
 
   scan: async (s, { db }) => {
     const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    clips.value = await syncSource({
+    clips.value = await fs.syncSource({
       db, store: 'clips', sourceId: s.id, files, rows: clips.value, keyOf,
       makeRecord: (f, { key, sourceId, sig, prev }) => ({
         key, sourceId, path: f.path, name: f.name, ext: f.ext,
