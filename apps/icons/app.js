@@ -19,6 +19,7 @@ Dock       = await zugriff.component('Dock'),
 Empty      = await zugriff.component('Empty'),
 Icon       = await zugriff.component('Icon'),
 IconButton = await zugriff.component('IconButton'),
+Loading    = await zugriff.component('Loading'),
 Settings   = await zugriff.component('Settings');
 
 // ::: the app handle
@@ -156,38 +157,6 @@ function IconGrid ({ names }) {
     </div>`;
 }
 
-// ── sidebar ──────────────────────────────────────────────────────────────
-
-function NavItem ({ name, icon, label }) {
-  return html`
-    <button class=${'nav-item' + (app.state.route.name === name ? ' active' : '')} onClick=${() => name === 'sets' ? (ensureCollections(), app.go('sets')) : app.go(name)}>
-      <${Icon} name=${icon} /> <span>${label}</span>
-    </button>`;
-}
-
-function Sidebar () {
-  return html`
-    <aside class=${'sidebar' + (app.state.nav ? ' open' : '')}>
-      <div class="brand">
-        <${Icon} name="mdi:emoticon-outline" /> <span>Icons</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.nav = false}><${Icon} name="mdi:close" /></button>
-      </div>
-      <nav class="nav-group">
-        <${NavItem} name="home"      icon="mdi:home-outline"          label="Home" />
-        <${NavItem} name="search"    icon="mdi:magnify"               label="Search" />
-        <${NavItem} name="sets"      icon="mdi:image-multiple-outline" label="Sets" />
-        <${NavItem} name="favorites" icon="mdi:heart-outline"         label="Favourites" />
-      </nav>
-      <div class="side-foot">
-        <div class="side-links">
-          <a href="./../"><${Icon} name="mdi:view-grid-outline" /> apps</a>
-          <a href="./../../"><${Icon} name="mdi:home-outline" /> launcher</a>
-        </div>
-        <div class="powered">powered by <a href="https://iconify.design" target="_blank" rel="noopener">Iconify</a></div>
-      </div>
-    </aside>`;
-}
-
 // ── views ────────────────────────────────────────────────────────────────
 
 function Home () {
@@ -276,6 +245,14 @@ function Content () {
   }
 }
 
+app.views = {
+  home   : 'HomeView',
+  favs   : 'FavoritesView',
+  search : 'SearchView',
+  set    : 'SetView',
+  sets   : 'SetsView',
+};
+
 // ── top bar ──────────────────────────────────────────────────────────────
 
 function SizeControl () {
@@ -342,10 +319,10 @@ function Detail () {
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 const dockItems = [
-  { icon: 'mdi:home', label: 'home',   view: 'home'      },
-  { icon: 'search',   label: 'search', view: 'search'    },
-  { icon: 'images',   label: 'sets',   view: 'sets'      },
-  { icon: 'heart',    label: 'favs',   view: 'favorites' },
+  { icon: 'mdi:home', label: 'home',   view: 'home'   },
+  { icon: 'search',   label: 'search', view: 'search' },
+  { icon: 'images',   label: 'sets',   view: 'sets'   },
+  { icon: 'heart',    label: 'favs',   view: 'favs'   },
 ];
 
 function App () {
