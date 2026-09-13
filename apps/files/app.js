@@ -131,17 +131,12 @@ const isNotGranted   = () => db.perm.value !== 'granted';
 function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
-  return html`<>
-    ${
-        isNotSupported() ? html`<${Unsupported} />`
-      : isLoading()      ? html`<${Icon} name='loading' />`
-      : isWelcome()      ? html`<${Welcome} />`
-      : isNotGranted()   ? html`<${Reconnect} />`
-      : html`
-        <${Sidebar} />
-        <main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`
-    }
-  </>`;
+  return isNotSupported() ? html`<${Unsupported} />`
+       : isLoading()      ? html`<${Icon} name='loading' />`
+       : isWelcome()      ? html`<${Welcome} />`
+       : isNotGranted()   ? html`<${Reconnect} />`
+       : html`<main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`;
+     //: html`<${Sidebar} /><main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`;
 }
 
 // :::::: BOOT
