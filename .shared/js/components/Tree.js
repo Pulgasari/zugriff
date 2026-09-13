@@ -15,8 +15,8 @@ import { useRef, useEffect } from './../vendors.js';
 function Tree ({ nodes, onSelect, onToggle, class: klass }) {
   const ref = useRef(null);
 
-  // feed the data as a property (never an attribute), waiting for the lazily
-  // registered element to upgrade first
+  // feed the data as a property (never an attribute),
+  // waiting for the lazily registered element to upgrade first
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
