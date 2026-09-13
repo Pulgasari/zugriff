@@ -104,9 +104,11 @@ function FolderTree ({
   };
 
   const renderSource = source => {
-    const state = lib.perms.value[source.id];
-    const tree  = lib.trees.value[source.id];
-    const busy  = lib.scanning.value[source.id];
+    // `?.` because these maps can be momentarily unset — a FolderLibrary seeds
+    // perms/scanning lazily, and trees only exists once the app's scan populates it
+    const state = lib.perms.value?.[source.id];
+    const tree  = lib.trees.value?.[source.id];
+    const busy  = lib.scanning.value?.[source.id];
 
     const remove = async () => {
       if (!confirm(`Close “${source.name}”? Your files are untouched — this only forgets the folder.`)) return;
