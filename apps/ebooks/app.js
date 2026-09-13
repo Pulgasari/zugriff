@@ -18,10 +18,10 @@ InstallTip = await zugriff.component('InstallTip'),
 Settings   = await zugriff.component('Settings');
 
 const // local
-LibraryView = await app.view('LibraryView');
+LibraryView = await app.view('LibraryView'),
+ReaderView  = await app.view('ReaderView');
 
 import { stored } from '/.shared/js/app/signals.js';
-import * as fs    from '/.shared/js/filesystem/fsaccess.js';
 
 // ::: app modules
 import { createPdfReader, createEpubReader } from './modules/reader.js';
@@ -29,6 +29,7 @@ import { createPdfReader, createEpubReader } from './modules/reader.js';
 // ::: the app handle
 const app = zugriff.app;
 app.db = await app.module('db');
+app.fs = zugriff.fs;
 
 // :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::
 // ephemeral ui state on app.state (no `.value`); the library is app.db (plain signals). sort
@@ -74,62 +75,6 @@ const continueReading = computed(() =>
     .filter(b => db.progressOf(b.key)?.lastOpenedAt)
     .sort((a, b) => (db.progressOf(b.key).lastOpenedAt) - (db.progressOf(a.key).lastOpenedAt))
     .slice(0, 12));
-
-// :::::: SHARED BITS ::::::::::::::::::::::::::::::::::::::::
-
-
-
-
-
-// :::::: LIBRARY VIEW :::::::::::::::::::::::::::::::::::::::
-
-function SortPicker ({ value, options, onChange }) {
-  return html`
-    <div class="seg">
-      ${options.map(([val, label]) => html`
-        <button key=${val} class=${'seg-btn' + (value === val ? ' active' : '')}
-                onClick=${() => onChange(val)}>${label}</button>`)}
-    </div>`;
-}
-
-function FolderBar () {
-  const list = db.sources.value;
-  if (list.length < 2) return null;
-  return html`
-    <div class="folder-bar">
-      <button class=${'chip' + (app.state.folder === '' ? ' active' : '')} onClick=${() => app.state.folder = ''}>All</button>
-      ${list.map(s => html`
-        <button key=${s.id} class=${'chip' + (app.state.folder === s.id ? ' active' : '')}
-                onClick=${() => app.state.folder = s.id}>${s.name}</button>`)}
-    </div>`;
-}
-
-function SourceStatus () {
-  // surface folders that need reconnecting after a reload
-  const stale = db.sources.value.filter(s => db.perms.value[s.id] && db.perms.value[s.id] !== 'granted');
-  if (!stale.length) return null;
-  return html`
-    <div class="reconnect-bar">
-      <${Icon} name="mdi:folder-alert-outline" />
-      <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
-      ${stale.map(s => html`
-        <div key=${s.id} class="reconnect-item">
-          <span class="reconnect-name">${s.name}</span>
-          <button class="btn small primary" onClick=${() => db.reconnect(s.id).then(res => {
-            if (res.granted) return;
-            const why = res.error ? `${res.error.name || 'error'}` : `browser said “${res.state}”`;
-            console.warn('[ebooks] reconnect failed', { source: s, ...res });
-            flash(`Reconnect failed — ${why}. Try “Choose folder”.`, 'err');
-          })}>
-            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
-          <button class="btn small ghost" title="Re-select the folder — always works"
-                  onClick=${() => db.repick(s.id).then(ok => ok || flash(`Could not open ${s.name}`, 'err'))}>
-            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
-        </div>`)}
-    </div>`;
-}
-
-
 
 // :::::: READER VIEW :::::::::::::::::::::::::::::::::::::::
 
@@ -186,7 +131,7 @@ function App () {
   const route = app.state.route;
   return route.name === 'reader'
     ? html`<${ReaderView} bookKey=${route.key} key=${route.key} />`
-    : html`<main id="app-main"><${Library} /></main>`;
+    : html`<main id="app-main"><${LibraryView} /></main>`;
 }
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
