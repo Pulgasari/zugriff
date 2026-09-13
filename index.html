@@ -4,19 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
-  <title>zugriff</title>
-
-  <!-- app colour (boot.js overwrites theme-color from the stored theme) -->
   <meta name="theme-color" content="#282a36">
   <meta name="msapplication-TileColor" content="#282a36">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="#282a36">
-
+  
+  <title>zugriff</title>
   <link rel="stylesheet" href="/.shared/css/index.css">
 
-  <!-- route-aware head: one shell for the launcher (home/apps/tools) and every app
-       route; inject the route's head resources before first paint (absolute paths) -->
   <script>
     (() => {
       const route    = location.pathname.split('/')[1] || 'home';
@@ -44,17 +39,8 @@
   <script src="/.shared/js/boot.js"></script>
 
   <style>
-    /* start transition: chill fade-in, no layout shift (boot.js toggles is-loading -> is-ready) */
-    :root.is-loading #app {
-      opacity : 0;
-      filter  : blur(3px);
-    }
-    :root.is-ready #app {
-      opacity    : 1;
-      filter     : none;
-      transition : opacity 500ms ease, filter 500ms ease;
-    }
-
+    :root.is-loading #app { opacity: 0; filter: blur(3px); }
+    :root.is-ready   #app { opacity: 1; filter: none; transition: opacity 500ms ease, filter 500ms ease; }
     /* launcher-only backdrop layers */
     .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12; }
     body > #app, #welcome, header, footer { position: relative; z-index: 1; }
