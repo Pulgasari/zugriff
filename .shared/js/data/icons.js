@@ -45,7 +45,7 @@ export const icons = {
   'fontsize'          : 'material-symbols:format-size',
   'fullscreen'        : 'mdi:fullscreen',
   'grid'              : 'mdi:view-grid-outline',
-  'heart',            : 'mdi:heart',
+  'heart'             : 'mdi:heart',
   'heart-outline'     : 'mdi:heart-outline',
   'home'              : 'mdi:home-outline',
   'image'             : 'mdi:image-outline',
