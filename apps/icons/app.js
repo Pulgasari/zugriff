@@ -15,6 +15,7 @@ import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
 ActionMenu = await zugriff.component('ActionMenu'),
+Button     = await zugriff.component('Button'),
 Dock       = await zugriff.component('Dock'),
 Empty      = await zugriff.component('Empty'),
 Icon       = await zugriff.component('Icon'),
@@ -131,17 +132,19 @@ function IconCell ({ name }) {
     <button class="cell" onClick=${() => app.state.detail = name} title=${name}>
       <span class="glyph"><${IconGlyph} name=${name} /></span>
       <span class="cname">${name.split(':')[1]}</span>
-      <button class=${'heart' + (fav ? ' on' : '')} title="Favourite"
-              onClick=${e => { e.stopPropagation(); db.toggleFav(name); }}>
-        <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} />
-      </button>
-    </button>`;
+      <${Button}
+        class=${'heart' + (fav ? ' on' : '')}
+        icon=${fav ? 'mdi:heart' : 'mdi:heart-outline'}
+        title="Favourite"
+        onClick=${e => { e.stopPropagation(); db.toggleFav(name); }}
+      />
+    </button>
+  `;
 }
 
 function IconGrid ({ names }) {
   const ref = useRef(null);
 
-  // resizable: two-finger + ctrl/⌘ wheel, best-effort (the slider always works)
   useEffect(() => {
     let handle;
     import('@aufbau/gestures')
@@ -154,12 +157,13 @@ function IconGrid ({ names }) {
   return html`
     <div class="grid" ref=${ref} style=${`--isz:${itemSize.value}px`}>
       ${names.map(n => html`<${IconCell} key=${n} name=${n} />`)}
-    </div>`;
+    </div>
+  `;
 }
 
 // ── views ────────────────────────────────────────────────────────────────
 
-function Home () {
+function HomeView () {
   const list = collections.value;
   const sets = list?.length ?? 0;
   const total = (list || []).reduce((n, c) => n + (c.total || 0), 0);
@@ -170,8 +174,8 @@ function Home () {
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <button class="btn primary" onClick=${() => { ensureCollections(); app.go('sets'); }}><${Icon} name="mdi:image-multiple-outline" /> Browse sets</button>
-          <button class="btn" onClick=${() => app.go('search')}><${Icon} name="mdi:magnify" /> Search</button>
+          <${Button} icon='images' label='browse sets' onClick=${() => { ensureCollections(); app.go('sets'); }} />
+          <${Button} icon='search' label='search'      onClick=${() => app.go('search')} />
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -183,11 +187,12 @@ function Home () {
               .map(c => html`<button class="chip" key=${c.prefix} onClick=${() => openSet(c.prefix)}>${c.name} <span>${nfmt(c.total)}</span></button>`)}
           </div>
         </div>`}
-    </div>`;
+    </div>
+  `;
 }
 
 function SetsView () {
-  if (!collections.value) return html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+  if (!collections.value) return html`<${Loading}/>`;
   const rows = filteredSets.value;
   return html`
     <div class="sets">
@@ -199,21 +204,21 @@ function SetsView () {
           <div class="set-name" title=${c.name}>${c.name}</div>
           <div class="set-meta">${nfmt(c.total)} icons${c.author ? ` · ${c.author}` : ''}</div>
         </button>`)}
-      ${!rows.length && html`<${Empty} icon="mdi:image-search-outline" title="Nothing here." />`}
+      ${!rows.length && html`<${Empty} icon='image-search' title="Nothing here." />`}
     </div>`;
 }
 
 function SetView () {
   const d = setData.value;
-  if (setLoading.value || !d) return html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+  if (setLoading.value || !d) return html`<${Loading}/>`;
   return html`
     <div class="setview">
-      <header class="setview-head">
+      <header>
         <div>
           <h1>${d.title}</h1>
           <div class="sub">${nfmt(d.total)} icons · <code>${d.prefix}</code></div>
         </div>
-        <button class="btn small" onClick=${() => copy(d.prefix)}><${Icon} name="mdi:content-copy" /> Copy prefix</button>
+        <${Button} class='small' icon='copy' label='copy prefix' onClick=${() => copy(d.prefix)} />
       </header>
       <${IconGrid} names=${d.icons} />
     </div>`;
@@ -222,17 +227,18 @@ function SetView () {
 function SearchView () {
   return html`
     <div class="searchview">
-      ${searching.value ? html`<div class="loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`
+      ${searching.value ? html`<${Loading}/>`
         : app.state.query.trim() ? html`<${IconGrid} names=${results.value} />`
-        : html`<div class="empty"><${Icon} name="mdi:magnify" /><p>Search across every Iconify set.</p></div>`}
-    </div>`;
+        : html`<${Empty} icon='search' hint='Search across every Iconify set.' />`}
+    </div>
+  `;
 }
 
 function FavoritesView () {
   const names = [...db.favs.value];
   return names.length
     ? html`<${IconGrid} names=${names} />`
-    : html`<div class="empty"><${Icon} name="mdi:heart-outline" /><p>No favourites yet — tap the heart on any icon.</p></div>`;
+    : html`<${Empty} icon='heart' hint='No favourites yet — tap the heart on any icon.' />`;
 }
 
 function Content () {
@@ -245,6 +251,7 @@ function Content () {
   }
 }
 
+/*
 app.views = {
   home   : 'HomeView',
   favs   : 'FavoritesView',
@@ -252,15 +259,16 @@ app.views = {
   set    : 'SetView',
   sets   : 'SetsView',
 };
+*/
 
 // ── top bar ──────────────────────────────────────────────────────────────
 
 function SizeControl () {
   return html`
     <div class="size">
-      <${Icon} name="mdi:magnify-minus-outline" />
+      <${Icon} name='zoom-out' />
       <input type="range" min="56" max="200" step="1" value=${itemSize.value} onInput=${e => itemSize.value = +e.target.value} />
-      <${Icon} name="mdi:magnify-plus-outline" />
+      <${Icon} name='zoom-in' />
     </div>`;
 }
 
@@ -269,17 +277,17 @@ function TopBar () {
   const grid = r.name === 'set' || r.name === 'search' || r.name === 'favorites';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => app.state.nav = true}><${Icon} name="mdi:menu" /></button>
+      <${IconButton} aria-label="Menu" icon='menu' onClick=${() => app.state.nav = true} />
       ${r.name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go('sets')} />`}
 
       ${r.name === 'search'
         ? html`<div class="searchbox big">
-            <${Icon} name="mdi:magnify" />
+            <${Icon} name='search' />
             <input type="search" placeholder="Search all of Iconify…" autofocus value=${app.state.query} onInput=${e => onSearch(e.target.value)} />
           </div>`
         : r.name === 'sets'
         ? html`<div class="searchbox">
-            <${Icon} name="mdi:magnify" />
+            <${Icon} name='search' />
             <input type="search" placeholder="Filter sets…" value=${app.state.setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
         : html`<h1 class="topbar-title">${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
@@ -305,9 +313,9 @@ function Detail () {
         <div class="sheet-name">${icon}</div>
         <div class="sheet-set"><button class="linkish" onClick=${() => { app.state.detail = null; openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
-          <button class="btn" onClick=${() => copy(name)}><${Icon} name="mdi:content-copy" /> Copy name</button>
-          <button class="btn" onClick=${() => copySvg(name)}><${Icon} name="mdi:svg" /> Copy SVG</button>
-          <button class="btn" onClick=${() => downloadSvg(name)}><${Icon} name="mdi:download" /> Download</button>
+          <button onClick=${() => copy(name)}><${Icon} name="mdi:content-copy" /> Copy name</button>
+          <button onClick=${() => copySvg(name)}><${Icon} name="mdi:svg" /> Copy SVG</button>
+          <button onClick=${() => downloadSvg(name)}><${Icon} name="mdi:download" /> Download</button>
           <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => db.toggleFav(name)}>
             <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
           </button>
@@ -333,7 +341,7 @@ function App () {
 
   return html`<>
     <main id='app-main'>
-      <div class="content"><${Content}/></div>
+      <${Content}/>
     </main>
     <${Dock} items=${dockItems} />
   </>`;
