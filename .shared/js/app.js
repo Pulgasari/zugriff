@@ -103,6 +103,9 @@ class ZugriffApp {
   // ::: command dispatch (app.commands is a Map<id, { exec }>)
   exec = id => this.commands?.get(id)?.exec();
 
+  //
+  go = (name, id = null) => this.state.route = { name, id };
+
   // ::: pwa (install-to-home-screen), lifted off the shared plumbing
   canInstall    = pwa.canInstall;
   isInstalled   = pwa.isInstalled;
