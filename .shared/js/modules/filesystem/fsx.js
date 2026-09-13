@@ -119,6 +119,10 @@ renameFile = async (root, path, from, to) => {
 
 // :::::: CAPACITOR
 
+globalThis.Capacitor                        // die Bridge (nur im nativen WebView da)
+globalThis.Capacitor.Plugins.Filesystem     // @capacitor/filesystem
+globalThis.Capacitor.Plugins.FilePicker     // @capawesome/capacitor-file-picker
+
 FilePicker.pickDirectory ()                 // → { path: "content://.../tree/primary:Music" }
 
 Filesystem.readdir    ({ path })            // → { files: [{ name, type, size, mtime, uri }, ...] }
