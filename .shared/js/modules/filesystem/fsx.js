@@ -114,3 +114,24 @@ renameFile = async (root, path, from, to) => {
   await writable.close();
   await dir.removeEntry(from, { recursive: true });
 }
+
+/*
+
+// :::::: CAPACITOR
+
+FilePicker.pickDirectory ()                 // → { path: "content://.../tree/primary:Music" }
+
+Filesystem.readdir    ({ path })            // → { files: [{ name, type, size, mtime, uri }, ...] }
+Filesystem.readFile   ({ path })            // → { data: "<base64>" }
+Filesystem.stat       ({ path })            // → { type, size, ctime, mtime, uri }
+Filesystem.writeFile  ({ path, data })      // data = base64
+Filesystem.mkdir      ({ path, recursive })
+Filesystem.rmdir      ({ path, recursive })
+Filesystem.deleteFile ({ path })
+
+
+
+
+
+
+*/
