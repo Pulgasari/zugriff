@@ -320,12 +320,14 @@ function Detail () {
         <div class="sheet-name">${icon}</div>
         <div class="sheet-set"><button class="linkish" onClick=${() => { app.state.detail = null; openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
-          <button onClick=${() => copy(name)}><${Icon} name="copy" /> Copy name</button>
-          <button onClick=${() => copySvg(name)}><${Icon} name="svg" /> Copy SVG</button>
-          <button onClick=${() => downloadSvg(name)}><${Icon} name="download" /> Download</button>
-          <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => app.db.toggleFav(name)}>
-            <${Icon} name=${fav ? 'heart' : 'heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
-          </button>
+          <${Button} icon='copy'     label='copy name' onClick=${() => copy        (name)} />
+          <${Button} icon='svg'      label='copy svg'  onClick=${() => copySvg     (name)} />
+          <${Button} icon='download' label='download'  onClick=${() => downloadSvg (name)} />
+          <${Button}
+            icon=${fav ? 'heart' : 'heart-outline'}
+            label=${fav ? 'Favourited' : 'Favourite'}
+            onClick=${() => app.db.toggleFav(name)}
+          />
         </div>
       </div>
     </div>`;
