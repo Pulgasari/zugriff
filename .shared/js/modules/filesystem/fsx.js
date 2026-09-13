@@ -1,20 +1,19 @@
-# fs
 
-```javascript
+
+/*
 const publicAPI = {};
 
 const
 createDir = (path)          => {}
 readFile  = (path)          => {},
 writeFile = (path, content) => {},
-```
 
-```javascript
+
 zugriff.isNative
 
-```
+*/
 
-```javascript
+/*
 fs.isSupported
 
 fs.pickDir
@@ -44,9 +43,38 @@ fs.moveDir
 fs.readDir
 fs.renameDir
 
-```
+*/
 
-```javascript
+// ::: COPY
+copyDir = async (srcHandle, dstHandle) => {
+  for await (const [name, handle] of srcHandle.entries()) {
+    if (handle.kind === 'directory') {
+      const child = await dstHandle.getDirectoryHandle(name, { create: true });
+      await copyDirInto(handle, child);
+    } else {
+      const file     = await handle.getFile();
+      const target   = await dstHandle.getFileHandle(name, { create: true });
+      const writable = await target.createWritable();
+      await writable.write(await file.arrayBuffer());
+      await writable.close();
+    }
+  }
+}
+
+// ::: CREATE
+createDir = async (root, path, name) {
+  const dir = await dirAt(root, path);
+  await dir.getDirectoryHandle(name, { create: true });
+}
+
+// ::: READ
+readFile = async (root, path, name) => {
+  const dir    = await dirAt(root, path);
+  const handle = await dir.getFileHandle(name);
+  return handle.getFile();
+}
+
+// ::: rename
 rename = async (root, path, from, to, kind) => {
   switch (kind) {
     case 'dir'  : return renameDir  (root, path, from, to);
@@ -72,4 +100,3 @@ renameFile = async (root, path, from, to) => {
   await writable.close();
   await dir.removeEntry(from, { recursive: true });
 }
-```
