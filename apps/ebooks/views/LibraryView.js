@@ -3,11 +3,19 @@
 import Brand       from '/.shared/js/components/Brand.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
 import InstallTip  from '/.shared/js/components/InstallTip.js';
+import Index       from '/.shared/js/components/Index.js';
+import Picker      from '/.shared/js/components/SortPicker.js';
 import SearchInput from '/.shared/js/components/SearchInput.js';
-import SortPicker  from '/.shared/js/components/SortPicker.js';
-
 
 const app = zugriff.app;
+
+function BooksIndex () {
+  return html`
+    <${Index} viewmode='grid' item-size='150px' gap='1rem'>
+      ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
+    </${Index}>
+  `;
+}
 
 function LibraryView () {
   const books      = visibleBooks.value;
@@ -44,7 +52,7 @@ function LibraryView () {
               onInput=${e => app.state.search = e.target.value} 
               />     
               
-            <${SortPicker} 
+            <${Picker} 
               value=${sort.value} 
               onChange=${v => sort.value = v}
               options=${['recent', 'title', 'author', 'added']}
