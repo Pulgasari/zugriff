@@ -55,7 +55,7 @@ app.thumbs = createThumbCache({ resizer: buildResizer });
 
 // ::: navigation — navigating always clears the current filter. for toasts call
 // app.toast directly (see .shared/js/modules/toast.js).
-app.go = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
+//app.go = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
 
 // :::::: ACTIONS
 
