@@ -11,8 +11,8 @@ name: Build Capacitor packages
 # it" model the folder apps rely on. A Capacitor wrapper instead injects a native
 # filesystem bridge (@capacitor/filesystem) whose Storage Access Framework grant
 # is *persisted*, so re-granting is silent. The shared filesystem layer
-# (.shared/js/filesystem/) detects the Capacitor runtime and routes through that
-# native fs automatically (see platform.js + cap-fs.js).
+# (.shared/js/modules/filesystem/) detects the Capacitor runtime and routes through
+# that native fs automatically (see platform.js).
 #
 # Like the TWA build, each app is wrapped around its LIVE deployment URL
 # (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —

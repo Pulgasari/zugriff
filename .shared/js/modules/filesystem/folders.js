@@ -1,97 +1,54 @@
-// shared/js/filesystem/folders.js
+// .shared/js/modules/filesystem/folders.js
 // zugriff.fs.FolderLibrary
+//
+// the shared lifecycle around folders the user grants us off their real disk with
+// the File System Access API. every app that is a live view onto granted folders
+// used to re-implement the same dance in its own db.js:
+//
+//   * keep the granted directory handles in a @bunker/db store, because a
+//     FileSystemDirectoryHandle is structured-cloneable and survives a reload
+//   * on load, resolve each handle's permission (never prompts) before showing the
+//     ui, then rescan the granted ones in the background
+//   * add / reconnect / re-pick / forget a folder, keeping signals and db in step
+//
+// this class owns exactly that. what a scan *produces* — a tree, tagged tracks,
+// book covers — is app-specific, so the app passes a `scan` callback (and, if it
+// keeps its own record stores, an `onLoad` to hydrate them and a `cascade` to drop
+// them when a source is removed). the class owns the shared @bunker/db instance
+// and exposes it as `.db`.
+//
+// two shapes:
+//   multi  (default)         an array of granted folders — sources / perms / scanning
+//   single { single:true }   one granted root — folder / perm  (the files app)
+//
+// picking + persistence go through platform.js, so a Capacitor build transparently
+// gets the native SAF picker and its handle shim; the permission dance goes through
+// handles.js. it hangs off the runtime as the constructor zugriff.fs.FolderLibrary.
+//
+// used by: notes, ebooks, audio-manager, images, videos, files.
 
-/* FolderLibrary — 
-the shared lifecycle around folders the user grants us off their real disk 
-with the File System Access API. 
-every app that is a live view onto granted folders used to
-re-implement the same dance in its own db.js:
-
-* keep the granted directory handles in a @bunker/db store, because a
-  FileSystemDirectoryHandle is structured-cloneable and survives a reload
-* on load, resolve each handle's permission (never prompts) before showing
-  the ui, then rescan the granted ones in the background
-* add / reconnect / re-pick / forget a folder, keeping signals and the db in step
-
-this class owns exactly that. what a scan *produces* — a tree, tagged tracks,
-book covers — is app-specific, so the app passes a `scan` callback (and, if it
-keeps its own record stores, an `onLoad` to hydrate them and a `cascade` to
-drop them when a source is removed). the class owns the shared @bunker/db
-instance and exposes it as `.db`.
-
-two shapes:
-  multi  (default)  an array of granted folders — sources / perms / scanning
-  single { single:true }  one granted root — folder / perm  (the files app)
-
-it hangs off the runtime as the constructor `zugriff.fs.FolderLibrary`.
-
-notes, ebooks, audio-manager, files
-*/
-
-/*
-function deleteKeyFromSignalObject(signal, key) {
-  const { [key]: _, ...rest } = signal.value;  // destructuring + rest
-  signal.value = rest;
-}
-
-// oder explizit mit delete (wie im Original)
-function deleteKeyFromSignalObject(signal, key) {
-  const copy = { ...signal.value };
-  delete copy[key];
-  signal.value = copy;
-}
-
-function setSignalObject(signal, key, value) {
-  signal.value = { ...signal.value, [key]: value };
-}
-
-// Verwendung:
-setSignalObject(this._perms, id, 'granted');
-setSignalObject(this._scanning, id, true);
-
-function removeFromSignalObjectListByPredicate(signal, predicate) {
-  signal.value = signal.value.filter(item => !predicate(item));
-}
-
-// Entfernt Elemente, bei denen ALLE Kriterien erfüllt sind (AND)
-function removeFromSignalObjectListByCriteria(signal, criteria) {
-  signal.value = signal.value.filter(item =>
-    !Object.keys(criteria).every(key => item[key] === criteria[key])
-  );
-}
-
-// Entfernt Elemente, bei denen MINDESTENS EIN Kriterium erfüllt ist (OR)
-function removeFromSignalObjectListByAnyCriteria(signal, criteria) {
-  signal.value = signal.value.filter(item =>
-    !Object.keys(criteria).some(key => item[key] === criteria[key])
-  );
-}
-*/
-
-
-//import { signal }    from '@aufbau/kits/preact-htm';
 import { signal }    from '@aufbau/signals';
 import { createDb }  from '@bunker/db';
-import * as fs       from './fsaccess.js';
+import * as handles  from './handles.js';
 import * as platform from './platform.js';
 
 // a granted root is kept live (a directory handle) in the signals, but persisted
-// as whatever survives IndexedDB: on the web that is the handle itself (identity),
-// on a Capacitor build a plain { uri } descriptor. dehydrate at every db.set,
-// hydrate at every read — so the in-memory `handle` is always a live handle.
+// as whatever survives IndexedDB: on the web the handle itself (identity), on a
+// Capacitor build a plain { uri } descriptor. dehydrate at every db.set, hydrate at
+// every read — so the in-memory `handle` is always a live handle.
 const persist   = rec => ({ ...rec, handle: platform.dehydrate(rec.handle) });
 const rehydrate = rec => rec && ({ ...rec, handle: platform.hydrate(rec.handle) });
 
 export class FolderLibrary {
   /**
-   * @param {object}  opts
-   * @param {string}  opts.db        @bunker/db database name (e.g. 'zugriff-notes')
-   * @param {string}  opts.pickerId  showDirectoryPicker id (stable "start here" slot)
-   * @param {object}  opts.stores    db.setup schema, e.g. { sources: {}, books: {} }
-   * @param {boolean} [opts.single]  single-root mode (one folder, no array)
-   * @param {function} [opts.scan]   async (source, ctx) => void — multi mode
-   * @param {function} [opts.onLoad] async (db) => void — hydrate app-owned signals after load
-   * @param {function} [opts.cascade] async (id, db) => void — drop app records for a removed source
+   * @param {object}   opts
+   * @param {string}   opts.db        @bunker/db database name (e.g. 'zugriff-notes')
+   * @param {string}   opts.pickerId  showDirectoryPicker id (stable "start here" slot)
+   * @param {object}   opts.stores    db.setup schema, e.g. { sources: {}, books: {} }
+   * @param {boolean} [opts.single]   single-root mode (one folder, no array)
+   * @param {function}[opts.scan]     async (source, ctx) => void — multi mode
+   * @param {function}[opts.onLoad]   async (db) => void — hydrate app-owned signals after load
+   * @param {function}[opts.cascade]  async (id, db) => void — drop app records for a removed source
    */
   constructor ({ db, pickerId, stores, single = false, scan, onLoad, cascade } = {}) {
     this.db       = createDb(db);
@@ -122,7 +79,7 @@ export class FolderLibrary {
     ]) if (typeof this[m] === 'function') this[m] = this[m].bind(this);
   }
 
-  // ── single-root mode ───────────────────────────────────────────────────────
+  // ── single-root mode ─────────────────────────────────────────────────────
 
   static #ROOT = 'root';   // the one key single-mode stores its folder under
 
@@ -131,14 +88,14 @@ export class FolderLibrary {
     const rec = rehydrate(await this.db.get('root', FolderLibrary.#ROOT));
     if (rec) {
       this.folder.value = rec;
-      this.perm.value   = await fs.queryPermission(rec.handle, 'read');   // never prompts
+      this.perm.value   = await handles.queryPermission(rec.handle, 'read');   // never prompts
     }
     this.ready.value = true;
   }
 
   /** pick a folder to browse (also the "change folder" path). must run from a click. */
   async grant () {
-    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' });
+    const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
     const rec = { name: handle.name, handle, addedAt: Date.now() };
     await this.db.set('root', FolderLibrary.#ROOT, persist(rec));
@@ -169,7 +126,7 @@ export class FolderLibrary {
     // resolve permissions first (fast, never prompts) so the ui never flashes a
     // spurious "reconnect", reveal it, then rescan granted folders in the background
     await Promise.all(this.sources.value.map(async s => {
-      this.perms.value = { ...this.perms.value, [s.id]: await fs.queryPermission(s.handle, 'read') };
+      this.perms.value = { ...this.perms.value, [s.id]: await handles.queryPermission(s.handle, 'read') };
     }));
     this.ready.value = true;
 
@@ -184,7 +141,7 @@ export class FolderLibrary {
 
   /** grant a new folder. returns the record, or null if the picker was dismissed. */
   async addFolder () {
-    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' });
+    const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
     for (const s of this.sources.value) {
       if (await s.handle.isSameEntry?.(handle)) throw new Error('That folder is already in your library.');
@@ -196,19 +153,6 @@ export class FolderLibrary {
     await this.scan(rec.id);
     return rec;
   }
-  /*
-  async addFolder() {
-    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' })
-    
-    if (!handle) return null;
-    if (!this.single && this._entries.value.some(s => s.handle.isSameEntry?.(handle))) throw new Error('...');
-    
-    const rec = await this.#addEntry(handle);
-    await this.scan(rec.id);
-    
-    return rec;
-  }
-  */
 
   /**
    * fast path: re-grant a folder from an earlier session via the stored handle.
@@ -220,13 +164,13 @@ export class FolderLibrary {
     if (this.single) {
       const rec = this.folder.value;
       if (!rec) return { granted: false };
-      const res = await fs.requestRead(rec.handle, 'read');
+      const res = await handles.requestRead(rec.handle, 'read');
       this.perm.value = res.granted ? 'granted' : (res.state ?? 'denied');
       return res;
     }
     const s = this.sourceById(id);
     if (!s) return { granted: false };
-    const res = await fs.requestRead(s.handle, 'read');
+    const res = await handles.requestRead(s.handle, 'read');
     this.perms.value = { ...this.perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
     if (res.granted) await this.scan(id);
     return res;
@@ -240,14 +184,14 @@ export class FolderLibrary {
    */
   async repick (id) {
     const source = this.sourceById(id); if (!source) return false;
-    const handle = await fs.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
+    const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
     const rec    = { ...source, name: handle.name, handle };
 
     await this.db.set('sources', id, persist(rec));
 
     this.sources.value = this.sources.value.map(x => x.id === id ? rec : x);
     this.perms.value   = { ...this.perms.value, [id]: 'granted' };
-    
+
     await this.scan(id);
     return true;
   }
@@ -258,11 +202,11 @@ export class FolderLibrary {
     await this.db.delete('sources', id);
     this.sources.value = this.sources.value.filter(s => s.id !== id);
     const pm = { ...this.perms.value };
-    delete pm[id]; 
+    delete pm[id];
     this.perms.value = pm;
   }
 
-  // ── scanning ───────────────────────────────────────────────────────────────
+  // ── scanning ─────────────────────────────────────────────────────────────
 
   async scan (id) {
     const s = this.sourceById(id);
@@ -272,8 +216,6 @@ export class FolderLibrary {
       if (this._scan) await this._scan(s, { db: this.db, lib: this });
     } finally {
       this.scanning.value = { ...this.scanning.value, [id]: false };
-      //updateSignalObj(this.scanning, id, false);
-      //this.scanning[id] = false;
     }
   }
 
@@ -285,7 +227,7 @@ export class FolderLibrary {
     );
   }
 
-  // ── file access ────────────────────────────────────────────────────────────
+  // ── file access ──────────────────────────────────────────────────────────
   // walk a stored '/'-path down from a source's granted root to a live handle.
 
   async fileHandle (source, path) {
@@ -299,20 +241,6 @@ export class FolderLibrary {
   async fileAt (source, path) {
     return (await this.fileHandle(source, path)).getFile();
   }
-
-  /*
-  async #addEntry (handle) {
-    const id  = this.single ? 'root' : crypto.randomUUID();
-    const rec = { handle, id, name: handle.name, addedAt: Date.now() };
-    
-    await this.db.set(this.single ? 'root' : 'sources', id, rec);
-    
-    this._entries.value = [...this._entries.value, rec];
-    this._perms.value   = { ...this._perms.value, [id]: 'granted' };
-    
-    return rec;
-  }
-  */
 }
 
 export default FolderLibrary;

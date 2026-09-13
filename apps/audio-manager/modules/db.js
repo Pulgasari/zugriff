@@ -2,7 +2,7 @@
 //
 // storage for the music library. the granted-folder lifecycle (the `sources`
 // store, permissions, scanning) is the shared FolderLibrary
-// (shared/js/filesystem/folders.js); this module owns the `tracks` store it
+// (shared/js/modules/filesystem/folders.js); this module owns the `tracks` store it
 // scans into: one record per audio file — path, tags, a cover Blob and a
 // size+mtime signature so tags are only re-read when a file changes.
 //
@@ -12,9 +12,10 @@
 // tags is stored — audio is streamed from disk on play (see player.js).
 
 import { signal, computed }               from '@aufbau/signals';
-import { syncSource, MetaQueue }           from '/.shared/js/filesystem/scan.js';
-import * as fs                             from '/.shared/js/filesystem/fsaccess.js';
 import { accept, prettyName, extractMeta } from './library.js';
+
+// the filesystem layer, uniformly via the runtime
+const fs = zugriff.fs;
 
 const keyOf = (sourceId, path) => sourceId + '\n' + path;
 
@@ -23,7 +24,7 @@ const keyOf = (sourceId, path) => sourceId + '\n' + path;
 
 export const tracks = signal([]);   // [{ key, sourceId, path, name, title, artist, album, … }]
 
-const meta = new MetaQueue(3);
+const meta = new fs.MetaQueue(3);
 export const pending = meta.pending;   // tracks still queued for tag extraction
 
 export const trackByKey = key => tracks.value.find(t => t.key === key) ?? null;
@@ -48,7 +49,7 @@ const lib = new zugriff.fs.FolderLibrary({
 
   scan: async (s, { db }) => {
     const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    const next  = await syncSource({
+    const next  = await fs.syncSource({
       db, store: 'tracks', sourceId: s.id, files, rows: tracks.value, keyOf,
       makeRecord: (f, { key, sourceId, sig, prev }) => ({
         key, sourceId, path: f.path, name: f.name,

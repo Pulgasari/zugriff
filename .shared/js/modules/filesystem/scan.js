@@ -1,4 +1,4 @@
-// shared/js/filesystem/scan.js
+// .shared/js/modules/filesystem/scan.js
 //
 // the two reusable pieces of a "scan a granted folder into records" pass, pulled
 // out of the audio-manager and ebooks libraries where they were nearly identical:
@@ -15,7 +15,7 @@
 // tree), so FolderLibrary takes a plain `scan` callback and these stay opt-in.
 
 import { signal }     from '@aufbau/signals';
-import { createPool } from './../vendors/pool.js';
+import { createPool } from './../../vendors/pool.js';
 
 /** the size+mtime signature we use to tell whether a file changed since last scan */
 export const signatureOf = file => `${file.size}:${file.lastModified}`;
@@ -27,7 +27,7 @@ export const signatureOf = file => `${file.size}:${file.lastModified}`;
  *   db          the @bunker/db instance
  *   store       object-store name the records live in (e.g. 'tracks', 'books')
  *   sourceId    the source being scanned
- *   files       flat file nodes from fsaccess.flatten(scanTree(...))
+ *   files       flat file nodes from handles.flatten(scanTree(...))
  *   rows        the current full array of records (from the app's signal)
  *   keyOf       (sourceId, path) => key
  *   makeRecord  (fileNode, { key, sourceId, sig, prev }) => a fresh record,
