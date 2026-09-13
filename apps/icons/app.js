@@ -58,7 +58,7 @@ async function openSet (prefix) {
   setData.value = null;
   setLoading.value = true;
   try     { setData.value = await api.collection(prefix); }
-  catch   { flash('Could not load that set'); }
+  catch   { app.toast({ error: 'Could not load that set' }); }
   finally { setLoading.value = false; }
 }
 
@@ -71,7 +71,7 @@ function onSearch (value) {
   searching.value = true;
   searchTimer = setTimeout(async () => {
     try     { results.value = await app.api.search(q); }
-    catch   { flash('Search failed'); }
+    catch   { app.toast({ error: 'Search failed' }); }
     finally { searching.value = false; }
   }, 250);
 }
@@ -140,7 +140,7 @@ function IconCell ({ name }) {
       <span class="cname">${name.split(':')[1]}</span>
       <${Button}
         class=${'heart' + (fav ? ' on' : '')}
-        icon=${fav ? 'mdi:heart' : 'mdi:heart-outline'}
+        icon=${fav ? 'heart' : 'heart-outline'}
         title="Favourite"
         onClick=${e => { e.stopPropagation(); app.db.toggleFav(name); }}
       />
@@ -159,7 +159,7 @@ function IconGrid ({ names }) {
     return () => handle?.destroy();
   }, []);
 
-  if (!names.length) return html`<${Empty} icon="mdi:image-search-outline" title="Nothing here." />`;
+  if (!names.length) return html`<${Empty} icon="image-search" title="Nothing here." />`;
   return html`
     <div class="grid" ref=${ref} style=${`--isz:${itemSize.value}px`}>
       ${names.map(n => html`<${IconCell} key=${n} name=${n} />`)}
@@ -296,7 +296,7 @@ function TopBar () {
             <${Icon} name='search' />
             <input type="search" placeholder="Filter sets…" value=${app.state.setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
-        : html`<h1 class="topbar-title">${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
+        : html`<h1>${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
 
       <span class="spacer"></span>
       ${grid && html`<${SizeControl} />`}
