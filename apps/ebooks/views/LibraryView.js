@@ -9,6 +9,8 @@ import SearchInput from '/.shared/js/components/SearchInput.js';
 
 const app = zugriff.app;
 
+// :::::: SUB-COMPONENTS
+
 function BooksIndex () {
   return html`
     <${Index} viewmode='grid' item-size='150px' gap='1rem'>
@@ -16,6 +18,17 @@ function BooksIndex () {
     </${Index}>
   `;
 }
+
+function EmptyLibrary () {
+  return html`<${Empty} icon='mdi:book-outline' title='No books here yet' hint='Scanning may still be running, or this folder has no EPUB/PDF files.' />`;
+}
+
+function EmptySearch () {
+  return html`<${Empty} icon='mdi:magnify-close' title='Nothing matches your search' hint='' />`;
+}
+
+
+
 
 function LibraryView () {
   const books      = visibleBooks.value;
@@ -71,14 +84,17 @@ function LibraryView () {
 
           <section class="shelf">
             <h2 class="shelf-title">${app.state.folder ? db.sourceById(app.state.folder)?.name : 'All books'}
-              <span class="shelf-count">${books.length}</span></h2>
+              <span class="shelf-count">${books.length}</span>
+            </h2>
+            
             ${books.length
               ? html`<aufbau-index class="book-grid" viewmode="grid" item-size="150px" gap="1rem">
                   ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
                 </aufbau-index>`
               : html`<${Empty} icon=${app.state.search ? 'mdi:magnify-close' : 'mdi:book-outline'}
                        title=${app.state.search ? 'Nothing matches your search' : 'No books here yet'}
-                       hint=${app.state.search ? '' : 'Scanning may still be running, or this folder has no EPUB/PDF files.'} />`}
+                       hint=${app.state.search ? '' : 'Scanning may still be running, or this folder has no EPUB/PDF files.'} />`
+            }
           </section>`}
     </div>`;
 }
