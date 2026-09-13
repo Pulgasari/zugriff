@@ -2,34 +2,29 @@
 
 // :::::: IMPORT
 
-// ::: vendors
 import { computed, local, signal as persisted } from '@aufbau/signals';
 import { useEffect, useRef, useState }          from 'preact/hooks';
 
 const // shared components
-Button     = await zugriff.component('Button'),
-Empty      = await zugriff.component('Empty'),
-Icon       = await zugriff.component('Icon'),
-InstallTip = await zugriff.component('InstallTip'),
-Reader     = await zugriff.component('Reader'),
-Settings   = await zugriff.component('Settings'),
-TOC        = await zugriff.component('TOC'),
-Tree       = await zugriff.component('Tree');
+Button      = await zugriff.component('Button'),
+Breadcrumbs = await zugriff.component('Breadcrumbs'),
+Empty       = await zugriff.component('Empty'),
+Icon        = await zugriff.component('Icon'),
+InstallTip  = await zugriff.component('InstallTip'),
+Reader      = await zugriff.component('Reader'),
+Settings    = await zugriff.component('Settings'),
+TOC         = await zugriff.component('TOC'),
+Tree        = await zugriff.component('Tree');
 
 // ::: the app
 const app = zugriff.app;
 app.lib = await app.module('library');
-
 const { fs } = zugriff;
-
-
-// const { Button, Empty, Icon, InstallTip, Settings, Tree } = zugriff.components;
 
 // :::::: STATE
 
-// ephemeral ui state — on the shared deepSignal
-app.state.filter    = '';       // tree filter query
-app.state.isNavOpen = false;    // mobile: is the tree drawer showing
+app.state.filter    = '';    // tree filter query
+app.state.isNavOpen = false; // mobile: is the tree drawer showing
 
 // durable state — kept apart, hydrates from + persists to localStorage
 const open       = persisted({ value: null, key: 'notes:open',     store: local });   // { sourceId, path } | null
@@ -65,11 +60,9 @@ function filterTree (node, q) {
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
 // :::::: SIDEBAR TREE
-// the tree itself is <aufbau-tree>; this maps a scanned folder into the node shape
-// it renders, and the value on each node ("f:"/"d:" + sourceId + path) is what the
-// select/toggle events hand back so we can act on it.
 
 const nodeValue = (kind, sourceId, path) => `${kind}:${sourceId}:${path}`;
+
 function parseValue (v = '') {
   const kind = v.slice(0, 1);
   const rest = v.slice(2);
@@ -157,7 +150,8 @@ function SourceBlock ({ source }) {
         <${Button} class="src-x" icon='close'   title="Close folder" onClick=${remove} />
       </div>
       ${body}
-    </div>`;
+    </div>
+  `;
 }
 
 function Sidebar () {
@@ -225,35 +219,6 @@ function NoteView ({ note }) {
     };
   }, [note.sourceId, note.node.path, note.node.handle]);
 
-  // runs inside the reader, over the parsed markup, before it is committed
-  const transform = async frag => {
-    urls.current.forEach(URL.revokeObjectURL);
-    urls.current = [];
-
-    // relative images → blob urls from the same granted folder
-    await Promise.all([...frag.querySelectorAll('img')].map(async img => {
-      const src = img.getAttribute('src') || '';
-      if (!src || /^([a-z]+:)?\/\//i.test(src) || src.startsWith('data:') || src.startsWith('blob:')) return;
-      const handle = await fs.resolveRelative(root, note.node.path, src);
-      if (!handle) return;
-      try {
-        const content = await handle.getFile()
-        const url     = URL.createObjectURL(content);
-        urls.current.push(url);
-        img.src     = url;
-        img.loading = 'lazy';
-      } catch {}
-    }));
-
-    // relative .md links open the sibling note in-app; the rest open safely
-    frag.querySelectorAll('a[href]').forEach(a => {
-      const href = a.getAttribute('href') || '';
-      if (/^([a-z]+:)?\/\//i.test(href) || href.startsWith('mailto:')) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
-      else if (href.startsWith('#'))                                    a.classList.add('anchor-link');
-      else if (/\.(md|markdown)(#|$)/i.test(href))                      { a.classList.add('note-link'); a.dataset.href = href; }
-    });
-  };
-
   // in-app navigation for note-to-note and anchor links (delegated on the reader)
   const onClick = e => {
     const a = e.target.closest('a');
@@ -291,25 +256,7 @@ function NoteView ({ note }) {
         </aside>
         
       </div>
-    </div>`;
-}
-
-function NotesReaderHeader () {
-  const segs = note ? note.node.path.split('/') : [];
-  
-  return html`
-    <header class=${'reader-head' + (note ? '' : ' empty')}>
-      <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
-      ${note
-        ? html`<nav class="crumbs">
-          ${segs.map((seg, i) => html`
-            <span key=${i}>${i > 0 && html`<span class="crumb-sep">/</span>`}
-            <span class=${i === segs.length - 1 ? 'crumb last' : 'crumb'}>${seg}</span></span>`)}
-            </nav>`
-          : html`<span class="crumb head-brand">Notes</span>`}
-        <span class="spacer"></span>
-        <${Settings} />
-    </header>
+    </div>
   `;
 }
 
@@ -320,14 +267,15 @@ function NotesReaderBody ({ note }) {
 
   return html`
     <div class="reader">
-      <${NotesReaderHeader} note=${note} />
+      <header class=${'reader-head' + (note ? '' : ' empty')}>
+        <${Button} icon='menu' class="ibtn nav-open" aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
+        <${Breadcrumbs} segments=${segs} />
+      </header>
 
       ${note
         ? html`<${NoteView} note=${note} />`
         : html`<div class="reader-empty">
-            <${Empty}
-              icon='notes'
-              title="No note open"
+            <${Empty} icon='notes' title="No note open"
                  hint=${app.lib.sources.value.length ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.'}
               action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`}
             />
@@ -360,7 +308,7 @@ async function addFolder () {
     const rec = await app.lib.addFolder();
     if (rec) app.toast({ success: `Opened ${rec.name}` });
   } 
-  catch (error) { app.toast({ error }); }
+  catch (e) { app.toast(e); }
 }
 
 // :::::: APP
@@ -368,13 +316,11 @@ async function addFolder () {
 function App () {
   useEffect(() => { app.lib.load().catch(toast); }, []);
 
-  if (!app.lib.ready.value) {
-    return html`<div class="booting"><${Icon} name='loading' /></div>`;
-  }
+  if (!app.lib.ready.value)
+  return html`<div class="booting"><${Icon} name='loading' /></div>`;
 
   return html`<>
     <${Sidebar} />
-    ${app.state.isNavOpen && html`<div class="scrim-mobile" onClick=${() => app.state.isNavOpen = false}></div>`}
     <main id="app-main"><${NotesReader} /></main>
   </>`;
 }
