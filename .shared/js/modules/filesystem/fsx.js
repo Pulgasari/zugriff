@@ -115,6 +115,41 @@ renameFile = async (root, path, from, to) => {
   await dir.removeEntry(from, { recursive: true });
 }
 
+
+
+fs.isDir
+is.isFile
+fs.isHandle
+fs.isPath
+fs.isSupported
+
+fs.pickDir
+fs.pickFile
+
+fs.create
+fs.delete
+fs.move
+fs.read
+fs.rename
+
+fs.exists
+fs.lastModified
+fs.getExt
+fs.getMeta
+fs.getSize
+fs.getMimeType
+
+
+const isHandle
+const isPath
+
+const delete (sth) {
+  if (isHandle (sth)) return dełeteByHandle (sth);
+  if (isPath   (sth)) return deleteByPath   (sth);
+}
+dełeteByHandle
+deleteByPath
+
 /*
 
 // :::::: CAPACITOR
