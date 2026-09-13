@@ -108,10 +108,8 @@ function Sidebar () {
           <${Icon} name="folder-open" /> <span>${f.name}</span>
         </div>
         <div class="fe-current-actions">
-          <button class="fe-btn small" onClick=${chooseFolder}>
-            <${Icon} name="mdi:folder-swap-outline" /> Change</button>
-          <button class="fe-btn small ghost" onClick=${closeFolder}>
-            <${Icon} name="close" /> Close</button>
+          <${Button} class='small' icon='mdi:folder-swap-outline' label='change' onClick=${chooseFolder} />
+          <${Button} class='small ghost' icon='close' label='close' onClick=${closeFolder} />
         </div>
       </div>
 
