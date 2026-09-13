@@ -93,10 +93,6 @@ const currentNote = computed(() => {
   return node ? { sourceId: o.sourceId, node } : null;
 });
 
-function NotesReader () {
-  return html`<${NotesReaderBody} note=${currentNote.value} />`;
-}
-
 // the open note: read its text off disk and hand it to the shared <${Reader}>,
 // which owns the markdown pipeline (via <aufbau-reader>); <${TOC}> builds the
 // "on this page" list off the rendered headings.
@@ -129,30 +125,6 @@ function NoteView ({ note }) {
   `;
 }
 
-// the frame is always drawn — header (with the mobile menu button) included — so on
-// a phone the tree drawer is always reachable, note open or not
-function NotesReaderBody ({ note }) {
-  const segs = note ? note.node.path.split('/') : [];
-
-  return html`
-    <div class="reader">
-      <header class=${'reader-head' + (note ? '' : ' empty')}>
-        <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
-        <${Breadcrumbs} segments=${segs} />
-      </header>
-
-      ${note
-        ? html`<${NoteView} note=${note} />`
-        : html`<div class="reader-empty">
-            <${Empty} icon='notes' title="No note open"
-                 hint=${app.lib.sources.value.length ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.'}
-              action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`}
-            />
-          </div>`
-      }
-    </div>`;
-}
-
 // :::::: ACTIONS
 
 async function addFolder () {
@@ -172,9 +144,29 @@ function App () {
   if (!app.lib.ready.value)
   return html`<div class="booting"><${Icon} name='loading' /></div>`;
 
+  const note = currentNote.value;
+  const segs = note ? note.node.path.split('/') : [];
+
   return html`<>
     <${Sidebar} />
-    <main id='app-main'><${NotesReader} /></main>
+    <main id='app-main'>
+      <div class="reader">
+        <header class=${'reader-head' + (note ? '' : ' empty')}>
+          <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
+          <${Breadcrumbs} segments=${segs} />
+        </header>
+  
+        ${note
+          ? html`<${NoteView} note=${note} />`
+          : html`<div class="reader-empty">
+              <${Empty} icon='notes' title="No note open"
+                   hint=${app.lib.sources.value.length ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.'}
+                action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`}
+              />
+            </div>`
+        }
+      </div>
+    </main>
   </>`;
 }
 
