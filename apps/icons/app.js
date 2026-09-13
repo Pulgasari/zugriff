@@ -14,6 +14,8 @@ import { stored } from '/.shared/js/app/signals.js';
 import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
+ActionMenu = await zugriff.component('ActionMenu'),
+Dock       = await zugriff.component('Dock'),
 Empty      = await zugriff.component('Empty'),
 Icon       = await zugriff.component('Icon'),
 IconButton = await zugriff.component('IconButton'),
@@ -339,20 +341,24 @@ function Detail () {
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
+const dockItems = [
+  { icon: 'mdi:home', label: 'home',   view: 'home'      },
+  { icon: 'search',   label: 'search', view: 'search'    },
+  { icon: 'images',   label: 'sets',   view: 'sets'      },
+  { icon: 'heart',    label: 'favs',   view: 'favorites' },
+];
+
 function App () {
   useEffect(() => {
     db.loadFavs().catch(() => {});
-    ensureCollections();   // warms the catalogue for home stats + sets
+    ensureCollections(); // warms the catalogue for home stats + sets
   }, []);
 
   return html`<>
-    <${Sidebar} />
-    ${app.state.nav && html`<div class="scrim-mobile" onClick=${() => app.state.nav = false}></div>`}
-    <main id="app-main">
-      <${TopBar} />
+    <main id='app-main'>
       <div class="content"><${Content}/></div>
     </main>
-    <${Detail} />
+    <${Dock} items=${dockItems} />
   </>`;
 }
 
