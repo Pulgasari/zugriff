@@ -133,7 +133,32 @@ Filesystem.mkdir      ({ path, recursive })
 Filesystem.rmdir      ({ path, recursive })
 Filesystem.deleteFile ({ path })
 
+// :::::: WEB
 
+// window global — existiert nur auf Desktop-Chromium, NICHT im Android-WebView
+const dir = await window.showDirectoryPicker({ id, mode, startIn });
+// → FileSystemDirectoryHandle
+
+// FileSystemDirectoryHandle
+dir.kind            // 'directory'
+dir.name            // string
+for await (const [name, handle] of dir.entries()) { ... }
+await dir.getFileHandle(name, { create })
+await dir.getDirectoryHandle(name, { create })
+await dir.removeEntry(name, { recursive })
+
+// FileSystemFileHandle
+fh.kind                                      // 'file'
+const file     = await fh.getFile()          // → File (erst hier size/mtime/type)
+const writable = await fh.createWritable()   // write/close
+
+// Permissions (Chromium-Erweiterung am Handle)
+await handle.queryPermission   ({ mode })   // 'granted'|'prompt'|'denied'
+await handle.requestPermission ({ mode })
+
+// OPFS — auch Browser-API, aber ohne Picker:
+const root = await navigator.storage.getDirectory()   // FileSystemDirectoryHandle
+await navigator.storage.estimate()                    // { usage, quota }
 
 
 
