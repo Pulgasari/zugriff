@@ -14,12 +14,9 @@ import InstallTip   from '/.shared/js/components/InstallTip.js';
 import { computed }  from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
 
-// ::: app modules
-import * as db from './modules/db.js';
-
 // ::: the app handle
 const app = zugriff.app;
-app.db = db;
+app.db = await app.module('db');
 
 const { fs } = zugriff;
 
@@ -134,8 +131,8 @@ const isNotGranted   = () => db.perm.value !== 'granted';
 function App () {
   useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
-  return html`
-    <>${
+  return html`<>
+    ${
         isNotSupported() ? html`<${Unsupported} />`
       : isLoading()      ? html`<${Icon} name='loading' />`
       : isWelcome()      ? html`<${Welcome} />`
@@ -143,7 +140,8 @@ function App () {
       : html`
         <${Sidebar} />
         <main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`
-    }</>`;
+    }
+  </>`;
 }
 
 // :::::: BOOT
