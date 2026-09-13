@@ -127,7 +127,7 @@ z.clipboard = {};
 const IconGlyph = ({ name }) => html`<iconify-icon icon=${name}></iconify-icon>`;
 
 function IconCell ({ name }) {
-  const fav = db.favs.value.has(name);
+  const fav = app.db.favs.value.has(name);
   return html`
     <button class="cell" onClick=${() => app.state.detail = name} title=${name}>
       <span class="glyph"><${IconGlyph} name=${name} /></span>
@@ -136,7 +136,7 @@ function IconCell ({ name }) {
         class=${'heart' + (fav ? ' on' : '')}
         icon=${fav ? 'mdi:heart' : 'mdi:heart-outline'}
         title="Favourite"
-        onClick=${e => { e.stopPropagation(); db.toggleFav(name); }}
+        onClick=${e => { e.stopPropagation(); app.db.toggleFav(name); }}
       />
     </button>
   `;
@@ -304,7 +304,7 @@ function Detail () {
   const name = app.state.detail;
   if (!name) return null;
   const [prefix, icon] = name.split(':');
-  const fav = db.favs.value.has(name);
+  const fav = app.db.favs.value.has(name);
   return html`
     <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.detail = null; }}>
       <div class="sheet" role="dialog" aria-modal="true">
@@ -313,11 +313,11 @@ function Detail () {
         <div class="sheet-name">${icon}</div>
         <div class="sheet-set"><button class="linkish" onClick=${() => { app.state.detail = null; openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
-          <button onClick=${() => copy(name)}><${Icon} name="mdi:content-copy" /> Copy name</button>
-          <button onClick=${() => copySvg(name)}><${Icon} name="mdi:svg" /> Copy SVG</button>
-          <button onClick=${() => downloadSvg(name)}><${Icon} name="mdi:download" /> Download</button>
+          <button onClick=${() => copy(name)}><${Icon} name="copy" /> Copy name</button>
+          <button onClick=${() => copySvg(name)}><${Icon} name="svg" /> Copy SVG</button>
+          <button onClick=${() => downloadSvg(name)}><${Icon} name="download" /> Download</button>
           <button class=${'btn' + (fav ? ' primary' : '')} onClick=${() => db.toggleFav(name)}>
-            <${Icon} name=${fav ? 'mdi:heart' : 'mdi:heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
+            <${Icon} name=${fav ? 'heart' : 'heart-outline'} /> ${fav ? 'Favourited' : 'Favourite'}
           </button>
         </div>
       </div>
