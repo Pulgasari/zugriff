@@ -21,12 +21,9 @@ app.db = await app.module('db');
 const { fs } = zugriff;
 
 // :::::: BACKEND
-// the granted folder described for FileExplorer. read-only for now (picked as mode:'read')
-// — browse, preview, download; write is a later step. the id keys off the grant time so
-// switching folders remounts the explorer at its new root.
 const backend = computed(() => {
-  const f = db.folder.value;
-  if (!f || db.perm.value !== 'granted') return null;
+  const f = app.db.folder.value;
+  if (!f || app.db.perm.value !== 'granted') return null;
   return { id: 'disk:' + f.addedAt, label: f.name, writable: false, supported: fs.supported, getRoot: () => f.handle };
 });
 
@@ -34,18 +31,18 @@ const backend = computed(() => {
 
 async function chooseFolder () {
   if (!fs.supported()) return;
-  try         { await db.grant(); }
+  try         { await app.db.grant(); }
   catch (err) { console.warn('[files] grant failed', err); }
 }
 
 async function tryReconnect () {
-  const res = await db.reconnect();
+  const res = await app.db.reconnect();
   if (!res.granted) await chooseFolder();   // fall back to the reliable re-pick
 }
 
 async function closeFolder () {
   if (!confirm('Close this folder? Your files are untouched — this only forgets it.')) return;
-  await db.forget();
+  await app.db.forget();
 }
 
 // :::::: SCREENS
@@ -54,7 +51,7 @@ async function closeFolder () {
 function Unsupported () {
   return html`
     <div class="fe-hero">
-      <${Icon} name="mdi:folder-alert-outline" />
+      <${Icon} name='alert' />
       <h1>Can't open folders here</h1>
       <p>This browser doesn't support the File System Access API, so the explorer
          has no folder to open. Try a recent Chromium-based browser (Chrome, Edge,
@@ -78,24 +75,23 @@ function Welcome () {
 
 // a folder is remembered but the browser wants permission again
 function Reconnect () {
-  const denied = db.perm.value === 'denied';
+  const denied = app.db.perm.value === 'denied';
   return html`
     <div class="fe-hero">
-      <${Icon} name="mdi:folder-key-outline" />
-      <h1>Reconnect “${db.folder.value.name}”</h1>
+      <${Icon} name='folder-key' />
+      <h1>Reconnect “${app.db.folder.value.name}”</h1>
       <p>${denied
           ? 'Permission for this folder was blocked. Re-pick it to browse again.'
           : 'This folder needs permission again for this visit.'}</p>
       <div class="fe-hero-actions">
-        <${Button} class="primary" icon="mdi:folder-key-outline" label='Reconnect' onClick=${tryReconnect} />
-        <${Button} class="ghost" icon='mdi:folder-search-outline' label='Choose folder'
-          title="Re-select the folder — always works" onClick=${chooseFolder} />
+        <${Button} class="primary" icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
+        <${Button} class="ghost"   icon='folder-search' label='Choose folder' onClick=${chooseFolder} />
       </div>
     </div>`;
 }
 
 function Sidebar () {
-  const f = db.folder.value;
+  const f = app.db.folder.value;
   return html`
     <aside class="sidebar">
       <div class="brand">
@@ -122,12 +118,12 @@ function Sidebar () {
 // :::::: APP
 
 const isNotSupported = () => !fs.supported();
-const isLoading      = () => !db.ready.value;
-const isWelcome      = () => !db.folder.value;
-const isNotGranted   = () => db.perm.value !== 'granted';
+const isLoading      = () => !app.db.ready.value;
+const isWelcome      = () => !app.db.folder.value;
+const isNotGranted   = () =>  app.db.perm.value !== 'granted';
 
 function App () {
-  useEffect(() => { db.load().catch(err => console.warn('[files] load failed', err)); }, []);
+  useEffect(() => { app.db.load().catch(err => console.warn('[files] load failed', err)); }, []);
 
   return isNotSupported() ? html`<${Unsupported} />`
        : isLoading()      ? html`<${Icon} name='loading' />`
