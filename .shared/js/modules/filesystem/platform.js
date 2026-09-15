@@ -38,7 +38,7 @@ const plugin = name => {
 };
 
 const Filesystem = () => plugin('Filesystem');
-const FilePicker  = () => plugin('FilePicker');   // @capawesome/capacitor-file-picker
+const FilePicker = () => plugin('FilePicker');   // @capawesome/capacitor-file-picker
 
 // :::::: base64 <-> binary (the plugin speaks base64 for file bodies)
 
@@ -146,15 +146,10 @@ class CapDirHandle {
       : { name: f.name, kind: f.type === 'directory' ? 'directory' : 'file', uri: f.uri ?? joinUri(this._uri, f.name) });
   }
 
-  async *entries () {
-    for (const c of await this.#children()) {
-      yield [c.name, c.kind === 'directory' ? new CapDirHandle(c.uri, c.name) : new CapFileHandle(c.uri, c.name)];
-    }
-  }
-
-  async *values () { for await (const [, h] of this.entries()) yield h; }
-  async *keys ()   { for (const c of await this.#children()) yield c.name; }
-
+  async *entries () { for (const c of await this.#children()) yield [c.name, c.kind === 'directory' ? new CapDirHandle(c.uri, c.name) : new CapFileHandle(c.uri, c.name)]; }    
+  async *keys    () { for (const c of await this.#children()) yield c.name; }
+  async *values  () { for await (const [, h] of this.entries()) yield h; }
+  
   async getDirectoryHandle (name, { create = false } = {}) {
     for (const c of await this.#children())
       if (c.name === name && c.kind === 'directory') return new CapDirHandle(c.uri, c.name);
@@ -209,9 +204,10 @@ async function capPick () {
   }
 }
 
-const isCapRef    = v => v && typeof v === 'object' && v.__capfs === true;
-const capHydrate  = ref    => new CapDirHandle(ref.uri, ref.name);
-const capDehydrate = handle => ({ __capfs: true, uri: handle._uri, name: handle.name });
+const
+isCapRef     = v      => v && typeof v === 'object' && v.__capfs === true,
+capHydrate   = ref    => new CapDirHandle(ref.uri, ref.name),
+capDehydrate = handle => ({ __capfs: true, uri: handle._uri, name: handle.name });
 
 // :::::: THE PUBLIC SEAM
 
