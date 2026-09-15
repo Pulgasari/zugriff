@@ -236,7 +236,7 @@ function applyTheme (theme) {
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
   function getImportMap () {
-    const jsr    = 'https://esm.sh/jsr;
+    const jsr    = 'https://esm.sh/jsr';
     const pkg    = 'https://code.pulgasari.dev';
     const PREACT = '10.20.1';
     const HLJS   = '11.10.0';
