@@ -236,6 +236,7 @@ function applyTheme (theme) {
   // ── FRAMEWORK DEFAULTS ───────────────────────────────────────────────────
 
   function getImportMap () {
+    const jsr    = 'https://esm.sh/jsr;
     const pkg    = 'https://code.pulgasari.dev';
     const PREACT = '10.20.1';
     const HLJS   = '11.10.0';
@@ -307,12 +308,12 @@ function applyTheme (theme) {
       "@pulgasari/canonicalmap" : `${pkg}/js/canonicalmap.js`,
       "@pulgasari/coerce" : `${pkg}/js/coerce.js`,
       "@pulgasari/hash"   : `${pkg}/js/hash.js`,
-      "@pulgasari/is"     : `${pkg}/js/is.js`,
-      "@pulgasari/logger" : `${pkg}/js/logger.js`,
+      "@pulgasari/is"     : `${jsr}/@pulgasari/is`,
+      "@pulgasari/logger" : `${jsr}/@pulgasari/logger`,
       "@pulgasari/num"    : `${pkg}/js/num.js`,
       "@pulgasari/obj"    : `${pkg}/js/obj.js`,
       "@pulgasari/random" : `${pkg}/js/random.js`,
-      "@pulgasari/str"    : `${pkg}/js/str.js`,
+      "@pulgasari/str"    : `${jsr}/@pulgasari/str`,
       "@pulgasari/timing" : `${pkg}/js/timing.js`,
       "@pulgasari/url"    : `${pkg}/js/url.js`,
 
