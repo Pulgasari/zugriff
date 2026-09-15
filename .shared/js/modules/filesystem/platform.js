@@ -239,11 +239,7 @@ export async function pick ({ id, mode = 'read', startIn } = {}) {
   }
 }
 
-/** the public name apps call — an alias of pick() */
-export const pickDirectory = pick;
-
-/** a stored root descriptor -> a live handle (web: identity) */
-export const hydrate = ref => (isCapRef(ref) ? capHydrate(ref) : ref);
-
-/** a live handle -> the structured-cloneable thing we persist (web: identity) */
-export const dehydrate = handle => (handle instanceof CapDirHandle ? capDehydrate(handle) : handle);
+export const
+pickDir   = pick,
+dehydrate = handle => (handle instanceof CapDirHandle ? capDehydrate(handle) : handle),
+hydrate   = ref    => (isCapRef(ref) ? capHydrate(ref) : ref);
