@@ -70,32 +70,38 @@ class CapacitorDirHandle extends CapacitorHandle {
     }));
   }
 
-  async *entries () { for (const c of await this.#children()) yield [c.name, getHandle(c)]; }    
+  async *entries () { for (const c of await this.#children()) yield [c.name, getHandleClass(c)]; }    
   async *keys    () { for (const c of await this.#children()) yield c.name; }
   async *values  () { for await (const [, h] of this.entries()) yield h; }
   
+  async getHandleClass (child) {
+    return child.kind === 'dir' 
+      ? new CapacitorDirHandle  ({ name: child.name, path: child.uri }) 
+      : new CapacitorFileHandle ({ name: child.name, path: child.uri });
+  }
+  
   async getDirHandle (name, { create = false } = {}) {
     for (const c of await this.#children())
-      if (c.name === name && c.kind === 'directory') return new CapDirHandle(c.uri, c.name);
+      if (c.name === name && c.kind === 'directory') return new CapacitorDirHandle(c.uri, c.name);
     if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
-    const uri = joinUri(this._uri, name);
-    await Filesystem().mkdir({ path: uri, recursive: false });
-    return new CapDirHandle(uri, name);
+    
+    const path = joinUri(this.path, name);
+    await CapacitorFS().mkdir({ path, recursive: false });
+    
+    return new CapacitorDirHandle({ name, path });
   }
-
-  getHandle (children) {
-    return children.kind === 'dir' 
-      ? new CapacitorDirHandle  ({ name: c.name, path: c.uri }) 
-      : new CapacitorFileHandle ({ name: c.name, path: c.uri });
-  }
-
+  
   async getFileHandle (name, { create = false } = {}) {
-    for (const c of await this.#children())
-      if (c.name === name && c.kind === 'file') return new CapFileHandle(c.uri, c.name);
+    for (const child of await this.#children()) {
+      if (child.name === name && child.kind === 'file')
+      return new CapacitorFileHandle({ path: child.uri, name: child.name });
+    }
     if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
-    const uri = joinUri(this._uri, name);
-    await Filesystem().writeFile({ path: uri, data: '' });
-    return new CapFileHandle(uri, name);
+    
+    const path = joinUri(this.path, name);
+    await Filesystem().writeFile({ path, data: '' });
+    
+    return new CapacitorFileHandle ({ name, path });
   }
 
   async removeEntry (name, { recursive = false } = {}) {
