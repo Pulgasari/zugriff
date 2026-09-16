@@ -32,12 +32,14 @@ import { createDb }  from '@bunker/db';
 import * as handles  from './handles.js';
 import * as platform from './platform.js';
 
-// a granted root is kept live (a directory handle) in the signals, but persisted
-// as whatever survives IndexedDB: on the web the handle itself (identity), on a
-// Capacitor build a plain { uri } descriptor. dehydrate at every db.set, hydrate at
-// every read — so the in-memory `handle` is always a live handle.
-const persist   = rec => ({ ...rec, handle: platform.dehydrate(rec.handle) });
-const rehydrate = rec => rec && ({ ...rec, handle: platform.hydrate(rec.handle) });
+// a granted root is kept live (a directory handle) in the signals,
+// but persisted as whatever survives IndexedDB:
+// on the web the handle itself (identity), 
+// on a Capacitor build a plain { uri } descriptor. 
+// dehydrate at every db.set, hydrate at every read 
+// — so the in-memory `handle` is always a live handle.
+const persist   = rec =>        ({ ...rec, handle: platform.dehydrate(rec.handle) });
+const rehydrate = rec => rec && ({ ...rec, handle: platform.  hydrate(rec.handle) });
 
 export class FolderLibrary {
   /**
@@ -64,7 +66,8 @@ export class FolderLibrary {
     if (single) {
       this.folder = signal(null);       // { name, handle, addedAt } | null
       this.perm   = signal('prompt');   // 'granted' | 'prompt' | 'denied'
-    } else {
+    }
+    else {
       this.sources  = signal([]);       // [{ id, name, handle, addedAt }]
       this.perms    = signal({});       // id -> permission state
       this.scanning = signal({});       // id -> true while scanning
