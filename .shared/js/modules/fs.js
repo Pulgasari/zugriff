@@ -76,25 +76,28 @@ class CapacitorDirHandle extends CapacitorHandle {
   
   async getHandleClass (child) {
     return child.kind === 'dir' 
-      ? new CapacitorDirHandle  ({ name: child.name, path: child.uri }) 
-      : new CapacitorFileHandle ({ name: child.name, path: child.uri });
+      ? new CapacitorDirHandle  (child) 
+      : new CapacitorFileHandle (child);
   }
   
   async getDirHandle (name, { create = false } = {}) {
-    for (const c of await this.#children())
-      if (c.name === name && c.kind === 'directory') return new CapacitorDirHandle(c.uri, c.name);
+    for (const child of await this.#children()) {
+      if (child.name === name && child.kind === 'dir')
+      return new CapacitorDirHandle (child);
+    }
+    
     if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
     
     const path = joinUri(this.path, name);
     await CapacitorFS().mkdir({ path, recursive: false });
     
-    return new CapacitorDirHandle({ name, path });
+    return new CapacitorDirHandle ({ name, path });
   }
   
   async getFileHandle (name, { create = false } = {}) {
     for (const child of await this.#children()) {
       if (child.name === name && child.kind === 'file')
-      return new CapacitorFileHandle({ path: child.uri, name: child.name });
+      return new CapacitorFileHandle (child);
     }
     if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
     
@@ -105,13 +108,16 @@ class CapacitorDirHandle extends CapacitorHandle {
   }
 
   async removeEntry (name, { recursive = false } = {}) {
-    for (const c of await this.#children()) if (c.name === name) {
-      if (c.kind === 'directory') await Filesystem().rmdir({ path: c.uri, recursive });
-      else                        await Filesystem().deleteFile({ path: c.uri });
+    for (const child of await this.#children()) if (child.name === name) {
+      (child.kind === 'dir') 
+        ? await this.removeDir  (c)
+        : await this.removeFile (c);
       return;
     }
     throw new DOMException(`${name} not found`, 'NotFoundError');
   }
+  async removeDir  ({ path }) { CapacitorFS().rmdir({ path, recursive }); }
+  async removeFile ({ path }) { CapacitorFS().deleteFile({ path }); }
 }
 
 class CapacitorFileHandle extends CapacitorHandle {
@@ -143,7 +149,7 @@ class CapacitorFileHandle extends CapacitorHandle {
       async close () {
         const buffer = await new Blob (chunks).arrayBuffer();
         const data   = arrayBufferToB64(buffer);
-        await Filesystem().writeFile({ path, data });
+        await CapacitorFS().writeFile({ path, data });
       },
       async abort () {},
     };
