@@ -29,8 +29,9 @@
 
 import { signal }    from '@aufbau/signals';
 import { createDb }  from '@bunker/db';
-import * as handles  from './handles.js';
-import * as platform from './platform.js';
+
+import * as handles  from './filesystem/handles.js';
+import * as platform from './filesystem/platform.js';
 
 // a granted root is kept live (a directory handle) in the signals,
 // but persisted as whatever survives IndexedDB:
@@ -159,20 +160,19 @@ export class FolderLibrary {
 
   /**
    * fast path: re-grant a folder from an earlier session via the stored handle.
-   * requestPermission() must run inside the click, so call this straight from the
-   * button. browsers are flaky about re-granting a *stored* handle — repick() is
-   * the reliable fallback. returns { granted, state?, error? }.
+   * requestPermission() must run inside the click, so call this straight from the button. 
+   * browsers are flaky about re-granting a *stored* handle — repick() is the reliable fallback. 
+   * returns { granted, state?, error? }.
    */
   async reconnect (id) {
     if (this.single) {
-      const rec = this.folder.value;
-      if (!rec) return { granted: false };
+      const rec = this.folder.value; if (!rec) return { granted: false };
       const res = await handles.requestRead(rec.handle, 'read');
       this.perm.value = res.granted ? 'granted' : (res.state ?? 'denied');
       return res;
     }
-    const s = this.sourceById(id);
-    if (!s) return { granted: false };
+    
+    const s   = this.sourceById(id); if (!s) return { granted: false };
     const res = await handles.requestRead(s.handle, 'read');
     this.perms.value = { ...this.perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
     if (res.granted) await this.scan(id);
