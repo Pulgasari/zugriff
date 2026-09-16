@@ -13,5 +13,5 @@
 export * as platform from './platform.js';
 export * as handles  from './handles.js';
 //export { FolderLibrary } from './folders.js';
-export { syncSource, MetaQueue, signatureOf } from './scan.js';
+//export { syncSource, MetaQueue, signatureOf } from './scan.js';
 //export { opfs, OPFS, vfs, VFS, opfsBackend, opfsSupported, usageEstimate } from './opfs.js';
