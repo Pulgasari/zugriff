@@ -62,15 +62,15 @@ class CapacitorDirHandle extends CapacitorHandle {
   constructor (args) { super(args); }
 
   async #children () {
-    const { files = [] } = await CapacitorFS().readdir({ path: this._uri });
-    // recent plugin versions return {name,type,uri,size,mtime}; older ones a bare
-    // string name — handle both, falling back to a joined URI when none is given.
-    return files.map(file => isString(file)
-      ? { name: file, kind: 'file', uri: joinUri(this.path, file) }
-      : { name: file.name, kind: file.type === 'directory' ? 'directory' : 'file', uri: file.uri ?? joinUri(this.path, file.name) });
+    const { files = [] } = await CapacitorFS().readdir({ path: this.path });
+    return files.map(file => ({ 
+      name : file.name, 
+      kind : file.type === 'directory' ? 'dir' : 'file', 
+      uri  : file.uri ?? joinUri(this.path, file.name) 
+    }));
   }
 
-  async *entries () { for (const c of await this.#children()) yield [c.name, c.kind === 'directory' ? new CapDirHandle(c.uri, c.name) : new CapFileHandle(c.uri, c.name)]; }    
+  async *entries () { for (const c of await this.#children()) yield [c.name, getHandle(c)]; }    
   async *keys    () { for (const c of await this.#children()) yield c.name; }
   async *values  () { for await (const [, h] of this.entries()) yield h; }
   
@@ -81,6 +81,12 @@ class CapacitorDirHandle extends CapacitorHandle {
     const uri = joinUri(this._uri, name);
     await Filesystem().mkdir({ path: uri, recursive: false });
     return new CapDirHandle(uri, name);
+  }
+
+  getHandle (children) {
+    return children.kind === 'dir' 
+      ? new CapacitorDirHandle  ({ name: c.name, path: c.uri }) 
+      : new CapacitorFileHandle ({ name: c.name, path: c.uri });
   }
 
   async getFileHandle (name, { create = false } = {}) {
