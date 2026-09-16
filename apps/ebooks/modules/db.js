@@ -2,7 +2,7 @@
 //
 // storage for the library. the granted-folder lifecycle (the `sources` store,
 // permissions, scanning) is the shared FolderLibrary
-// (shared/js/modules/filesystem/folders.js); this module owns the two app stores it
+// (shared/js/modules/fs.js); this module owns the two app stores it
 // scans into:
 //
 //   books     one record per book file — path, extracted title/author, a cover
@@ -33,7 +33,7 @@ progress = signal({});        // key -> { location, page, pages, percent, update
 
 // extraction (unzip / pdf-parse / cover render) is the slow part of a scan, so a
 // few books go at once through a bounded gate while the fast listing is already
-// on screen. see shared/js/modules/filesystem/scan.js.
+// on screen. see shared/js/modules/fs.js.
 const meta = new fs.MetaQueue(3);
 export const pending = meta.pending;   // books still queued for metadata extraction
 

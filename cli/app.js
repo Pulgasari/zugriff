@@ -14,7 +14,7 @@ import * as config from './app.config.js';
 import Nav     from '/.shared/js/components/Nav.js';
 import Settings, { SettingsButton } from '/.shared/js/components/Settings.js';
 import { themeGroup } from '/.shared/js/lib/settings.js';
-import { vfs } from '/.shared/js/modules/filesystem/opfs.js';
+import { opfs } from '/.shared/js/modules/fs.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
 
@@ -167,7 +167,7 @@ async function handleCommand(rawInput, term, worker, finishCallback) {
 
     case 'ls':
       try {
-        const files = await vfs.listFiles();
+        const files = await opfs.listFiles();
         if (files.length === 0) {
           term.writeln('VFS is empty.');
         } else {
@@ -200,7 +200,7 @@ async function handleCommand(rawInput, term, worker, finishCallback) {
         break;
       }
       try {
-        await vfs.removeFile(args[0]);
+        await opfs.removeFile(args[0]);
         term.writeln(`Removed file: ${args[0]}`);
       } catch (err) {
         term.writeln(`\x1b[31mError removing file: ${err.message}\x1b[0m`);
@@ -243,7 +243,7 @@ function triggerFileUpload(term, callback) {
     if (file) {
       term.writeln(`Uploading ${file.name} to VFS...`);
       const buffer = await file.arrayBuffer();
-      await vfs.writeFile(file.name, buffer);
+      await opfs.writeFile(file.name, buffer);
       term.writeln(`\x1b[32mSuccessfully saved ${file.name} to OPFS.\x1b[0m`);
     } else {
       term.writeln('Upload canceled.');
@@ -264,7 +264,7 @@ function triggerFileUpload(term, callback) {
 // Helper: Download file from OPFS
 async function triggerFileDownload(filename, term) {
   try {
-    const buffer = await vfs.readFile(filename);
+    const buffer = await opfs.readFile(filename);
     const blob = new Blob([buffer]);
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

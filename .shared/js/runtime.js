@@ -4,11 +4,8 @@
 
 import registry          from './data/apps.js';
 import { ZugriffApp }    from './app.js';
-import { FolderLibrary } from './modules/filesystem/folders.js';
-import * as fsPlatform   from './modules/filesystem/platform.js';
-import * as fsHandles    from './modules/filesystem/handles.js';
-import * as fsScan       from './modules/filesystem/scan.js';
-import { opfs }          from './modules/filesystem/opfs.js';
+import * as fs           from './modules/fs.js';
+import { opfs }          from './modules/fs.js';
 import fmt               from './modules/fmt.js';
 import { toast }         from './modules/toast.js';
 import { html }          from './vendors.js';
@@ -59,8 +56,8 @@ const zugriff = {
   // namespaces
   fmt,
   // the whole filesystem layer, app-agnostic: platform seam + handle ops +
-  // FolderLibrary + scan helpers. opfs stays separate, below.
-  fs: { FolderLibrary, ...fsPlatform, ...fsHandles, ...fsScan },
+  // FolderLibrary + scan helpers. opfs stays separate, below (one per origin).
+  fs,
   opfs,
   registry,
   toast,

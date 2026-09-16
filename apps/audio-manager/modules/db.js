@@ -2,7 +2,7 @@
 //
 // storage for the music library. the granted-folder lifecycle (the `sources`
 // store, permissions, scanning) is the shared FolderLibrary
-// (shared/js/modules/filesystem/folders.js); this module owns the `tracks` store it
+// (shared/js/modules/fs.js); this module owns the `tracks` store it
 // scans into: one record per audio file — path, tags, a cover Blob and a
 // size+mtime signature so tags are only re-read when a file changes.
 //
