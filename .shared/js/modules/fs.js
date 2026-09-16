@@ -47,15 +47,65 @@ cap.pick = async () => {
 const CapacitorFP = () => plugin('FilePicker');   // @capawesome/capacitor-file-picker
 const CapacitorFS = () => plugin('Filesystem');
 
-class CapacitorFileHandle {
-  kind = 'file';
-  
-  constructor ({ name, path }) { 
-    this.path = path;
+class CapacitorHandle {
+  constructor ({ name, path }) {
     this.name = name;
+    this.path = path;
+  }
+  async isSameEntry       (other) { return other?.path === this.path; }
+  async queryPermission   ()      { return 'granted'; }   // the SAF grant is persisted at pick time
+  async requestPermission ()      { return 'granted'; }
+}
+
+class CapacitorDirHandle extends CapacitorHandle {
+  kind = 'directory';
+  constructor (args) { super(args); }
+
+  async #children () {
+    const { files = [] } = await CapacitorFS().readdir({ path: this._uri });
+    // recent plugin versions return {name,type,uri,size,mtime}; older ones a bare
+    // string name — handle both, falling back to a joined URI when none is given.
+    return files.map(file => isString(file)
+      ? { name: file, kind: 'file', uri: joinUri(this.path, file) }
+      : { name: file.name, kind: file.type === 'directory' ? 'directory' : 'file', uri: file.uri ?? joinUri(this.path, file.name) });
   }
 
-  /** the live File, read fresh from disk — mirrors FileSystemFileHandle.getFile() */
+  async *entries () { for (const c of await this.#children()) yield [c.name, c.kind === 'directory' ? new CapDirHandle(c.uri, c.name) : new CapFileHandle(c.uri, c.name)]; }    
+  async *keys    () { for (const c of await this.#children()) yield c.name; }
+  async *values  () { for await (const [, h] of this.entries()) yield h; }
+  
+  async getDirHandle (name, { create = false } = {}) {
+    for (const c of await this.#children())
+      if (c.name === name && c.kind === 'directory') return new CapDirHandle(c.uri, c.name);
+    if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
+    const uri = joinUri(this._uri, name);
+    await Filesystem().mkdir({ path: uri, recursive: false });
+    return new CapDirHandle(uri, name);
+  }
+
+  async getFileHandle (name, { create = false } = {}) {
+    for (const c of await this.#children())
+      if (c.name === name && c.kind === 'file') return new CapFileHandle(c.uri, c.name);
+    if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
+    const uri = joinUri(this._uri, name);
+    await Filesystem().writeFile({ path: uri, data: '' });
+    return new CapFileHandle(uri, name);
+  }
+
+  async removeEntry (name, { recursive = false } = {}) {
+    for (const c of await this.#children()) if (c.name === name) {
+      if (c.kind === 'directory') await Filesystem().rmdir({ path: c.uri, recursive });
+      else                        await Filesystem().deleteFile({ path: c.uri });
+      return;
+    }
+    throw new DOMException(`${name} not found`, 'NotFoundError');
+  }
+}
+
+class CapacitorFileHandle extends CapacitorHandle {
+  kind = 'file';
+  constructor (args) { super(args); }
+
   async getFile () {
     const stat  = await Filesystem().stat({ path: this.path }); 
     const mtime = stat.mtime ?? Date.now(); 
@@ -69,12 +119,6 @@ class CapacitorFileHandle {
     return new File ([buffer], this.name, { type, lastModified: mtime });
   }
 
-  /**
-   * a writable that buffers writes and flushes once on close, since the plugin has
-   * no streaming write. good enough for the small files the apps produce. creating
-   * a brand-new file under a SAF content:// tree this way is best-effort;
-   * overwriting an existing file (the common case) is reliable.
-   */
   async createWritable () {
     const path = this.path; 
     const chunks = [];
@@ -93,9 +137,7 @@ class CapacitorFileHandle {
     };
   }
 
-  async isSameEntry (other)  { return other?._uri === this._uri; }
-  async queryPermission ()   { return 'granted'; }   // the SAF grant is persisted at pick time
-  async requestPermission () { return 'granted'; }
+  
 }
 
 // web / browser
