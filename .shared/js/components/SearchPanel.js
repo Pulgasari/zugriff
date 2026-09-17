@@ -13,7 +13,7 @@ function SearchPanel ({ placeholder, appStateId = 'search' }) {
   return html`
     <div class='SearchPanel search-panel'>
       <${SearchInput} placeholder=${placeholder} value=${app.state[appStateId]} onInput=${onInput} />
-      ${signal && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
+      ${app.state[appStateId] && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
     </div>
   `;
 }
