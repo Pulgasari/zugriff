@@ -8,15 +8,7 @@
 
 /* ── sidebar ─────────────────────────────────────────────────────────────── */
 
-.sidebar {
-  width    : 300px;
-  flex     : none;
-  background: var(--panel);
-  border-right: 1px solid var(--line);
-  display  : flex;
-  flex-direction: column;
-  overflow : hidden;
-}
+
 
 
 .nav-close { display: none; }
