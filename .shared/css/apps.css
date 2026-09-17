@@ -110,6 +110,28 @@ aufbau-item .art {
   }
 }
 
+/* INSTALL-TIP */
+
+.install-tip {
+  border-radius: var(--radius);
+  display: flex; 
+  gap: 0.45rem; 
+  align-items: flex-start;
+  padding: 0.5rem; 
+  border: 1px solid var(--line);
+  background: color-mix(in oklch, var(--accent) 9%, var(--panel));
+  font-size: 0.75rem; 
+  color: var(--fg-75, var(--fg)); 
+  line-height: 1.4;
+
+   > .icon { color: var(--accent); flex: none; margin-top: 1px; }
+  .body    { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
+  .hint    { color: var(--fg-50, var(--fg)); }
+  .hint b  { color: var(--fg-75, var(--fg)); font-weight: 600; }
+  
+  button, aufbau-button, .btn { align-self: flex-start; }
+}
+
 /* SIDEBAR */
 
 .sidebar {
