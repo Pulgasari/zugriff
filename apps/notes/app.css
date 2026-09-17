@@ -18,17 +18,7 @@
   overflow : hidden;
 }
 
-.brand {
-  display    : flex;
-  align-items: center;
-  gap        : 0.5rem;
-  font-size  : 1.1rem;
-  font-weight: 700;
-  padding    : 0.9rem 1rem 0.6rem;
-  color      : var(--fg);
-}
-.brand > span { flex: 1 1 auto; }
-.brand .icon { color: var(--accent); }
+
 .nav-close { display: none; }
 
 .tree-filter {
