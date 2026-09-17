@@ -64,6 +64,14 @@ function limiter (max) {
 
 const canResize = typeof createImageBitmap === 'function' && typeof document !== 'undefined';
 
+const URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}';
+
+const buildResizer = (url, w) => {
+  const tpl = URL_PROXY_IMG;
+  if (!tpl || !url) return null;
+  return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
+};
+
 /**
  * create a thumbnail cache.
  *
@@ -90,7 +98,7 @@ export function createThumbCache ({
   quality     = 0.80,
   concurrency = 3,
   scope       = 'thumbs',
-  resizer     = null,
+  resizer     = buildResizer,
 } = {}) {
   const db       = createDb(name);
   const mem      = new Map; // key -> object-url (this session)
