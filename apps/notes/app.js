@@ -65,7 +65,8 @@ function Sidebar () {
         labelOf=${titleOf}
         fileIcon='notes'
         emptyText='No markdown files here'
-        expandedKey='notes:expanded' />
+        expandedKey='notes:expanded'
+      />
 
       <div class="side-foot">
         <${InstallTip} show=${app.lib.sources.value.length > 0} />
