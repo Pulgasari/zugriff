@@ -5,15 +5,12 @@
 import registry          from './data/apps.js';
 import { ZugriffApp }    from './app.js';
 import fmt               from './modules/fmt.js';
+import * as fs           from './modules/fs.js';
 import { toast }         from './modules/toast.js';
 import { html }          from './vendors.js';
 
-import { FolderLibrary } from './modules/folders.js';
 import { opfs }          from './modules/opfs.js';
 
-import * as fsHandles    from './modules/filesystem/handles.js';
-import * as fsPlatform   from './modules/filesystem/platform.js';
-import * as fsScan       from './modules/filesystem/scan.js';
 
 // :::::: CONSTS
 
@@ -60,8 +57,7 @@ const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
 const zugriff = {
   // namespaces
   fmt,
-  folders: FolderLibrary,
-  fs: { ...fsPlatform, ...fsHandles, ...fsScan },
+  fs,
   opfs,
   registry,
   toast,
