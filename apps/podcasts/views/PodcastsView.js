@@ -9,8 +9,11 @@ import { sortPodcasts } from './../modules/methods.js';
 
 const app = zugriff.app;
 
-export default function PodcastsView () {
-  const list = sortPodcasts(app.db.podcasts.all, app.settings.podcastSort);
+const sorting  = 'newest';
+const viewmode = 'list';
+
+function PodcastsView () {
+  const list = sortPodcasts(app.db.podcasts.all, sorting);
 
   return html`
     <${View}>
@@ -18,13 +21,13 @@ export default function PodcastsView () {
         <h1>Podcasts</h1>
         <div class="view-tools">
           <${Picker}
-            value=${app.settings.podcastSort}
-            onChange=${v => app.settings.podcastSort = v}
-            options=${['recent', 'alpha']}
+            value=${sorting}
+            onChange=${v => sorting = v}
+            options=${['newest', 'alpha']}
             />
           <div class="seg">
-            <${IconButton} icon="viewmode-grid" label="Grid" active=${app.settings.view === 'grid'} onClick=${() => app.settings.view = 'grid'} />
-            <${IconButton} icon="viewmode-list" label="List" active=${app.settings.view === 'list'} onClick=${() => app.settings.view = 'list'} />
+            <${IconButton} icon='viewmode-grid' label='grid' active=${viewmode === 'grid'} onClick=${() => viewmode = 'grid'} />
+            <${IconButton} icon='viewmode-list' label='list' active=${viewmode === 'list'} onClick=${() => viewmode = 'list'} />
           </div>
           <${IconButton} icon="add" label="Add podcast" onClick=${() => app.state.dialog = 'add'} />
         </div>
@@ -33,10 +36,12 @@ export default function PodcastsView () {
       <${PodcastsIndex}
         podcasts=${list}
         empty=${{
-          icon: 'rss', 
-          title: 'No subscriptions yet',
-          hint: "Paste a podcast's RSS feed URL to subscribe." 
+          icon  : 'rss', 
+          title : 'No subscriptions yet',
+          hint  : "Paste a podcast's RSS feed URL to subscribe." 
         }}
         />
     </${View}>`;
 }
+
+export default PodcastsView;
