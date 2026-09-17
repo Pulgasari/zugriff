@@ -62,7 +62,7 @@ function Sidebar () {
     <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
       <${Brand} app=${app} />
       <${Button} icon='close' aria-label='close' onClick=${closeSidebar} />
-      <${SearchPanel} placeholder='filter notes ...' app-state-id='filter' />
+      <${SearchPanel} placeholder='filter notes ...' appStateId='filter' />
 
       <${FolderTree}
         lib=${app.lib}
