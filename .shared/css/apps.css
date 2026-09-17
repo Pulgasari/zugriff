@@ -78,6 +78,24 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .Dock        { text-transform: uppercase; }
 .Dock button { text-transform: uppercase; }
 
+/* EMPTY */
+
+.empty {
+  align-items: center;
+  color: var(--fg-50, var(--fg));
+  display: flex; 
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: auto;
+  padding: 4rem 1rem;
+  text-align: center;
+  
+  .icon  { opacity: 0.6; }
+  .title { font-size: 1rem; font-weight: 600; color: var(--fg); }
+  .hint  { max-width: 26rem; font-size: 1rem; }
+  .btn   { margin-top: 0.75rem; }
+}
+
 /* INDEX */
 
 aufbau-index[viewmode="grid"],
