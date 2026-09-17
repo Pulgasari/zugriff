@@ -1,11 +1,11 @@
 // apps/podcasts/views/LatestView.js
-// the mixed "latest episodes" stream across all subscriptions.
 
 import Button             from '/.shared/js/components/Button.js';
 import Icon               from '/.shared/js/components/Icon.js';
 import IconButton         from '/.shared/js/components/IconButton.js';
-import View               from '/.shared/js/components/View.js';
 import SearchPanel        from '/.shared/js/components/SearchPanel.js';
+import View               from '/.shared/js/components/View.js';
+
 import EpisodesIndex      from './../components/EpisodesIndex.js';
 import { filterEpisodes } from './../modules/methods.js';
 
@@ -41,6 +41,6 @@ export default function LatestView () {
 
       <${EpisodesIndex} episodes=${recent} empty=${empty} />
     </${View}>
-    ${hasSubs && html`<${SearchPanel} placeholder="Filter episodes…" />`}
+    ${hasSubs && html`<${SearchPanel} placeholder="filter episodes …" />`}
   `;
 }
