@@ -10,9 +10,10 @@ import { createThumbCache } from '/.shared/js/thumbs.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
 const // shared components
-Dock = await zugriff.component('Dock'),
-Icon = await zugriff.component('Icon'),
-Slot = await zugriff.component('Slot');
+Dock    = await zugriff.component('Dock'),
+Icon    = await zugriff.component('Icon'),
+Loading = await zugriff.component('Loading'),
+Slot    = await zugriff.component('Slot');
 
 const // panels
 PlayerPanel   = await app.panel('PlayerPanel'),
@@ -47,7 +48,7 @@ app.settings = typedSignal({
 
 // on-device artwork thumbnail cache, resized through the configured endpoint
 const buildResizer = (url, w) => {
-  const tpl = app.settings.imgResizer.trim();
+  const tpl = URL_PROXY_IMG;
   if (!tpl || !url) return null;
   return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
 };
@@ -109,8 +110,7 @@ const dockItems = [
 ];
 
 app.dialogs = {
-  add      : 'AddPodcastDialog',
-  //settings : 'panels/SettingsPanel',
+  add : 'AddPodcastDialog',
 };
 
 app.views = {
@@ -130,7 +130,7 @@ function App () {
       .catch(app.toast);
   }, []);
 
-  if (!app.db.ready) return html`<div class="booting"><${Icon} name='loading' /></div>`;
+  if (!app.db.ready) return html`<${Loading}/>`;
 
   const route = app.state.route;
   const view  = route.name in app.views ? route.name : 'latest';
