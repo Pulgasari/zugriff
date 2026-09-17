@@ -18,6 +18,10 @@
 .Dock     { background-color: var(--bg-d-1); }
 .Dock > * { background-color: var(--bg-d-2); border: none; border-radius: 0; }
 
+/* typo */
+
+.date, .datetime, .duration, .time { font-family: monospace; }
+
 aufbau-index[viewmode="grid"],
 aufbau-index[viewmode="list"] > *:nth-child(odd) { background-color: #0001; }
 aufbau-index[viewmode="list"] { gap: 0; }
@@ -66,30 +70,9 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .Dock     { gap: 0.125rem; }
 .Dock > * { gap: 0.5rem; padding: 0.75rem; }
 
-.Dock aufbau-icon {
-  font-size: 2rem;
-}
+.Dock aufbau-icon { font-size: 2rem; }
 
 
-.View header {
-  background-color: var(--bg-d-2);
-  display: flex; justify-content: space-between;
-  gap: 0.5rem; padding: 0.75rem;
-  position: sticky; top: 0;
-  /*
-  aufbau-bg       : darken(--bg, 10%);
-  aufbau-flow     : flex row space-between;
-  aufbau-sticky   : top;
-  aufbau-spacing  : small normal
-  */
-}
-
-.Dock               { text-transform: uppercase; }
-.Dock button        { text-transform: uppercase; }
-.View header        { text-transform: uppercase; }
-.View header button { text-transform: uppercase; }
-
-.date, .datetime, .duration, .time { font-family: monospace; }
 
 aufbau-item .art {
   display: grid;
@@ -102,11 +85,42 @@ aufbau-item .art {
   }
 }
 
-.Brand {}
+/* BRAND */
+
+.Brand, .brand {
+  align-items : center;
+  color       : var(--fg);
+  display     : flex;
+  gap         : 0.5rem;
+  font-size   : 1.0rem;
+  font-weight : 700;
+  padding     : 0.5rem;
+  
+  > span { flex: 1 1 auto; }
+  .icon  { color: var(--accent); }
+}
+
+/* DOCK */
+
+.Dock        { text-transform: uppercase; }
+.Dock button { text-transform: uppercase; }
+
+/* VIEW */
+
+.View header {
+  background-color: var(--bg-d-2);
+  display: flex; justify-content: space-between;
+  gap: 0.5rem; padding: 0.75rem;
+  position: sticky; top: 0;
+}
+
+.View header        { text-transform: uppercase; }
+.View header button { text-transform: uppercase; }
+
+/*  */
 
 .ActionMenu {}
-.ContextMenu {
-}
+.ContextMenu {}
 .NavMenu {}
 
 .Modal {}
