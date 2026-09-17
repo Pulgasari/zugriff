@@ -169,6 +169,15 @@ aufbau-item .art {
   width        : 300px;
 }
 
+.side-foot {
+  flex: none;
+  padding: 0.5rem;
+  border-top: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 0.5rem;
+
+  .btn { justify-content: center; }
+}
+
 /* TREE */
 
 .tree {
