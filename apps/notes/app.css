@@ -40,25 +40,7 @@
 
 
 
-/* a granted folder block */
-.src { margin-bottom: 0.4rem; }
-.src-head {
-  display: flex; align-items: center; gap: 0.4rem;
-  padding: 0.35rem 0.5rem; margin: 0 0.1rem;
-  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em;
-  color: var(--fg-75, var(--fg)); text-transform: uppercase;
-}
-.src-head .icon { color: var(--fg-50, var(--fg)); }
-.src-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; letter-spacing: 0; }
-.src-x {
-  flex: none; border: none; background: none; color: var(--fg-50, var(--fg));
-  width: 1.4rem; height: 1.4rem; border-radius: 0.3rem; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.src-x:hover:not(:disabled) { background: var(--hover); color: var(--fg); }
-.src-x:disabled { opacity: 0.35; cursor: default; }
-.src-reconnect { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
-.src-reconnect-row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
 
 /* the tree itself — rendered by <aufbau-tree> / <aufbau-tree-item> */
 aufbau-tree, aufbau-tree-item { display: block; }
