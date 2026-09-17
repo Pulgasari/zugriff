@@ -22,12 +22,12 @@
 //     emptyText='No markdown files here'
 //     expandedKey='notes:expanded' />
 
-import { html }                     from './../vendors.js';
 import { signal as persist, local } from '@aufbau/signals';
-import Tree    from './Tree.js';
+
 import Button  from './Button.js';
 import Icon    from './Icon.js';
 import Loading from './Loading.js';
+import Tree    from './Tree.js';
 
 // one persisted expanded-set per key, so repeat renders reuse the same signal
 const expandedStores = new Map();
@@ -147,15 +147,16 @@ function FolderTree ({
     const disabled = busy || state !== 'granted';
     const refresh  = () => lib.scan(source.id).catch(() => {});
     return html`
-      <div class="src" key=${source.id}>
-        <div class="src-head">
-          <${Icon} name="folder" />
-          <span class="src-name" title=${source.name}>${source.name}</span>
-          <${Button} class="src-x" icon='refresh' title="Refresh"      onClick=${refresh} disabled=${disabled} />
-          <${Button} class="src-x" icon='close'   title="Close folder" onClick=${remove} />
+      <div class='src' key=${source.id}>
+        <div class='head'>
+          <${Icon} name='folder' />
+          <span class='name' title=${source.name}>${source.name}</span>
+          <${Button} class="src-x" icon='refresh' title='refresh' onClick=${refresh} disabled=${disabled} />
+          <${Button} class="src-x" icon='close'   title='close'   onClick=${remove} />
         </div>
         ${body}
-      </div>`;
+      </div>
+    `;
   };
 
   return html`
