@@ -12,12 +12,12 @@ function InstallTip ({ message = DEFAULT_MESSAGE }) {
   if (zugriff.app.isInstalled) return null;
 
   return html`
-    <div class="install-tip">
-      <${Icon} name="info" />
-      <span class="install-tip-text">${message}</span>
+    <div class='install-tip'>
+      <${Icon} name='info' />
+      <span class='text'>${message}</span>
       ${zugriff.app.canInstall
-        ? html`<${Button} class="small primary" onClick=${zugriff.app.promptInstall} icon="mdi:download" label='Install app' />`      
-        : html`<span class="install-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
+        ? html`<${Button} onClick=${zugriff.app.promptInstall} icon='download' label='Install app' />`      
+        : html`<span class='hint'>Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
     </div>`;
 }
 
