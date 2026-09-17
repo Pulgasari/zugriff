@@ -24,6 +24,7 @@ img { max-width: 100%; }
 
 /* typo */
 
+code, kbd { font-family: var(--mono); }
 .date, .datetime, .duration, .time { font-family: monospace; }
 
 
