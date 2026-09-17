@@ -110,6 +110,18 @@ aufbau-item .art {
   }
 }
 
+/* SIDEBAR */
+
+.sidebar {
+  background   : var(--panel);
+  border-right : 1px solid var(--line);
+  display      : flex;
+  flex         : none;
+  flex-flow    : column;
+  overflow     : hidden;
+  width        : 300px;
+}
+
 /* VIEW */
 
 .View header {
