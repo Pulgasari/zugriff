@@ -1,5 +1,4 @@
-// apps/podcasts/views/PodcastsView.js
-// the subscriptions grid / list.
+// podcasts :: views/PodcastsView.js
 
 import IconButton       from '/.shared/js/components/IconButton.js';
 import Picker           from '/.shared/js/components/Picker.js';
