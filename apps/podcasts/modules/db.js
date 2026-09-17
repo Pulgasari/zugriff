@@ -12,6 +12,8 @@ import { createDb }            from '@bunker/db';
 import { fetchFeed, parseFeed } from './feed.js';
 
 const store = createDb('zugriff-podcasts');
+const URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}';
+const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 
 // ── ids ──
 // cyrb53: a short, stable base-36 hash, so long urls/guids stay out of the keys.
@@ -84,9 +86,8 @@ async function load () {
 
 // ── state (progress / done / saved) ──
 
-const EMPTY_STATE = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
-
-const stateOf = id => stateMap.get(id) ?? EMPTY_STATE;
+const EMPTY_STATE = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };      
+const stateOf     = id => stateMap.get(id) ?? EMPTY_STATE;
 
 /** merge `patch` into an episode's state, persist it and refresh the mirror */
 async function patchState (id, patch) {
@@ -178,16 +179,14 @@ async function subscribe (rawUrl, proxy) {
   return podcast;
 }
 
-const URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}';
-const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
+
 
 /** re-fetch one subscription and merge in any new episodes */
 async function refresh (pid) {
   const proxy   = URL_PROXY_RSS;
-  const podcast = podcastMap.get(pid);
-  if (!podcast) return;
-
-  const parsed = parseFeed(await fetchFeed(podcast.url, proxy));
+  const podcast = podcastMap.get(pid); if (!podcast) return;
+  const fetched = await fetchFeed(podcast.url, proxy);
+  const parsed  = parseFeed(fetched);
   const { podcast: fresh, eps } = toRecords(podcast.url, parsed);
 
   const prefix = pid + ':';
@@ -209,9 +208,9 @@ async function refreshAll (onProgress) {
   const all = [...podcastMap.values()];
   const results = [];
   let done = 0;
-  for (const p of all) {
-    try { results.push(await refresh(p.id)); }
-    catch (err) { results.push({ error: err?.message || String(err), podcast: p }); }
+  for (const podcast of all) {
+    try         { results.push(await refresh(podcast.id)); }
+    catch (err) { results.push({ error: err?.message || String(err), podcast }); }
     onProgress?.(++done, all.length);
   }
   return results;
