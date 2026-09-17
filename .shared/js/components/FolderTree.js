@@ -1,26 +1,6 @@
 // components/FolderTree.js
-// a sidebar file tree for a multi-mode FolderLibrary. the app owns the
-// library (and its own "which file is open" state); this renders each granted
-// source as a collapsible tree and handles the plumbing every such view repeats:
-//
-// - map a scanned folder tree (fs.scanTree shape: kind 'dir' | 'file') into
-//   <aufbau-tree> nodes
-// - encode node identity ("f:"/"d:" + sourceId + path) for the select/toggle events
-// - persist which directories are expanded (per `expandedKey`, in localStorage)
-// - per-source chrome: a reconnect prompt on a lost grant, a scanning spinner, an
-//   empty / no-match line, refresh + close
-// - prune the tree to a filter query
-//
-//   <${FolderTree}
-//     lib=${app.lib}
-//     filter=${app.state.filter}
-//     selected=${open.value}                                   // { sourceId, path } | null
-//     onOpen=${(sourceId, path) => open.value = { sourceId, path }}
-//     onRemoveSource=${id => { if (open.value?.sourceId === id) open.value = null; }}
-//     labelOf=${node => node.name.replace(/\.[^.]+$/, '')}     // default: node.name
-//     fileIcon='notes'
-//     emptyText='No markdown files here'
-//     expandedKey='notes:expanded' />
+
+// :::::: IMPORT
 
 import { signal as persist, local } from '@aufbau/signals';
 
@@ -29,8 +9,10 @@ import Icon    from './Icon.js';
 import Loading from './Loading.js';
 import Tree    from './Tree.js';
 
+// :::::: 
+
 // one persisted expanded-set per key, so repeat renders reuse the same signal
-const expandedStores = new Map();
+const expandedStores = new Map;
 const expandedSignal = key => {
   if (!expandedStores.has(key)) expandedStores.set(key, persist({ value: [], key, store: local }));
   return expandedStores.get(key);
@@ -52,6 +34,8 @@ function filterTree (node, q) {
   const kids = (node.children ?? []).map(c => filterTree(c, q)).filter(Boolean);
   return kids.length ? { ...node, children: kids } : null;
 }
+
+// :::::: MAIN COMPONENT
 
 function FolderTree ({
   lib,
@@ -99,8 +83,8 @@ function FolderTree ({
     if (kind !== 'd') return;
     const k   = keyOf(sourceId, path);
     const has = expanded.value.includes(k);
-    if (e.detail.expanded && !has)      expanded.value = [...expanded.value, k];
-    else if (!e.detail.expanded && has) expanded.value = expanded.value.filter(x => x !== k);
+         if  (e.detail.expanded && !has) expanded.value = [...expanded.value, k];
+    else if (!e.detail.expanded &&  has) expanded.value = expanded.value.filter(x => x !== k);
   };
 
   const renderSource = source => {
@@ -128,15 +112,15 @@ function FolderTree ({
       });
       const repick = () => lib.repick(source.id).then(ok => ok || toast({ error: 'Could not open that folder' }));
       body = html`
-        <div class="src-reconnect">
+        <div class='reconnect'>
           <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
-          <div class="src-reconnect-row">
-            <${Button} class='small'       icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
-            <${Button} class='small ghost' icon='folder-search' label='Choose folder' onClick=${repick}       />
+          <div class='row'>
+            <${Button} icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
+            <${Button} icon='folder-search' label='Choose folder' onClick=${repick}       />
           </div>
         </div>`;
     } else if (busy && !tree) {
-      body = html`<${Loading} class='src-loading' text='Scanning…' />`;
+      body = html`<${Loading} text='Scanning…' />`;
     } else {
       const view = q && tree ? filterTree(tree, q) : tree;
       body = view && view.children.length
@@ -151,8 +135,8 @@ function FolderTree ({
         <div class='head'>
           <${Icon} name='folder' />
           <span class='name' title=${source.name}>${source.name}</span>
-          <${Button} class="src-x" icon='refresh' title='refresh' onClick=${refresh} disabled=${disabled} />
-          <${Button} class="src-x" icon='close'   title='close'   onClick=${remove} />
+          <${Button} icon='refresh' title='refresh' onClick=${refresh} disabled=${disabled} />
+          <${Button} icon='close'   title='close'   onClick=${remove} />
         </div>
         ${body}
       </div>
@@ -160,10 +144,10 @@ function FolderTree ({
   };
 
   return html`
-    <div class="tree">
+    <div class='tree'>
       ${lib.sources.value.length
         ? lib.sources.value.map(renderSource)
-        : html`<p class="tree-hint">${noSourcesText}</p>`}
+        : html`<p class='hint'>${noSourcesText}</p>`}
     </div>
   `;
 }
