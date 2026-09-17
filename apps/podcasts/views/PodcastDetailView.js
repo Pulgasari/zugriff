@@ -1,5 +1,4 @@
-// apps/podcasts/views/PodcastDetailView.js
-// one podcast: header, actions (refresh / website / unsubscribe) and its episodes.
+// podcasts :: views/PodcastDetailView.js
 
 import Button from '/.shared/js/components/Button.js';
 import Empty  from '/.shared/js/components/Empty.js';
@@ -39,7 +38,7 @@ export default function PodcastDetailView ({ id }) {
   const refreshOne = async () => {
     app.state.busy = 'Refreshing…';
     try {
-      const { added } = await app.db.refresh(id, app.settings.proxy);
+      const { added } = await app.db.refresh(id);
       const message = added ? `${added} new episode(s)` : 'Up to date';
       app.toast.success(message);
     }
