@@ -54,7 +54,7 @@ async function refreshAll () {
   if (!app.db.podcasts.size) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
-    const results = await app.db.refreshAll(URL_PROXY_RSS, (n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.db.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
     const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed  = results.filter(r => r.error).length;
     const type    = failed ? 'error' : 'success';
