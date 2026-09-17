@@ -102,10 +102,7 @@ aufbau-tree, aufbau-tree-item { display: block; }
   background: var(--panel); overflow: hidden;
 }
 .nav-open { display: none; }
-.crumbs { display: flex; align-items: center; flex-wrap: nowrap; overflow: hidden; font-size: 0.82rem; }
-.crumb { color: var(--fg-50, var(--fg)); white-space: nowrap; }
-.crumb.last { color: var(--fg); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-.crumb-sep { color: var(--fg-50, var(--fg)); margin: 0 0.4rem; }
+
 .head-brand { font-weight: 700; color: var(--fg); }
 
 .reader-scroll { flex: 1 1 auto; overflow-y: auto; }
