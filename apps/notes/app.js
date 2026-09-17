@@ -5,6 +5,8 @@
 import { computed, local, signal } from '@aufbau/signals';
 import { useEffect, useState }     from 'preact/hooks';
 
+import FolderLibrary from '/.shared/js/modules/folders.js';
+
 const // shared components
 Brand       = await zugriff.component('Brand'),
 Button      = await zugriff.component('Button'),
@@ -19,24 +21,34 @@ Reader      = await zugriff.component('Reader'),
 SearchPanel = await zugriff.component('SearchPanel'),
 TOC         = await zugriff.component('TOC');
 
-//
-import FolderLibrary from '/.shared/js/modules/folders.js';
 
-// ::: the app
+// :::::: APP
+
 const app = zugriff.app;
 app.lib = new FolderLibrary({ accept: 'md, markdown, mdown, mkd, mdwn, mdtxt' });
 const { fs } = zugriff;
 
-// :::::: STATE
+// ::: state
 
-app.state.filter    = '';    // tree filter query
-app.state.isNavOpen = false; // mobile: is the tree drawer showing
+app.state.filter    = '';
+app.state.isNavOpen = false;
 
 // durable state — hydrates from + persists to localStorage
 const open = signal({ value: null, key: 'notes:open', store: local });   // { sourceId, path } | null
 
 const closeSidebar = () => app.state.isNavOpen = false;
 const  openSidebar = () => app.state.isNavOpen = true;
+
+// :::::: ACTIONS
+
+async function addFolder () {
+  if (!zugriff.fs.supported()) { app.toast({ error: 'This browser can’t open folders — try Chrome, Edge or another Chromium browser.' }); return; }
+  try {
+    const record = await app.lib.addFolder();
+    if (record) app.toast({ success: `Opened ${record.name}` });
+  } 
+  catch (e) { app.toast(e); }
+}
 
 // :::::: TREE HELPERS
 
@@ -46,13 +58,11 @@ const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 // :::::: SIDEBAR
 
 function Sidebar () {
-  
-  
   return html`
     <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
       <${Brand} app=${app} />
       <${Button} icon='close' aria-label='close' onClick=${closeSidebar} />
-      <${SearchPanel} signal=${app.state.filter} />
+      <${SearchPanel} placeholder='filter notes ...' app-state-id='filter' />
 
       <${FolderTree}
         lib=${app.lib}
@@ -111,16 +121,7 @@ function NoteView ({ note }) {
   `;
 }
 
-// :::::: ACTIONS
 
-async function addFolder () {
-  if (!zugriff.fs.supported()) { app.toast({ error: 'This browser can’t open folders — try Chrome, Edge or another Chromium browser.' }); return; }
-  try {
-    const record = await app.lib.addFolder();
-    if (record) app.toast({ success: `Opened ${record.name}` });
-  } 
-  catch (e) { app.toast(e); }
-}
 
 // :::::: APP
 
