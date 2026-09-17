@@ -1,58 +1,13 @@
 // .shared/js/modules/filesystem/folders.js
-// zugriff.fs.FolderLibrary
-//
-// the shared lifecycle around folders the user grants us off their real disk with
-// the File System Access API. every app that is a live view onto granted folders
-// used to re-implement the same dance in its own db.js:
-//
-//   * keep the granted directory handles in a @bunker/db store, because a
-//     FileSystemDirectoryHandle is structured-cloneable and survives a reload
-//   * on load, resolve each handle's permission (never prompts) before showing the
-//     ui, then rescan the granted ones in the background
-//   * add / reconnect / re-pick / forget a folder, keeping signals and db in step
-//
-// this class owns exactly that. what a scan *produces* — a tree, tagged tracks,
-// book covers — is app-specific, so the app passes a `scan` callback (and, if it
-// keeps its own record stores, an `onLoad` to hydrate them and a `cascade` to drop
-// them when a source is removed). the class owns the shared @bunker/db instance
-// and exposes it as `.db`.
-//
-// two shapes:
-//   multi  (default)         an array of granted folders — sources / perms / scanning
-//   single { single:true }   one granted root — folder / perm  (the files app)
-//
-// picking + persistence go through platform.js, so a Capacitor build transparently
-// gets the native SAF picker and its handle shim; the permission dance goes through
-// handles.js. it hangs off the runtime as the constructor zugriff.fs.FolderLibrary.
-//
-// used by: notes, ebooks, audio-manager, images, videos, files.
 
-import { signal }    from '@aufbau/signals';
-import { createDb }  from '@bunker/db';
+import { signal }     from '@aufbau/signals';
+import { createDb }   from '@bunker/db';
+import { createPool } from './../../vendors/pool.js';
 
-import * as handles  from './filesystem/handles.js';
-import * as platform from './filesystem/platform.js';
-
-// a granted root is kept live (a directory handle) in the signals,
-// but persisted as whatever survives IndexedDB:
-// on the web the handle itself (identity), 
-// on a Capacitor build a plain { uri } descriptor. 
-// dehydrate at every db.set, hydrate at every read 
-// — so the in-memory `handle` is always a live handle.
-const persist   = rec =>        ({ ...rec, handle: platform.dehydrate(rec.handle) });
-const rehydrate = rec => rec && ({ ...rec, handle: platform.  hydrate(rec.handle) });
+const persist   = rec =>        ({ ...rec, handle: zugriff.fs.dehydrate(rec.handle) });
+const rehydrate = rec => rec && ({ ...rec, handle: zugriff.fs.  hydrate(rec.handle) });
 
 export class FolderLibrary {
-  /**
-   * @param {object}   opts
-   * @param {string}   opts.db        @bunker/db database name (e.g. 'zugriff-notes')
-   * @param {string}   opts.pickerId  showDirectoryPicker id (stable "start here" slot)
-   * @param {object}   opts.stores    db.setup schema, e.g. { sources: {}, books: {} }
-   * @param {boolean} [opts.single]   single-root mode (one folder, no array)
-   * @param {function}[opts.scan]     async (source, ctx) => void — multi mode
-   * @param {function}[opts.onLoad]   async (db) => void — hydrate app-owned signals after load
-   * @param {function}[opts.cascade]  async (id, db) => void — drop app records for a removed source
-   */
   constructor ({ db, pickerId, stores, single = false, scan, onLoad, cascade } = {}) {
     this.db       = createDb(db);
     this.pickerId = pickerId;
@@ -97,7 +52,6 @@ export class FolderLibrary {
     this.ready.value = true;
   }
 
-  /** pick a folder to browse (also the "change folder" path). must run from a click. */
   async grant () {
     const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
@@ -108,7 +62,6 @@ export class FolderLibrary {
     return rec;
   }
 
-  /** forget the single root — drops the handle only, never touches disk. */
   async forget () {
     await this.db.delete('root', FolderLibrary.#ROOT);
     this.folder.value = null;
@@ -143,7 +96,6 @@ export class FolderLibrary {
 
   sourceById (id) { return this.sources.value.find(s => s.id === id) ?? null; }
 
-  /** grant a new folder. returns the record, or null if the picker was dismissed. */
   async addFolder () {
     const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
@@ -158,12 +110,6 @@ export class FolderLibrary {
     return rec;
   }
 
-  /**
-   * fast path: re-grant a folder from an earlier session via the stored handle.
-   * requestPermission() must run inside the click, so call this straight from the button. 
-   * browsers are flaky about re-granting a *stored* handle — repick() is the reliable fallback. 
-   * returns { granted, state?, error? }.
-   */
   async reconnect (id) {
     if (this.single) {
       const rec = this.folder.value; if (!rec) return { granted: false };
@@ -179,12 +125,6 @@ export class FolderLibrary {
     return res;
   }
 
-  /**
-   * reliable fallback: re-pick the same folder. the picker remembers the location
-   * (via the shared id) and always hands back a freshly granted handle, so this
-   * works even when reconnect() can't re-grant the stored one. records are keyed
-   * by path, so covers/metadata/progress survive the swap.
-   */
   async repick (id) {
     const source = this.sourceById(id); if (!source) return false;
     const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
@@ -246,51 +186,9 @@ export class FolderLibrary {
   }
 }
 
-export default FolderLibrary;
+const signatureOf = file => `${file.size}:${file.lastModified}`;
 
-
-
-
-
-// .shared/js/modules/filesystem/scan.js
-//
-// the two reusable pieces of a "scan a granted folder into records" pass, pulled
-// out of the audio-manager and ebooks libraries where they were nearly identical:
-//
-//   syncSource  diff the files on disk against the rows we already hold for one
-//               source — keep unchanged rows (by a size+mtime signature), write
-//               new/changed ones, drop rows whose file vanished.
-//   MetaQueue   a bounded background queue for the slow per-file metadata
-//               extraction (tag reading, cover render, pdf/epub parse) that runs
-//               off to the side after the fast listing pass.
-//
-// neither knows anything about a specific app's record shape; the caller passes
-// `makeRecord` / a worker that does. notes doesn't need either (it just stores a
-// tree), so FolderLibrary takes a plain `scan` callback and these stay opt-in.
-
-import { signal }     from '@aufbau/signals';
-import { createPool } from './../../vendors/pool.js';
-
-/** the size+mtime signature we use to tell whether a file changed since last scan */
-export const signatureOf = file => `${file.size}:${file.lastModified}`;
-
-/**
- * reconcile `rows` (every record across all sources) with the `files` found in
- * one source's folder, and persist the difference to `store`.
- *
- *   db          the @bunker/db instance
- *   store       object-store name the records live in (e.g. 'tracks', 'books')
- *   sourceId    the source being scanned
- *   files       flat file nodes from handles.flatten(scanTree(...))
- *   rows        the current full array of records (from the app's signal)
- *   keyOf       (sourceId, path) => key
- *   makeRecord  (fileNode, { key, sourceId, sig, prev }) => a fresh record,
- *               called only for a new or changed file
- *
- * returns the next full array of records (this source rebuilt, others untouched),
- * ready to assign straight to the app's signal.
- */
-export async function syncSource ({ db, store, sourceId, files, rows, keyOf, makeRecord }) {
+async function syncSource ({ db, store, sourceId, files, rows, keyOf, makeRecord }) {
   const seen    = new Set;
   const known   = new Map(rows.map(r => [r.key, r]));
   const next    = rows.filter(r => r.sourceId !== sourceId);   // rebuild this source's rows
@@ -318,15 +216,7 @@ export async function syncSource ({ db, store, sourceId, files, rows, keyOf, mak
   return next;
 }
 
-/**
- * a bounded background queue keyed by each item's `.key`, so a rescan can't
- * double-enqueue an item that is already queued or in flight. `pending` is a
- * signal of how many are still outstanding, for a "reading tags…" indicator.
- *
- *   const meta = new MetaQueue(3);
- *   meta.enqueue(newRows, row => extractOne(row));
- */
-export class MetaQueue {
+class MetaQueue {
   constructor (concurrency = 3) {
     this.gate    = createPool(concurrency);
     this.queued  = new Set();
@@ -345,3 +235,14 @@ export class MetaQueue {
     this.pending.value = this.queued.size;
   }
 }
+
+// :::::: EXPORT
+
+export {
+  FolderLibrary,
+  MetaQueue,
+  signatureOf,
+  syncSource,
+}
+
+export default FolderLibrary
