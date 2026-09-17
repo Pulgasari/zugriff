@@ -11,7 +11,7 @@ function SearchPanel ({ placeholder, appStateId = 'search' }) {
   const onInput = (event) => app.state[appStateId] = event.detail.value;
 
   return html`
-    <div class='SearchPanel'>
+    <div class='SearchPanel search-panel'>
       <${SearchInput} placeholder=${placeholder} value=${app.state[appStateId]} onInput=${onInput} />
       ${signal && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
     </div>
