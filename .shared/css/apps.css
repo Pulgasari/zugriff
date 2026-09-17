@@ -168,8 +168,17 @@ aufbau-item .art {
   flex: 1 1 auto; 
   overflow-y: auto; 
   padding: 0.5rem;
+}
 
-  .src .loading { display: flex; align-items: center; gap: 0.4rem; }
+/* a granted folder block */
+.src { 
+  margin-bottom: 0.4rem; 
+
+  .head           { align-items: center; display: flex; font-weight: 700; gap: 0.5rem; padding: 0.5rem; text-transform: uppercase; }
+  .loading        { display: flex; align-items: center; gap: 0.5rem; }
+  .name           { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: none; letter-spacing: 0; }     
+  .reconnect      { display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+  .reconnect .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 }
 
 /* VIEW */
