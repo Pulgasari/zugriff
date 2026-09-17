@@ -1,3 +1,7 @@
+/* reset */
+
+img { max-width: 100%; }
+
 /* colors */
 
 :root {
