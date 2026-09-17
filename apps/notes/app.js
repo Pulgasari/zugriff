@@ -38,9 +38,6 @@ const open = signal({ value: null, key: 'notes:open', store: local });   // { so
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
 // :::::: SIDEBAR
-// the source list + tree is the shared <${FolderTree}> — it owns the node mapping,
-// expanded persistence, per-source reconnect/scan chrome and the filter; the app
-// only wires it to its library and its own "which note is open" state.
 
 function Sidebar () {
   return html`
@@ -123,42 +120,55 @@ function NoteView ({ note }) {
 async function addFolder () {
   if (!zugriff.fs.supported()) { app.toast({ error: 'This browser can’t open folders — try Chrome, Edge or another Chromium browser.' }); return; }
   try {
-    const rec = await app.lib.addFolder();
-    if (rec) app.toast({ success: `Opened ${rec.name}` });
+    const record = await app.lib.addFolder();
+    if (record) app.toast({ success: `Opened ${record.name}` });
   } 
   catch (e) { app.toast(e); }
 }
 
 // :::::: APP
 
+function EmptyReader () {
+  let action, hint;
+  const hasSources = app.lib.sources.value.length ? true : false;
+
+  if (hasSources) {
+    action = '';
+    hint   = 'Choose a note to start reading.';
+  } else {
+    action = html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`;    
+    hint   = 'Open a folder of Markdown files to get started.';
+  }
+  
+  return html`<${Empty} icon='notes' title='No note open' hint=${hint} action=${action} />`;
+}
+
+function NotesReader () {
+  const hasSources = app.lib.sources.value.length ? true : false;
+  const note = currentNote.value;
+  const segs = note ? note.node.path.split('/') : [];
+  
+  return html`
+    <div class='reader'>
+      <header class='reader-head'>
+        <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
+        <${Breadcrumbs} segments=${segs} />
+      </header>
+  
+      ${note ? html`<${NoteView} note=${note} />` : html`<${EmptyReader}/>`}
+    </div>
+  `;
+}
+
 function App () {
   useEffect(() => { app.lib.load().catch(app.toast); }, []);
 
-  if (!app.lib.ready.value)
-  return html`<div class="booting"><${Icon} name='loading' /></div>`;
-
-  const note = currentNote.value;
-  const segs = note ? note.node.path.split('/') : [];
-
-  return html`<>
+  return (!app.lib.ready.value)
+  ? html`<div class="booting"><${Icon} name='loading' /></div>`
+  : html`<>
     <${Sidebar} />
     <main id='app-main'>
-      <div class="reader">
-        <header class=${'reader-head' + (note ? '' : ' empty')}>
-          <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
-          <${Breadcrumbs} segments=${segs} />
-        </header>
-  
-        ${note
-          ? html`<${NoteView} note=${note} />`
-          : html`<div class="reader-empty">
-              <${Empty} icon='notes' title="No note open"
-                   hint=${app.lib.sources.value.length ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.'}
-                action=${!app.lib.sources.value.length && html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`}
-              />
-            </div>`
-        }
-      </div>
+      <${NotesReader}/>
     </main>
   </>`;
 }
