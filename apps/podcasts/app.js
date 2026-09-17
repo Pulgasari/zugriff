@@ -53,10 +53,6 @@ const buildResizer = (url, w) => {
 };
 app.thumbs = createThumbCache({ resizer: buildResizer });
 
-// ::: navigation — navigating always clears the current filter. for toasts call
-// app.toast directly (see .shared/js/modules/toast.js).
-//app.go = (name, id) => { app.state.route = { name, id: id ?? null }; app.state.search = ''; };
-
 // :::::: ACTIONS
 
 async function refreshAll () {
@@ -96,8 +92,6 @@ app.hotkeys = {
 };
 
 // :::::: EFFECTS
-// the frame reads menu/player placement off #app's data-attributes; keep them in sync
-// so the layout responds without an extra wrapper element
 
 const $app = document.getElementById('app');
 app.effect(() => {
@@ -108,11 +102,16 @@ app.effect(() => {
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
 const dockItems = [
-  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
   { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'episodes'  },
+  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
   { label: 'Later',    icon: 'bookmarks',             view: 'episodes'  },     
   { label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
+
+app.dialogs = {
+  add      : 'AddPodcastDialog',
+  //settings : 'panels/SettingsPanel',
+};
 
 app.views = {
   latest   : 'LatestView',
@@ -122,10 +121,7 @@ app.views = {
   saved    : 'SavedView',
 };
 
-app.dialogs = {
-  add      : 'AddPodcastDialog',
-  //settings : 'panels/SettingsPanel',
-};
+
 
 function App () {
   useEffect(() => {
