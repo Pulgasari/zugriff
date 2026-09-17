@@ -103,13 +103,8 @@ function NoteView ({ note }) {
   return html`
     <div class="reader-scroll">
       <div class="reader-grid">
-
-        <${Reader} id="notes-reader" class="md" format="markdown" text=${text} />
-
-        <aside class="toc">
-          <${TOC} target="#notes-reader" selector="h1, h2, h3" />
-        </aside>
-
+        <${Reader} id='notes-reader' class='md' format='markdown' text=${text} />
+        <${TOC} target='#notes-reader' selector='h1, h2, h3' />
       </div>
     </div>
   `;
