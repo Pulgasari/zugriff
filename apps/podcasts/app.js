@@ -16,8 +16,7 @@ Loading = await zugriff.component('Loading'),
 Slot    = await zugriff.component('Slot');
 
 const // panels
-PlayerPanel   = await app.panel('PlayerPanel'),
-SettingsPanel = await app.panel('SettingsPanel');
+PlayerPanel = await app.panel('PlayerPanel');
 
 const 
 URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}',
@@ -28,31 +27,26 @@ URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 // ::: HANDLE
 app.db     = await app.module('db');
 app.player = await app.module('player');
+app.thumbs = createThumbCache();
 
 // :::: STATE
+app.state.busy   = '';   // a label while a long task runs
+app.state.dialog = null; // 'add' | 'settings' | null
 app.state.route  = { name: 'latest', id: null };   // { name, id }
 app.state.search = '';   // shared episode filter
-app.state.dialog = null; // 'add' | 'settings' | null
-app.state.busy   = '';   // a label while a long task runs
+app.state.menuPosition   = 'bottom';
+app.state.playerPosition = 'bottom';
 
 // ::: SETTINGS
+/*
 app.settings = typedSignal({
   podcastSort : oneOf(['recent', 'alpha'], 'recent'),
   episodeSort : oneOf(['newest', 'oldest', 'alpha'], 'newest'),
   view        : oneOf(['grid', 'list'], 'grid'),
   menuPos     : oneOf(['top', 'bottom', 'left', 'right'], 'bottom'),
   playerPos   : oneOf(['top', 'bottom'], 'bottom'),
-  //proxy       : text(DEFAULT_PROXY),
-  //imgResizer  : text(DEFAULT_IMG_RESIZER),
 }, { key: 'zugriff:podcasts:settings', store: local });
-
-// on-device artwork thumbnail cache, resized through the configured endpoint
-const buildResizer = (url, w) => {
-  const tpl = URL_PROXY_IMG;
-  if (!tpl || !url) return null;
-  return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
-};
-app.thumbs = createThumbCache({ resizer: buildResizer });
+*/
 
 // :::::: ACTIONS
 
@@ -96,8 +90,8 @@ app.hotkeys = {
 
 const $app = document.getElementById('app');
 app.effect(() => {
-  $app.dataset.menu   = app.settings.menuPos;
-  $app.dataset.player = app.settings.playerPos;
+  $app.dataset.menu   = app.state.menuPosition;
+  $app.dataset.player = app.state.playerPosition;
 });
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
