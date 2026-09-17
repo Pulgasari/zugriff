@@ -8,6 +8,7 @@ import { useEffect, useState }     from 'preact/hooks';
 const // shared components
 Button      = await zugriff.component('Button'),
 Breadcrumbs = await zugriff.component('Breadcrumbs'),
+Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
 FolderTree  = await zugriff.component('FolderTree'),
 Icon        = await zugriff.component('Icon'),
@@ -155,6 +156,10 @@ function NotesReader () {
   `;
 }
 
+const dockItems = [
+  { icon: 'menu', label: 'menu', onClick: () => app.state.isNavOpen = !app.state.isNavOpen },
+];
+
 function App () {
   useEffect(() => { app.lib.load().catch(app.toast); }, []);
 
@@ -165,6 +170,7 @@ function App () {
     <main id='app-main'>
       <${NotesReader}/>
     </main>
+    <${Dock} items=${dockItems} />
   </>`;
 }
 
