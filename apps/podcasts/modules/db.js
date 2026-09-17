@@ -15,6 +15,25 @@ const store = createDb('zugriff-podcasts');
 const URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}';
 const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 
+// NEW
+/*
+const database = createDb('zugriff:podcasts');
+
+const deletePodcast = id => await store.podcasts.delete(pid);
+
+const getEpisode  = async (id) => await database.episodes.get    ({ id });
+const getPodcast  = async (id) => await database.podcasts.get    ({ id });
+
+const getEpisodes = async ()   => await database.episodes.getAll ();
+const getPodcasts = async ()   => await database.podcasts.getAll ();
+
+const setEpisode = async (id, body) => await database.episodes.set (id, body);
+const setPodcast = async (id, body) => await database.podcasts.set (id, body);
+
+const createHashedEpisodeId = (pid, guid) => `${pid}:${hash(guid)}`;
+const createHashedPodcastId = (url)       => 'p' + hash(url);
+*/
+
 // ── ids ──
 // cyrb53: a short, stable base-36 hash, so long urls/guids stay out of the keys.
 // same input -> same id, which is what lets progress survive a re-fetch.
@@ -154,8 +173,7 @@ function toRecords (url, parsed) {
 }
 
 /** batch-write episodes in one transaction */
-const writeEpisodes = eps =>
-  eps.length && store.task('episodes', 'readwrite', s => { for (const ep of eps) s.put(ep, ep.id); });
+const writeEpisodes = eps => eps.length && store.task('episodes', 'readwrite', s => { for (const ep of eps) s.put(ep, ep.id); });     
 
 /**
  * subscribe to a feed by url. fetches, parses and stores it. throws on a bad feed
