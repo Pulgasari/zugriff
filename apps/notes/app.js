@@ -16,9 +16,12 @@ InstallTip  = await zugriff.component('InstallTip'),
 Reader      = await zugriff.component('Reader'),
 TOC         = await zugriff.component('TOC');
 
+//
+import FolderLibrary from '/.shared/js/modules/folders.js';
+
 // ::: the app
 const app = zugriff.app;
-app.lib = await app.module('library');
+app.lib = new FolderLibrary({ accept: 'md, markdown, mdown, mkd, mdwn, mdtxt' });
 const { fs } = zugriff;
 
 // :::::: STATE
@@ -117,7 +120,7 @@ function NoteView ({ note }) {
 // :::::: ACTIONS
 
 async function addFolder () {
-  if (!fs.supported()) { app.toast({ error: 'This browser can’t open folders — try Chrome, Edge or another Chromium browser.' }); return; }
+  if (!zugriff.fs.supported()) { app.toast({ error: 'This browser can’t open folders — try Chrome, Edge or another Chromium browser.' }); return; }
   try {
     const rec = await app.lib.addFolder();
     if (rec) app.toast({ success: `Opened ${rec.name}` });
