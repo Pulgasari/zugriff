@@ -29,7 +29,7 @@
 // and keep the import map free of capacitor entries.
 
 /** running inside the native Capacitor wrapper (vs a plain browser)? */
-export const isNative = () => !!globalThis.Capacitor?.isNativePlatform?.();
+const isNative = () => !!globalThis.Capacitor?.isNativePlatform?.();
 
 const plugin = name => {
   const p = globalThis.Capacitor?.Plugins?.[name];
@@ -212,7 +212,7 @@ capDehydrate = handle => ({ __capfs: true, uri: handle._uri, name: handle.name }
 // :::::: THE PUBLIC SEAM
 
 /** can this platform grant a folder at all? */
-export function supported () {
+function supported () {
   return isNative()
     ? true
     : (typeof window !== 'undefined' && typeof window.showDirectoryPicker === 'function');
@@ -224,7 +224,7 @@ export function supported () {
  * SAF picker, which persists the grant so it survives restarts. either way the
  * result satisfies the shared handle interface.
  */
-export async function pick ({ id, mode = 'read', startIn } = {}) {
+async function pick ({ id, mode = 'read', startIn } = {}) {
   if (isNative()) return capPick();
   if (!supported()) throw new Error('This browser cannot open a folder — try a Chromium-based one.');
   try {
@@ -239,3 +239,9 @@ export const
 pickDir   = pick,
 dehydrate = handle => (handle instanceof CapDirHandle ? capDehydrate(handle) : handle),
 hydrate   = ref    => (isCapRef(ref) ? capHydrate(ref) : ref);
+
+export {
+  isNative,
+  pick,
+  supported,
+};
