@@ -146,7 +146,7 @@ function NotesReader () {
   
   return html`
     <div class='reader'>
-      <header class='reader-head'>
+      <header>
         <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
         <${Breadcrumbs} segments=${segs} />
       </header>
