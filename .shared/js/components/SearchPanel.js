@@ -6,14 +6,15 @@ import SearchInput from './SearchInput.js';
 
 const app = zugriff.app;
 
-function SearchPanel ({ placeholder, appStateId = 'search' }) {
-  const clear   = ()      => app.state[appStateId] = '';
-  const onInput = (event) => app.state[appStateId] = event.detail.value;
+function SearchPanel ({ placeholder, appStateId: id = 'search' }) {
+  const clear   = ()      => app.state[id] = '';
+  const onInput = (event) => app.state[id] = event.detail.value;
+  const value   = app.state[id];
 
   return html`
     <div class='SearchPanel search-panel'>
-      <${SearchInput} placeholder=${placeholder} value=${app.state[appStateId]} onInput=${onInput} />
-      ${app.state[appStateId] && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
+      <${SearchInput} ...${{ onInput, placeholder, value }} />
+      ${value && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
     </div>
   `;
 }
