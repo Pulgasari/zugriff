@@ -48,10 +48,10 @@ function collection (map) {
   return {
     get all  () { return list(); },
     get size () { return map.size; },
-    get   : q => q == null                                                  ? undefined
-               : typeof q === 'string'                                      ? map.get(q)
+    get   : q => q == null ? undefined
+               : typeof q === 'string' ? map.get(q)
                : typeof q === 'object' && Object.keys(q).length === 1 && 'id' in q ? map.get(q.id)
-               :                                                              list().find(match(q)),
+               : list().find(match(q)),
     where : q => q == null ? list() : list().filter(match(q)),
     [Symbol.iterator] : () => map.values(),
   };
