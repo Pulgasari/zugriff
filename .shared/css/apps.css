@@ -73,6 +73,13 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
   .icon  { color: var(--accent); }
 }
 
+/* BREADCRUMBS */
+
+.crumbs     { display: flex; align-items: center; flex-wrap: nowrap; overflow: hidden; }
+.crumb      { white-space: nowrap; }
+.crumb.last { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.crumb-sep  { margin: 0 0.4rem; }
+
 /* DOCK */
 
 .Dock        { text-transform: uppercase; }
