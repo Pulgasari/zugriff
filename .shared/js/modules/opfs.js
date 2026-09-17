@@ -1,4 +1,4 @@
-// .shared/js/modules/filesystem/opfs.js
+// .shared/js/modules/opfs.js
 //
 // the private Origin Private File System — storage the origin owns outright, with
 // no picker and no permission prompt. deliberately kept apart from the rest of the

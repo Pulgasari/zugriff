@@ -67,20 +67,43 @@ async function toArrayBuffer (data) {
   return new Blob([data]).arrayBuffer();
 }
 
-// a light ext -> mime map so getFile() hands back a typed File where it is cheap
-// to know; anything unlisted gets '' (the folder apps sniff their own types).
-const MIME = {
-  txt:'text/plain', md:'text/markdown', markdown:'text/markdown', json:'application/json',
-  html:'text/html', css:'text/css', js:'text/javascript', csv:'text/csv', xml:'application/xml',
-  png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', gif:'image/gif', webp:'image/webp',
-  svg:'image/svg+xml', avif:'image/avif', bmp:'image/bmp', ico:'image/x-icon', heic:'image/heic',
+// ext -> mime. a lookup table rather than a platform detail, but this is where it
+// is needed first (getFile() hands back a typed File) and it is exported because
+// FolderLibrary resolves a mime `accept` spec ('image/*') against it. anything
+// unlisted is '' — the folder apps sniff their own types.
+export const MIME = {
+  // text
+  txt:'text/plain', md:'text/markdown', markdown:'text/markdown', mdown:'text/markdown',
+  mkd:'text/markdown', mdwn:'text/markdown', mdtxt:'text/markdown',
+  json:'application/json', html:'text/html', css:'text/css', js:'text/javascript',
+  csv:'text/csv', xml:'application/xml',
+  // images
+  png:'image/png', jpg:'image/jpeg', jpeg:'image/jpeg', jfif:'image/jpeg', gif:'image/gif',
+  webp:'image/webp', svg:'image/svg+xml', avif:'image/avif', bmp:'image/bmp',
+  ico:'image/x-icon', heic:'image/heic', heif:'image/heif', tif:'image/tiff', tiff:'image/tiff',
+  // documents
   pdf:'application/pdf', epub:'application/epub+zip',
-  mp3:'audio/mpeg', ogg:'audio/ogg', flac:'audio/flac', m4a:'audio/mp4', wav:'audio/wav',
-  mp4:'video/mp4', webm:'video/webm', mov:'video/quicktime',
+  // audio
+  mp3:'audio/mpeg', m4a:'audio/mp4', aac:'audio/aac', ogg:'audio/ogg', oga:'audio/ogg',
+  opus:'audio/opus', flac:'audio/flac', wav:'audio/wav', wma:'audio/x-ms-wma',
+  aif:'audio/aiff', aiff:'audio/aiff',
+  // video
+  mp4:'video/mp4', m4v:'video/x-m4v', webm:'video/webm', mov:'video/quicktime',
+  mkv:'video/x-matroska', avi:'video/x-msvideo', ogv:'video/ogg', '3gp':'video/3gpp',
+  flv:'video/x-flv', wmv:'video/x-ms-wmv', mpg:'video/mpeg', mpeg:'video/mpeg', ts:'video/mp2t',
 };
-const mimeOf = name => {
+
+/** the mime for a filename, or '' when the extension is unknown */
+export const mimeOf = name => {
   const dot = name.lastIndexOf('.');
   return dot > 0 ? (MIME[name.slice(dot + 1).toLowerCase()] ?? '') : '';
+};
+
+/** every extension matching `pattern` — an exact mime, or a wildcard like 'image/*' */
+export const extsForMime = pattern => {
+  const want   = String(pattern).toLowerCase();
+  const prefix = want.endsWith('/*') ? want.slice(0, -1) : null;
+  return Object.keys(MIME).filter(ext => prefix ? MIME[ext].startsWith(prefix) : MIME[ext] === want);
 };
 
 // content:// URIs cannot be reliably extended by string concatenation, but file://
@@ -236,12 +259,11 @@ async function pick ({ id, mode = 'read', startIn } = {}) {
 }
 
 export const
-pickDir   = pick,
 dehydrate = handle => (handle instanceof CapDirHandle ? capDehydrate(handle) : handle),
 hydrate   = ref    => (isCapRef(ref) ? capHydrate(ref) : ref);
 
 export {
   isNative,
-  pick,
+  pick as pickDirectory,
   supported,
 };

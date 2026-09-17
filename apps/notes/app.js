@@ -31,16 +31,6 @@ const open = signal({ value: null, key: 'notes:open', store: local });   // { so
 
 // :::::: TREE HELPERS
 
-function findByPath (node, path) {
-  if (!node) return null;
-  if (node.kind === 'file') return node.path === path ? node : null;
-  for (const child of node.children ?? []) {
-    const hit = findByPath(child, path);
-    if (hit) return hit;
-  }
-  return null;
-}
-
 // derive a note's display title: the filename without its extension
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
@@ -88,8 +78,7 @@ function Sidebar () {
 const currentNote = computed(() => {
   const o = open.value;
   if (!o) return null;
-  const tree = app.lib.trees.value[o.sourceId];
-  const node = tree && findByPath(tree, o.path);
+  const node = app.lib.nodeAt(o.sourceId, o.path);
   return node ? { sourceId: o.sourceId, node } : null;
 });
 
@@ -102,9 +91,9 @@ function NoteView ({ note }) {
   useEffect(() => {
     let alive = true;
     setText(null);
-    app.lib.readNote(note.node.handle)
-      .then(({ text }) => { if (alive) setText(text); })
-      .catch(err => { toast({ error: 'Could not read that note: ' + err.message }); if (alive) setText(''); });
+    app.lib.readText(note.node)
+      .then(text => { if (alive) setText(text); })
+      .catch(err => { app.toast({ error: 'Could not read that note: ' + err.message }); if (alive) setText(''); });
     return () => { alive = false; };
   }, [note.sourceId, note.node.path, note.node.handle]);
 
@@ -139,7 +128,7 @@ async function addFolder () {
 // :::::: APP
 
 function App () {
-  useEffect(() => { app.lib.load().catch(toast); }, []);
+  useEffect(() => { app.lib.load().catch(app.toast); }, []);
 
   if (!app.lib.ready.value)
   return html`<div class="booting"><${Icon} name='loading' /></div>`;
