@@ -16,6 +16,7 @@ Icon        = await zugriff.component('Icon'),
 IconButton  = await zugriff.component('IconButton'),
 InstallTip  = await zugriff.component('InstallTip'),
 Reader      = await zugriff.component('Reader'),
+SearchPanel = await zugriff.component('SearchPanel'),
 TOC         = await zugriff.component('TOC');
 
 //
@@ -48,12 +49,7 @@ function Sidebar () {
     <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
       <${Brand} app=${app} />
       <${Button} icon='close' aria-label='close' onClick=${close} />
-
-      <div class="tree-filter">
-        <${Icon} name='search' />
-        <input type='search' placeholder="Filter notes…" value=${app.state.filter} onInput=${e => app.state.filter = e.target.value} />
-        ${app.state.filter && html`<${Button} class="ibtn" icon='close' aria-label="Clear" onClick=${() => app.state.filter = ''} />`}
-      </div>
+      <${SearchPanel} signal=${app.state.filter} />
 
       <${FolderTree}
         lib=${app.lib}
