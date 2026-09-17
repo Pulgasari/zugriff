@@ -35,6 +35,9 @@ app.state.isNavOpen = false; // mobile: is the tree drawer showing
 // durable state — hydrates from + persists to localStorage
 const open = signal({ value: null, key: 'notes:open', store: local });   // { sourceId, path } | null
 
+const closeSidebar = () => app.state.isNavOpen = false;
+const  openSidebar = () => app.state.isNavOpen = true;
+
 // :::::: TREE HELPERS
 
 // derive a note's display title: the filename without its extension
@@ -43,19 +46,19 @@ const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 // :::::: SIDEBAR
 
 function Sidebar () {
-  const close = () => app.state.isNavOpen = false;
+  
   
   return html`
     <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
       <${Brand} app=${app} />
-      <${Button} icon='close' aria-label='close' onClick=${close} />
+      <${Button} icon='close' aria-label='close' onClick=${closeSidebar} />
       <${SearchPanel} signal=${app.state.filter} />
 
       <${FolderTree}
         lib=${app.lib}
         filter=${app.state.filter}
         selected=${open.value}
-        onOpen=${(sourceId, path) => { open.value = { sourceId, path }; app.state.isNavOpen = false; }}
+        onOpen=${(sourceId, path) => { open.value = { sourceId, path }; closeSidebar(); }}
         onRemoveSource=${id => { if (open.value?.sourceId === id) open.value = null; }}
         labelOf=${titleOf}
         fileIcon='notes'
@@ -129,7 +132,7 @@ function EmptyReader () {
     action = '';
     hint   = 'Choose a note to start reading.';
   } else {
-    action = html`<${Button} class="primary" label='Open a folder' icon='folder-add' onClick=${addFolder} />`;    
+    action = html`<${Button} label='Open a folder' icon='folder-add' onClick=${addFolder} />`;    
     hint   = 'Open a folder of Markdown files to get started.';
   }
   
@@ -137,15 +140,14 @@ function EmptyReader () {
 }
 
 function NotesReader () {
-  const hasSources = app.lib.sources.value.length ? true : false;
   const note = currentNote.value;
-  const segs = note ? note.node.path.split('/') : [];
+  const segments = note ? note.node.path.split('/') : [];
   
   return html`
     <div class='reader'>
       <header>
-        <${IconButton} icon='menu' aria-label="Open notes" onClick=${() => app.state.isNavOpen = true} />
-        <${Breadcrumbs} segments=${segs} />
+        <${IconButton} icon='menu' aria-label="Open notes" onClick=${openSidebar} />
+        <${Breadcrumbs} segments=${segments} />
       </header>
   
       ${note ? html`<${NoteView} note=${note} />` : html`<${EmptyReader}/>`}
