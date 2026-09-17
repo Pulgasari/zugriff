@@ -109,16 +109,12 @@ function NoteView ({ note }) {
     return () => { alive = false; };
   }, [note.sourceId, note.node.path, note.node.handle]);
 
-  if (text == null) return html`<div class="reader-scroll"><div class="reader-grid"><div class="md-loading">…</div></div></div>`;
-
-  return html`
-    <div class="reader-scroll">
-      <div class="reader-grid">
-        <${Reader} id='notes-reader' class='md' format='markdown' text=${text} />
-        <${TOC} target='#notes-reader' selector='h1, h2, h3' />
-      </div>
-    </div>
-  `;
+  return (text == null) 
+  ? html`<div>…</div>`
+  : html`<>
+    <${Reader} id='notes-reader' format='markdown' text=${text} />
+    <${TOC} target='#notes-reader' selector='h1, h2, h3' />
+  </>`;
 }
 
 
