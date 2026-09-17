@@ -178,8 +178,12 @@ async function subscribe (rawUrl, proxy) {
   return podcast;
 }
 
+const URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}';
+const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
+
 /** re-fetch one subscription and merge in any new episodes */
-async function refresh (pid, proxy) {
+async function refresh (pid) {
+  const proxy   = URL_PROXY_RSS;
   const podcast = podcastMap.get(pid);
   if (!podcast) return;
 
@@ -201,12 +205,12 @@ async function refresh (pid, proxy) {
   return { added };
 }
 
-async function refreshAll (proxy, onProgress) {
+async function refreshAll (onProgress) {
   const all = [...podcastMap.values()];
   const results = [];
   let done = 0;
   for (const p of all) {
-    try { results.push(await refresh(p.id, proxy)); }
+    try { results.push(await refresh(p.id)); }
     catch (err) { results.push({ error: err?.message || String(err), podcast: p }); }
     onProgress?.(++done, all.length);
   }
@@ -224,7 +228,7 @@ async function unsubscribe (pid) {
 
   podcastMap.delete(pid);
   episodeMap.replace([...episodeMap.entries()].filter(([k]) => !k.startsWith(prefix)));
-  stateMap.replace([...stateMap.entries()].filter(([k]) => !k.startsWith(prefix)));
+    stateMap.replace([  ...stateMap.entries()].filter(([k]) => !k.startsWith(prefix)));
 }
 
 // ── import / export ──
@@ -314,7 +318,7 @@ export default {
   episodes,
   stateOf,
   get savedEpisodes () { return savedList(); },
-  get ready ()        { return readySig.value; },
+  get ready         () { return readySig.value; },
 
   load,
   subscribe, refresh, refreshAll, unsubscribe,
