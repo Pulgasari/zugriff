@@ -1,5 +1,4 @@
 // components/SearchPanel.js
-// a filter dock bound to the shared app.state.search leaf.
 
 import Button      from './Button.js';
 import SearchInput from './SearchInput.js';
