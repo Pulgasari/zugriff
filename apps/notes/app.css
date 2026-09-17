@@ -37,17 +37,31 @@
 
 /* ── markdown typography ─────────────────────────────────────────────────── */
 
-.md { min-width: 0; line-height: 1.65; font-size: 0.98rem; color: var(--fg); }
-.md > *:first-child { margin-top: 0; }
-.md h1, .md h2, .md h3, .md h4, .md h5, .md h6 { line-height: 1.25; font-weight: 700; margin: 1.6em 0 0.6em; scroll-margin-top: 1rem; }
-.md h1 { font-size: 1.9rem; }
-.md h2 { font-size: 1.5rem; padding-bottom: 0.25em; border-bottom: 1px solid var(--line); }
-.md h3 { font-size: 1.25rem; }
-.md h4 { font-size: 1.05rem; }
-.md p, .md ul, .md ol, .md blockquote, .md table, .md pre { margin: 0 0 1em; }
-.md ul, .md ol { padding-left: 1.5em; }
-.md li { margin: 0.25em 0; }
-.md li > ul, .md li > ol { margin: 0.25em 0; }
+.md { 
+  min-width: 0; 
+  line-height: 1.5; 
+
+  *:first-child { margin-top: 0; }
+  
+  h1, h2, h3, h4, h5, h6 { 
+    line-height: 1.25; 
+    font-weight: 700; 
+    margin: 1.6em 0 0.6em; 
+    scroll-margin-top: 1rem; 
+  }
+  
+  h1 { font-size: 2.00rem; }
+  h2 { font-size: 1.50rem; padding-bottom: 0.25em; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 1.25rem; }
+  h4 { font-size: 1.00rem; }
+
+  p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+  ul, ol { padding-left: 1.5em; }
+
+  li { margin: 0.25em 0; }
+  li > ul,
+  li > ol { margin: 0.25em 0; }
+}
 .md a { color: var(--accent); text-decoration: none; }
 .md a:hover { text-decoration: underline; }
 .md img { max-width: 100%; height: auto; border-radius: var(--radius); display: block; margin: 1em 0; }
