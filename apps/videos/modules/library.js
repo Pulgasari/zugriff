@@ -1,7 +1,7 @@
 // apps/videos/modules/library.js
 //
 // the folder-library data layer for the library route. like images it leans on the shared
-// FolderLibrary (zugriff.fs.FolderLibrary) — which owns the granted-folder lifecycle
+// FolderLibrary (modules/folders.js) — which owns the granted-folder lifecycle
 // (persisting handles in @bunker/db, resolving perms, add / reconnect / re-pick / forget) —
 // and calls back here only to turn a scanned folder into clip records. the built instance is
 // extended with the app-specific surface (clips, accept, ensureLoaded, openFile, fs) and
@@ -9,6 +9,7 @@
 // an icon in the ui. zugriff is global, so no runtime import.
 
 import { signal }            from '@aufbau/signals';
+import FolderLibrary, { MetaQueue, syncSource } from '/.shared/js/modules/folders.js';
 import { createPosterCache } from '/.shared/js/media/poster.js';
 
 // the filesystem layer, uniformly via the runtime
@@ -23,7 +24,7 @@ const keyOf = (sourceId, path) => sourceId + SEP + path;
 // [{ key, sourceId, path, name, ext, sig, addedAt }]
 const clips = signal([]);
 
-const lib = new zugriff.fs.FolderLibrary({
+const lib = new FolderLibrary({
   db:       'zugriff-videos',
   pickerId: 'zugriff-videos',
   stores:   { sources: {}, clips: {} },
@@ -32,7 +33,7 @@ const lib = new zugriff.fs.FolderLibrary({
 
   scan: async (s, { db }) => {
     const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    clips.value = await fs.syncSource({
+    clips.value = await syncSource({
       db, store: 'clips', sourceId: s.id, files, rows: clips.value, keyOf,
       makeRecord: (f, { key, sourceId, sig, prev }) => ({
         key, sourceId, path: f.path, name: f.name, ext: f.ext,

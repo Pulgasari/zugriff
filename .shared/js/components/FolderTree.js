@@ -1,5 +1,5 @@
 // components/FolderTree.js
-// a sidebar file tree for a multi-mode zugriff.fs.FolderLibrary. the app owns the
+// a sidebar file tree for a multi-mode FolderLibrary. the app owns the
 // library (and its own "which file is open" state); this renders each granted
 // source as a collapsible tree and handles the plumbing every such view repeats:
 //

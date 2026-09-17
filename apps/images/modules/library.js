@@ -1,7 +1,7 @@
 // apps/images/library.js
 //
 // the folder-library data layer for the library route. it leans on the shared
-// FolderLibrary (zugriff.fs.FolderLibrary), which owns the whole granted-folder
+// FolderLibrary (modules/folders.js), which owns the whole granted-folder
 // lifecycle (persisting handles in @bunker/db, resolving perms, add / reconnect /
 // re-pick / forget) and calls back here only to turn a scanned folder into image
 // records. the built instance is extended with the app-specific surface (pics,
@@ -10,6 +10,7 @@
 // thumbnail, generated lazily in the ui. zugriff is global, so no runtime import.
 
 import { signal }     from '@aufbau/signals';
+import FolderLibrary, { MetaQueue, syncSource } from '/.shared/js/modules/folders.js';
 
 // the filesystem layer, uniformly via the runtime
 const fs = zugriff.fs;
@@ -23,7 +24,7 @@ const keyOf = (sourceId, path) => sourceId + SEP + path;
 // [{ key, sourceId, path, name, ext, sig, addedAt }]
 const pics = signal([]);
 
-const lib = new zugriff.fs.FolderLibrary({
+const lib = new FolderLibrary({
   db:       'zugriff-images',
   pickerId: 'zugriff-images',
   stores:   { sources: {}, pics: {} },
@@ -32,7 +33,7 @@ const lib = new zugriff.fs.FolderLibrary({
 
   scan: async (s, { db }) => {
     const files = fs.flatten(await fs.scanTree(s.handle, { accept }));
-    pics.value = await fs.syncSource({
+    pics.value = await syncSource({
       db, store: 'pics', sourceId: s.id, files, rows: pics.value, keyOf,
       makeRecord: (f, { key, sourceId, sig, prev }) => ({
         key, sourceId, path: f.path, name: f.name, ext: f.ext,

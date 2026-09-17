@@ -1,18 +1,85 @@
-// .shared/js/modules/filesystem/folders.js
+// .shared/js/modules/folders.js
+//
+// FolderLibrary — the granted-folder lifecycle: pick a folder, persist its handle
+// in IndexedDB, resolve its permission on a return visit, scan it, forget it.
+//
+// it sits ON TOP of the filesystem primitives (zugriff.fs), so it is not part of
+// that namespace — it is imported directly:
+//
+//   import FolderLibrary from '/.shared/js/modules/folders.js';
+//   app.folders = new FolderLibrary({ accept: 'md, markdown' });
+//
+// everything else has a default: the database name and picker id come from the
+// app slug, and `accept` drives a built-in recursive scan into `lib.trees`. an
+// app only passes scan / onLoad / cascade when it scans into its own record
+// stores instead of a tree (see syncSource / MetaQueue at the bottom).
 
 import { signal }     from '@aufbau/signals';
 import { createDb }   from '@bunker/db';
-import { createPool } from './../../vendors/pool.js';
+import { createPool } from './../vendors/pool.js';
 
-const persist   = rec =>        ({ ...rec, handle: zugriff.fs.dehydrate(rec.handle) });
-const rehydrate = rec => rec && ({ ...rec, handle: zugriff.fs.  hydrate(rec.handle) });
+import * as handles from './filesystem/handles.js';
+import { dehydrate, extsForMime, hydrate, pickDirectory } from './filesystem/platform.js';
+
+// :::::: ACCEPT
+
+/**
+ * normalize an `accept` spec into a predicate over a filename. the spec is what an
+ * app actually knows about its files — extensions or mime types — in whichever
+ * form is handiest:
+ *
+ *   undefined | '*'      every file
+ *   'md'                 one extension, leading dot optional
+ *   '.md, .markdown'     a comma- or space-separated list
+ *   ['md', 'markdown']   an array of any of the above
+ *   'text/markdown'      a mime type
+ *   'image/*'            a mime wildcard
+ *   /\.md$/i             a regexp, tested against the whole filename
+ *   name => boolean      your own predicate, passed through untouched
+ *
+ * mime specs resolve to extensions once, here: a scan only ever sees names, never
+ * File objects, so there is nothing else to match on.
+ */
+export function toAccept (spec) {
+  if (!spec || spec === '*')      return () => true;
+  if (typeof spec === 'function') return spec;
+  if (spec instanceof RegExp)     return name => spec.test(name);
+
+  const parts = [].concat(spec).flatMap(s => String(s).split(/[,\s]+/)).filter(Boolean);
+  const exts  = new Set(parts.flatMap(p => p.includes('/')
+    ? extsForMime(p)
+    : p.replace(/^\./, '').toLowerCase()));
+
+  return name => exts.has(handles.extOf(name));
+}
+
+// :::::: THE LIBRARY
+
+// a native handle is not structured-cloneable, so it persists as a descriptor;
+// on the web both directions are the identity.
+const persist   = rec =>        ({ ...rec, handle: dehydrate(rec.handle) });
+const rehydrate = rec => rec && ({ ...rec, handle:   hydrate(rec.handle) });
+
+// the app slug names the database and the picker unless told otherwise, so a
+// folder app configures nothing but its `accept`.
+const slugOf = () => globalThis.zugriff?.app?.slug ?? 'zugriff';
 
 export class FolderLibrary {
-  constructor ({ db, pickerId, stores, single = false, scan, onLoad, cascade } = {}) {
+  constructor ({
+    accept,
+    id       = slugOf(),
+    single   = false,
+    db       = `zugriff-${id}`,
+    pickerId = `zugriff-${id}`,
+    stores   = single ? { root: {} } : { sources: {} },
+    scan, onLoad, cascade,
+  } = {}) {
     this.db       = createDb(db);
     this.pickerId = pickerId;
     this.stores   = stores;
     this.single   = single;
+    this.accept   = toAccept(accept);
+
     this._scan    = scan;
     this._onLoad  = onLoad;
     this._cascade = cascade;
@@ -20,13 +87,16 @@ export class FolderLibrary {
     this.ready = signal(false);
 
     if (single) {
-      this.folder = signal(null);       // { name, handle, addedAt } | null
-      this.perm   = signal('prompt');   // 'granted' | 'prompt' | 'denied'
+      this.folder = signal(null);        // { name, handle, addedAt } | null
+      this.perm   = signal('prompt');    // 'granted' | 'prompt' | 'denied'
     }
     else {
-      this.sources  = signal([]);       // [{ id, name, handle, addedAt }]
-      this.perms    = signal({});       // id -> permission state
-      this.scanning = signal({});       // id -> true while scanning
+      // a plain object is CONFIG to the signal factory, so a map has to be wrapped
+      // in { value } — signal({}) would leave .value undefined.
+      this.sources  = signal([]);              // [{ id, name, handle, addedAt }]
+      this.perms    = signal({ value: {} });   // id -> permission state
+      this.scanning = signal({ value: {} });   // id -> true while scanning
+      this.trees    = signal({ value: {} });   // id -> scanned tree (the built-in scan)
     }
 
     // bind the public surface so callers can `export const load = lib.load`
@@ -34,7 +104,7 @@ export class FolderLibrary {
       'load', 'sourceById',
       'addFolder', 'reconnect', 'repick', 'removeFolder', 'scan', 'rescanAll',
       'grant', 'forget',
-      'fileHandle', 'fileAt',
+      'fileHandle', 'fileAt', 'nodeAt', 'files', 'read', 'readText',
     ]) if (typeof this[m] === 'function') this[m] = this[m].bind(this);
   }
 
@@ -53,7 +123,7 @@ export class FolderLibrary {
   }
 
   async grant () {
-    const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' });
+    const handle = await pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
     const rec = { name: handle.name, handle, addedAt: Date.now() };
     await this.db.set('root', FolderLibrary.#ROOT, persist(rec));
@@ -97,7 +167,7 @@ export class FolderLibrary {
   sourceById (id) { return this.sources.value.find(s => s.id === id) ?? null; }
 
   async addFolder () {
-    const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' });
+    const handle = await pickDirectory({ id: this.pickerId, mode: 'read' });
     if (!handle) return null;
     for (const s of this.sources.value) {
       if (await s.handle.isSameEntry?.(handle)) throw new Error('That folder is already in your library.');
@@ -117,7 +187,7 @@ export class FolderLibrary {
       this.perm.value = res.granted ? 'granted' : (res.state ?? 'denied');
       return res;
     }
-    
+
     const s   = this.sourceById(id); if (!s) return { granted: false };
     const res = await handles.requestRead(s.handle, 'read');
     this.perms.value = { ...this.perms.value, [id]: res.granted ? 'granted' : (res.state ?? 'denied') };
@@ -127,7 +197,7 @@ export class FolderLibrary {
 
   async repick (id) {
     const source = this.sourceById(id); if (!source) return false;
-    const handle = await platform.pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
+    const handle = await pickDirectory({ id: this.pickerId, mode: 'read' }); if (!handle) return false;
     const rec    = { ...source, name: handle.name, handle };
 
     await this.db.set('sources', id, persist(rec));
@@ -144,12 +214,31 @@ export class FolderLibrary {
     if (this._cascade) await this._cascade(id, this.db);
     await this.db.delete('sources', id);
     this.sources.value = this.sources.value.filter(s => s.id !== id);
-    const pm = { ...this.perms.value };
-    delete pm[id];
-    this.perms.value = pm;
+
+    const pm = { ...this.perms.value }; delete pm[id]; this.perms.value = pm;
+    const tr = { ...this.trees.value }; delete tr[id]; this.trees.value = tr;
   }
 
   // ── scanning ─────────────────────────────────────────────────────────────
+
+  /**
+   * the built-in scan: walk a source into `trees`, keeping only accepted files and
+   * pruning branches that hold none. an app that scans into its own record stores
+   * passes `scan` instead and this never runs.
+   */
+  async #scanTree (source) {
+    try {
+      const tree = await handles.scanTree(source.handle, { accept: this.accept });
+      this.trees.value = { ...this.trees.value, [source.id]: tree };
+    } catch (err) {
+      // a grant that lapsed between load and scan — put the ui back to "reconnect"
+      if (err?.name === 'NotAllowedError') {
+        this.perms.value = { ...this.perms.value, [source.id]: 'prompt' };
+      }
+      this.trees.value = { ...this.trees.value, [source.id]: { ...this.trees.value[source.id], error: err.message } };
+      throw err;
+    }
+  }
 
   async scan (id) {
     const s = this.sourceById(id);
@@ -157,6 +246,7 @@ export class FolderLibrary {
     this.scanning.value = { ...this.scanning.value, [id]: true };
     try {
       if (this._scan) await this._scan(s, { db: this.db, lib: this });
+      else            await this.#scanTree(s);
     } finally {
       this.scanning.value = { ...this.scanning.value, [id]: false };
     }
@@ -170,9 +260,9 @@ export class FolderLibrary {
     );
   }
 
-  // ── file access ──────────────────────────────────────────────────────────
-  // walk a stored '/'-path down from a source's granted root to a live handle.
+  // ── reading ──────────────────────────────────────────────────────────────
 
+  /** walk a stored '/'-path down from a source's granted root to a live handle */
   async fileHandle (source, path) {
     const parts = path.split('/');
     let dir = source.handle;
@@ -184,7 +274,42 @@ export class FolderLibrary {
   async fileAt (source, path) {
     return (await this.fileHandle(source, path)).getFile();
   }
+
+  /** the scanned file node at `path` in a source's tree, or null */
+  nodeAt (sourceId, path) {
+    const find = node => {
+      if (!node) return null;
+      if (node.kind === 'file') return node.path === path ? node : null;
+      for (const child of node.children ?? []) { const hit = find(child); if (hit) return hit; }
+      return null;
+    };
+    return find(this.trees.value[sourceId]);
+  }
+
+  /** every scanned file node, flat — across all sources, or just one */
+  files (sourceId) {
+    const ids = sourceId ? [sourceId] : Object.keys(this.trees.value);
+    return ids.flatMap(id => handles.flatten(this.trees.value[id]));
+  }
+
+  /** the live File for a scanned node, or for a { sourceId, path } reference */
+  async read (ref) {
+    if (ref?.handle) return ref.handle.getFile();
+    const source = this.sourceById(ref?.sourceId);
+    if (!source) throw new Error('That folder is no longer open.');
+    return this.fileAt(source, ref.path);
+  }
+
+  /** the text of a file, read fresh off disk */
+  async readText (ref) {
+    return (await this.read(ref)).text();
+  }
 }
+
+// :::::: SCANNING INTO RECORDS
+// for apps that keep a record per file (a cover, tags, reading progress) rather
+// than a live tree: syncSource diffs a scan against what is stored, MetaQueue
+// runs the slow per-file extraction behind a bounded gate.
 
 const signatureOf = file => `${file.size}:${file.lastModified}`;
 
@@ -239,7 +364,6 @@ class MetaQueue {
 // :::::: EXPORT
 
 export {
-  FolderLibrary,
   MetaQueue,
   signatureOf,
   syncSource,
