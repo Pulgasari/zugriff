@@ -22,7 +22,7 @@
 // still held, so there is no need to query first.
 
 /** the current permission state without prompting: 'granted' | 'prompt' | 'denied' */
-export async function queryPermission (handle, mode = 'read') {
+async function queryPermission (handle, mode = 'read') {
   if (!handle?.queryPermission) return 'granted';   // no gate on this platform
   try   { return await handle.queryPermission({ mode }); }
   catch { return 'denied'; }
@@ -33,7 +33,7 @@ export async function queryPermission (handle, mode = 'read') {
  * can show the real reason a re-grant failed. returns { granted, state?, error? }
  * — `state` is the raw permission string, `error` is set only if the call threw.
  */
-export async function requestRead (handle, mode = 'read') {
+async function requestRead (handle, mode = 'read') {
   if (!handle?.requestPermission) return { granted: true, state: 'granted' };
   try {
     const state = await handle.requestPermission({ mode });
@@ -45,13 +45,13 @@ export async function requestRead (handle, mode = 'read') {
 }
 
 /** make sure we may read `handle`, prompting if needed. returns a boolean. */
-export async function ensurePermission (handle, mode = 'read') {
+async function ensurePermission (handle, mode = 'read') {
   return (await requestRead(handle, mode)).granted;
 }
 
 // :::::: WALKING (forward-slash string paths)
 
-export const extOf = name => {
+const extOf = name => {
   const dot = name.lastIndexOf('.');
   return dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
 };
@@ -70,7 +70,7 @@ const byName = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true
  *
  * children are directories first, then files, each sorted naturally by name.
  */
-export async function scanTree (dirHandle, { accept = () => true, signal } = {}) {
+async function scanTree (dirHandle, { accept = () => true, signal } = {}) {
   const walk = async (handle, prefix) => {
     const dirs = [], files = [];
 
@@ -95,7 +95,7 @@ export async function scanTree (dirHandle, { accept = () => true, signal } = {})
 }
 
 /** every file node in a tree, depth-first, as a flat array */
-export function flatten (node, out = []) {
+function flatten (node, out = []) {
   if (!node) return out;
   if (node.kind === 'file') out.push(node);
   else for (const child of node.children ?? []) flatten(child, out);
@@ -103,14 +103,14 @@ export function flatten (node, out = []) {
 }
 
 /** count the file nodes beneath a tree */
-export const countFiles = node => flatten(node).length;
+const countFiles = node => flatten(node).length;
 
 /**
  * resolve a relative path (as written inside a file, e.g. "../img/cover.png")
  * against the directory that holds `fromPath`, returning the file handle or null.
  * used to load a note's sibling images from the same granted folder.
  */
-export async function resolveRelative (rootHandle, fromPath, relative) {
+async function resolveRelative (rootHandle, fromPath, relative) {
   if (!relative || /^([a-z]+:)?\/\//i.test(relative) || relative.startsWith('data:')) return null;
 
   const base  = fromPath.split('/').slice(0, -1);            // the file's own directory
@@ -137,14 +137,14 @@ export async function resolveRelative (rootHandle, fromPath, relative) {
 // backend.writable, so these are never reached read-only.
 
 /** the directory handle at `path`, walking down from `root` */
-export async function dirAt (root, path = []) {
+async function dirAt (root, path = []) {
   let dir = root;
   for (const name of path) dir = await dir.getDirectoryHandle(name, { create: false });
   return dir;
 }
 
 /** the entries in `path`, directories first then files, each sorted by name */
-export async function list (root, path = []) {
+async function list (root, path = []) {
   const dir  = await dirAt(root, path);
   const rows = [];
 
@@ -165,26 +165,26 @@ export async function list (root, path = []) {
 }
 
 /** true if `name` already exists in `path` (either kind) */
-export async function exists (root, path, name) {
+async function exists (root, path, name) {
   const dir = await dirAt(root, path);
   try { await dir.getFileHandle(name);      return true; } catch {}
   try { await dir.getDirectoryHandle(name); return true; } catch {}
   return false;
 }
 
-export async function mkdir (root, path, name) {
+async function mkdir (root, path, name) {
   const dir = await dirAt(root, path);
   await dir.getDirectoryHandle(name, { create: true });
 }
 
 /** create an empty file (no-op if it already exists) */
-export async function touch (root, path, name) {
+async function touch (root, path, name) {
   const dir = await dirAt(root, path);
   await dir.getFileHandle(name, { create: true });
 }
 
 /** write `data` (Blob | ArrayBuffer | string) to a file, creating it */
-export async function writeFile (root, path, name, data) {
+async function writeFile (root, path, name, data) {
   const dir      = await dirAt(root, path);
   const handle   = await dir.getFileHandle(name, { create: true });
   const writable = await handle.createWritable();
@@ -193,7 +193,7 @@ export async function writeFile (root, path, name, data) {
 }
 
 /** remove an entry; directories are removed recursively */
-export async function remove (root, path, name) {
+async function remove (root, path, name) {
   const dir = await dirAt(root, path);
   await dir.removeEntry(name, { recursive: true });
 }
@@ -216,7 +216,7 @@ async function copyDirInto (srcHandle, dstHandle) {
   }
 }
 
-export async function rename (root, path, from, to, kind) {
+async function rename (root, path, from, to, kind) {
   const dir = await dirAt(root, path);
 
   if (kind === 'directory') {
@@ -236,8 +236,31 @@ export async function rename (root, path, from, to, kind) {
 }
 
 /** the File object at path/name */
-export async function readFile (root, path, name) {
+async function readFile (root, path, name) {
   const dir    = await dirAt(root, path);
   const handle = await dir.getFileHandle(name);
   return handle.getFile();
 }
+
+// :::::: EXPORT
+
+export {
+  copyDirInto,
+  countFiles,
+  dirAt,
+  ensurePermission,
+  exists,
+  extOf,
+  flatten,
+  list,
+  mkdir,
+  queryPermission,
+  readFile,
+  remove,
+  rename,
+  requestRead,
+  resolveRelative,
+  scanTree,
+  touch,
+  writeFile,
+};
