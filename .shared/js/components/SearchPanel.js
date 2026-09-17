@@ -1,24 +1,21 @@
 // components/SearchPanel.js
 // a filter dock bound to the shared app.state.search leaf.
 
-import { html }   from './../vendors.js';
-import SearchInput from './SearchInput.js';
 import Button      from './Button.js';
+import SearchInput from './SearchInput.js';
 
 const app = zugriff.app;
 
-function SearchPanel ({ placeholder }) {
-  const search = app.state.search;
+function SearchPanel ({ placeholder, signal = app.state.search }) {
+  const clear   = ()      => signal = '';
+  const onInput = (event) => signal = event.detail.value;
 
   return html`
     <div class='SearchPanel'>
-      <${SearchInput}
-        placeholder=${placeholder}
-        value=${search}
-        onInput=${e => app.state.search = e.detail.value}
-      />
-      ${search && html`<${Button} aria-label='Clear filter' icon='close' onClick=${() => app.state.search = ''} />`}
-    </div>`;
+      <${SearchInput} placeholder=${placeholder} value=${signal} onInput=${onInput} />
+      ${signal && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
+    </div>
+  `;
 }
 
 export       { SearchPanel };
