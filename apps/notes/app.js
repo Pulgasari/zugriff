@@ -6,6 +6,7 @@ import { computed, local, signal } from '@aufbau/signals';
 import { useEffect, useState }     from 'preact/hooks';
 
 const // shared components
+Brand       = await zugriff.component('Brand'),
 Button      = await zugriff.component('Button'),
 Breadcrumbs = await zugriff.component('Breadcrumbs'),
 Dock        = await zugriff.component('Dock'),
@@ -41,16 +42,16 @@ const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 // :::::: SIDEBAR
 
 function Sidebar () {
+  const close = () => app.state.isNavOpen = false;
+  
   return html`
     <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
-      <div class="brand">
-        <${Icon} name="notes" /> <span>Notes</span>
-        <${Button} class="ibtn nav-close" icon='close' aria-label="Close" onClick=${() => app.state.isNavOpen = false} />
-      </div>
+      <${Brand} app=${app} />
+      <${Button} icon='close' aria-label='close' onClick=${close} />
 
       <div class="tree-filter">
-        <${Icon} name="search" />
-        <input type="search" placeholder="Filter notes…" value=${app.state.filter} onInput=${e => app.state.filter = e.target.value} />
+        <${Icon} name='search' />
+        <input type='search' placeholder="Filter notes…" value=${app.state.filter} onInput=${e => app.state.filter = e.target.value} />
         ${app.state.filter && html`<${Button} class="ibtn" icon='close' aria-label="Clear" onClick=${() => app.state.filter = ''} />`}
       </div>
 
@@ -67,8 +68,8 @@ function Sidebar () {
       />
 
       <div class="side-foot">
-        <${InstallTip} show=${app.lib.sources.value.length > 0} />
-        <${Button} class="small" icon='folder-add' label='Open a folder' onClick=${addFolder} />
+        <${InstallTip} />
+        <${Button} icon='folder-add' label='Open a folder' onClick=${addFolder} />
       </div>
     </aside>
   `;
