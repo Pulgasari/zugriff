@@ -22,9 +22,10 @@ URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
-app.library = await app.module('library');
-app.player  = await app.module('player');
-app.thumbs  = createThumbCache();
+app.database = await app.module('database');
+app.library  = await app.module('library');
+app.player   = await app.module('player');
+app.thumbs   = createThumbCache();
 
 // :::: STATE
 app.state.busy   = '';   // a label while a long task runs
