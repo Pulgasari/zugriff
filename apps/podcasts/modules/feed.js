@@ -29,24 +29,16 @@ async function get (url) {
  * network, http error) retries through the configured proxy. throws with a
  * human message when both routes fail.
  */
-export async function fetchFeed (url, proxy = DEFAULT_PROXY) {
+async function fetchFeed (url, proxy = DEFAULT_PROXY) {
   let directError;
-  try {
-    return await get(url);
-  } catch (err) {
-    directError = err;
-  }
+  try         { return await get(url); }
+  catch (err) { directError = err; }
 
   const proxied = viaProxy(proxy, url);
-  if (!proxied) {
-    throw new Error(`could not reach the feed (${directError.message}). set a CORS proxy in settings to load feeds that block direct access.`);
-  }
+  if (!proxied) throw new Error(`could not reach the feed (${directError.message}). set a CORS proxy in settings to load feeds that block direct access.`);        
 
-  try {
-    return await get(proxied);
-  } catch (err) {
-    throw new Error(`could not reach the feed — direct and proxy both failed (${err.message})`);
-  }
+  try         { return await get(proxied); }
+  catch (err) { throw new Error(`could not reach the feed — direct and proxy both failed (${err.message})`); }
 }
 
 // ── parsing ────────────────────────────────────────────────────────────────
@@ -61,6 +53,11 @@ function local (parent, name) {
 }
 const localText = (parent, name) => local(parent, name)[0]?.textContent?.trim() || '';
 
+function parseDate (raw) {
+  const t = Date.parse((raw || '').trim());
+  return Number.isNaN(t) ? 0 : t;
+}
+
 /** "01:02:03" or "3600" or "62:00" -> seconds */
 function parseDuration (raw) {
   const s = (raw || '').trim();
@@ -69,11 +66,6 @@ function parseDuration (raw) {
   const parts = s.split(':').map(Number);
   if (parts.some(Number.isNaN)) return null;
   return parts.reduce((acc, n) => acc * 60 + n, 0);
-}
-
-function parseDate (raw) {
-  const t = Date.parse((raw || '').trim());
-  return Number.isNaN(t) ? 0 : t;
 }
 
 function imageFrom (node) {
@@ -128,8 +120,8 @@ function parseAtom (feed) {
 
   const episodes = local(feed, 'entry').map(entry => {
     const links = local(entry, 'link');
-    const audio = links.find(l => (l.getAttribute('type') || '').startsWith('audio')) ||
-                  links.find(l => l.getAttribute('rel') === 'enclosure');
+    const audio = links.find(l => (l.getAttribute('type') || '').startsWith('audio'))
+               || links.find(l => l.getAttribute('rel') === 'enclosure');
     return {
       title       : localText(entry, 'title'),
       guid        : localText(entry, 'id'),
@@ -147,7 +139,7 @@ function parseAtom (feed) {
 }
 
 /** parse feed xml into { title, description, link, author, image, episodes[] } */
-export function parseFeed (xml) {
+function parseFeed (xml) {
   const doc = new DOMParser().parseFromString(xml, 'text/xml');
   if (doc.querySelector('parsererror')) throw new Error('this does not look like a valid feed (XML parse error)');
 
@@ -159,3 +151,10 @@ export function parseFeed (xml) {
 
   throw new Error('unrecognised feed format — expected RSS or Atom');
 }
+
+// :::::: EXPORT
+
+export {
+  fetchFeed,
+  parseFeed,
+};
