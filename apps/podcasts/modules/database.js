@@ -14,6 +14,7 @@
 
 import { createDB }             from '@bunker/db';
 import { fetchFeed, parseFeed } from './feed.js';
+import { hash }                 from './methods.js';
 
 // :::::: CONSTANTS
 
