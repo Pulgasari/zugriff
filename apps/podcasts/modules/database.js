@@ -72,10 +72,4 @@ export {
   deletePodcast, deleteEpisodes, deleteProgress,
 };
 
-export default {
-  database, setup,
-  podcastId, episodeId,
-  getPodcast, getPodcasts, getEpisode, getEpisodes, getProgress,
-  setPodcast, setProgress, putEpisodes, putProgress,
-  deletePodcast, deleteEpisodes, deleteProgress,
-};
+export default database;
