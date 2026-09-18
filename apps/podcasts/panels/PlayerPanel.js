@@ -4,14 +4,18 @@
 import Icon            from '/.shared/js/components/Icon.js';
 import IconButton      from '/.shared/js/components/IconButton.js';
 import Art             from './../components/Artwork.js';
+import { useTable }    from './../modules/hooks.js';
 import { fmtDuration } from './../modules/methods.js';
 
 const RATES = [0.8, 1, 1.2, 1.5, 1.75, 2];
 const app = zugriff.app;
 
 export default function PlayerPanel () {
-  const episode = app.player.episode; if (!episode) return null;
-  const podcast = app.library.getPodcast(episode.podcastId);
+  const episode  = app.player.episode;
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toMap());
+  if (!episode) return null;
+
+  const podcast = podcasts?.[episode.podcastId];
   const dur     = app.player.duration || episode.duration || 0;
   const time    = app.player.time;
 

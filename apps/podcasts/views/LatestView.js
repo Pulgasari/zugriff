@@ -7,16 +7,22 @@ import SearchPanel        from '/.shared/js/components/SearchPanel.js';
 import View               from '/.shared/js/components/View.js';
 
 import EpisodesIndex      from './../components/EpisodesIndex.js';
+import { useTable }        from './../modules/hooks.js';
 import { filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
 
 export default function LatestView () {
-  const podcasts = app.library.getPodcasts();
-  const hasSubs  = podcasts.length > 0;
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toMap());
+  const episodes = useTable('episodes', () => app.db.episodes.toValues());
+  if (!podcasts || !episodes) return null;
 
-  const         episodes = app.library.getEpisodes();
-  const   sortedEpisodes = sortEpisodes(episodes, 'newest');
+  const hasSubs = Object.keys(podcasts).length > 0;
+
+  // the join happens once here, so neither a row nor the filter has to look a
+  // podcast up for itself
+  const         joined = episodes.map(ep => ({ ...ep, podcast: podcasts[ep.podcastId] }));
+  const   sortedEpisodes = sortEpisodes(joined, 'newest');
   const filteredEpisodes = filterEpisodes(sortedEpisodes, true).slice(0, 200);
 
   const empty = !hasSubs
@@ -38,7 +44,7 @@ export default function LatestView () {
           <${IconButton}
             icon="refresh" 
             onClick=${() => app.actions.run('refresh-all')} 
-            disabled=${!!app.state.busy} 
+            disabled=${!!app.ui.$busy} 
           />
         </div>
       </header>

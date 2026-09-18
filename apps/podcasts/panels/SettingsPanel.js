@@ -19,8 +19,8 @@ export default function SettingsPanel () {
   const resizerVal = useSignal(app.settings.imgResizer);
   const fileRef    = useRef(null);
 
-  const doExport = () => {
-    const data = library.exportData();
+  const doExport = async () => {
+    const data = await library.exportData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
     const a    = Object.assign(document.createElement('a'), {
@@ -37,14 +37,14 @@ export default function SettingsPanel () {
     try { data = JSON.parse(await file.text()); }
     catch { app.toast.error('Could not read that file'); return; }
     app.state.dialog = null;
-    app.state.busy = 'Importing…';
+    app.ui.busy = 'Importing…';
     try {
-      const results = await library.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
+      const results = await library.importData(data, (n, total) => app.ui.busy = `Importing ${n}/${total}…`);
       const added   = results.filter(r => r.added).length;
       const failed  = results.filter(r => r.error).length;
       app.toast({ message: `Imported ${added} new` + (failed ? `, ${failed} failed` : ''), type: failed ? 'error' : 'success' });
     } catch (err) { app.toast.error(err); }
-    finally { app.state.busy = ''; }
+    finally { app.ui.busy = ''; }
   };
 
   return html`

@@ -8,8 +8,8 @@ import Button     from '/.shared/js/components/Button.js';
 
 const app = zugriff.app;
 
-function exportFeeds () {
-  const data = app.library.exportData();
+async function exportFeeds () {
+  const data = await app.library.exportData();
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const href = URL.createObjectURL(blob);
   const name = `podcasts-${new Date().toISOString().slice(0, 10)}.json`;
@@ -28,10 +28,10 @@ async function importFeeds (file) {
   catch { app.toast.error('Could not read that file'); return; }
 
   app.state.dialog = null;
-  app.state.busy   = 'Importing…';
+  app.ui.busy   = 'Importing…';
 
   try {
-    const results = await app.library.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
+    const results = await app.library.importData(data, (n, total) => app.ui.busy = `Importing ${n}/${total}…`);
     const added   = results.filter(r => r.added).length;
     const failed  = results.filter(r => r.error).length;
 
@@ -41,7 +41,7 @@ async function importFeeds (file) {
     });
   }
   catch (error) { app.toast(error); }
-  finally       { app.state.busy = ''; }
+  finally       { app.ui.busy = ''; }
 }
 
 function Export () {

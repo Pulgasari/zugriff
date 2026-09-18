@@ -10,6 +10,7 @@ import View   from '/.shared/js/components/View.js';
 import Art           from './../components/Artwork.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
 import SearchPanel   from '/.shared/js/components/SearchPanel.js';
+import { useTable } from './../modules/hooks.js';
 import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -19,10 +20,14 @@ const sorting = 'newest';
 
 export default function PodcastDetailView ({ id }) {
   const back    = { label: 'Podcasts', onClick: () => app.go('podcasts') };
-  const podcast = app.library.getPodcast(id);
+
+  const podcast = useTable('podcasts', () => app.db.podcasts.get(id), [id]);
+  // every episode of this podcast is one prefix scan — that is what the key layout is for
+  const rows    = useTable('episodes', () => app.db.episodes.toValues(id + ':'), [id]);
+  if (podcast === null || !rows) return null;
   if (!podcast) return html`<${View} back=${back}><${Empty} icon='alert' title='Podcast not found' /></${View}>`;      
 
-  const all       = sortEpisodes(app.library.getEpisodes(id), sorting);
+  const all       = sortEpisodes(rows.map(ep => ({ ...ep, podcast })), sorting);
   const episodes  = filterEpisodes(all, false);
   const doneCount = all.filter(e => app.library.stateOf(e.id).done).length;
 
@@ -36,14 +41,14 @@ export default function PodcastDetailView ({ id }) {
   };
 
   const refreshOne = async () => {
-    app.state.busy = 'Refreshing…';
+    app.ui.busy = 'Refreshing…';
     try {
       const { added } = await app.library.refresh(id);
       const message = added ? `${added} new episode(s)` : 'Up to date';
       app.toast.success(message);
     }
     catch (e) { app.toast(e); }
-    finally   { app.state.busy = ''; }
+    finally   { app.ui.busy = ''; }
   };
 
   return html`
@@ -51,7 +56,7 @@ export default function PodcastDetailView ({ id }) {
       <header>
         <h1>${podcast.title}</h1>
         <div class='actions'>
-          <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.busy} />
+          <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.ui.$busy} />
           <${Button} icon='trash'   onClick=${remove} class='danger' />
         </div>
       </header>

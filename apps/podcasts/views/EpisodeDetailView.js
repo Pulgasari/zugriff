@@ -8,20 +8,25 @@ import View       from '/.shared/js/components/View.js';
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
 import Art        from './../components/Artwork.js';
 
+import { useTable } from './../modules/hooks.js';
 import { fmtDate, fmtDuration, paragraphs } from './../modules/methods.js';
 
 const app = zugriff.app;
-const { library, player, go } = app;
+const { go } = app;
 
 export default function EpisodeDetailView ({ id }) {
-  const episode = library.getEpisode(id);
+  const episode = useTable('episodes', () => app.db.episodes.get(id), [id]);
+  // keyed on the episode's podcastId, so this reads once the episode has landed
+  const podcast = useTable('podcasts', () => app.db.podcasts.get(episode?.podcastId), [episode?.podcastId]);
+
+  if (episode === null) return null;
   if (!episode) return html`
     <${View} back=${{ label: 'Back', onClick: () => go('latest') }}>
       <${Empty} icon="mdi:alert-outline" title="Episode not found" />
     <//>`;
 
-  const podcast = library.getPodcast(episode.podcastId);
-  const st      = library.stateOf(id);
+  const player  = app.player;
+  const st      = app.library.stateOf(id);
   const paras   = paragraphs(episode.description);
   const dur     = st.duration || episode.duration || 0;
   const pct     = st.done ? 100 : (dur && st.position ? Math.min(100, (st.position / dur) * 100) : 0);
