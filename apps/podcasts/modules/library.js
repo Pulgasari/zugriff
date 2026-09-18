@@ -33,12 +33,16 @@ const EMPTY_PROGRESS = { position: 0, duration: 0, done: false, doneAt: 0, saved
 // :::::: LOAD
 
 async function load () {
-  await db.setup();
+  await app.database.setup();
 
-  const [podcasts, episodes, progress] = await Promise.all([
-    db.getPodcasts(),
-    db.getEpisodes(),
-    db.getProgress(),
+  const [
+    podcasts, 
+    episodes, 
+    progress
+  ] = await Promise.all([
+    app.database.podcasts.toValues(),
+    app.database.episodes.toValues(),
+    app.database.progress.toMap(),
   ]);
 
   app.state.podcasts = podcasts;
