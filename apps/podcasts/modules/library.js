@@ -36,7 +36,7 @@ const EMPTY_PROGRESS = { position: 0, duration: 0, done: false, doneAt: 0, saved
 // :::::: LOAD
 
 async function load () {
-  await app.database.setup();
+  await app.db.setup({ podcasts: {}, episodes: {}, progress: {} });
 
   const [
     podcasts, 
