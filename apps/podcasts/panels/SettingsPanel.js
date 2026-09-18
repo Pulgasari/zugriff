@@ -7,7 +7,7 @@ import { useRef }        from 'preact/hooks';
 import Icon   from '/.shared/js/components/Icon.js';
 import Modal  from '/.shared/js/components/Modal.js';
 import Picker from '/.shared/js/components/Picker.js';
-import { DEFAULT_PROXY } from './../modules/feed.js';
+import { DEFAULT_PROXY, getProxy, setProxy } from './../modules/feed.js';
 
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
@@ -15,7 +15,7 @@ const app = zugriff.app;
 const { db } = app;
 
 export default function SettingsPanel () {
-  const proxyVal   = useSignal(app.settings.proxy);
+  const proxyVal   = useSignal(getProxy());
   const resizerVal = useSignal(app.settings.imgResizer);
   const fileRef    = useRef(null);
 
@@ -106,6 +106,7 @@ export default function SettingsPanel () {
 
         <div class="modal-actions">
           <button onClick=${() => {
+            setProxy(proxyVal.value.trim());   // the live value; app.settings only persists it
             app.settings.proxy      = proxyVal.value.trim();
             app.settings.imgResizer = resizerVal.value.trim();
             app.state.dialog = null; app.toast.success('Settings saved');

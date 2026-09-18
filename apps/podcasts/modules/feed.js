@@ -11,7 +11,15 @@
 
 export const DEFAULT_PROXY = 'https://api.allorigins.win/raw?url={url}';
 
-function viaProxy (proxy, url) {
+// the proxy is one app-wide setting, not a per-call argument — it never varies
+// between two fetches. settings writes it once, everything that fetches reads it
+// from here. an empty string is a deliberate "direct only" and is kept as such.
+let proxy = DEFAULT_PROXY;
+
+export const getProxy = ()      => proxy;
+export const setProxy = (value) => proxy = value ?? DEFAULT_PROXY;
+
+function viaProxy (url) {
   const tpl = (proxy || '').trim();
   if (!tpl) return null;
   const enc = encodeURIComponent(url);
@@ -29,12 +37,12 @@ async function get (url) {
  * network, http error) retries through the configured proxy. throws with a
  * human message when both routes fail.
  */
-async function fetchFeed (url, proxy = DEFAULT_PROXY) {
+async function fetchFeed (url) {
   let directError;
   try         { return await get(url); }
   catch (err) { directError = err; }
 
-  const proxied = viaProxy(proxy, url);
+  const proxied = viaProxy(url);
   if (!proxied) throw new Error(`could not reach the feed (${directError.message}). set a CORS proxy in settings to load feeds that block direct access.`);        
 
   try         { return await get(proxied); }

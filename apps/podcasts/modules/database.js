@@ -138,12 +138,12 @@ async function store (podcast, eps) {
  * subscribe to a feed by url. fetches, parses and stores it. throws on a bad feed
  * or an unreachable url so the caller can surface the message.
  */
-async function subscribe (rawUrl, proxy) {
+async function subscribe (rawUrl) {
   const url = normalizeUrl(rawUrl);
   const pid = podcastId(url);
   if (podcasts[pid]) throw new Error('already subscribed to this feed');
 
-  const parsed = parseFeed(await fetchFeed(url, proxy));
+  const parsed = parseFeed(await fetchFeed(url));
   if (!parsed.episodes.length) throw new Error('no episodes found in this feed');
 
   const { podcast, episodes: eps } = toRecords(url, parsed);
@@ -156,11 +156,11 @@ async function subscribe (rawUrl, proxy) {
  * and descriptions change in place; episodes a feed has since dropped are kept,
  * so a truncated feed does not take their progress with it.
  */
-async function refresh (pid, proxy) {
+async function refresh (pid) {
   const known = podcasts[pid];
   if (!known) return { added: 0 };
 
-  const parsed = parseFeed(await fetchFeed(known.url, proxy));
+  const parsed = parseFeed(await fetchFeed(known.url));
   const { podcast, episodes: eps } = toRecords(known.url, parsed);
   const added = eps.filter(ep => !episodes[ep.id]).length;
 
@@ -168,13 +168,13 @@ async function refresh (pid, proxy) {
   return { added };
 }
 
-async function refreshAll (onProgress, proxy) {
+async function refreshAll (onProgress) {
   const all     = getPodcasts();
   const results = [];
   let   done    = 0;
 
   for (const podcast of all) {
-    try           { results.push(await refresh(podcast.id, proxy)); }
+    try           { results.push(await refresh(podcast.id)); }
     catch (error) { results.push({ podcast, error: error?.message || String(error) }); }
     onProgress?.(++done, all.length);
   }
@@ -219,7 +219,7 @@ function exportData () {
   };
 }
 
-async function importData (data, onProgress, proxy) {
+async function importData (data, onProgress) {
   if (!data || !Array.isArray(data.feeds)) throw new Error('not a podcasts export file');
 
   const results = [];
@@ -230,7 +230,7 @@ async function importData (data, onProgress, proxy) {
     if      (!url)                     results.push({ url: feed.url, skipped: 'no url' });
     else if (podcasts[podcastId(url)]) results.push({ url, skipped: 'already subscribed' });
     else {
-      try           { await subscribe(url, proxy); results.push({ url, added: true }); }
+      try           { await subscribe(url); results.push({ url, added: true }); }
       catch (error) { results.push({ url, error: error?.message || String(error) }); }
     }
     onProgress?.(++done, data.feeds.length);

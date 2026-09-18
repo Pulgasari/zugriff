@@ -28,8 +28,9 @@ app.player = await app.module('player');
 app.thumbs = createThumbCache();
 
 // the whole library is read into memory once, before the first render, so views
-// stay synchronous. everything after this is a lookup.
-await app.db.load();
+// stay synchronous. everything after this is a lookup. a storage failure must not
+// blank the app — it mounts either way, just empty.
+await app.db.load().catch(error => app.toast.error(error));
 app.thumbs.prewarm(app.db.getPodcasts().map(podcast => podcast.image));
 
 // :::: STATE
