@@ -15,10 +15,6 @@ Slot = await zugriff.component('Slot');
 const // panels
 PlayerPanel = await app.panel('PlayerPanel');
 
-const 
-URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}',
-URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
-
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
