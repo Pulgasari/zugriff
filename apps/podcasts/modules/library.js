@@ -21,8 +21,11 @@
 
 // :::::: IMPORTS
 
-import db                         from './database.js';
-import { fetchFeed, parseFeed }   from './feed.js';
+import { fetchFeed, parseFeed } from './feed.js';
+import { hash }                 from './methods.js';
+
+const podcastIdByHash = (url)       => 'p' + hash(url);
+const episodeIdByHash = (pid, guid) => `${pid}:${hash(guid)}`;
 
 // :::::: CONSTANTS
 
@@ -40,9 +43,9 @@ async function load () {
     episodes, 
     progress
   ] = await Promise.all([
-    app.database.podcasts.toValues(),
-    app.database.episodes.toValues(),
-    app.database.progress.toMap(),
+    app.db.podcasts.toValues(),
+    app.db.episodes.toValues(),
+    app.db.progress.toMap(),
   ]);
 
   app.state.podcasts = podcasts;
@@ -85,7 +88,7 @@ const getSaved = () => Object.entries(app.state.progress)
 async function patchProgress (id, patch) {
   const next = { ...EMPTY_PROGRESS, ...app.state.progress[id], ...patch, updatedAt: Date.now() };
   app.state.progress[id] = next;
-  await app.database.progress.set(id, next);
+  await app.db.progress.set(id, next);
   return next;
 }
 
@@ -103,13 +106,13 @@ const toggleSaved = (id) => {
 // episode the parsed entry plus its ids. guid is normalized here because the
 // export keys listening progress by it, and not every feed sets one.
 function toRecords (url, { episodes: entries, ...feed }) {
-  const pid = db.podcastId(url);
+  const pid = podcastIdByHash(url);
 
   const eps = entries
     .filter(entry => entry.audioUrl)            // an episode with no audio is nothing to play
     .map(entry => {
       const guid = entry.guid || entry.audioUrl;
-      return { ...entry, guid, id: db.episodeId(pid, guid), podcastId: pid };
+      return { ...entry, guid, id: episodeIdByHash(pid, guid), podcastId: pid };
     });
 
   const podcast = {
@@ -128,8 +131,8 @@ function toRecords (url, { episodes: entries, ...feed }) {
 // store a feed, then swap it into app.state in one assignment per collection —
 // a per-record write would publish that many times.
 async function store (podcast, eps) {
-  await app.database.podcasts.set(podcast.id, podcast);
-  await db.putEpisodes(eps.map(ep => [ep.id, ep]));
+  await app.db.podcasts.set(podcast.id, podcast);
+  await app.db.episodes.setMany(eps.map(ep => [ep.id, ep]));
 
   const fresh = new Set(eps.map(ep => ep.id));
   app.state.podcasts = [...app.state.podcasts.filter(p  => p.id !== podcast.id), podcast];
@@ -190,8 +193,8 @@ async function unsubscribe (pid) {
   const keys = getEpisodes(pid).map(episode => episode.id);
 
   await app.db.podcasts.delete(pid);
-  await app.db.episodes.delete(keys);
-  await app.db.progress.delete(keys);
+  await app.db.episodes.deleteMany(keys);
+  await app.db.progress.deleteMany(keys);
 
   app.state.podcasts = app.state.podcasts.filter(podcast => podcast.id         !== pid);
   app.state.episodes = app.state.episodes.filter(episode => episode.podcastId  !== pid);
@@ -233,7 +236,7 @@ async function importData (data, onProgress) {
   for (const feed of data.feeds) {
     const url = normalizeUrl(feed.url || '');
     if      (!url)                          results.push({ url: feed.url, skipped: 'no url' });
-    else if (getPodcast(db.podcastId(url))) results.push({ url, skipped: 'already subscribed' });
+    else if (getPodcast(podcastIdByHash(url))) results.push({ url, skipped: 'already subscribed' });
     else {
       try           { await subscribe(url); results.push({ url, added: true }); }
       catch (error) { results.push({ url, error: error?.message || String(error) }); }
@@ -249,7 +252,7 @@ async function importData (data, onProgress) {
     if (saved) rows.push([episode.id, { ...EMPTY_PROGRESS, ...saved, updatedAt: Date.now() }]);
   }
   if (rows.length) {
-    await db.putProgress(rows);
+    await app.db.progress.setMany(rows);
     for (const [id, row] of rows) app.state.progress[id] = row;
   }
 
