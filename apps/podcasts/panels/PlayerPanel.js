@@ -11,7 +11,7 @@ const app = zugriff.app;
 
 export default function PlayerPanel () {
   const episode = app.player.episode; if (!episode) return null;
-  const podcast = app.db.podcasts.get({ id: episode.podcastId });
+  const podcast = app.db.getPodcast(episode.podcastId);
   const dur     = app.player.duration || episode.duration || 0;
   const time    = app.player.time;
 

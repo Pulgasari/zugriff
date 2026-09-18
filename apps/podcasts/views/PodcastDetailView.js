@@ -19,10 +19,10 @@ const sorting = 'newest';
 
 export default function PodcastDetailView ({ id }) {
   const back    = { label: 'Podcasts', onClick: () => app.go('podcasts') };
-  const podcast = app.db.podcasts.get({ id });
+  const podcast = app.db.getPodcast(id);
   if (!podcast) return html`<${View} back=${back}><${Empty} icon='alert' title='Podcast not found' /></${View}>`;      
 
-  const all       = sortEpisodes(app.db.episodes.where({ podcastId: id }), sorting);
+  const all       = sortEpisodes(app.db.getEpisodes(id), sorting);
   const episodes  = filterEpisodes(all, false);
   const doneCount = all.filter(e => app.db.stateOf(e.id).done).length;
 

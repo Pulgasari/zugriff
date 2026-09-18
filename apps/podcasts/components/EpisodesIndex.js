@@ -14,7 +14,7 @@ const app = zugriff.app;
 
 function Item ({ episode }) {
   const state      = app.db.stateOf(episode.id);
-  const podcast    = app.db.podcasts.get({ id: episode.podcastId });
+  const podcast    = app.db.getPodcast(episode.podcastId);
   const dur        = state.duration || 0;
   const pct        = state.done ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
   const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     
@@ -28,7 +28,7 @@ function Item ({ episode }) {
       />
       
       <div class='meta'>
-        <${Button} label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />       
+        ${podcast && html`<${Button} label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}
         <${Date} value=${episode.pubDate} />
         <span class='dur'>${zugriff.fmt.duration(episode.duration)}</span>
       </div>

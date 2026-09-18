@@ -41,7 +41,7 @@ reference point (see `.shared/js/app.js`).
 
 ```
 app.js         assembles the handle: modules, state, actions, hotkeys, mount
-modules/       app logic — db, player, feed, methods (pure helpers)
+modules/       app logic — database, player, feed, methods (pure helpers)
 views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail, Saved
 panels/        chrome + overlays — Sidebar, Player, Search dock, Settings
 dialogs/       modal dialogs — Add podcast
@@ -50,8 +50,9 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 
 `app.js` hangs the modules on the handle and seeds the state:
 
-- `app.db` / `app.player` / `app.thumbs` — the modules (their own preact signals; read
-  with `.value`).
+- `app.db` / `app.player` / `app.thumbs` — the modules. `app.db` is read
+  synchronously (plain calls, no `.value`); `app.js` awaits `app.db.load()` once
+  before mounting, so the first render already has the library.
 - `app.state` — the app's ephemeral ui state on the shared deep signal (`@aufbau/signals`),
   read/written **without** `.value`: `route` (`{name,id}`), `search`, `dialog`, `busy`.
   Leaves are read inside render to stay reactive, so they are never destructured at module
@@ -71,10 +72,16 @@ destructuring the stable module refs); shared components load from
 
 ## modules
 
-- **`modules/db.js`** — the storage layer over [`@bunker/db`](https://github.com/pulgasari/bunker/)
-  (IndexedDB). Three tables — `podcasts`, `episodes`, `state` — mirrored into
-  preact signals so the whole UI stays reactive. Episode keys start with their
-  podcast id, so "all episodes of this podcast" is a plain prefix scan.
+- **`modules/database.js`** — the storage layer over [`@bunker/db`](https://github.com/pulgasari/bunker/)
+  (IndexedDB). Three tables — `podcasts`, `episodes`, `state`. What a feed parses
+  to is what gets stored: the podcast record *is* the parsed feed minus its
+  episodes, each episode record the parsed entry plus its keys, so nothing is
+  copied field by field on the way in. Episode keys start with their podcast id,
+  so "all episodes of this podcast" is a plain prefix scan. `load()` reads all
+  three tables into an in-memory mirror once at boot, which is what lets the
+  views read synchronously (`getPodcasts()`, `getEpisodes(id)`, `stateOf(id)`, …);
+  writes go to IndexedDB and patch the mirror. No signals in here — re-rendering
+  after a write is the app's business, not the storage layer's.
 - **`modules/feed.js`** — fetches and parses feeds in the browser. Podcast feeds
   rarely send CORS headers, so it tries a direct request first and falls back to
   a CORS proxy whose URL you set in **Settings**.

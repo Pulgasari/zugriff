@@ -7,12 +7,11 @@ import Index   from '/.shared/js/components/Index.js';
 const viewmode = 'list';
 
 function Item ({ podcast }) {
-  const episodes = zugriff.app.db.episodes.where({ podcastId: podcast.id });
   return html`
     <aufbau-item onClick=${() => zugriff.app.go('podcast', podcast.id)}>
       <${Artwork} src=${podcast.image} />
       <div class="title">${podcast.title}</div>
-      <div class="sub">${episodes.length} episode(s) · ${zugriff.fmt.date(podcast.lastEpisodeAt)}</div>
+      <div class="sub">${podcast.episodeCount} episode(s) · ${zugriff.fmt.date(podcast.lastEpisodeAt)}</div>
     </aufbau-item>
   `;
 }

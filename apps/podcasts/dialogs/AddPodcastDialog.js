@@ -16,7 +16,7 @@ export default function AddPodcastDialog () {
     if (!url || state.loading) return;
     state.loading = true;
     try {
-      const podcast = await app.db.subscribe(url, app.settings.proxy);
+      const podcast = await app.db.subscribe(url);
       app.toast.success(`Subscribed to ${podcast.title}`);
       close();
       app.go('podcast', podcast.id);
