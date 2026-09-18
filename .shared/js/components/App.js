@@ -2,7 +2,7 @@
 
 function Slot ({ map }) {
   const xxx = {};
-  for (const [id, component] of Object.entries(map) {
+  for (const [id, component] of Object.entries(map)) {
     xxx[id] = await zugriff.app['view'](component);
   }
 }
