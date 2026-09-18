@@ -12,8 +12,12 @@ import { filterEpisodes, sortEpisodes } from './../modules/methods.js';
 const app = zugriff.app;
 
 export default function LatestView () {
-  const hasSubs = app.library.getPodcasts().length > 0;
-  const recent  = filterEpisodes(sortEpisodes(app.library.getEpisodes(), 'newest'), true).slice(0, 200);
+  const podcasts = app.library.getPodcasts();
+  const hasSubs  = podcasts.length > 0;
+
+  const         episodes = app.library.getEpisodes();
+  const   sortedEpisodes = sortEpisodes(episodes, 'newest');
+  const filteredEpisodes = filterEpisodes(sortedEpisodes, true).slice(0, 200);
 
   const empty = !hasSubs
     ? {
@@ -39,8 +43,11 @@ export default function LatestView () {
         </div>
       </header>
 
-      <${EpisodesIndex} episodes=${recent} empty=${empty} />
+      <${EpisodesIndex} episodes=${filteredEpisodes} empty=${empty} />
+
+      <footer>
+        ${hasSubs && html`<${SearchPanel} placeholder="filter episodes …" />`}
+      </footer>
     </${View}>
-    ${hasSubs && html`<${SearchPanel} placeholder="filter episodes …" />`}
   `;
 }
