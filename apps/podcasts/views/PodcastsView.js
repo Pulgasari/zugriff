@@ -12,7 +12,8 @@ const sorting  = 'newest';
 const viewmode = 'list';
 
 function PodcastsView () {
-  const list = sortPodcasts(app.library.getPodcasts(), sorting);
+  const       podcasts = app.library.getPodcasts();
+  const sortedPodcasts = sortPodcasts(podcasts, sorting);
 
   return html`
     <${View}>
@@ -33,7 +34,7 @@ function PodcastsView () {
       </header>
 
       <${PodcastsIndex}
-        podcasts=${list}
+        podcasts=${sortedPodcasts}
         empty=${{
           icon  : 'rss', 
           title : 'No subscriptions yet',
