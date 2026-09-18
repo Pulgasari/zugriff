@@ -2,14 +2,13 @@
 
 // :::::: IMPORTS
 
-import { effect }        from '@aufbau/signals';
-import { createDB }      from '@bunker/db';
+import { effect, signal } from '@aufbau/signals';
+import { createDB }       from '@bunker/db';
 
 import { createState }   from './app/state.js';
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
 import { toast }         from './modules/toast.js';
-import * as pwa          from './app/pwa.js';
 
 import { registry }     from './data/apps.js';
 import { html, render } from './vendors.js';
@@ -22,6 +21,54 @@ const configFor = slug => (slug && registry.get(slug)) || {};
 
 // a dynamic import resolves to its default export, else the whole namespace
 const pick = mod => mod?.default ?? mod;
+
+// :::::: PWA
+
+const standalone = () =>
+  (typeof window !== 'undefined' && (
+    window.matchMedia?.('(display-mode: standalone)')?.matches ||
+    window.matchMedia?.('(display-mode: window-controls-overlay)')?.matches ||
+    window.navigator?.standalone === true));
+
+const canInstall  = signal(false);
+const isInstalled = signal(standalone());
+
+let deferred = null;
+
+if (typeof window !== 'undefined') {
+  // chrome/edge/android fire this when the app meets the install criteria and
+  // isn't installed yet; we stash it so a button can trigger it on demand
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferred = e;
+    canInstall.value = !isInstalled.value;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    isInstalled.value = true;
+    canInstall.value  = false;
+    deferred = null;
+  });
+
+  window.matchMedia?.('(display-mode: standalone)')
+    ?.addEventListener?.('change', e => {
+      if (e.matches) { isInstalled.value = true; canInstall.value = false; }
+    });
+}
+
+async function promptInstall () {
+  if (!deferred) return false;
+  const evt = deferred;
+  deferred = null;
+  canInstall.value = false;
+  try {
+    evt.prompt();
+    const { outcome } = await evt.userChoice;
+    return outcome === 'accepted';
+  } catch {
+    return false;
+  }
+}
 
 // :::::: APP
 
@@ -110,9 +157,9 @@ class ZugriffApp {
   go = (name, id = null) => this.state.route = { name, id };
 
   // ::: pwa (install-to-home-screen), lifted off the shared plumbing
-  canInstall    = pwa.canInstall;
-  isInstalled   = pwa.isInstalled;
-  promptInstall = pwa.promptInstall;
+  canInstall    = canInstall;
+  isInstalled   = isInstalled;
+  promptInstall = promptInstall;
 
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {
