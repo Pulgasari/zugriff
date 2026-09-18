@@ -53,6 +53,10 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 - `app.db` / `app.player` / `app.thumbs` — the modules. `app.db` is read
   synchronously (plain calls, no `.value`); `app.js` awaits `app.db.load()` once
   before mounting, so the first render already has the library.
+- `app.state.podcasts` / `.episodes` / `.progress` — the library itself, mirrored
+  out of IndexedDB. `database.js` owns these three leaves: it fills them at boot
+  and patches them on every write, which is what re-renders the views. Unlike the
+  seeded leaves they are not persisted — IndexedDB is the durable copy.
 - `app.state` — the app's ephemeral ui state on the shared deep signal (`@aufbau/signals`),
   read/written **without** `.value`: `route` (`{name,id}`), `search`, `dialog`, `busy`.
   Leaves are read inside render to stay reactive, so they are never destructured at module
@@ -77,11 +81,14 @@ destructuring the stable module refs); shared components load from
   to is what gets stored: the podcast record *is* the parsed feed minus its
   episodes, each episode record the parsed entry plus its keys, so nothing is
   copied field by field on the way in. Episode keys start with their podcast id,
-  so "all episodes of this podcast" is a plain prefix scan. `load()` reads all
-  three tables into an in-memory mirror once at boot, which is what lets the
-  views read synchronously (`getPodcasts()`, `getEpisodes(id)`, `stateOf(id)`, …);
-  writes go to IndexedDB and patch the mirror. No signals in here — re-rendering
-  after a write is the app's business, not the storage layer's.
+  so "all episodes of this podcast" is a plain prefix scan. IndexedDB is async and
+  preact renders synchronously, so `load()` mirrors all three tables into
+  `app.state` at boot and the views read from there (`getPodcasts()`,
+  `getEpisodes(id)`, `stateOf(id)`, …); writes go to IndexedDB and patch the same
+  leaves. No signals are created here — `app.state` is already the app's deep
+  signal, and the shape is picked to suit it: `podcasts`/`episodes` are arrays, so
+  each is a single signal replaced on write, while `progress` is keyed by episode
+  id, so the player's position writes wake only the rows showing that episode.
 - **`modules/feed.js`** — fetches and parses feeds in the browser. Podcast feeds
   rarely send CORS headers, so it tries a direct request first and falls back to
   a CORS proxy whose URL you set in **Settings**.

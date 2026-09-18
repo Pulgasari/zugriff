@@ -11,9 +11,15 @@
 // is copied field by field, so whatever feed.js learns to parse lands in the db
 // without a second round of mapping here.
 //
-// reads are synchronous over an in-memory mirror that load() fills once at boot;
-// writes go to indexeddb and patch the mirror. there is no reactivity in here —
-// re-rendering after a write is the app's business, not the storage layer's.
+// indexeddb is async, preact renders synchronously, so the library is mirrored in
+// app.state and read from there. no signals in this file: app.state is already the
+// app's deep signal, and writing a leaf is what re-renders the views.
+//
+//   app.state.podcasts  []                 array leaf -> one signal, replaced on write
+//   app.state.episodes  []                 same
+//   app.state.progress  { episodeId: … }   keyed node -> one signal per episode, so the
+//                                          player's position writes wake only the rows
+//                                          showing that episode (the `state` table)
 
 // :::::: IMPORTS
 
@@ -23,16 +29,13 @@ import { hash }                 from './methods.js';
 
 // :::::: CONSTANTS
 
-const EMPTY_STATE = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
+const app = zugriff.app;
+
+const EMPTY_PROGRESS = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
 
 // :::::: DB
 
 const database = createDb('zugriff:podcasts');
-
-// the mirror. plain objects keyed by id, so every read below is a lookup.
-let podcasts = {};
-let episodes = {};
-let states   = {};
 
 // all three tables in ONE upgrade. reading a table that does not exist yet
 // triggers its own lazy upgrade, and three of those race on a cold db.
@@ -40,11 +43,15 @@ let states   = {};
 async function load () {
   await database.setup({ podcasts: {}, episodes: {}, state: {} });
 
-  [podcasts, episodes, states] = await Promise.all([
-    database.podcasts.toMap(),
-    database.episodes.toMap(),
+  const [podcasts, episodes, progress] = await Promise.all([
+    database.podcasts.toValues(),
+    database.episodes.toValues(),
     database.state.toMap(),
   ]);
+
+  app.state.podcasts = podcasts;
+  app.state.episodes = episodes;
+  app.state.progress = progress;
 }
 
 // :::::: IDS
@@ -58,39 +65,49 @@ const episodeId = (pid, guid) => `${pid}:${hash(guid)}`;
 
 // :::::: READ
 
-const getPodcasts = ()    => Object.values(podcasts);
-const getPodcast  = (id)  => podcasts[id] ?? null;
+// the list reads copy: what app.state holds is the live array, and a caller that
+// sorts in place would reorder the state itself without publishing it.
+const getPodcasts = ()    => [...app.state.podcasts];
+const getPodcast  = (id)  => app.state.podcasts.find(podcast => podcast.id === id) ?? null;
 
-const getEpisode  = (id)  => episodes[id] ?? null;
-const getEpisodes = (pid) => {
-  const all = Object.values(episodes);
-  return pid ? all.filter(episode => episode.podcastId === pid) : all;
+const getEpisode  = (id)  => app.state.episodes.find(episode => episode.id === id) ?? null;
+const getEpisodes = (pid) => pid ? app.state.episodes.filter(episode => episode.podcastId === pid)
+                                 : [...app.state.episodes];
+
+// an episode that already has progress reads its own signals and nothing else. one
+// that has none has no signal to subscribe to yet, so it falls back to $keys, which
+// fires when the key appears. keeping that fallback off the hit path matters: $keys
+// wakes every reader holding it, and the first write for any episode fires it.
+const stateOf = (id) => {
+  const progress = app.state.progress[id];
+  if (progress) return progress;
+
+  void app.state.progress.$keys;
+  return EMPTY_PROGRESS;
 };
 
-const stateOf = id => states[id] ?? EMPTY_STATE;
-
 // the listen-later list, newest-saved first, joined to its episode
-const getSaved = () => Object.entries(states)
-  .filter(([, state]) => state.saved)
+const getSaved = () => Object.entries(app.state.progress)
+  .filter(([, progress]) => progress.saved)
   .sort(([, a], [, b]) => b.savedAt - a.savedAt)
-  .map(([id]) => episodes[id])
+  .map(([id]) => getEpisode(id))
   .filter(Boolean);
 
 // :::::: STATE (progress / done / saved)
 
-async function patchState (id, patch) {
-  const next = { ...EMPTY_STATE, ...states[id], ...patch, updatedAt: Date.now() };
-  states[id] = next;
+async function patchProgress (id, patch) {
+  const next = { ...EMPTY_PROGRESS, ...app.state.progress[id], ...patch, updatedAt: Date.now() };
+  app.state.progress[id] = next;
   await database.state.set(id, next);
   return next;
 }
 
-const setProgress = (id, position, duration) => patchState(id, { position, duration });
-const markDone    = (id, done = true)        => patchState(id, { done, doneAt: done ? Date.now() : 0 });
+const setProgress = (id, position, duration) => patchProgress(id, { position, duration });
+const markDone    = (id, done = true)        => patchProgress(id, { done, doneAt: done ? Date.now() : 0 });
 const toggleDone  = (id)                     => markDone(id, !stateOf(id).done);
 const toggleSaved = (id) => {
   const saved = !stateOf(id).saved;
-  return patchState(id, { saved, savedAt: saved ? Date.now() : 0 });
+  return patchProgress(id, { saved, savedAt: saved ? Date.now() : 0 });
 };
 
 // :::::: SUBSCRIPTIONS
@@ -125,13 +142,15 @@ function toRecords (url, { episodes: entries, ...feed }) {
 const putEpisodes = (eps)          => database.task('episodes', 'readwrite', os => { for (const ep  of eps)  os.put(ep, ep.id); });
 const dropKeys    = (table, keys)  => database.task(table,      'readwrite', os => { for (const key of keys) os.delete(key);    });
 
-// write a feed's records to both the db and the mirror
+// write a feed's records to the db, then swap them into app.state in one
+// assignment per collection — a per-record write would publish that many times.
 async function store (podcast, eps) {
   await database.podcasts.set(podcast.id, podcast);
   await putEpisodes(eps);
 
-  podcasts[podcast.id] = podcast;
-  for (const ep of eps) episodes[ep.id] = ep;
+  const fresh = new Set(eps.map(ep => ep.id));
+  app.state.podcasts = [...app.state.podcasts.filter(p  => p.id !== podcast.id), podcast];
+  app.state.episodes = [...app.state.episodes.filter(ep => !fresh.has(ep.id)),   ...eps];
 }
 
 /**
@@ -141,14 +160,14 @@ async function store (podcast, eps) {
 async function subscribe (rawUrl) {
   const url = normalizeUrl(rawUrl);
   const pid = podcastId(url);
-  if (podcasts[pid]) throw new Error('already subscribed to this feed');
+  if (getPodcast(pid)) throw new Error('already subscribed to this feed');
 
   const parsed = parseFeed(await fetchFeed(url));
   if (!parsed.episodes.length) throw new Error('no episodes found in this feed');
 
   const { podcast, episodes: eps } = toRecords(url, parsed);
   await store({ ...podcast, addedAt: Date.now() }, eps);
-  return podcasts[pid];
+  return getPodcast(pid);
 }
 
 /**
@@ -157,12 +176,14 @@ async function subscribe (rawUrl) {
  * so a truncated feed does not take their progress with it.
  */
 async function refresh (pid) {
-  const known = podcasts[pid];
+  const known = getPodcast(pid);
   if (!known) return { added: 0 };
 
   const parsed = parseFeed(await fetchFeed(known.url));
   const { podcast, episodes: eps } = toRecords(known.url, parsed);
-  const added = eps.filter(ep => !episodes[ep.id]).length;
+
+  const have  = new Set(app.state.episodes.map(episode => episode.id));
+  const added = eps.filter(ep => !have.has(ep.id)).length;
 
   await store({ ...podcast, addedAt: known.addedAt }, eps);
   return { added };
@@ -183,14 +204,15 @@ async function refreshAll (onProgress) {
 
 /** drop a subscription along with its episodes and their state */
 async function unsubscribe (pid) {
-  const keys = Object.keys(episodes).filter(key => key.startsWith(pid + ':'));
+  const keys = getEpisodes(pid).map(episode => episode.id);
 
   await database.podcasts.delete(pid);
   await dropKeys('episodes', keys);
   await dropKeys('state',    keys);
 
-  delete podcasts[pid];
-  for (const key of keys) { delete episodes[key]; delete states[key]; }
+  app.state.podcasts = app.state.podcasts.filter(podcast => podcast.id   !== pid);
+  app.state.episodes = app.state.episodes.filter(episode => episode.podcastId !== pid);
+  for (const key of keys) delete app.state.progress[key];
 }
 
 // :::::: IMPORT / EXPORT
@@ -203,10 +225,10 @@ const stateKey = (url, guid) => `${url}\n${guid}`;
 function exportData () {
   const state = {};
 
-  for (const [id, { updatedAt, ...rest }] of Object.entries(states)) {
+  for (const [id, { updatedAt, ...rest }] of Object.entries(app.state.progress)) {
     if (!rest.saved && !rest.done && !rest.position) continue;   // nothing worth keeping
-    const episode = episodes[id];
-    const podcast = episode && podcasts[episode.podcastId];
+    const episode = getEpisode(id);
+    const podcast = episode && getPodcast(episode.podcastId);
     if (podcast) state[stateKey(podcast.url, episode.guid)] = rest;
   }
 
@@ -227,8 +249,8 @@ async function importData (data, onProgress) {
 
   for (const feed of data.feeds) {
     const url = normalizeUrl(feed.url || '');
-    if      (!url)                     results.push({ url: feed.url, skipped: 'no url' });
-    else if (podcasts[podcastId(url)]) results.push({ url, skipped: 'already subscribed' });
+    if      (!url)                    results.push({ url: feed.url, skipped: 'no url' });
+    else if (getPodcast(podcastId(url))) results.push({ url, skipped: 'already subscribed' });
     else {
       try           { await subscribe(url); results.push({ url, added: true }); }
       catch (error) { results.push({ url, error: error?.message || String(error) }); }
@@ -238,14 +260,14 @@ async function importData (data, onProgress) {
 
   // re-apply the saved state now that the episodes exist
   const rows = [];
-  for (const episode of Object.values(episodes)) {
-    const podcast = podcasts[episode.podcastId];
+  for (const episode of app.state.episodes) {
+    const podcast = getPodcast(episode.podcastId);
     const saved   = podcast && data.state?.[stateKey(podcast.url, episode.guid)];
-    if (saved) rows.push([episode.id, { ...EMPTY_STATE, ...saved, updatedAt: Date.now() }]);
+    if (saved) rows.push([episode.id, { ...EMPTY_PROGRESS, ...saved, updatedAt: Date.now() }]);
   }
   if (rows.length) {
     await database.task('state', 'readwrite', os => { for (const [id, row] of rows) os.put(row, id); });
-    for (const [id, row] of rows) states[id] = row;
+    for (const [id, row] of rows) app.state.progress[id] = row;
   }
 
   return results;
