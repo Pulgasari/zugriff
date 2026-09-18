@@ -13,15 +13,16 @@ import { filterEpisodes, sortEpisodes } from './../modules/methods.js';
 const app = zugriff.app;
 
 export default function LatestView () {
-  const podcasts = useTable('podcasts', () => app.db.podcasts.toMap());
-  const episodes = useTable('episodes', () => app.db.episodes.toValues());
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toValues(), ['all']);
+  const episodes = useTable('episodes', () => app.db.episodes.toValues(), ['all']);
   if (!podcasts || !episodes) return null;
 
-  const hasSubs = Object.keys(podcasts).length > 0;
+  const hasSubs = podcasts.length > 0;
+  const byId    = Object.fromEntries(podcasts.map(podcast => [podcast.id, podcast]));
 
   // the join happens once here, so neither a row nor the filter has to look a
   // podcast up for itself
-  const         joined = episodes.map(ep => ({ ...ep, podcast: podcasts[ep.podcastId] }));
+  const         joined = episodes.map(ep => ({ ...ep, podcast: byId[ep.podcastId] }));
   const   sortedEpisodes = sortEpisodes(joined, 'newest');
   const filteredEpisodes = filterEpisodes(sortedEpisodes, true).slice(0, 200);
 

@@ -103,13 +103,51 @@ class ZugriffApp {
     this.baseURL  = new URL(`/${slug}/`, location.origin);   // absolute — loaders resolve against it
     this.url      = this.baseURL.href;
     this.database = createDB('zugriff:' + slug);
-    this.state    = createState(this.config);
+    this.state    = this.#createState();
     this.toast    = toast;
     this.effect   = effect;
 
     // ::: behaviour registries — actions (named callbacks) + hotkeys wired to them
     this._actions = createActions();
     this._hotkeys = createHotkeys(this._actions);
+  }
+
+  // ::: state
+  // in the constructor, not a class field: a field initialises before the
+  // constructor body has assigned this.config, and both the schema and the effects
+  // read it. $onEffects runs each one right away with the leaf's current value —
+  // after hydration, so a stored theme is applied rather than the declared default.
+  #createState () {
+    const config = this.config;
+
+    const state = signalStore({
+      color    : { type: 'scalar', value: config.color },
+      dir      : { type: 'scalar', value: config.dir },
+      font     : { type: String,   value: config.font  ?? 'Manrope' },
+      lang     : { type: 'scalar', value: config.lang },
+      theme    : { type: 'enum',   values: Object.keys(themes), value: config.theme ?? 'dracula' },
+      title    : { type: 'scalar', value: config.title ?? config.name ?? null },
+      viewport : { type: 'scalar', value: config.viewport },
+
+      // ui-frame state every app shares — persisted too: a dialog left open reopens
+      dialog : { type: 'scalar', value: null },
+      route  : { type: 'scalar', value: null },
+    }, {
+      key   : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
+      store : local,
+    });
+
+    // pure side effects — persistence is the store's job. theme additionally
+    // refreshes the boot-time colour cache (see applyTheme).
+    state.$onEffects({
+      dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
+      font  : value => { if (value) webfonts?.init?.({ name: value, target: '--font' }); },
+      lang  : value => { if ($root && value) $root.lang = value; },
+      theme : value => applyTheme(value),
+      title : value => { if ($doc && value) $doc.title = value; },
+    });
+
+    return state;
   }
 
   // ::: loaders (app-relative)
@@ -177,31 +215,6 @@ class ZugriffApp {
   canInstall    = canInstall;
   isInstalled   = isInstalled;
   promptInstall = promptInstall;
-
-  // ::: state
-  state = signalStore({
-    color    : { type: 'scalar', value: config.color },
-    dir      : { type: 'scalar', value: config.dir },
-    font     : { type: String,   value: config.font  ?? 'Manrope' },
-    lang     : { type: 'scalar', value: config.lang },
-    theme    : { type: 'enum',   values: Object.keys(themes), value: config.theme ?? 'dracula' },
-    title    : { type: 'scalar', value: config.title ?? config.name ?? null },
-    viewport : { type: 'scalar', value: config.viewport },
-
-    // ui-frame state every app shares — persisted too: a dialog left open reopens
-    dialog : { type: 'scalar', value: null },
-    route  : { type: 'scalar', value: null },
-  }, {
-    key   : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
-    store : local, // should be: localStorage or 'local' but no need for export
-  });
-  this.state.$onEffects({
-    dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
-    font  : value => { if (value) webfonts?.init?.({ name: value, target: '--font' }); },
-    lang  : value => { if ($root && value) $root.lang = value; },
-    theme : value => applyTheme(value),
-    title : value => { if ($doc && value) $doc.title = value; },
-  });
 
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {

@@ -15,9 +15,9 @@ const app = zugriff.app;
 const { go } = app;
 
 export default function EpisodeDetailView ({ id }) {
-  const episode = useTable('episodes', () => app.db.episodes.get(id), [id]);
+  const episode = useTable('episodes', () => app.db.episodes.get(id), ['one', id]);
   // keyed on the episode's podcastId, so this reads once the episode has landed
-  const podcast = useTable('podcasts', () => app.db.podcasts.get(episode?.podcastId), [episode?.podcastId]);
+  const podcast = useTable('podcasts', () => app.db.podcasts.get(episode?.podcastId), ['one', episode?.podcastId]);
 
   if (episode === null) return null;
   if (!episode) return html`
