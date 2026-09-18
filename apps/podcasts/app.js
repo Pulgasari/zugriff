@@ -92,7 +92,7 @@ const dockItems = [
   { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'episodes'  },
   { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
   { label: 'Later',    icon: 'bookmarks',             view: 'episodes'  },     
-  { label: 'Settings', icon: 'settings',            dialog: 'settings' },
+//{ label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
 app.dialogs = {
