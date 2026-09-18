@@ -61,8 +61,7 @@ const getPodcasts = ()    => [...app.state.podcasts];
 const getPodcast  = (id)  => app.state.podcasts.find(podcast => podcast.id === id) ?? null;
 
 const getEpisode  = (id)  => app.state.episodes.find(episode => episode.id === id) ?? null;
-const getEpisodes = (pid) => pid ? app.state.episodes.filter(episode => episode.podcastId === pid)
-                                 : [...app.state.episodes];
+const getEpisodes = (pid) => pid ? app.state.episodes.filter(episode => episode.podcastId === pid) : [...app.state.episodes];     
 
 // an episode that already has progress reads its own signals and nothing else. one
 // that has none has no signal to subscribe to yet, so it falls back to $keys, which
@@ -145,7 +144,7 @@ async function store (podcast, eps) {
  */
 async function subscribe (rawUrl) {
   const url = normalizeUrl(rawUrl);
-  const pid = db.podcastId(url);
+  const pid = podcastIdByHash(url);
   if (getPodcast(pid)) throw new Error('already subscribed to this feed');
 
   const parsed = parseFeed(await fetchFeed(url));
