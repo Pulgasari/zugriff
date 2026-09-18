@@ -7,13 +7,13 @@ import SearchPanel        from '/.shared/js/components/SearchPanel.js';
 import View               from '/.shared/js/components/View.js';
 
 import EpisodesIndex      from './../components/EpisodesIndex.js';
-import { filterEpisodes } from './../modules/methods.js';
+import { filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
 
 export default function LatestView () {
   const hasSubs = app.db.getPodcasts().length > 0;
-  const recent  = filterEpisodes(app.db.getEpisodes().sort((a, b) => (b.pubDate || 0) - (a.pubDate || 0)), true).slice(0, 200);
+  const recent  = filterEpisodes(sortEpisodes(app.db.getEpisodes(), 'newest'), true).slice(0, 200);
 
   const empty = !hasSubs
     ? {
