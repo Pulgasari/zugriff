@@ -35,10 +35,6 @@ app.state.menuPosition   = 'bottom';
 app.state.playerPosition = 'bottom';
 
 // ::: LIBRARY
-// mirrored out of indexeddb by database.js, which reads and writes it from here.
-// podcasts/episodes are arrays, so each is one signal a write replaces; progress is
-// keyed by episode id, so the player's position writes wake only the rows showing
-// that episode. none of these persist — app.state persists its seeded leaves only.
 app.state.podcasts = [];
 app.state.episodes = [];
 app.state.progress = {};
@@ -47,17 +43,6 @@ app.state.progress = {};
 // failure must not blank the app — it mounts either way, just empty.
 await app.db.load().catch(error => app.toast.error(error));
 app.thumbs.prewarm(app.db.getPodcasts().map(podcast => podcast.image));
-
-// ::: SETTINGS
-/*
-app.settings = typedSignal({
-  podcastSort : oneOf(['recent', 'alpha'], 'recent'),
-  episodeSort : oneOf(['newest', 'oldest', 'alpha'], 'newest'),
-  view        : oneOf(['grid', 'list'], 'grid'),
-  menuPos     : oneOf(['top', 'bottom', 'left', 'right'], 'bottom'),
-  playerPos   : oneOf(['top', 'bottom'], 'bottom'),
-}, { key: 'zugriff:podcasts:settings', store: local });
-*/
 
 // :::::: ACTIONS
 
