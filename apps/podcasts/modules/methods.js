@@ -66,7 +66,7 @@ export function paragraphs (htmlStr = '') {
 // podcast title, for the mixed "latest" stream — the view joins that on, so there is
 // no lookup to do per episode per keystroke.
 export function filterEpisodes (list, withPodcast = false) {
-  const q = zugriff.app.state.search.trim().toLowerCase();
+  const q = zugriff.app.state.$search.trim().toLowerCase();
   if (!q) return list;
   return list.filter(ep =>
     ep.title.toLowerCase().includes(q) ||

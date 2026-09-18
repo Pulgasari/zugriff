@@ -37,14 +37,14 @@ export default function SettingsPanel () {
     try { data = JSON.parse(await file.text()); }
     catch { app.toast.error('Could not read that file'); return; }
     app.state.dialog = null;
-    app.ui.busy = 'Importing…';
+    app.state.busy = 'Importing…';
     try {
-      const results = await library.importData(data, (n, total) => app.ui.busy = `Importing ${n}/${total}…`);
+      const results = await library.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
       const added   = results.filter(r => r.added).length;
       const failed  = results.filter(r => r.error).length;
       app.toast({ message: `Imported ${added} new` + (failed ? `, ${failed} failed` : ''), type: failed ? 'error' : 'success' });
     } catch (err) { app.toast.error(err); }
-    finally { app.ui.busy = ''; }
+    finally { app.state.busy = ''; }
   };
 
   return html`

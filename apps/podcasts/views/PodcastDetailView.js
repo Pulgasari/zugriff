@@ -41,14 +41,14 @@ export default function PodcastDetailView ({ id }) {
   };
 
   const refreshOne = async () => {
-    app.ui.busy = 'Refreshing…';
+    app.state.busy = 'Refreshing…';
     try {
       const { added } = await app.library.refresh(id);
       const message = added ? `${added} new episode(s)` : 'Up to date';
       app.toast.success(message);
     }
     catch (e) { app.toast(e); }
-    finally   { app.ui.busy = ''; }
+    finally   { app.state.busy = ''; }
   };
 
   return html`
@@ -56,7 +56,7 @@ export default function PodcastDetailView ({ id }) {
       <header>
         <h1>${podcast.title}</h1>
         <div class='actions'>
-          <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.ui.$busy} />
+          <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.$busy} />
           <${Button} icon='trash'   onClick=${remove} class='danger' />
         </div>
       </header>

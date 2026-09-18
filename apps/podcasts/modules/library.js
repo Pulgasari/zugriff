@@ -13,7 +13,7 @@
 // useTable (modules/hooks.js) and reload on @bunker/db's change feed, so subscribing
 // or refreshing here is a plain write — nothing to keep in step by hand.
 //
-// progress is the exception and lives on app.ui: it is read per row and written
+// progress is the exception and lives on app.state: it is read per row and written
 // while an episode plays, which is no way to treat a table.
 
 // :::::: IMPORTS
@@ -31,12 +31,12 @@ const app = zugriff.app;
 const EMPTY_PROGRESS = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
 
 // :::::: LOAD
-// all three tables in one upgrade, then the progress table into app.ui. podcasts and
+// all three tables in one upgrade, then the progress table into app.state. podcasts and
 // episodes are not read here — the views do that for themselves.
 
 async function load () {
   await app.db.setup({ podcasts: {}, episodes: {}, progress: {} });
-  app.ui.progress.replace(await app.db.progress.toMap());
+  app.state.progress.replace(await app.db.progress.toMap());
 }
 
 // :::::: READ
@@ -44,11 +44,11 @@ async function load () {
 // a RecordSignal read: one signal for the whole table, so any progress write wakes
 // every reader. that is affordable because the player throttles its writes (player.js)
 // rather than storing a position on every timeupdate.
-const stateOf = (id) => app.ui.progress.get(id) ?? EMPTY_PROGRESS;
+const stateOf = (id) => app.state.progress.get(id) ?? EMPTY_PROGRESS;
 
 // the ids of every saved episode, newest-saved first. the view joins them to the
 // episodes it has already loaded.
-const savedIds = () => Object.entries(app.ui.progress.value)
+const savedIds = () => Object.entries(app.state.progress.value)
   .filter(([, progress]) => progress.saved)
   .sort(([, a], [, b]) => b.savedAt - a.savedAt)
   .map(([id]) => id);
@@ -56,8 +56,8 @@ const savedIds = () => Object.entries(app.ui.progress.value)
 // :::::: PROGRESS (position / done / saved)
 
 async function patchProgress (id, patch) {
-  const next = { ...EMPTY_PROGRESS, ...app.ui.progress.get(id), ...patch, updatedAt: Date.now() };
-  app.ui.progress.set(id, next);
+  const next = { ...EMPTY_PROGRESS, ...app.state.progress.get(id), ...patch, updatedAt: Date.now() };
+  app.state.progress.set(id, next);
   await app.db.progress.set(id, next);
   return next;
 }
@@ -165,7 +165,7 @@ async function unsubscribe (pid) {
   await app.db.episodes.deleteMany(keys);
   await app.db.progress.deleteMany(keys);
 
-  for (const key of keys) app.ui.progress.delete(key);
+  for (const key of keys) app.state.progress.delete(key);
 }
 
 // :::::: IMPORT / EXPORT
@@ -179,7 +179,7 @@ async function exportData () {
   const podcasts = await app.db.podcasts.toMap();
   const state    = {};
 
-  for (const [id, { updatedAt, ...rest }] of Object.entries(app.ui.progress.value)) {
+  for (const [id, { updatedAt, ...rest }] of Object.entries(app.state.progress.value)) {
     if (!rest.saved && !rest.done && !rest.position) continue;   // nothing worth keeping
     const episode = await app.db.episodes.get(id);
     const podcast = episode && podcasts[episode.podcastId];
@@ -224,7 +224,7 @@ async function importData (data, onProgress) {
 
   if (rows.length) {
     await app.db.progress.setMany(rows);
-    for (const [id, row] of rows) app.ui.progress.set(id, row);
+    for (const [id, row] of rows) app.state.progress.set(id, row);
   }
 
   return results;

@@ -1,15 +1,24 @@
 // .shared/js/app/state.js
-// the per-app reactive state, built on @aufbau/signals' `signal` factory in nested mode:
-// one deep signal whose every leaf is independent AND persisted per-leaf under a
-// `zugriff:<app-id>:` prefix (font, dir, theme, dialog, route ... each its own key).
-// hydration and write-back are the factory's job now — createState only seeds the leaves
-// from the app's registry config and wires the cross-cutting DOM side effects. an app
-// adds its own keys by assigning them onto the returned state (…app('notes').state.filter
-// = ''); those extra keys are reactive but not auto-persisted (the seeded keys are).
+// the per-app reactive state as a signalStore: one typed leaf per key, each its own
+// signal, each persisted under a `zugriff:<app-id>:` prefix (font, dir, theme, dialog,
+// route ... each its own storage key). hydration and write-back are the store's job —
+// createState only declares the leaves from the app's registry config and wires the
+// cross-cutting DOM side effects.
+//
+// a leaf reads as its signal and `$name` as its value:
+//
+//   app.state.theme          the EnumSignal
+//   app.state.$theme         'dracula'
+//   app.state.$theme = 'nord'
+//
+// an app adds its own keys with $extend; those are reactive but not stored unless the
+// leaf says `persist: true`.
+//
+//   app.state.$extend({ filter: { type: String, value: '' } });
 
 // :::::: IMPORTS
 
-import { signal, local } from '@aufbau/signals';
+import { signalStore, local } from '@aufbau/signals';
 import webfonts          from '@aufbau/webfonts';
 //import { aufbau }        from './../vendors.js';
 import { themes }        from './../data/themes.js';
@@ -45,23 +54,24 @@ const applyTheme = preset => {
 // :::::: MAIN
 
 export function createState (config = {}) {
-  const state = signal({
-    key    : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
-    store  : local,
-    nested : true,                               // per-leaf persistence (implies a deep carrier)
-    value  : {
-      color    : config.color,
-      dir      : config.dir,
-      font     : config.font  ?? 'Manrope',
-      lang     : config.lang,
-      theme    : config.theme ?? 'dracula',
-      title    : config.title ?? config.name ?? null,
-      viewport : config.viewport,
+  // typed where the value is really constrained, scalar where it is genuinely
+  // optional — a String leaf would turn an absent `dir` into '' and an absent
+  // `title` into the empty string rather than leaving them unset.
+  const state = signalStore({
+    color    : { type: 'scalar', value: config.color },
+    dir      : { type: 'scalar', value: config.dir },
+    font     : { type: String,   value: config.font  ?? 'Manrope' },
+    lang     : { type: 'scalar', value: config.lang },
+    theme    : { type: 'enum',   values: Object.keys(themes), value: config.theme ?? 'dracula' },
+    title    : { type: 'scalar', value: config.title ?? config.name ?? null },
+    viewport : { type: 'scalar', value: config.viewport },
 
-      // ui-frame state every app shares — persisted too: a dialog left open reopens
-      dialog : null,
-      route  : null,
-    },
+    // ui-frame state every app shares — persisted too: a dialog left open reopens
+    dialog : { type: 'scalar', value: null },
+    route  : { type: 'scalar', value: null },
+  }, {
+    key   : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
+    store : local,
   });
 
   // :::::: EFFECTS

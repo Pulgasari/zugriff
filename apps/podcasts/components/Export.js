@@ -28,10 +28,10 @@ async function importFeeds (file) {
   catch { app.toast.error('Could not read that file'); return; }
 
   app.state.dialog = null;
-  app.ui.busy   = 'Importing…';
+  app.state.busy   = 'Importing…';
 
   try {
-    const results = await app.library.importData(data, (n, total) => app.ui.busy = `Importing ${n}/${total}…`);
+    const results = await app.library.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
     const added   = results.filter(r => r.added).length;
     const failed  = results.filter(r => r.error).length;
 
@@ -41,7 +41,7 @@ async function importFeeds (file) {
     });
   }
   catch (error) { app.toast(error); }
-  finally       { app.ui.busy = ''; }
+  finally       { app.state.busy = ''; }
 }
 
 function Export () {

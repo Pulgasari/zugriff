@@ -4,7 +4,6 @@ const app = zugriff.app;
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
-import { signalStore } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -26,17 +25,15 @@ const // panels
 PlayerPanel = await app.panel('PlayerPanel');
 
 // :::: STATE
-// these three stay on app.state because shared code owns them: app.go() and the
-// router drive route, app.setDialog() drives dialog, and SearchPanel writes search.
-// everything below is this app's own, so it gets its own typed store.
-app.state.dialog = null; // 'add' | 'settings' | null
-app.state.route  = { name: 'latest', id: null };
-app.state.search = '';
+// dialog and route are declared by createState; this app's own keys go on the same
+// store. nothing added here is persisted — a leaf has to ask for that.
+app.state.route = { name: 'latest', id: null };
 
-app.ui = signalStore({
-  busy           : { type: String,   value: '' },     // a label while a long task runs
-  menuPosition   : { type: 'enum',   values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
-  playerPosition : { type: 'enum',   values: ['top', 'bottom'], value: 'bottom' },
+app.state.$extend({
+  busy           : { type: String, value: '' },   // a label while a long task runs
+  search         : { type: String, value: '' },   // shared episode filter, written by SearchPanel
+  menuPosition   : { type: 'enum', values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
+  playerPosition : { type: 'enum', values: ['top', 'bottom'], value: 'bottom' },
 
   // listening progress, keyed by episode id. the one part of the library that does
   // not come out of the db per view — it is read per row and written while playing.
@@ -52,16 +49,16 @@ app.db.podcasts.toValues().then(rows => app.thumbs.prewarm(rows.map(podcast => p
 
 async function refreshAll () {
   if (!await app.db.podcasts.count()) { app.state.dialog = 'add'; return; }
-  app.ui.busy = 'Refreshing…';
+  app.state.busy = 'Refreshing…';
   try {
-    const results = await app.library.refreshAll((n, total) => app.ui.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.library.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
     const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed  = results.filter(r => r.error).length;
     const type    = failed ? 'error' : 'success';
     const message = `${added} new episode(s), ${failed} feed(s) failed.`;
     app.toast({ message, type });
   }
-  finally { app.ui.busy = ''; }
+  finally { app.state.busy = ''; }
 }
 
 app.actions = {
@@ -79,7 +76,7 @@ app.actions = {
 // :::::: HOTKEYS
 
 app.hotkeys = {
-  'escape'      : { action: 'close-dialog', when: () => !!app.state.dialog },
+  'escape'      : { action: 'close-dialog', when: () => !!app.state.$dialog },
 
   'space'       : { action: 'toggle-play',   when: !!app.player.episode },
   'arrow-left'  : { action: 'skip-back',     when: !!app.player.episode },
@@ -90,8 +87,8 @@ app.hotkeys = {
 
 const $app = document.getElementById('app');
 app.effect(() => {
-  $app.dataset.menu   = app.ui.$menuPosition;
-  $app.dataset.player = app.ui.$playerPosition;
+  $app.dataset.menu   = app.state.$menuPosition;
+  $app.dataset.player = app.state.$playerPosition;
 });
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
@@ -118,7 +115,7 @@ app.views = {
 
 
 function App () {
-  const route = app.state.route;
+  const route = app.state.$route;
   const view  = route.name in app.views ? route.name : 'latest';
 
   return html`<>
@@ -127,7 +124,7 @@ function App () {
     </main>
     <${PlayerPanel} />
     <${Dock} items=${dockItems} />
-    <${Slot} map=${app.dialogs} name=${app.state.dialog} load='dialog' />
+    <${Slot} map=${app.dialogs} name=${app.state.$dialog} load='dialog' />
   </>`;
 }
 
