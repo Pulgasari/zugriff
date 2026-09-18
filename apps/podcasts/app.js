@@ -4,16 +4,14 @@ const app = zugriff.app;
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
-import { useEffect } from 'preact/hooks';
 import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 import { DEFAULT_PROXY } from './modules/feed.js';
 
 const // shared components
-Dock    = await zugriff.component('Dock'),
-Icon    = await zugriff.component('Icon'),
-Loading = await zugriff.component('Loading'),
-Slot    = await zugriff.component('Slot');
+Dock = await zugriff.component('Dock'),
+Icon = await zugriff.component('Icon'),
+Slot = await zugriff.component('Slot');
 
 const // panels
 PlayerPanel = await app.panel('PlayerPanel');
@@ -25,10 +23,14 @@ URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
-app.database = await app.module('database');
-app.db       = await app.module('db');
-app.player   = await app.module('player');
-app.thumbs   = createThumbCache();
+app.db     = await app.module('database');
+app.player = await app.module('player');
+app.thumbs = createThumbCache();
+
+// the whole library is read into memory once, before the first render, so views
+// stay synchronous. everything after this is a lookup.
+await app.db.load();
+app.thumbs.prewarm(app.db.getPodcasts().map(podcast => podcast.image));
 
 // :::: STATE
 app.state.busy   = '';   // a label while a long task runs
@@ -52,7 +54,7 @@ app.settings = typedSignal({
 // :::::: ACTIONS
 
 async function refreshAll () {
-  if (!app.db.podcasts.size) { app.state.dialog = 'add'; return; }
+  if (!app.db.getPodcasts().length) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
     const results = await app.db.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
@@ -119,14 +121,6 @@ app.views = {
 
 
 function App () {
-  useEffect(() => {
-    app.db.load()
-      .then(() => app.thumbs.prewarm(app.db.podcasts.all.map(p => p.image)))
-      .catch(app.toast);
-  }, []);
-
-  if (!app.db.ready) return html`<${Loading}/>`;
-
   const route = app.state.route;
   const view  = route.name in app.views ? route.name : 'latest';
 

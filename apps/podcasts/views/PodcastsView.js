@@ -12,7 +12,7 @@ const sorting  = 'newest';
 const viewmode = 'list';
 
 function PodcastsView () {
-  const list = sortPodcasts(app.db.podcasts.all, sorting);
+  const list = sortPodcasts(app.db.getPodcasts(), sorting);
 
   return html`
     <${View}>

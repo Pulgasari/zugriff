@@ -14,13 +14,13 @@ const app = zugriff.app;
 const { db, player, go } = app;
 
 export default function EpisodeDetailView ({ id }) {
-  const episode = db.episodes.get({ id });
+  const episode = db.getEpisode(id);
   if (!episode) return html`
     <${View} back=${{ label: 'Back', onClick: () => go('latest') }}>
       <${Empty} icon="mdi:alert-outline" title="Episode not found" />
     <//>`;
 
-  const podcast = db.podcasts.get({ id: episode.podcastId });
+  const podcast = db.getPodcast(episode.podcastId);
   const st      = db.stateOf(id);
   const paras   = paragraphs(episode.description);
   const dur     = st.duration || episode.duration || 0;

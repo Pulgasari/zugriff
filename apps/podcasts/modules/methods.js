@@ -70,7 +70,7 @@ export function filterEpisodes (list, withPodcast = false) {
   if (!q) return list;
   return list.filter(ep =>
     ep.title.toLowerCase().includes(q) ||
-    (withPodcast && db.podcasts.get({ id: ep.podcastId })?.title.toLowerCase().includes(q)));
+    (withPodcast && db.getPodcast(ep.podcastId)?.title.toLowerCase().includes(q)));
 }
 
 export const sortEpisodes = (list, mode) => [...list].sort((a, b) =>
