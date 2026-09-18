@@ -4,6 +4,7 @@ import IconButton       from '/.shared/js/components/IconButton.js';
 import Picker           from '/.shared/js/components/Picker.js';
 import View             from '/.shared/js/components/View.js';
 import PodcastsIndex    from './../components/PodcastsIndex.js';
+import { useTable }     from './../modules/hooks.js';
 import { sortPodcasts } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -12,7 +13,9 @@ const sorting  = 'newest';
 const viewmode = 'list';
 
 function PodcastsView () {
-  const       podcasts = app.library.getPodcasts();
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toValues());
+  if (!podcasts) return null;
+
   const sortedPodcasts = sortPodcasts(podcasts, sorting);
 
   return html`

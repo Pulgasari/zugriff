@@ -2,11 +2,20 @@
 
 import EpisodesIndex from './../components/EpisodesIndex.js';
 import View          from '/.shared/js/components/View.js';
+import { useTable }  from './../modules/hooks.js';
 
 const app = zugriff.app;
 
 function SavedView () {
-  const list = app.library.getSaved();
+  const episodes = useTable('episodes', () => app.db.episodes.toMap());
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toMap());
+  if (!episodes || !podcasts) return null;
+
+  // the saved ids carry the order (newest saved first); the episodes come from the db
+  const list = app.library.savedIds()
+    .map(id => episodes[id])
+    .filter(Boolean)
+    .map(ep => ({ ...ep, podcast: podcasts[ep.podcastId] }));
 
   const empty = {
     icon  : 'bookmarks',

@@ -53,10 +53,14 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 - `app.library` / `app.player` / `app.thumbs` — the modules. `app.library` is read
   synchronously (plain calls, no `.value`); `app.js` awaits `app.library.load()`
   once before mounting, so the first render already has the library.
-- `app.state.podcasts` / `.episodes` / `.progress` — the library itself, mirrored
-  out of IndexedDB. `library.js` owns these three leaves: it fills them at boot
-  and patches them on every write, which is what re-renders the views. Unlike the
-  seeded leaves they are not persisted — IndexedDB is the durable copy.
+- `app.ui` — this app's own state as a `signalStore` (`@aufbau/signals`): `busy`,
+  `menuPosition`, `playerPosition` and `progress`. A leaf reads as its signal
+  (`app.ui.busy.value`), `$name` as its value (`app.ui.$busy`). `route`, `dialog`
+  and `search` stay on `app.state`, because shared code owns them — `app.go()` and
+  the router, `app.setDialog()`, and `SearchPanel`.
+- There is no mirror of podcasts and episodes. The db is the one copy; views read
+  the tables they need through `useTable` (`modules/hooks.js`) and reload on
+  `@bunker/db`'s change feed, which also carries across tabs.
 - `app.state` — the app's ephemeral ui state on the shared deep signal (`@aufbau/signals`),
   read/written **without** `.value`: `route` (`{name,id}`), `search`, `dialog`, `busy`.
   Leaves are read inside render to stay reactive, so they are never destructured at module
@@ -86,25 +90,14 @@ destructuring the stable module refs); shared components load from
   listened to: the layer that turns a parsed feed into stored records and back.
   What a feed parses to is what gets stored — the podcast record *is* the parsed
   feed minus its episodes, each episode record the parsed entry plus its keys, so
-  nothing is copied field by field on the way in. IndexedDB is async and preact
-  renders synchronously, so `load()` mirrors the three tables onto `app.state` at
-  boot and the views read from there (`getPodcasts()`, `getEpisodes(id)`,
-  `stateOf(id)`, …); writes go through `database.js` and patch the same leaves.
-  No signals are created here — `app.state` is already the app's deep signal, and
-  the shape is picked to suit it: `podcasts`/`episodes` are arrays, so each is a
-  single signal replaced on write, while `progress` is keyed by episode id, so the
-  player's position writes wake only the rows showing that episode.
-- **`modules/feed.js`** — fetches and parses feeds in the browser. Podcast feeds
-  rarely send CORS headers, so it tries a direct request first and falls back to
-  a CORS proxy whose URL you set in **Settings**.
-- **`modules/player.js`** — one `<audio>` element lifted out of the component
-  tree so it survives navigation, with the position written back to the db as it
-  plays. its state is held in signals internally but the public surface
-  (`app.player`) is a `.value`-free facade of getters + methods: `app.player.episode`,
-  `.time`, `.duration`, `.isPlaying` / `.isWaiting` / `.status`, and `play()` /
-  `toggle()` / `close()` / `skip()` / `setRate()`.
-- **`modules/methods.js`** — pure view helpers (formatting, html→text, the
-  list filters/sorts).
+  nothing is copied field by field on the way in. Subscribing, refreshing and
+  unsubscribing are plain db writes; the views hear about them through the change
+  feed. Only `progress` is held in memory (`app.ui.progress`), because it is read
+  per row and written while an episode plays.
+- **`modules/hooks.js`** — `useTable(table, read, deps)`: a view's slice of the db,
+  reloaded when that table changes, in this tab or another. Returns `null` until
+  the first read lands, and remembers the last rows per key so navigating back
+  draws immediately and refreshes behind the list.
 
 The grid/list podcasts view is laid out by `<aufbau-index viewmode="grid|list">`
 with each podcast in an `<aufbau-item>`.

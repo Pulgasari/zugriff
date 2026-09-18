@@ -12,9 +12,11 @@ import PlayToggle from './PlayToggle.js';
 
 const app = zugriff.app;
 
+// `episode.podcast` is joined on by the view that loaded the list — a lookup per row
+// would mean a db read per row.
 function Item ({ episode }) {
   const state      = app.library.stateOf(episode.id);
-  const podcast    = app.library.getPodcast(episode.podcastId);
+  const podcast    = episode.podcast;
   const dur        = state.duration || 0;
   const pct        = state.done ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
   const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     

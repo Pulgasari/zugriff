@@ -9,15 +9,12 @@
 // is copied field by field, so whatever feed.js learns to parse lands in the db
 // without a second round of mapping here.
 //
-// indexeddb is async and preact renders synchronously, so the library is mirrored
-// on app.state, the deep signal the app already has. nothing here creates a
-// signal; writing a leaf is what re-renders the views.
+// the db is the one copy of the library. views read the tables they need through
+// useTable (modules/hooks.js) and reload on @bunker/db's change feed, so subscribing
+// or refreshing here is a plain write — nothing to keep in step by hand.
 //
-//   app.state.podcasts  []                 array leaf -> one signal, replaced on write
-//   app.state.episodes  []                 same
-//   app.state.progress  { episodeId: … }   keyed node -> one signal per episode, so the
-//                                          player's position writes wake only the rows
-//                                          showing that episode
+// progress is the exception and lives on app.ui: it is read per row and written
+// while an episode plays, which is no way to treat a table.
 
 // :::::: IMPORTS
 
@@ -34,59 +31,33 @@ const app = zugriff.app;
 const EMPTY_PROGRESS = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
 
 // :::::: LOAD
+// all three tables in one upgrade, then the progress table into app.ui. podcasts and
+// episodes are not read here — the views do that for themselves.
 
 async function load () {
   await app.db.setup({ podcasts: {}, episodes: {}, progress: {} });
-
-  const [
-    podcasts, 
-    episodes, 
-    progress
-  ] = await Promise.all([
-    app.db.podcasts.toValues(),
-    app.db.episodes.toValues(),
-    app.db.progress.toMap(),
-  ]);
-
-  app.state.podcasts = podcasts;
-  app.state.episodes = episodes;
-  app.state.progress = progress;
+  app.ui.progress.replace(await app.db.progress.toMap());
 }
 
 // :::::: READ
-// the list reads copy: what app.state holds is the live array, and a caller that
-// sorts in place would reorder the state itself without publishing it.
 
-const getPodcasts = ()    => [...app.state.podcasts];
-const getPodcast  = (id)  => app.state.podcasts.find(podcast => podcast.id === id) ?? null;
+// a RecordSignal read: one signal for the whole table, so any progress write wakes
+// every reader. that is affordable because the player throttles its writes (player.js)
+// rather than storing a position on every timeupdate.
+const stateOf = (id) => app.ui.progress.get(id) ?? EMPTY_PROGRESS;
 
-const getEpisode  = (id)  => app.state.episodes.find(episode => episode.id === id) ?? null;
-const getEpisodes = (pid) => pid ? app.state.episodes.filter(episode => episode.podcastId === pid) : [...app.state.episodes];     
-
-// an episode that already has progress reads its own signals and nothing else. one
-// that has none has no signal to subscribe to yet, so it falls back to $keys, which
-// fires when the key appears. keeping that fallback off the hit path matters: $keys
-// wakes every reader holding it, and the first write for any episode fires it.
-const stateOf = (id) => {
-  const progress = app.state.progress[id];
-  if (progress) return progress;
-
-  void app.state.progress.$keys;
-  return EMPTY_PROGRESS;
-};
-
-// the listen-later list, newest-saved first, joined to its episode
-const getSaved = () => Object.entries(app.state.progress)
+// the ids of every saved episode, newest-saved first. the view joins them to the
+// episodes it has already loaded.
+const savedIds = () => Object.entries(app.ui.progress.value)
   .filter(([, progress]) => progress.saved)
   .sort(([, a], [, b]) => b.savedAt - a.savedAt)
-  .map(([id]) => getEpisode(id))
-  .filter(Boolean);
+  .map(([id]) => id);
 
 // :::::: PROGRESS (position / done / saved)
 
 async function patchProgress (id, patch) {
-  const next = { ...EMPTY_PROGRESS, ...app.state.progress[id], ...patch, updatedAt: Date.now() };
-  app.state.progress[id] = next;
+  const next = { ...EMPTY_PROGRESS, ...app.ui.progress.get(id), ...patch, updatedAt: Date.now() };
+  app.ui.progress.set(id, next);
   await app.db.progress.set(id, next);
   return next;
 }
@@ -132,10 +103,6 @@ function toRecords (url, { episodes: entries, ...feed }) {
 async function store (podcast, eps) {
   await app.db.podcasts.set(podcast.id, podcast);
   await app.db.episodes.setMany(eps.map(ep => [ep.id, ep]));
-
-  const fresh = new Set(eps.map(ep => ep.id));
-  app.state.podcasts = [...app.state.podcasts.filter(p  => p.id !== podcast.id), podcast];
-  app.state.episodes = [...app.state.episodes.filter(ep => !fresh.has(ep.id)),   ...eps];
 }
 
 /**
@@ -145,14 +112,15 @@ async function store (podcast, eps) {
 async function subscribe (rawUrl) {
   const url = normalizeUrl(rawUrl);
   const pid = podcastIdByHash(url);
-  if (getPodcast(pid)) throw new Error('already subscribed to this feed');
+  if (await app.db.podcasts.get(pid)) throw new Error('already subscribed to this feed');
 
   const parsed = parseFeed(await fetchFeed(url));
   if (!parsed.episodes.length) throw new Error('no episodes found in this feed');
 
   const { podcast, episodes: eps } = toRecords(url, parsed);
-  await store({ ...podcast, addedAt: Date.now() }, eps);
-  return getPodcast(pid);
+  const record = { ...podcast, addedAt: Date.now() };
+  await store(record, eps);
+  return record;
 }
 
 /**
@@ -161,13 +129,15 @@ async function subscribe (rawUrl) {
  * so a truncated feed does not take their progress with it.
  */
 async function refresh (pid) {
-  const known = getPodcast(pid);
+  const known = await app.db.podcasts.get(pid);
   if (!known) return { added: 0 };
 
   const parsed = parseFeed(await fetchFeed(known.url));
   const { podcast, episodes: eps } = toRecords(known.url, parsed);
 
-  const have  = new Set(app.state.episodes.map(episode => episode.id));
+  // the episode keys of this podcast are one prefix scan, which is what the key
+  // layout is for — no need to read the records themselves to count what is new
+  const have  = new Set(await app.db.episodes.toKeys(pid + ':'));
   const added = eps.filter(ep => !have.has(ep.id)).length;
 
   await store({ ...podcast, addedAt: known.addedAt }, eps);
@@ -175,7 +145,7 @@ async function refresh (pid) {
 }
 
 async function refreshAll (onProgress) {
-  const all     = getPodcasts();
+  const all     = await app.db.podcasts.toValues();
   const results = [];
   let   done    = 0;
 
@@ -189,15 +159,13 @@ async function refreshAll (onProgress) {
 
 /** drop a subscription along with its episodes and their progress */
 async function unsubscribe (pid) {
-  const keys = getEpisodes(pid).map(episode => episode.id);
+  const keys = await app.db.episodes.toKeys(pid + ':');
 
   await app.db.podcasts.delete(pid);
   await app.db.episodes.deleteMany(keys);
   await app.db.progress.deleteMany(keys);
 
-  app.state.podcasts = app.state.podcasts.filter(podcast => podcast.id         !== pid);
-  app.state.episodes = app.state.episodes.filter(episode => episode.podcastId  !== pid);
-  for (const key of keys) delete app.state.progress[key];
+  for (const key of keys) app.ui.progress.delete(key);
 }
 
 // :::::: IMPORT / EXPORT
@@ -207,13 +175,14 @@ async function unsubscribe (pid) {
 
 const stateKey = (url, guid) => `${url}\n${guid}`;
 
-function exportData () {
-  const state = {};
+async function exportData () {
+  const podcasts = await app.db.podcasts.toMap();
+  const state    = {};
 
-  for (const [id, { updatedAt, ...rest }] of Object.entries(app.state.progress)) {
+  for (const [id, { updatedAt, ...rest }] of Object.entries(app.ui.progress.value)) {
     if (!rest.saved && !rest.done && !rest.position) continue;   // nothing worth keeping
-    const episode = getEpisode(id);
-    const podcast = episode && getPodcast(episode.podcastId);
+    const episode = await app.db.episodes.get(id);
+    const podcast = episode && podcasts[episode.podcastId];
     if (podcast) state[stateKey(podcast.url, episode.guid)] = rest;
   }
 
@@ -221,7 +190,7 @@ function exportData () {
     app        : 'zugriff-podcasts',
     version    : 1,
     exportedAt : new Date().toISOString(),
-    feeds      : getPodcasts().map(({ url, title }) => ({ url, title })),
+    feeds      : Object.values(podcasts).map(({ url, title }) => ({ url, title })),
     state,
   };
 }
@@ -235,7 +204,7 @@ async function importData (data, onProgress) {
   for (const feed of data.feeds) {
     const url = normalizeUrl(feed.url || '');
     if      (!url)                          results.push({ url: feed.url, skipped: 'no url' });
-    else if (getPodcast(podcastIdByHash(url))) results.push({ url, skipped: 'already subscribed' });
+    else if (await app.db.podcasts.get(podcastIdByHash(url))) results.push({ url, skipped: 'already subscribed' });
     else {
       try           { await subscribe(url); results.push({ url, added: true }); }
       catch (error) { results.push({ url, error: error?.message || String(error) }); }
@@ -244,15 +213,18 @@ async function importData (data, onProgress) {
   }
 
   // re-apply the saved progress now that the episodes exist
-  const rows = [];
-  for (const episode of app.state.episodes) {
-    const podcast = getPodcast(episode.podcastId);
+  const podcasts = await app.db.podcasts.toMap();
+  const rows     = [];
+
+  for (const episode of await app.db.episodes.toValues()) {
+    const podcast = podcasts[episode.podcastId];
     const saved   = podcast && data.state?.[stateKey(podcast.url, episode.guid)];
     if (saved) rows.push([episode.id, { ...EMPTY_PROGRESS, ...saved, updatedAt: Date.now() }]);
   }
+
   if (rows.length) {
     await app.db.progress.setMany(rows);
-    for (const [id, row] of rows) app.state.progress[id] = row;
+    for (const [id, row] of rows) app.ui.progress.set(id, row);
   }
 
   return results;
@@ -278,9 +250,7 @@ export { load, stateOf, setProgress, markDone, normalizeUrl };
 export default {
   load,
 
-  getPodcast, getPodcasts,
-  getEpisode, getEpisodes,
-  getSaved,   stateOf,
+  stateOf, savedIds,
 
   setProgress, markDone, toggleDone, toggleSaved,
   subscribe, refresh, refreshAll, unsubscribe,

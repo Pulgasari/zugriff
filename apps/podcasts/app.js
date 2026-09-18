@@ -4,6 +4,7 @@ const app = zugriff.app;
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
+import { signalStore } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,37 +26,42 @@ const // panels
 PlayerPanel = await app.panel('PlayerPanel');
 
 // :::: STATE
-app.state.busy   = '';   // a label while a long task runs
+// these three stay on app.state because shared code owns them: app.go() and the
+// router drive route, app.setDialog() drives dialog, and SearchPanel writes search.
+// everything below is this app's own, so it gets its own typed store.
 app.state.dialog = null; // 'add' | 'settings' | null
-app.state.route  = { name: 'latest', id: null };   // { name, id }
-app.state.search = '';   // shared episode filter
-app.state.menuPosition   = 'bottom';
-app.state.playerPosition = 'bottom';
+app.state.route  = { name: 'latest', id: null };
+app.state.search = '';
 
-// ::: LIBRARY
-app.state.podcasts = [];
-app.state.episodes = [];
-app.state.progress = {};
+app.ui = signalStore({
+  busy           : { type: String,   value: '' },     // a label while a long task runs
+  menuPosition   : { type: 'enum',   values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
+  playerPosition : { type: 'enum',   values: ['top', 'bottom'], value: 'bottom' },
 
-// filled once, before the first render, so the views stay synchronous. a storage
-// failure must not blank the app — it mounts either way, just empty.
+  // listening progress, keyed by episode id. the one part of the library that does
+  // not come out of the db per view — it is read per row and written while playing.
+  progress       : { type: 'record', value: {} },
+});
+
+// the db is the library; only the schema and the progress table are read up front.
+// a storage failure must not blank the app — it mounts either way, just empty.
 await app.library.load().catch(error => app.toast.error(error));
-app.thumbs.prewarm(app.library.getPodcasts().map(podcast => podcast.image));
+app.db.podcasts.toValues().then(rows => app.thumbs.prewarm(rows.map(podcast => podcast.image)));
 
 // :::::: ACTIONS
 
 async function refreshAll () {
-  if (!app.library.getPodcasts().length) { app.state.dialog = 'add'; return; }
-  app.state.busy = 'Refreshing…';
+  if (!await app.db.podcasts.count()) { app.state.dialog = 'add'; return; }
+  app.ui.busy = 'Refreshing…';
   try {
-    const results = await app.library.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.library.refreshAll((n, total) => app.ui.busy = `Refreshing ${n}/${total}…`);
     const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed  = results.filter(r => r.error).length;
     const type    = failed ? 'error' : 'success';
     const message = `${added} new episode(s), ${failed} feed(s) failed.`;
     app.toast({ message, type });
   }
-  finally { app.state.busy = ''; }
+  finally { app.ui.busy = ''; }
 }
 
 app.actions = {
@@ -84,8 +90,8 @@ app.hotkeys = {
 
 const $app = document.getElementById('app');
 app.effect(() => {
-  $app.dataset.menu   = app.state.menuPosition;
-  $app.dataset.player = app.state.playerPosition;
+  $app.dataset.menu   = app.ui.$menuPosition;
+  $app.dataset.player = app.ui.$playerPosition;
 });
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
