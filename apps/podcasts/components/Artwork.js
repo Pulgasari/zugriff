@@ -7,9 +7,9 @@ import Icon from '/.shared/js/components/Icon.js';
 const app = zugriff.app;
 const { thumbs } = app;
 
-export default function Artwork ({ src, size = 48, className = '', onClick }) {
+function Artwork ({ src, size = 48, className = '', onClick }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
-  let state = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
+  let state = useSignal({ value: { url: null, phase: src ? 'pending' : 'none', broken: false }});
 
   useEffect(() => {
     if (!src) { state = { url: null, phase: 'none', broken: false }; return; }
@@ -41,3 +41,5 @@ export default function Artwork ({ src, size = 48, className = '', onClick }) {
     ? html`<button class=${'art ' + className}>${pic}</button>`          
     : html`<div    class=${'art ' + className}>${pic}</div>`
 }
+
+export default Artwork;
