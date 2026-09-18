@@ -10,7 +10,9 @@
 
 export const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 
-function viaProxy (url) {
+// exported because the search endpoint needs the same escape hatch — it is the
+// generic "route this through the CORS proxy" helper, not an rss-only one.
+export function viaProxy (url) {
   const enc = encodeURIComponent(url);
   return URL_PROXY_RSS.includes('{url}') ? URL_PROXY_RSS.replaceAll('{url}', enc) : URL_PROXY_RSS + enc;
 }

@@ -6,7 +6,9 @@ Subscribe by RSS feed URL, play episodes with a docked player, and keep progress
 
 ## features
 
-- **subscribe by RSS** — paste a feed URL; RSS 2.0 and Atom are both parsed.
+- **add by name or URL** — one field: type a name to search Apple's podcast
+  directory, or paste a feed URL to subscribe to it directly. RSS 2.0 and Atom are
+  both parsed.
 - **latest episodes** — a combined, newest-first stream across every subscription.
 - **podcasts view** — grid or list, sorted alphabetically or by most recently
   updated (the feed with the newest episode first).

@@ -2,3 +2,52 @@
 NOTE FOR CLAUDE: YOU ARE NOT ALLOWED TO EDIT THIS
 BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
 */
+
+/*
+SUGGESTION — add-podcast dialog (dialogs/AddPodcastDialog.js)
+the markup is: .Modal.add-podcast > main > input, i.note, .results > li > button
+> .art + .meta > .title + .sub
+
+.add-podcast {
+  min-width: min(30rem, 92vw);
+
+  input[type='search'] { width: 100%; }
+
+  .note { color: var(--fg); opacity: 0.6; display: block; margin-block: 0.5rem; }
+
+  .results {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    max-height: 50vh;
+    overflow-y: auto;
+
+    li + li { border-top: 1px solid var(--line); }
+
+    button {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 3rem auto;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.5rem;
+      background: none;
+      border: 0;
+      border-radius: var(--radius);
+      text-align: left;
+      color: inherit;
+      cursor: pointer;
+
+      &:hover:not(:disabled) { background: var(--hover); }
+      &:disabled             { opacity: 0.5; cursor: default; }
+    }
+
+    .art { width: 3rem; border-radius: calc(var(--radius) / 2); }
+
+    .meta  { display: grid; gap: 0.15rem; min-width: 0; }
+    .title { font-weight: 600; }
+    .title, .sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sub   { opacity: 0.6; font-size: 0.85em; }
+  }
+}
+*/
