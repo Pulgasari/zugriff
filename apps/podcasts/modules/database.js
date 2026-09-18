@@ -40,19 +40,7 @@ const database = createDb('zugriff:podcasts');
 // all three tables in ONE upgrade. reading a table that does not exist yet
 // triggers its own lazy upgrade, and three of those race on a cold db.
 // setup() is a no-op from the second call on.
-async function load () {
-  await database.setup({ podcasts: {}, episodes: {}, state: {} });
 
-  const [podcasts, episodes, progress] = await Promise.all([
-    database.podcasts.toValues(),
-    database.episodes.toValues(),
-    database.state.toMap(),
-  ]);
-
-  app.state.podcasts = podcasts;
-  app.state.episodes = episodes;
-  app.state.progress = progress;
-}
 
 // :::::: IDS
 // cyrb53 (methods.js): a short, stable base-36 hash, so long urls and guids stay
@@ -291,7 +279,7 @@ export { database, load, podcastId, episodeId, stateOf, setProgress, markDone, n
 
 // the default is app.db
 export default {
-  load,
+  //load,
 
   getPodcast, getPodcasts,
   getEpisode, getEpisodes,
