@@ -14,6 +14,9 @@ import { useEffect, useState } from 'preact/hooks';
 // the last rows read under a key, so navigating back renders immediately and the
 // reload happens behind the already-drawn list instead of a loading flash.
 
+// the key is table + deps, so THE SAME table AND deps MUST MEAN THE SAME QUERY —
+// two views reading `podcasts` with no deps, one as a map and one as a list, would
+// hand each other the wrong shape out of here. name the query in the deps.
 const cache = new Map();
 const keyOf = (table, deps) => table + ':' + deps.join(',');
 
@@ -22,6 +25,9 @@ const keyOf = (table, deps) => table + ':' + deps.join(',');
 /**
  * a slice of one table, kept current. `null` until the first read lands, which is
  * how a view tells "still loading" from "nothing there".
+ *
+ * `deps` identify the query, not just its arguments: two different reads of one
+ * table need different deps, or they share a cache entry and its shape.
  */
 export function useTable (table, read, deps = []) {
   const key = keyOf(table, deps);

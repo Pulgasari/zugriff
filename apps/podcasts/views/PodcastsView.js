@@ -13,7 +13,7 @@ const sorting  = 'newest';
 const viewmode = 'list';
 
 function PodcastsView () {
-  const podcasts = useTable('podcasts', () => app.db.podcasts.toValues());
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toValues(), ['all']);
   if (!podcasts) return null;
 
   const sortedPodcasts = sortPodcasts(podcasts, sorting);

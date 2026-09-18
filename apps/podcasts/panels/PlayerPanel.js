@@ -12,10 +12,10 @@ const app = zugriff.app;
 
 export default function PlayerPanel () {
   const episode  = app.player.episode;
-  const podcasts = useTable('podcasts', () => app.db.podcasts.toMap());
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toValues(), ['all']);
   if (!episode) return null;
 
-  const podcast = podcasts?.[episode.podcastId];
+  const podcast = podcasts?.find(p => p.id === episode.podcastId);
   const dur     = app.player.duration || episode.duration || 0;
   const time    = app.player.time;
 

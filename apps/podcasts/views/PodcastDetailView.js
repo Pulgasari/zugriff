@@ -21,9 +21,9 @@ const sorting = 'newest';
 export default function PodcastDetailView ({ id }) {
   const back    = { label: 'Podcasts', onClick: () => app.go('podcasts') };
 
-  const podcast = useTable('podcasts', () => app.db.podcasts.get(id), [id]);
+  const podcast = useTable('podcasts', () => app.db.podcasts.get(id), ['one', id]);
   // every episode of this podcast is one prefix scan — that is what the key layout is for
-  const rows    = useTable('episodes', () => app.db.episodes.toValues(id + ':'), [id]);
+  const rows    = useTable('episodes', () => app.db.episodes.toValues(id + ':'), ['of', id]);
   if (podcast === null || !rows) return null;
   if (!podcast) return html`<${View} back=${back}><${Empty} icon='alert' title='Podcast not found' /></${View}>`;      
 

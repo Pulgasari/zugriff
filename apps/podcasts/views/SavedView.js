@@ -7,15 +7,18 @@ import { useTable }  from './../modules/hooks.js';
 const app = zugriff.app;
 
 function SavedView () {
-  const episodes = useTable('episodes', () => app.db.episodes.toMap());
-  const podcasts = useTable('podcasts', () => app.db.podcasts.toMap());
+  const episodes = useTable('episodes', () => app.db.episodes.toValues(), ['all']);
+  const podcasts = useTable('podcasts', () => app.db.podcasts.toValues(), ['all']);
   if (!episodes || !podcasts) return null;
+
+  const byId     = Object.fromEntries(episodes.map(ep => [ep.id, ep]));
+  const showById = Object.fromEntries(podcasts.map(p  => [p.id, p]));
 
   // the saved ids carry the order (newest saved first); the episodes come from the db
   const list = app.library.savedIds()
-    .map(id => episodes[id])
+    .map(id => byId[id])
     .filter(Boolean)
-    .map(ep => ({ ...ep, podcast: podcasts[ep.podcastId] }));
+    .map(ep => ({ ...ep, podcast: showById[ep.podcastId] }));
 
   const empty = {
     icon  : 'bookmarks',
