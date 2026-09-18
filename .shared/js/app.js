@@ -2,18 +2,19 @@
 
 // :::::: IMPORTS
 
-import { effect, signal } from '@aufbau/signals';
+import aufbau from '@aufbau/runtime';
+import { effect, signal, signalStore, local } from '@aufbau/signals';
+import webfonts           from '@aufbau/webfonts';
 import { createDB }       from '@bunker/db';
 
-import { createState }   from './app/state.js';
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
 import { toast }         from './modules/toast.js';
 
-import { registry }     from './data/apps.js';
-import { html, render } from './vendors.js';
+import { registry } from './data/apps.js';
+import { themes }   from './data/themes.js';
 
-import aufbau from '@aufbau/runtime';
+import { html, render } from './vendors.js';
 
 // :::::: HELPERS
 
@@ -70,6 +71,28 @@ async function promptInstall () {
   }
 }
 
+// :::::: STATE
+
+const $doc  = typeof document !== 'undefined' ? document : null;
+const $root = $doc?.documentElement ?? null;
+
+const THEME_PREFIX = 'zugriff:theme';   // :bg / :fg / :accent — read by boot.js pre-paint
+const COLOR_KEYS   = ['bg', 'fg', 'accent'];
+
+const writeColor = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} };
+
+const applyTheme = preset => {
+  const palette = themes[preset];
+  if (!$root || !palette) return;
+  $root.dataset.theme = preset;
+  for (const key of COLOR_KEYS) {
+    $root.style.setProperty(`--${key}`, palette[key]);
+    writeColor(`${THEME_PREFIX}:${key}`, palette[key]);
+  }
+  const meta = $doc.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = palette.bg;
+};
+
 // :::::: APP
 
 class ZugriffApp {
@@ -89,22 +112,14 @@ class ZugriffApp {
     this._hotkeys = createHotkeys(this._actions);
   }
 
-  // ::: loaders (app-relative). ui pieces resolve to a default export when present,
-  // else the namespace: component() from ./components, view() from ./views,
-  // panel() from ./panels, dialog() from ./dialogs; module() from the app root.
+  // ::: loaders (app-relative)
   import    = path => import(new URL(path, this.baseURL)).then(pick);
   component = name => this.import('components' + `/${name}.js`);
   dialog    = name => this.import('dialogs'    + `/${name}.js`);
   module    = name => this.import('modules'    + `/${name}.js`);
   panel     = name => this.import('panels'     + `/${name}.js`);
   view      = name => this.import('views'      + `/${name}.js`);
-  /*
-  component = name => import(new URL(`components/${name}.js`, this.baseURL)).then(pick);
-  module    = name => import(new URL(`modules/${name}.js`,    this.baseURL)).then(pick);
-  dialog    = name => import(new URL(`dialogs/${name}.js`,    this.baseURL)).then(pick)
-  panel     = name => import(new URL(`panels/${name}.js`,     this.baseURL)).then(pick);
-  view      = name => import(new URL(`views/${name}.js`,      this.baseURL)).then(pick);
-  */
+  
   // ::: actions
   get actions ()    { return this._actions; }
   set actions (obj) { for (const [id, fn] of Object.entries(obj ?? {})) this._actions.add(id, fn); }
@@ -162,6 +177,31 @@ class ZugriffApp {
   canInstall    = canInstall;
   isInstalled   = isInstalled;
   promptInstall = promptInstall;
+
+  // ::: state
+  state = signalStore({
+    color    : { type: 'scalar', value: config.color },
+    dir      : { type: 'scalar', value: config.dir },
+    font     : { type: String,   value: config.font  ?? 'Manrope' },
+    lang     : { type: 'scalar', value: config.lang },
+    theme    : { type: 'enum',   values: Object.keys(themes), value: config.theme ?? 'dracula' },
+    title    : { type: 'scalar', value: config.title ?? config.name ?? null },
+    viewport : { type: 'scalar', value: config.viewport },
+
+    // ui-frame state every app shares — persisted too: a dialog left open reopens
+    dialog : { type: 'scalar', value: null },
+    route  : { type: 'scalar', value: null },
+  }, {
+    key   : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
+    store : local, // should be: localStorage or 'local' but no need for export
+  });
+  this.state.$onEffects({
+    dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
+    font  : value => { if (value) webfonts?.init?.({ name: value, target: '--font' }); },
+    lang  : value => { if ($root && value) $root.lang = value; },
+    theme : value => applyTheme(value),
+    title : value => { if ($doc && value) $doc.title = value; },
+  });
 
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {
