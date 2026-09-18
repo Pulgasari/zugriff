@@ -17,7 +17,7 @@ PlayerPanel = await app.panel('PlayerPanel');
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
-app.database = await app.module('database');
+app.db       = await app.module('database');
 app.library  = await app.module('library');
 app.player   = await app.module('player');
 app.thumbs   = createThumbCache();
