@@ -4,7 +4,6 @@ const app = zugriff.app;
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
-import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
 const // shared components
