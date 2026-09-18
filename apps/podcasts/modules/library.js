@@ -85,7 +85,7 @@ const getSaved = () => Object.entries(app.state.progress)
 async function patchProgress (id, patch) {
   const next = { ...EMPTY_PROGRESS, ...app.state.progress[id], ...patch, updatedAt: Date.now() };
   app.state.progress[id] = next;
-  await db.setProgress(id, next);
+  await app.database.progress.set(id, next);
   return next;
 }
 
@@ -128,7 +128,7 @@ function toRecords (url, { episodes: entries, ...feed }) {
 // store a feed, then swap it into app.state in one assignment per collection —
 // a per-record write would publish that many times.
 async function store (podcast, eps) {
-  await db.setPodcast(podcast.id, podcast);
+  await app.database.podcasts.set(podcast.id, podcast);
   await db.putEpisodes(eps.map(ep => [ep.id, ep]));
 
   const fresh = new Set(eps.map(ep => ep.id));
@@ -189,9 +189,9 @@ async function refreshAll (onProgress) {
 async function unsubscribe (pid) {
   const keys = getEpisodes(pid).map(episode => episode.id);
 
-  await db.deletePodcast(pid);
-  await db.deleteEpisodes(keys);
-  await db.deleteProgress(keys);
+  await app.db.podcasts.delete(pid);
+  await app.db.episodes.delete(keys);
+  await app.db.progress.delete(keys);
 
   app.state.podcasts = app.state.podcasts.filter(podcast => podcast.id         !== pid);
   app.state.episodes = app.state.episodes.filter(episode => episode.podcastId  !== pid);
