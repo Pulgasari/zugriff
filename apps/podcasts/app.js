@@ -6,6 +6,16 @@ const app = zugriff.app;
 
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
+// :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
+
+// ::: HANDLE
+// before anything is imported that reads the handle: a component captured at module
+// scope sees whatever was on it at import time, and undefined stays undefined.
+app.db       = app.database;
+app.library  = await app.module('library');
+app.player   = await app.module('player');
+app.thumbs   = createThumbCache();
+
 const // shared components
 Dock = await zugriff.component('Dock'),
 Icon = await zugriff.component('Icon'),
@@ -13,14 +23,6 @@ Slot = await zugriff.component('Slot');
 
 const // panels
 PlayerPanel = await app.panel('PlayerPanel');
-
-// :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
-
-// ::: HANDLE
-app.db       = app.database;
-app.library  = await app.module('library');
-app.player   = await app.module('player');
-app.thumbs   = createThumbCache();
 
 // :::: STATE
 app.state.busy   = '';   // a label while a long task runs

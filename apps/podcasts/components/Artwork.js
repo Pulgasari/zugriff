@@ -5,41 +5,46 @@ import { useEffect } from 'preact/hooks';
 import Icon from '/.shared/js/components/Icon.js';
 
 const app = zugriff.app;
-const { thumbs } = app;
 
 function Artwork ({ src, size = 48, className = '', onClick }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
-  let state = useSignal({ value: { url: null, phase: src ? 'pending' : 'none', broken: false }});
+  const state = useSignal({ value: { url: null, phase: src ? 'pending' : 'none', broken: false }});
 
   useEffect(() => {
-    if (!src) { state = { url: null, phase: 'none', broken: false }; return; }
-    const cached = thumbs.peek(src);
-    if (cached) { state = { url: cached, phase: 'ready', broken: false }; return; }
+    // read the cache off the handle here, never at module scope: app.js hangs
+    // app.thumbs on it after this module has already been imported.
+    const thumbs = app.thumbs;
 
-    state = { url: null, phase: 'pending', broken: false };
+    if (!src) { state.value = { url: null, phase: 'none', broken: false }; return; }
+
+    const cached = thumbs.peek(src);
+    if (cached) { state.value = { url: cached, phase: 'ready', broken: false }; return; }
+
+    state.value = { url: null, phase: 'pending', broken: false };
     let alive = true;
     thumbs.request(src).then(url => {
       if (!alive) return;
-      state = url ? { url: url, phase: 'ready', broken: false }
-                  : { url: src, phase: 'orig',  broken: false };
+      state.value = url ? { url,      phase: 'ready', broken: false }
+                        : { url: src, phase: 'orig',  broken: false };
     });
     return () => { alive = false; };
   }, [src]);
 
-  const showImg = (state.phase === 'ready' || state.phase === 'orig') && !state.broken;
+  const { url, phase, broken } = state.value;
+  const showImg = (phase === 'ready' || phase === 'orig') && !broken;
 
-  const tag = onClick ? 'button' : 'div';
-  if (onClick) className += ' not-a-button';
+  // keep url and phase — only the loading of this one url failed
+  const onError = () => state.value = { ...state.value, broken: true };
 
-  const onError = () => state = { broken: true };
-  
-  const pic = onClick
-    ? html`<img loading='lazy' src=${state.url} onError=${onError} />`     
+  const classes = 'art ' + className + (onClick ? ' not-a-button' : '');
+
+  const pic = showImg
+    ? html`<img loading='lazy' src=${url} onError=${onError} />`
     : html`<${Icon} name='mdi:podcast' />`;
 
   return onClick
-    ? html`<button class=${'art ' + className}>${pic}</button>`          
-    : html`<div    class=${'art ' + className}>${pic}</div>`
+    ? html`<button class=${classes} onClick=${onClick}>${pic}</button>`
+    : html`<div    class=${classes}>${pic}</div>`;
 }
 
 export default Artwork;
