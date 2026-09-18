@@ -1,7 +1,7 @@
 // apps/podcasts/modules/player.js
 
 import { signal } from '@aufbau/signals';
-import { stateOf, setProgress, markDone } from './database.js';
+import { stateOf, setProgress, markDone } from './library.js';
 
 const audio = new Audio;
 audio.preload = 'metadata';

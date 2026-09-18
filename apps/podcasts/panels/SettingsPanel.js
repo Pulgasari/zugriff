@@ -12,7 +12,7 @@ import { URL_PROXY_RSS } from './../modules/feed.js';
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
 const app = zugriff.app;
-const { db } = app;
+const { library } = app;
 
 export default function SettingsPanel () {
   const proxyVal   = useSignal(app.settings.proxy);
@@ -20,7 +20,7 @@ export default function SettingsPanel () {
   const fileRef    = useRef(null);
 
   const doExport = () => {
-    const data = db.exportData();
+    const data = library.exportData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
     const a    = Object.assign(document.createElement('a'), {
@@ -39,7 +39,7 @@ export default function SettingsPanel () {
     app.state.dialog = null;
     app.state.busy = 'Importing…';
     try {
-      const results = await db.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
+      const results = await library.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
       const added   = results.filter(r => r.added).length;
       const failed  = results.filter(r => r.error).length;
       app.toast({ message: `Imported ${added} new` + (failed ? `, ${failed} failed` : ''), type: failed ? 'error' : 'success' });

@@ -13,8 +13,8 @@ import PlayToggle from './PlayToggle.js';
 const app = zugriff.app;
 
 function Item ({ episode }) {
-  const state      = app.db.stateOf(episode.id);
-  const podcast    = app.db.getPodcast(episode.podcastId);
+  const state      = app.library.stateOf(episode.id);
+  const podcast    = app.library.getPodcast(episode.podcastId);
   const dur        = state.duration || 0;
   const pct        = state.done ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
   const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     
@@ -42,11 +42,11 @@ function Item ({ episode }) {
         { 
           icon    : state.saved ? 'bookmark'         : 'bookmark-outline', 
           label   : state.saved ? 'Remove from list' : 'Save for later',
-          onClick : () => app.db.toggleSaved(episode.id)
+          onClick : () => app.library.toggleSaved(episode.id)
         },{
           icon    : state.done ? 'mdi:check-circle' : 'mdi:check-circle-outline',
           label   : state.done ? 'Mark unplayed'    : 'Mark as done',
-          onClick : () => app.db.toggleDone(episode.id),
+          onClick : () => app.library.toggleDone(episode.id),
         },{
           icon  : 'mdi:open-in-new',
           href  : episode.link,

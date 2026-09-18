@@ -11,7 +11,7 @@ const app = zugriff.app;
 
 export default function PlayerPanel () {
   const episode = app.player.episode; if (!episode) return null;
-  const podcast = app.db.getPodcast(episode.podcastId);
+  const podcast = app.library.getPodcast(episode.podcastId);
   const dur     = app.player.duration || episode.duration || 0;
   const time    = app.player.time;
 
@@ -73,10 +73,10 @@ export default function PlayerPanel () {
         </button>
         
         <${IconButton} 
-          icon=${app.db.stateOf(episode.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
+          icon=${app.library.stateOf(episode.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
           label="Mark as done"
-          active=${app.db.stateOf(episode.id).done}
-          onClick=${() => app.db.toggleDone(episode.id)} 
+          active=${app.library.stateOf(episode.id).done}
+          onClick=${() => app.library.toggleDone(episode.id)} 
           />
           
         <${IconButton}

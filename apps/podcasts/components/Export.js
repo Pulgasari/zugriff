@@ -9,7 +9,7 @@ import Button     from '/.shared/js/components/Button.js';
 const app = zugriff.app;
 
 function exportFeeds () {
-  const data = app.db.exportData();
+  const data = app.library.exportData();
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const href = URL.createObjectURL(blob);
   const name = `podcasts-${new Date().toISOString().slice(0, 10)}.json`;
@@ -31,7 +31,7 @@ async function importFeeds (file) {
   app.state.busy   = 'Importing…';
 
   try {
-    const results = await app.db.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
+    const results = await app.library.importData(data, (n, total) => app.state.busy = `Importing ${n}/${total}…`);
     const added   = results.filter(r => r.added).length;
     const failed  = results.filter(r => r.error).length;
 

@@ -22,9 +22,9 @@ URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
-app.db     = await app.module('database');
-app.player = await app.module('player');
-app.thumbs = createThumbCache();
+app.library = await app.module('library');
+app.player  = await app.module('player');
+app.thumbs  = createThumbCache();
 
 // :::: STATE
 app.state.busy   = '';   // a label while a long task runs
@@ -35,7 +35,7 @@ app.state.menuPosition   = 'bottom';
 app.state.playerPosition = 'bottom';
 
 // ::: LIBRARY
-// mirrored out of indexeddb by database.js, which reads and writes it from here.
+// mirrored out of indexeddb by library.js, which reads and writes it from here.
 // podcasts/episodes are arrays, so each is one signal a write replaces; progress is
 // keyed by episode id, so the player's position writes wake only the rows showing
 // that episode. none of these persist — app.state persists its seeded leaves only.
@@ -45,8 +45,8 @@ app.state.progress = {};
 
 // filled once, before the first render, so the views stay synchronous. a storage
 // failure must not blank the app — it mounts either way, just empty.
-await app.db.load().catch(error => app.toast.error(error));
-app.thumbs.prewarm(app.db.getPodcasts().map(podcast => podcast.image));
+await app.library.load().catch(error => app.toast.error(error));
+app.thumbs.prewarm(app.library.getPodcasts().map(podcast => podcast.image));
 
 // ::: SETTINGS
 /*
@@ -62,10 +62,10 @@ app.settings = typedSignal({
 // :::::: ACTIONS
 
 async function refreshAll () {
-  if (!app.db.getPodcasts().length) { app.state.dialog = 'add'; return; }
+  if (!app.library.getPodcasts().length) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
-    const results = await app.db.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.library.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
     const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed  = results.filter(r => r.error).length;
     const type    = failed ? 'error' : 'success';
