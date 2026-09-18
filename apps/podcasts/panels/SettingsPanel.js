@@ -7,7 +7,7 @@ import { useRef }        from 'preact/hooks';
 import Icon   from '/.shared/js/components/Icon.js';
 import Modal  from '/.shared/js/components/Modal.js';
 import Picker from '/.shared/js/components/Picker.js';
-import { DEFAULT_PROXY, getProxy, setProxy } from './../modules/feed.js';
+import { URL_PROXY_RSS } from './../modules/feed.js';
 
 const DEFAULT_IMG_RESIZER = 'https://img.pulgasari.dev/?url={url}&w={w}';
 
@@ -15,7 +15,7 @@ const app = zugriff.app;
 const { db } = app;
 
 export default function SettingsPanel () {
-  const proxyVal   = useSignal(getProxy());
+  const proxyVal   = useSignal(app.settings.proxy);
   const resizerVal = useSignal(app.settings.imgResizer);
   const fileRef    = useRef(null);
 
@@ -74,10 +74,10 @@ export default function SettingsPanel () {
           <span class="field-label">CORS proxy</span>
           <span class="field-hint">Most podcast feeds block direct browser requests. Feeds are fetched directly first, then through this proxy. <code>{url}</code> is replaced with the feed URL. Clear it to use direct requests only.</span>
           <input class="modal-input" type="text" value=${proxyVal.value}
-                 placeholder=${DEFAULT_PROXY}
+                 placeholder=${URL_PROXY_RSS}
                  onInput=${e => proxyVal.value = e.target.value} />
           <span class="field-row">
-            <button class="ghost small" onClick=${() => proxyVal.value = DEFAULT_PROXY}>Reset to default</button>
+            <button class="ghost small" onClick=${() => proxyVal.value = URL_PROXY_RSS}>Reset to default</button>
             <button class="ghost small" onClick=${() => proxyVal.value = ''}>Direct only</button>
           </span>
         </label>
@@ -106,7 +106,6 @@ export default function SettingsPanel () {
 
         <div class="modal-actions">
           <button onClick=${() => {
-            setProxy(proxyVal.value.trim());   // the live value; app.settings only persists it
             app.settings.proxy      = proxyVal.value.trim();
             app.settings.imgResizer = resizerVal.value.trim();
             app.state.dialog = null; app.toast.success('Settings saved');

@@ -5,25 +5,14 @@
 // the catch with a client-side-only podcast app: almost no podcast feed sends
 // CORS headers, so a direct `fetch()` from a page is blocked. so we try direct
 // first (it is faster and keeps the request between the browser and the feed),
-// and on failure fall back to a CORS proxy whose url the user controls in the
-// app's settings. `{url}` in the proxy template is replaced with the
-// encoded feed url; a template without the placeholder gets it appended.
+// and on failure fall back to a CORS proxy. `{url}` in the template is replaced
+// with the encoded feed url; a template without the placeholder gets it appended.
 
-export const DEFAULT_PROXY = 'https://api.allorigins.win/raw?url={url}';
-
-// the proxy is one app-wide setting, not a per-call argument — it never varies
-// between two fetches. settings writes it once, everything that fetches reads it
-// from here. an empty string is a deliberate "direct only" and is kept as such.
-let proxy = DEFAULT_PROXY;
-
-export const getProxy = ()      => proxy;
-export const setProxy = (value) => proxy = value ?? DEFAULT_PROXY;
+export const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 
 function viaProxy (url) {
-  const tpl = (proxy || '').trim();
-  if (!tpl) return null;
   const enc = encodeURIComponent(url);
-  return tpl.includes('{url}') ? tpl.replaceAll('{url}', enc) : tpl + enc;
+  return URL_PROXY_RSS.includes('{url}') ? URL_PROXY_RSS.replaceAll('{url}', enc) : URL_PROXY_RSS + enc;
 }
 
 async function get (url) {
@@ -34,18 +23,14 @@ async function get (url) {
 
 /**
  * fetch a feed's xml. tries a direct request first; on any failure (CORS,
- * network, http error) retries through the configured proxy. throws with a
+ * network, http error) retries through the proxy. throws with a
  * human message when both routes fail.
  */
 async function fetchFeed (url) {
-  let directError;
-  try         { return await get(url); }
-  catch (err) { directError = err; }
+  try   { return await get(url); }
+  catch { /* almost always CORS — fall through to the proxy */ }
 
-  const proxied = viaProxy(url);
-  if (!proxied) throw new Error(`could not reach the feed (${directError.message}). set a CORS proxy in settings to load feeds that block direct access.`);        
-
-  try         { return await get(proxied); }
+  try         { return await get(viaProxy(url)); }
   catch (err) { throw new Error(`could not reach the feed — direct and proxy both failed (${err.message})`); }
 }
 

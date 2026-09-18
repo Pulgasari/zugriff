@@ -6,7 +6,6 @@ const app = zugriff.app;
 
 import { typedSignal, oneOf, text, local } from '@aufbau/signals';
 import { createThumbCache } from '/.shared/js/thumbs.js';
-import { DEFAULT_PROXY } from './modules/feed.js';
 
 const // shared components
 Dock = await zugriff.component('Dock'),
