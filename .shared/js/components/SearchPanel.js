@@ -8,7 +8,7 @@ const app = zugriff.app;
 function SearchPanel ({ placeholder, appStateId: id = 'search' }) {
   const clear   = ()      => app.state[id] = '';
   const onInput = (event) => app.state[id] = event.detail.value;
-  const value   = app.state[id];
+  const value   = app.state['$' + id];   // the leaf's value; the bare name is its signal
 
   return html`
     <div class='SearchPanel search-panel'>

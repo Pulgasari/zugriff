@@ -114,16 +114,18 @@ class ZugriffApp {
   set hotkeys (map) { this._hotkeys.define(map); }
 
   // ::: state extension — the mechanism to grow app.state and wire effects.
-  // scalar/plain-data leaves land on the deep signal;
-  // `effects` are plain @aufbau/signals effects the caller passes as functions.
+  // `seed` is a signalStore schema ({ key: { type, value } }); `effects` are plain
+  // @aufbau/signals effects the caller passes as functions.
   extend = (seed = {}, effects = []) => {
-    for (const [key, value] of Object.entries(seed)) this.state[key] = value;
+    this.state.$extend(seed);
     for (const fn of [].concat(effects)) if (fn) effect(fn);
     return this;
   };
 
-  // persist a deep-signal subtree (app.state[key]) as one localStorage blob under
-  // `zugriff:<slug>:<key>`: hydrate first, then write back on any leaf change.
+  // persist a record leaf (app.state[key]) as one localStorage blob under
+  // `zugriff:<slug>:<key>`: hydrate first, then write back on any change.
+  // NOTE: still on the deep-signal surface ($signal/$update) — only apps/code uses
+  // it, and that app has not moved to the signalStore surface yet.
   persist = (key, storeKey = `zugriff:${this.slug}:${key}`) => {
     const node = this.state[key];
     if (!node?.$signal) return this;
@@ -137,10 +139,10 @@ class ZugriffApp {
     return this;
   };
 
-  // ::: state sugar — base leaves live on the deep signal
-  getState    = key          => this.state[key];
+  // ::: state sugar — `$key` is the leaf's value, the bare name is its signal
+  getState    = key          => this.state['$' + key];
   setState    = (key, value) => this.state[key] = value;
-  toggleState = (key, force) => this.state[key] = force ?? !this.state[key];
+  toggleState = (key, force) => this.state[key] = force ?? !this.state['$' + key];
   resetState  = key          => this.state[key] = key in this.config ? this.config[key] : null;
   setDialog   = (id = null)  => this.state.dialog = id;
   setRoute    = (id = null)  => this.state.route  = id;
@@ -148,7 +150,7 @@ class ZugriffApp {
   // ::: modal helpers (app.state.modal drives an app's overlays)
   openModal   = id => this.state.modal = id;
   closeModal  = () => this.state.modal = null;
-  toggleModal = id => this.state.modal = this.state.modal === id ? null : id;
+  toggleModal = id => this.state.modal = this.state.$modal === id ? null : id;
 
   // ::: command dispatch (app.commands is a Map<id, { exec }>)
   exec = id => this.commands?.get(id)?.exec();

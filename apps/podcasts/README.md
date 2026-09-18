@@ -53,11 +53,12 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 - `app.library` / `app.player` / `app.thumbs` — the modules. `app.library` is read
   synchronously (plain calls, no `.value`); `app.js` awaits `app.library.load()`
   once before mounting, so the first render already has the library.
-- `app.ui` — this app's own state as a `signalStore` (`@aufbau/signals`): `busy`,
-  `menuPosition`, `playerPosition` and `progress`. A leaf reads as its signal
-  (`app.ui.busy.value`), `$name` as its value (`app.ui.$busy`). `route`, `dialog`
-  and `search` stay on `app.state`, because shared code owns them — `app.go()` and
-  the router, `app.setDialog()`, and `SearchPanel`.
+- `app.state` — a `signalStore` (`@aufbau/signals`, built in `.shared/js/app/state.js`).
+  A leaf reads as **its signal**, `$name` as its value:
+  `app.state.busy.value` / `app.state.$busy`, and `app.state.$busy = '…'` writes it.
+  `createState` declares the frame every app shares (theme, font, dialog, route, …);
+  this app adds `busy`, `search`, `menuPosition`, `playerPosition` and `progress` with
+  `$extend`. Only the declared frame persists — an added leaf has to ask for it.
 - There is no mirror of podcasts and episodes. The db is the one copy; views read
   the tables they need through `useTable` (`modules/hooks.js`) and reload on
   `@bunker/db`'s change feed, which also carries across tabs.
@@ -92,7 +93,7 @@ destructuring the stable module refs); shared components load from
   feed minus its episodes, each episode record the parsed entry plus its keys, so
   nothing is copied field by field on the way in. Subscribing, refreshing and
   unsubscribing are plain db writes; the views hear about them through the change
-  feed. Only `progress` is held in memory (`app.ui.progress`), because it is read
+  feed. Only `progress` is held in memory (`app.state.progress`), because it is read
   per row and written while an episode plays.
 - **`modules/hooks.js`** — `useTable(table, read, deps)`: a view's slice of the db,
   reloaded when that table changes, in this tab or another. Returns `null` until

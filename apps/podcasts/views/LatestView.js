@@ -31,9 +31,9 @@ export default function LatestView () {
       hint   : 'Add a podcast by its RSS feed URL to see its latest episodes here.',
       action : html`<${Button} icon='add' label='Add a podcast' onClick=${() => app.state.dialog = 'add'} />`     
     } : { 
-      icon  : app.state.search ? 'mdi:magnify-close' : 'mdi:playlist-remove',
-      title : app.state.search ? 'Nothing matches your filter' : 'No episodes found',
-      hint  : app.state.search ? '' : 'Try refreshing your feeds.'
+      icon  : app.state.$search ? 'mdi:magnify-close' : 'mdi:playlist-remove',
+      title : app.state.$search ? 'Nothing matches your filter' : 'No episodes found',
+      hint  : app.state.$search ? '' : 'Try refreshing your feeds.'
     };
 
   return html`
@@ -44,7 +44,7 @@ export default function LatestView () {
           <${IconButton}
             icon="refresh" 
             onClick=${() => app.actions.run('refresh-all')} 
-            disabled=${!!app.ui.$busy} 
+            disabled=${!!app.state.$busy} 
           />
         </div>
       </header>

@@ -46,11 +46,11 @@ export function createRouter (app, { routes, param = 'route', fallback } = {}) {
   app.routes   = list;
 
   const Outlet = () => {
-    const route = byId.get(app.state.route);
+    const route = byId.get(app.state.$route);
     return route?.component ? html`<${route.component} />` : null;
   };
 
-  return { routes: list, go, current: () => byId.get(app.state.route), Outlet };
+  return { routes: list, go, current: () => byId.get(app.state.$route), Outlet };
 }
 
 export default createRouter;

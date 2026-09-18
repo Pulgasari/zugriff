@@ -64,7 +64,7 @@ function SettingsPanel () {
   useEffect(() => {
     if (!app || !host.current) return;
     const spec   = buildSpec(app.config);
-    const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state[key]]));
+    const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));   // the leaf's value, not its signal
     const panel  = gui.controls(spec, {
       values,
       onChange: (next, key) => { if (key != null) app.state[key] = next[key]; },
