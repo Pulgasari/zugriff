@@ -5,17 +5,14 @@
 // the catch with a client-side-only podcast app: almost no podcast feed sends
 // CORS headers, so a direct `fetch()` from a page is blocked. so we try direct
 // first (it is faster and keeps the request between the browser and the feed),
-// and on failure fall back to a CORS proxy whose url the user controls in the
-// app's settings. `{url}` in the proxy template is replaced with the
-// encoded feed url; a template without the placeholder gets it appended.
+// and on failure fall back to a CORS proxy. `{url}` in the template is replaced
+// with the encoded feed url; a template without the placeholder gets it appended.
 
-export const DEFAULT_PROXY = 'https://api.allorigins.win/raw?url={url}';
+export const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 
-function viaProxy (proxy, url) {
-  const tpl = (proxy || '').trim();
-  if (!tpl) return null;
+function viaProxy (url) {
   const enc = encodeURIComponent(url);
-  return tpl.includes('{url}') ? tpl.replaceAll('{url}', enc) : tpl + enc;
+  return URL_PROXY_RSS.includes('{url}') ? URL_PROXY_RSS.replaceAll('{url}', enc) : URL_PROXY_RSS + enc;
 }
 
 async function get (url) {
@@ -26,18 +23,14 @@ async function get (url) {
 
 /**
  * fetch a feed's xml. tries a direct request first; on any failure (CORS,
- * network, http error) retries through the configured proxy. throws with a
+ * network, http error) retries through the proxy. throws with a
  * human message when both routes fail.
  */
-async function fetchFeed (url, proxy = DEFAULT_PROXY) {
-  let directError;
-  try         { return await get(url); }
-  catch (err) { directError = err; }
+async function fetchFeed (url) {
+  try   { return await get(url); }
+  catch { /* almost always CORS — fall through to the proxy */ }
 
-  const proxied = viaProxy(proxy, url);
-  if (!proxied) throw new Error(`could not reach the feed (${directError.message}). set a CORS proxy in settings to load feeds that block direct access.`);        
-
-  try         { return await get(proxied); }
+  try         { return await get(viaProxy(url)); }
   catch (err) { throw new Error(`could not reach the feed — direct and proxy both failed (${err.message})`); }
 }
 
