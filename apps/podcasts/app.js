@@ -22,9 +22,9 @@ URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: HANDLE
-app.db     = await app.module('database');
-app.player = await app.module('player');
-app.thumbs = createThumbCache();
+app.library = await app.module('library');
+app.player  = await app.module('player');
+app.thumbs  = createThumbCache();
 
 // :::: STATE
 app.state.busy   = '';   // a label while a long task runs
@@ -41,16 +41,16 @@ app.state.progress = {};
 
 // filled once, before the first render, so the views stay synchronous. a storage
 // failure must not blank the app — it mounts either way, just empty.
-await app.db.load().catch(error => app.toast.error(error));
-app.thumbs.prewarm(app.db.getPodcasts().map(podcast => podcast.image));
+await app.library.load().catch(error => app.toast.error(error));
+app.thumbs.prewarm(app.library.getPodcasts().map(podcast => podcast.image));
 
 // :::::: ACTIONS
 
 async function refreshAll () {
-  if (!app.db.getPodcasts().length) { app.state.dialog = 'add'; return; }
+  if (!app.library.getPodcasts().length) { app.state.dialog = 'add'; return; }
   app.state.busy = 'Refreshing…';
   try {
-    const results = await app.db.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
+    const results = await app.library.refreshAll((n, total) => app.state.busy = `Refreshing ${n}/${total}…`);
     const added   = results.reduce((sum, r) => sum + (r.added || 0), 0);
     const failed  = results.filter(r => r.error).length;
     const type    = failed ? 'error' : 'success';

@@ -13,23 +13,23 @@ import SearchPanel   from '/.shared/js/components/SearchPanel.js';
 import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
-const { db, go, thumbs } = app;
+const { library, go, thumbs } = app;
 
 const sorting = 'newest';
 
 export default function PodcastDetailView ({ id }) {
   const back    = { label: 'Podcasts', onClick: () => app.go('podcasts') };
-  const podcast = app.db.getPodcast(id);
+  const podcast = app.library.getPodcast(id);
   if (!podcast) return html`<${View} back=${back}><${Empty} icon='alert' title='Podcast not found' /></${View}>`;      
 
-  const all       = sortEpisodes(app.db.getEpisodes(id), sorting);
+  const all       = sortEpisodes(app.library.getEpisodes(id), sorting);
   const episodes  = filterEpisodes(all, false);
-  const doneCount = all.filter(e => app.db.stateOf(e.id).done).length;
+  const doneCount = all.filter(e => app.library.stateOf(e.id).done).length;
 
   const remove = async () => {
     if (!confirm(`Unsubscribe from “${podcast.title}”? This removes its episodes and their progress.`)) return;
     const artwork = [podcast.image, ...all.map(e => e.image)].filter(Boolean);
-    await app.db.unsubscribe(id);
+    await app.library.unsubscribe(id);
     app.thumbs.evict(artwork).catch(() => {});
     app.toast.success('Unsubscribed');
     app.go('podcasts');
@@ -38,7 +38,7 @@ export default function PodcastDetailView ({ id }) {
   const refreshOne = async () => {
     app.state.busy = 'Refreshing…';
     try {
-      const { added } = await app.db.refresh(id);
+      const { added } = await app.library.refresh(id);
       const message = added ? `${added} new episode(s)` : 'Up to date';
       app.toast.success(message);
     }

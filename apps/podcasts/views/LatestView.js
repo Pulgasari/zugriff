@@ -12,8 +12,8 @@ import { filterEpisodes, sortEpisodes } from './../modules/methods.js';
 const app = zugriff.app;
 
 export default function LatestView () {
-  const hasSubs = app.db.getPodcasts().length > 0;
-  const recent  = filterEpisodes(sortEpisodes(app.db.getEpisodes(), 'newest'), true).slice(0, 200);
+  const hasSubs = app.library.getPodcasts().length > 0;
+  const recent  = filterEpisodes(sortEpisodes(app.library.getEpisodes(), 'newest'), true).slice(0, 200);
 
   const empty = !hasSubs
     ? {

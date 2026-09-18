@@ -1,6 +1,6 @@
 // apps/podcasts/modules/player.js
 
-import { stateOf, setProgress, markDone } from './database.js';
+import { stateOf, setProgress, markDone } from './library.js';
 
 class PlayerModule extends EventTarget {
   #audio    = new Audio();

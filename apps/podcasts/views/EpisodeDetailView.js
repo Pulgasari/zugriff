@@ -11,17 +11,17 @@ import Art        from './../components/Artwork.js';
 import { fmtDate, fmtDuration, paragraphs } from './../modules/methods.js';
 
 const app = zugriff.app;
-const { db, player, go } = app;
+const { library, player, go } = app;
 
 export default function EpisodeDetailView ({ id }) {
-  const episode = db.getEpisode(id);
+  const episode = library.getEpisode(id);
   if (!episode) return html`
     <${View} back=${{ label: 'Back', onClick: () => go('latest') }}>
       <${Empty} icon="mdi:alert-outline" title="Episode not found" />
     <//>`;
 
-  const podcast = db.getPodcast(episode.podcastId);
-  const st      = db.stateOf(id);
+  const podcast = library.getPodcast(episode.podcastId);
+  const st      = library.stateOf(id);
   const paras   = paragraphs(episode.description);
   const dur     = st.duration || episode.duration || 0;
   const pct     = st.done ? 100 : (dur && st.position ? Math.min(100, (st.position / dur) * 100) : 0);
@@ -38,12 +38,12 @@ export default function EpisodeDetailView ({ id }) {
     { 
       icon     : 'bookmark',
       label    : st.saved ? 'Remove from list' : 'Save for later',
-      onClick  : () => db.toggleSaved(id) 
+      onClick  : () => library.toggleSaved(id) 
     },
     { 
       icon     : st.done ? 'mdi:check-circle' : 'mdi:check-circle-outline',
       label    : st.done ? 'Mark unplayed' : 'Mark as done',
-      onClick  : () => db.toggleDone(id)
+      onClick  : () => library.toggleDone(id)
     },
     episode.link && { 
       icon: 'mdi:open-in-new', 

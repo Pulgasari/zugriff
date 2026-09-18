@@ -6,7 +6,7 @@ import View          from '/.shared/js/components/View.js';
 const app = zugriff.app;
 
 function SavedView () {
-  const list = app.db.getSaved();
+  const list = app.library.getSaved();
 
   const empty = {
     icon  : 'bookmarks',
