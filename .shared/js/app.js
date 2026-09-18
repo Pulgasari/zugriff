@@ -3,6 +3,8 @@
 // :::::: IMPORTS
 
 import { effect }        from '@aufbau/signals';
+import { createDB }      from '@bunker/db';
+
 import { createState }   from './app/state.js';
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
@@ -26,13 +28,14 @@ const pick = mod => mod?.default ?? mod;
 class ZugriffApp {
 
   constructor (slug) {
-    this.slug    = slug;
-    this.config  = configFor(slug);
-    this.baseURL = new URL(`/${slug}/`, location.origin);   // absolute — loaders resolve against it
-    this.url     = this.baseURL.href;
-    this.state   = createState(this.config);
-    this.toast   = toast;
-    this.effect  = effect;
+    this.slug     = slug;
+    this.config   = configFor(slug);
+    this.baseURL  = new URL(`/${slug}/`, location.origin);   // absolute — loaders resolve against it
+    this.url      = this.baseURL.href;
+    this.database = createDB('zugriff:' + slug);
+    this.state    = createState(this.config);
+    this.toast    = toast;
+    this.effect   = effect;
 
     // ::: behaviour registries — actions (named callbacks) + hotkeys wired to them
     this._actions = createActions();
