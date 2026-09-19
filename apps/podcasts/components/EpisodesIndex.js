@@ -21,13 +21,17 @@ function Item ({ episode }) {
   const podcast    = episode.podcast;
   const dur        = state.duration || 0;
   const pct        = state.done ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
-  const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     
+  //const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     
   const ref = useGesture({
     onSwipeLeft: () => alert('swipe left'),
   });
   
   return html`
-    <aufbau-item class=${classNames} ref=${ref}>
+    <aufbau-item 
+      class:done=${state.done}
+      class:playing=${app.player.episode?.id === episode.id}
+      ref=${ref}
+      >
       <${Artwork}
         aria-label='open episode'
         onClick=${() => app.go('episode', episode.id)}
