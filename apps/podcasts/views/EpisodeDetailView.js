@@ -64,7 +64,7 @@ export default function EpisodeDetailView ({ id }) {
   return html`
     <${View} class='episode-view' id='episode'>
       <header>
-        <${Button} ...${back} />
+        <${Button} icon='arrow-left' ...${back} />
       </header>
 
       <main>
