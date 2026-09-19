@@ -17,6 +17,8 @@ img { max-width: 100%; }
 
   --bg-darker  : color-mix(in oklch, black 10%, var(--bg));
   --bg-darkest : color-mix(in oklch, black 25%, var(--bg));
+
+  --accent-a50: color-mix(in oklch, var(--accent) 50%, transparent);
 }
 
 .Dock     { background-color: var(--bg-d-1); }
@@ -160,6 +162,18 @@ aufbau-item .art {
   .hint b  { color: var(--fg-75, var(--fg)); font-weight: 600; }
   
   button, aufbau-button, .btn { align-self: flex-start; }
+}
+
+/* MODAL */
+
+.modal-backdrop {
+  background: var(--accent-a50);
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--bg);
+  padding: 1rem;
 }
 
 /* SIDEBAR */
