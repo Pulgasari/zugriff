@@ -55,7 +55,7 @@ function PodcastDetailView ({ id }) {
   };
 
   return html`
-    <${View} class='podcast-view' id='podcast' back=${back}>
+    <${View} class='podcast-view' id='podcast'>
       <header>
         <${Button} icon='arrow-left' ...${back} />
         <h1>${podcast.title}</h1>
