@@ -131,16 +131,35 @@ aufbau-index[viewmode="list"] > * {
   object-fit: cover;
 }
 
-aufbau-item .art {
-  display: grid;
-  align-items: center;
-  justify-content: center;
-
-  aufbau-icon {
-    font-size: 2rem;
-    opacity: 0.25;
+aufbau-item {
+  .art, .artwork {
+    display: grid;
+    align-items: center;
+    justify-content: center;
+  
+    aufbau-icon {
+      font-size: 2rem;
+      opacity: 0.25;
+    }
+  }
+  .meta {
+    opacity: 0.5;
+  }
+  .title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1.25;
   }
 }
+
+
+
+/*.art, .not-a-button,*/
+.meta > button,
+aufbau-item .title {
+  display: contents!important;
+}
+
 
 /* INSTALL-TIP */
 
@@ -332,6 +351,10 @@ aufbau-tree, aufbau-tree-item { display: block; }
 
 .View header        { text-transform: uppercase; }
 .View header button { text-transform: uppercase; }
+
+/* OTHER STUFF */
+
+
 
 /*  */
 
