@@ -1,7 +1,7 @@
 // .shared/js/vendors.js
 
 //
-import { createHtml }                  from '@pulgasari/htx';
+
 import { isArray, isObject, isString } from '@pulgasari/is';
 
 // ::: pulgasari utils
@@ -28,13 +28,16 @@ const preact = {
 };
 
 // htx
-const html = createHtml(h, Fragment);
-const htx  = createHtml(h, Fragment);
+//const html = createHtml(h, Fragment);
+//const htx  = createHtml(h, Fragment);
+
+// htx
+export * from '@pulgasari/htx/preact.js';
 
 // :::::: EXPORT
 
 export * from 'preact';
 export * from 'preact/hooks';
 export { signal, Signal, computed, effect, batch, untracked };
-export { html, preact };
+export { preact };
 //export { htm, html, preact };
