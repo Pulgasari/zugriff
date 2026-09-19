@@ -57,7 +57,7 @@ function PodcastDetailView ({ id }) {
   return html`
     <${View} class='podcast-view' id='podcast'>
       <header>
-        <${Button} icon='arrow-left' ...${back} />
+        <${Button} icon='arrow-left' onClick=${() => app.go('podcasts')} />
         <h1>${podcast.title}</h1>
         <div class='actions'>
           <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.$busy} />
