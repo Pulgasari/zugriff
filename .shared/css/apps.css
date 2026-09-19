@@ -200,6 +200,33 @@ aufbau-item .art {
 button { padding: 0.5rem; }
 input  { padding: 0.5rem; width: 100%; }
 
+.modal .results {
+  li:nth-child(odd) {
+    background: #0002;
+  }
+  li button {
+    background: none;
+    border: none;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 0.5rem;
+    width: stretch;
+  }
+  li button {
+    .art {
+      aspect-ratio: 1;
+      height : 2rem;
+      object-fit: cover;
+      order: 2;
+      flex: 0;
+    }
+    .meta {
+      flex: 1;
+      text-align: left;
+    }
+  }
+}
+
 /* SIDEBAR */
 
 .sidebar {
