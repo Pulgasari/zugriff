@@ -7,6 +7,8 @@ import Empty      from '/.shared/js/components/Empty.js';
 import Index      from '/.shared/js/components/Index.js';
 import Progress   from '/.shared/js/components/Progress.js';
 
+import { useGesture } from '@aufbau/gestures/preact';
+
 import Artwork    from './Artwork.js';
 import PlayToggle from './PlayToggle.js';
 
@@ -20,9 +22,12 @@ function Item ({ episode }) {
   const dur        = state.duration || 0;
   const pct        = state.done ? 100 : (dur ? Math.min(100, state.position / dur * 100) : 0);
   const classNames = [state.done && 'done', app.player.episode?.id === episode.id && 'playing'].filter(Boolean).join(' ');     
-
+  const ref = useGesture({
+    onSwipeLeft: () => alert('swipe left'),
+  });
+  
   return html`
-    <aufbau-item class=${classNames}>
+    <aufbau-item class=${classNames} ref=${ref}>
       <${Artwork}
         aria-label='open episode'
         onClick=${() => app.go('episode', episode.id)}
