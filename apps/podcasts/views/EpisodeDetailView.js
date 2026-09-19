@@ -1,6 +1,7 @@
 // podcasts :: views/EpisodeDetailView.js
 
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
+import Button     from '/.shared/js/components/Button.js';
 import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
 import Progress   from '/.shared/js/components/Progress.js';
