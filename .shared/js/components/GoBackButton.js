@@ -1,10 +1,10 @@
 // components/GoBackButton.js
 
-export default function GoBackButton ({ go, ...rest }) {
+export default function ({ go, ...rest }) {
   return html`
     <${Button} 
       icon='arrow-left' 
-      onClick=${() => app.go('podcasts')}
+      onClick=${() => app.go(go)}
       ...${rest}
     />
   `;
