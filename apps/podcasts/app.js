@@ -115,16 +115,17 @@ app.views = {
 
 
 function App () {
+  const modal = app.state.$dialog;
   const route = app.state.$route;
   const view  = route.name in app.views ? route.name : 'latest';
 
   return html`<>
     <main id='app-main'>
-      <${Slot} map=${app.views} name=${view} load='view' id=${route.id} />
+      <${Slot} map=${app.views}   name=${view}  load='view' id=${route.id} />
+      <${Slot} map=${app.dialogs} name=${modal} load='dialog' />
     </main>
     <${PlayerPanel} />
     <${Dock} items=${dockItems} />
-    <${Slot} map=${app.dialogs} name=${app.state.$dialog} load='dialog' />
   </>`;
 }
 
