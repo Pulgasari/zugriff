@@ -3,6 +3,8 @@
 function fmt (sth = {}) {
   if (date     in sth) return fmt.date     (sth.date);
   if (duration in sth) return fmt.duration (sth.duration);
+  if (number   in sth) return fmt.number   (sth.number);
+  if (percent  in sth) return fmt.percent  (sth.percent);
   return '';
 }
 
@@ -42,12 +44,12 @@ fmt.duration = function (sec) {
 };
 
 // formats numbers with fixed decimals and separators (e.g. 12345.6 -> "12.345,60")
-fmt.number = function (val, decimals = 2, locale = 'de-DE') {
-  if (val == null || isNaN(val)) return '';
+fmt.number = function (value, decimals = 2, locale = 'de-DE') {
+  if (value == null || isNaN(value)) return '';
   return new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }).format(val);
+  }).format(value);
 };
 
 // formats a decimal as a percentage (e.g. 0.15 -> "15%")
