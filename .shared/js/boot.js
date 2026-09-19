@@ -308,6 +308,7 @@ function applyTheme (theme) {
       "@pulgasari/canonicalmap" : `${pkg}/js/canonicalmap.js`,
       "@pulgasari/coerce" : `${pkg}/js/coerce.js`,
       "@pulgasari/hash"   : `${pkg}/js/hash.js`,
+      "@pulgasari/htx"    : `${pkg}/js-packages/htx/index.js`,
       "@pulgasari/is"     : `${jsr}/@pulgasari/is`,
       "@pulgasari/logger" : `${jsr}/@pulgasari/logger`,
       "@pulgasari/num"    : `${pkg}/js/num.js`,
