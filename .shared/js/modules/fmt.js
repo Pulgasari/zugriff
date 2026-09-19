@@ -1,8 +1,8 @@
 // .shared/js/modules/fmt.js
 
-function fmt ({ date, duration } = {}) {
-  if (date     !== undefined && date     !== null) return fmt.date(date);
-  if (duration !== undefined && duration !== null) return fmt.duration(duration);
+function fmt (sth = {}) {
+  if (date     in sth) return fmt.date     (sth.date);
+  if (duration in sth) return fmt.duration (sth.duration);
   return '';
 }
 
@@ -11,17 +11,20 @@ fmt.date = function (ms) {
   if (!ms) return '';
   
   const timestamp = ms instanceof Date ? ms.getTime() : Number(ms);
-  if (isNaN(timestamp)) return '';
+  return isNaN(timestamp) ? '' : new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 
   /*
+  const timestamp = ms instanceof Date ? ms.getTime() : Number(ms);
+  if (isNaN(timestamp)) return '';
+  
   const diffInDays = (Date.now() - timestamp) / 86400000;
   if (diffInDays < 0) return new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });      
   if (diffInDays < 1) return 'today';
   if (diffInDays < 2) return 'yesterday';
   if (diffInDays < 7) return `${Math.floor(diffInDays)} days ago`;
-  */
-  
+
   return new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  */
 };
 
 // Formats seconds into a duration string (e.g. "1:30" or "1:02:03")
