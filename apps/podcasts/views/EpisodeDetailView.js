@@ -61,11 +61,15 @@ export default function EpisodeDetailView ({ id }) {
   };
 
   return html`
-    <${View} class='episode-view' id='episode' back=${back}>
+    <${View} class='episode-view' id='episode'>
       <header>
-        <${Art} src=${episode.image || podcast?.image} size=${160} className="ed-art" />
+        <${Button} ...${back} />
+      </header>
+
+      <main>
+        <${Art} src=${episode.image || podcast?.image} size=${160} />
         
-        <div class="info">
+        <div class='info'>
           ${podcast && html`<button onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
           <h1>${episode.title}</h1>
           <div class="meta">
@@ -77,11 +81,11 @@ export default function EpisodeDetailView ({ id }) {
           <${ActionMenu} items=${actions} />
           <${Progress} value=${percent} />
         </div>
-      </header>
-
-      ${paras.length
+  
+        ${paras.length
         ? html`<div>${paras.map((p,i) => html`<p key=${i}>${p}</p>`)}</div>`
         : html`<i>No description.</i>`}
-    <//>
+      </main>
+    </${View}>
   `;
 }
