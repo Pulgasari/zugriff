@@ -1,5 +1,8 @@
 // .shared/js/vendors.js
 
+//
+import { isArray, isObject, isString } from '@pulgasari/is';
+
 // ::: pulgasari utils
 export * from '@pulgasari/is';
 export * from '@pulgasari/obj';
@@ -8,9 +11,11 @@ export * from '@pulgasari/timing';
 
 // ::: preact + htm
 import htm from 'htm';
-import * as preactCore  from 'preact';
+import * as preactCore from 'preact';
 import * as preactHooks from 'preact/hooks';
 import { preactSignal, PreactSignal, computed, effect, batch, untracked } from '@aufbau/signals';
+
+const { h, Fragment } = preactCore;
 
 const signal = preactSignal;
 const Signal = PreactSignal;
@@ -21,55 +26,55 @@ const preact = {
   signal, Signal, computed, effect, batch, untracked,
 };
 
-// fragment-aware binding: htm emits an empty-string tag for `<>...</>`, which plain
-// htm.bind(h) would render as a literal empty element. mapping it to preact's Fragment
-// makes `<>...</>` a real fragment, so components skip the explicit <${Fragment}> wrapper.
-const { h, Fragment } = preactCore;
-const html = htm.bind((type, props, ...children) => h(type || Fragment, props, ...children));
+// :::::: CUSTOM H
 
-export * from 'preact';
-export * from 'preact/hooks';
-export { signal, Signal, computed, effect, batch, untracked };
-export { htm, html, preact };
+function addClass (classList, value) {
+  if (!value) return;
+  else if (isString(value)) classList.push(value);
+  else if  (isArray(value)) for (const item of value) addClass(classList, item);
+  else if (isObject(value)) for (const [className, enabled] of Object.entries(value)) if (enabled) classList.push(className);        
+}
 
+/* 
+Custom h function for preact/htm to support:
+- Fragment fallback for empty tags (<>...</>)
+- Merging multiple class and className attributes
+- Object syntax (e.g. class=${{ active: isTrue, disabled: false }})
+- Directive syntax (e.g. class:active=${isTrue})
+*/
+function customH (type, props, ...children) {
+  const targetType = type || Fragment;
 
+  if (!props) return h (targetType, props, ...children);
 
-// new
-
-import { h as preactH } from 'preact';
-
-// Custom h function to transform props before passing to Preact
-function customH(type, props, ...children) {
-  if (!props) {
-    return preactH(type, props, ...children);
-  }
-
-  const newProps = {};
+  const newProps  = {};
   const classList = [];
 
   for (const [key, value] of Object.entries(props)) {
     if (key.startsWith('class:')) {
       // Handle conditional class directives: class:active=${condition}
       const className = key.slice(6);
-      if (value) {
-        classList.push(className);
-      }
+      if (value) classList.push(className);
     } else if (key === 'class' || key === 'className') {
-      // Merge multiple class and className attributes
-      if (value) {
-        classList.push(value);
-      }
-    } else {
-      // Preserve all other props
-      newProps[key] = value;
-    }
+      // Handle strings, objects, or arrays passed to class/className
+      addClass(classList, value);
+    } 
+    else newProps[key] = value; // preserve all other props
+    
   }
 
   if (classList.length > 0) {
     newProps.class = classList.join(' ');
   }
 
-  return preactH(type, newProps, ...children);
+  return h (targetType, newProps, ...children);
 }
 
-export const html = htm.bind(customH);
+const html = htm.bind(customH);
+
+// :::::: EXPORT
+
+export * from 'preact';
+export * from 'preact/hooks';
+export { signal, Signal, computed, effect, batch, untracked };
+export { htm, html, preact };
