@@ -2,13 +2,14 @@
 
 //import { enumSignal } from '@aufbau/signals';
 
-import Button      from '/.shared/js/components/Button.js';
-import Empty       from '/.shared/js/components/Empty.js';
-import Icon        from '/.shared/js/components/Icon.js';
-import Link        from '/.shared/js/components/Link.js';
-import Picker      from '/.shared/js/components/Picker.js';
-import SearchPanel from '/.shared/js/components/SearchPanel.js';
-import View        from '/.shared/js/components/View.js';
+import Button       from '/.shared/js/components/Button.js';
+import Empty        from '/.shared/js/components/Empty.js';
+import GoBackButton from '/.shared/js/components/GoBackButton.js';
+import Icon         from '/.shared/js/components/Icon.js';
+import Link         from '/.shared/js/components/Link.js';
+import Picker       from '/.shared/js/components/Picker.js';
+import SearchPanel  from '/.shared/js/components/SearchPanel.js';
+import View         from '/.shared/js/components/View.js';
 
 import Artwork       from './../components/Artwork.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
@@ -57,7 +58,7 @@ function PodcastDetailView ({ id }) {
   return html`
     <${View} class='podcast-view' id='podcast'>
       <header>
-        <${Button} icon='arrow-left' onClick=${() => app.go('podcasts')} />
+        <${GoBackButton} go='podcasts'/>
         <h1>${podcast.title}</h1>
         <div class='actions'>
           <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.$busy} />
