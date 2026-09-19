@@ -8,6 +8,15 @@ function fmt (sth = {}) {
   return '';
 }
 
+// Formats bytes into human-readable file sizes (e.g. 1048576 -> "1 MB")
+fmt.bytes = function (bytes) {
+  if (!bytes || bytes < 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i     = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+};
+
+
 // Formats a timestamp or Date object into a relative or formatted date string
 fmt.date = function (ms) {
   if (!ms) return '';
@@ -29,7 +38,7 @@ fmt.date = function (ms) {
   */
 };
 
-// Formats seconds into a duration string (e.g. "1:30" or "1:02:03")
+// formats seconds into a duration string (e.g. "1:30" or "1:02:03")
 fmt.duration = function (sec) {
   if (sec === null || sec === undefined || isNaN(sec) || sec < 0) return '';
   
@@ -42,6 +51,21 @@ fmt.duration = function (sec) {
   
   return h ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
 };
+
+// escapes HTML special characters to prevent XSS in raw text insertions
+fmt.escapeHtml = function (str) {
+  return str ? String(str).replace(/[&<>"']/g, (match) => {
+    const map = {
+      '&': '&amp;', 
+      '<': '&lt;', 
+      '>': '&gt;', 
+      '"': '&quot;', 
+      "'": '&#39;',
+    };
+    return map[match];
+  }) : '';
+};
+
 
 // formats numbers with fixed decimals and separators (e.g. 12345.6 -> "12.345,60")
 fmt.number = function (value, decimals = 2, locale = 'de-DE') {
@@ -57,6 +81,20 @@ fmt.percent = function (value, decimals = 0) {
   return (value == null || isNaN(value)) ? ''
   : `${(value * 100).toFixed(decimals)}%`;
 };
+
+// returns singular or plural based on count
+fmt.plural = function (count, singular, plural) {
+  return `${count} ${count === 1 ? singular : plural}`;
+};
+
+// truncates text and appends an ellipsis if it exceeds max length
+fmt.truncate = function (str, maxLen = 30) {
+  if (!str) return '';
+  return str.length > maxLen ? `${str.slice(0, maxLen)}…` : str;
+};
+
+
+
 
 export default fmt;
 
