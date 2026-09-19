@@ -166,15 +166,39 @@ aufbau-item .art {
 
 /* MODAL */
 
+#app-main {
+  position: relative;
+}
+
 .modal-backdrop {
   background: var(--accent-a50);
   padding: 1rem;
+  display: grid;
+  inset: 0;
+  position: absolute;
+  z-index: 10;
 }
 
 .modal {
   background: var(--bg);
+  
+  
+  align-content: center;
+  align-self: center;
+  justify-self: center;
+  position: relative;
+  display: grid;
+  gap: 1rem;
   padding: 1rem;
+  overflow-y: auto;
+  
+  > header { display: grid; gap: 1rem; }
+  > main   { display: grid; gap: 1rem; }
+  > footer { display: grid; gap: 1rem; }
 }
+
+button { padding: 0.5rem; }
+input  { padding: 0.5rem; width: 100%; }
 
 /* SIDEBAR */
 
