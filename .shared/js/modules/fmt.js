@@ -12,13 +12,14 @@ fmt.date = function (ms) {
   
   const timestamp = ms instanceof Date ? ms.getTime() : Number(ms);
   if (isNaN(timestamp)) return '';
-  
+
+  /*
   const diffInDays = (Date.now() - timestamp) / 86400000;
-  
   if (diffInDays < 0) return new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });      
   if (diffInDays < 1) return 'today';
   if (diffInDays < 2) return 'yesterday';
   if (diffInDays < 7) return `${Math.floor(diffInDays)} days ago`;
+  */
   
   return new Date(timestamp).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 };
