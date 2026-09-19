@@ -11,8 +11,8 @@ export * from '@pulgasari/str';
 export * from '@pulgasari/timing';
 
 // ::: preact + htm
-import htm from 'htm';
-import * as preactCore from 'preact';
+//import htm from 'htm';
+import * as preactCore  from 'preact';
 import * as preactHooks from 'preact/hooks';
 import { preactSignal, PreactSignal, computed, effect, batch, untracked } from '@aufbau/signals';
 
@@ -36,4 +36,5 @@ const htx  = createHtml(h, Fragment);
 export * from 'preact';
 export * from 'preact/hooks';
 export { signal, Signal, computed, effect, batch, untracked };
-export { htm, html, preact };
+export { html, preact };
+//export { htm, html, preact };
