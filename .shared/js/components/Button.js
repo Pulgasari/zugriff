@@ -1,6 +1,5 @@
 // components/Button.js
 
-import { html } from './../vendors.js';
 import Icon     from './Icon.js';
 
 function Button ({ children, className, class: klass, icon, onClick, label, text, disabled, title }) {
@@ -11,6 +10,16 @@ function Button ({ children, className, class: klass, icon, onClick, label, text
     </button>
   `;
 }
+/*
+function Button ({ children, icon, label, text, ...rest }) {
+  return html`
+    <button ...${rest}>
+      ${icon && html`<${Icon} name=${icon} />`}
+      ${children || label || text}
+    </button>
+  `;
+}
+*/
 
 export       { Button };
 export default Button;
