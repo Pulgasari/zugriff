@@ -35,6 +35,16 @@ function addClass (classList, value) {
   else if (isObject(value)) for (const [className, enabled] of Object.entries(value)) if (enabled) classList.push(className);        
 }
 
+function setProp (props, key, value) {
+  if (key === 'class' || key === 'className' || key.startsWith('class:')) {
+    if (!props._classes) props._classes = [];
+    if (value != null && value !== false) {
+      props._classes.push({ key, value });
+    }
+  } 
+  else props[key] = value;
+}
+
 /* 
 Custom h function for preact/htm to support:
 - Fragment fallback for empty tags (<>...</>)
@@ -50,9 +60,20 @@ function customH (type, props, ...children) {
   const newProps  = {};
   const classList = [];
 
+  // 1. Process classes collected during htm prop parsing / spreading
+  if (props._classes) {
+    for (const { key, value } of props._classes) {
+      if (key.startsWith('class:')) {
+        const className = key.slice(6);
+        if (value) classList.push(className);
+      } 
+      else addClass(classList, value);
+    }
+  }
+
   for (const [key, value] of Object.entries(props)) {
+    if (key === '_classes') continue;
     if (key.startsWith('class:')) {
-      // Handle conditional class directives: class:active=${condition}
       const className = key.slice(6);
       if (value) classList.push(className);
     } else if (key === 'class' || key === 'className') {
@@ -63,10 +84,10 @@ function customH (type, props, ...children) {
     
   }
 
-  if (classList.length > 0) {
-    newProps.class = classList.join(' ');
-  }
+  // build classList
+  if (classList.length > 0) newProps.class = classList.join(' ');
 
+  // done!
   return h (targetType, newProps, ...children);
 }
 
