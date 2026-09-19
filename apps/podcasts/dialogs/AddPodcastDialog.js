@@ -1,32 +1,23 @@
-// apps/podcasts/dialogs/AddPodcastDialog.js
-// one field for both ways in: type a name to search Apple's directory, or paste a
-// feed url to subscribe to it directly. what you typed decides which it is.
+// podcasts :: dialogs/AddPodcastDialog.js
 
 import { useSignal } from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
 
+import Artwork from './../components/Artwork.js';
 import Loading from '/.shared/js/components/Loading.js';
 import Modal   from '/.shared/js/components/Modal.js';
 
-import Artwork            from './../components/Artwork.js';
 import { searchPodcasts } from './../modules/search.js';
 
-const app = zugriff.app;
+const app          = zugriff.app;
+const DEBOUNCE     = 300;
+const looksLikeUrl = (text) => /^(https?|feed|podcast):\/\//i.test(text) || (!/\s/.test(text) && /\.[a-z]{2,}(\/|$)/i.test(text));     
 
-const DEBOUNCE = 300;
-
-// a url is what you paste, a name is what you type: a scheme, or no whitespace and
-// a dot followed by a tld.
-const looksLikeUrl = (text) =>
-     /^(https?|feed|podcast):\/\//i.test(text)
-  || (!/\s/.test(text) && /\.[a-z]{2,}(\/|$)/i.test(text));
-
-export default function AddPodcastDialog () {
+function AddPodcastDialog () {
   const query   = useSignal('');
   const results = useSignal([]);
   const busy    = useSignal(false);
   const note    = useSignal('');
-
   const close = () => app.state.dialog = null;
 
   // search-as-you-type: the timer waits out the typing, the controller drops a
@@ -60,7 +51,6 @@ export default function AddPodcastDialog () {
       close();
       app.go('podcast', podcast.id);
     }
-    // the dialog stays open on a failure, so the url can be corrected rather than retyped
     catch (error) { app.toast.error(error); note.value = error?.message || String(error); }
     finally       { busy.value = false; }
   };
@@ -107,7 +97,10 @@ export default function AddPodcastDialog () {
               </button>
             </li>
           `)}
-        </ul>`}
+        </ul>
+     `}
     <//>
   `;
 }
+
+export default AddPodcastDialog;
