@@ -1,7 +1,6 @@
 // components/Modal.js
 
-import { html } from './../vendors.js';
-import Button   from './Button.js';
+import Button from './Button.js';
 
 function Modal ({ children, headline, info, actions, onClose, ...rest }) {
   // only the backdrop itself dismisses — clicks inside the dialog bubble up too
