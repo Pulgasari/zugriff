@@ -1,5 +1,7 @@
 // podcasts :: views/PodcastDetailView.js
 
+//import { enumSignal } from '@aufbau/signals';
+
 import Button      from '/.shared/js/components/Button.js';
 import Empty       from '/.shared/js/components/Empty.js';
 import Icon        from '/.shared/js/components/Icon.js';
@@ -8,7 +10,7 @@ import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import View        from '/.shared/js/components/View.js';
 
-import Art           from './../components/Artwork.js';
+import Artwork       from './../components/Artwork.js';
 import EpisodesIndex from './../components/EpisodesIndex.js';
 
 import { useTable } from './../modules/hooks.js';
@@ -19,6 +21,7 @@ import { plain, filterEpisodes, sortEpisodes } from './../modules/methods.js';
 const app            = zugriff.app;
 const sorting        = 'newest';
 const sortingOptions = ['newest', 'oldest', 'alpha'];
+//const indexSorting   = enumSignal('newest', ['newest', 'oldest', 'alpha']);
 
 function PodcastDetailView ({ id }) {
   const back    = { label: 'Podcasts', onClick: () => app.go('podcasts') };
@@ -52,8 +55,9 @@ function PodcastDetailView ({ id }) {
   };
 
   return html`
-    <${View} id='podcast' back=${back}>
+    <${View} class='podcast-view' id='podcast' back=${back}>
       <header>
+        <${Button} icon='arrow-left' ...${back} />
         <h1>${podcast.title}</h1>
         <div class='actions'>
           <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.$busy} />
@@ -61,26 +65,29 @@ function PodcastDetailView ({ id }) {
         </div>
       </header>
 
-      <div class='info'>
-        <${Art} src=${podcast.image} size=${140} />
-        <div class='stats'>${episodes.length} episodes · ${doneCount} done</div>
-        ${podcast.author      && html`<div class='author'>${podcast.author}</div>`}
-        ${podcast.description && html`<p class='about'>${plain(podcast.description).slice(0, 400)}</p>`}
-        ${podcast.link        && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
-      </div>
+      <main>
+        <${Artwork} src=${podcast.image} />
 
-      <div>
-        <span>Episodes</span>
-        <${Picker} onChange=${v => sorting = v} options=${sortingOptions} value=${sorting} />
-      </div>
+        <div class='info'>
+          <div class='stats'>${episodes.length} episodes · ${doneCount} done</div>
+          ${podcast.title       && html`<div class='title'>${podcast.title}</div>`}
+          ${podcast.author      && html`<div class='author'>${podcast.author}</div>`}
+          ${podcast.description && html`<p class='about'>${plain(podcast.description).slice(0, 400)}</p>`}
+          ${podcast.link        && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
+        </div>
 
-      <${EpisodesIndex}
-        episodes=${episodes}
-        empty=${{ 
-          icon  : 'mdi:magnify-close', 
-          title : 'Nothing matches your filter' 
-        }}
+        <div>
+          <span>Episodes</span>
+          <${Picker} onChange=${v => sorting = v} options=${sortingOptions} value=${sorting} />
+        </div>
+  
+        <${EpisodesIndex} episodes=${episodes}
+          empty=${{ 
+            icon  : 'mdi:magnify-close', 
+            title : 'Nothing matches your filter' 
+          }}
         />
+      </main>
     </${View}>
     ${all.length > 0 && html`<${SearchPanel} placeholder='filter episodes …' />`}
   `;
