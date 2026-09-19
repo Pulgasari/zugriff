@@ -33,3 +33,43 @@ export { signal, Signal, computed, effect, batch, untracked };
 export { htm, html, preact };
 
 
+
+// new
+
+import { h as preactH } from 'preact';
+
+// Custom h function to transform props before passing to Preact
+function customH(type, props, ...children) {
+  if (!props) {
+    return preactH(type, props, ...children);
+  }
+
+  const newProps = {};
+  const classList = [];
+
+  for (const [key, value] of Object.entries(props)) {
+    if (key.startsWith('class:')) {
+      // Handle conditional class directives: class:active=${condition}
+      const className = key.slice(6);
+      if (value) {
+        classList.push(className);
+      }
+    } else if (key === 'class' || key === 'className') {
+      // Merge multiple class and className attributes
+      if (value) {
+        classList.push(value);
+      }
+    } else {
+      // Preserve all other props
+      newProps[key] = value;
+    }
+  }
+
+  if (classList.length > 0) {
+    newProps.class = classList.join(' ');
+  }
+
+  return preactH(type, newProps, ...children);
+}
+
+export const html = htm.bind(customH);
