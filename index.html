@@ -67,7 +67,16 @@
     await import('/' + route + '/app.js');
   }
 </script>
-<script type='module' src='https://code.pulgasari.dev/js-packages/devtools/boot.js'></script>
+<script type="module">
+  // devtools are opt-in: any ?dev in the query pulls them in, ?dev=off / ?dev=0 keeps them out.
+  // the specifier comes from the importmap boot.js injects.
+  const dev = new URLSearchParams(location.search).get('dev');
+
+  if (dev !== null && dev !== 'off' && dev !== '0') {
+    try { await import('@pulgasari/devtools/boot.js'); }
+    catch (error) { console.error('[shell] devtools not loaded:', error); }
+  }
+</script>
 
 </body>
 </html>
