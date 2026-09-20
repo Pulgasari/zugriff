@@ -16,6 +16,7 @@ body:has(#devtools) {
     display : flex;
     gap     : 0.5rem;
     padding : 0.5rem;
+    font-size: 2rem;
   }
 
   > section {
