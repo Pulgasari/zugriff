@@ -43,6 +43,7 @@ body { background : var(--bg); color : var(--fg); }
 /* the #devtools chrome moved to @pulgasari/devtools/devtools.css, which the
    panel adopts itself — it is not the app's layout to carry */
 
+
 a { color: var(--accent); }
 
 ::selection { background: var(--accent-25); }
