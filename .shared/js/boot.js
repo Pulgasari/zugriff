@@ -308,8 +308,6 @@ function applyTheme (theme) {
       "@pulgasari/canonicalmap" : `${pkg}/js/canonicalmap.js`,
       "@pulgasari/coerce" : `${pkg}/js/coerce.js`,
       "@pulgasari/hash"   : `${pkg}/js/hash.js`,
-      "@pulgasari/htx"    : `${pkg}/js-packages/htx/index.js`,
-      "@pulgasari/htx/"   : `${pkg}/js-packages/htx/`,
       "@pulgasari/is"     : `${jsr}/@pulgasari/is`,
       "@pulgasari/logger" : `${jsr}/@pulgasari/logger`,
       "@pulgasari/num"    : `${pkg}/js/num.js`,
@@ -318,6 +316,11 @@ function applyTheme (theme) {
       "@pulgasari/str"    : `${jsr}/@pulgasari/str`,
       "@pulgasari/timing" : `${pkg}/js/timing.js`,
       "@pulgasari/url"    : `${pkg}/js/url.js`,
+
+      "@pulgasari/devtools"  : `${pkg}/js-packages/devtools/index.js`,
+      "@pulgasari/devtools/" : `${pkg}/js-packages/devtools/`,
+      "@pulgasari/htx"       : `${pkg}/js-packages/htx/index.js`,
+      "@pulgasari/htx/"      : `${pkg}/js-packages/htx/`,
 
       // ::: preact + htm — one instance only; dependents pin PREACT via
       // ?external= / ?deps= so esm.sh never ships a second copy
