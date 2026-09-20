@@ -66,9 +66,8 @@
     if (route === 'icons') await import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
     await import('/' + route + '/app.js');
   }
-
-  import '@pulgasari/devtools/boot.js';
 </script>
+<script type='module' src='https://code.pulgasari.dev/js-packages/devtools/boot.js'></script>
 
 </body>
 </html>
