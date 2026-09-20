@@ -32,7 +32,7 @@ const preact = {
 //const htx  = createHtml(h, Fragment);
 
 // htx
-export * from '@pulgasari/htx/preact.js';
+export * from '@pulgasari/htx/adapters/preact.js';
 
 // :::::: EXPORT
 
