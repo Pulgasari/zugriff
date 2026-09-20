@@ -40,6 +40,8 @@ body { background : var(--bg); color : var(--fg); }
   opacity    : 0.4;
 }
 
+/* the #devtools chrome moved to @pulgasari/devtools/devtools.css, which the
+   panel adopts itself — it is not the app's layout to carry */
 
 
 a { color: var(--accent); }
