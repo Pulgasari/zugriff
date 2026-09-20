@@ -45,7 +45,7 @@ body:has(#devtools) {
   display       : flex;
   flex-direction: column;
 
-  #app      { flex: 1; }
+  #app      { flex: 1; height: unset; }
   #devtools { flex: 0; }
 }
 
