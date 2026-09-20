@@ -46,14 +46,20 @@ const LOG_MAX    = 500;
 
 function initDevRecorder () {
   try {
-    const entries = [];
-    const native  = {};
+    const entries  = [];
+    const native   = {};
+    const recorder = { entries, levels: LOG_LEVELS, native, onPush: null };
 
     // arguments are kept as live references, not serialised: an inspector needs
-    // the real object, and the ring buffer keeps the retention bounded
+    // the real object, and the ring buffer keeps the retention bounded. onPush
+    // lets the devtools console take live entries without wrapping console a
+    // second time; it stays null until a panel claims it, and the buffer fills
+    // either way, so the recorder is useful on its own
     const push = (level, args) => {
-      entries.push({ level, args, time: Date.now() });
+      const entry = { level, args, time: Date.now() };
+      entries.push(entry);
       if (entries.length > LOG_MAX) entries.shift();
+      try { recorder.onPush?.(entry); } catch {}
     };
 
     for (const level of LOG_LEVELS) {
@@ -78,7 +84,7 @@ function initDevRecorder () {
     // panel reads the buffer through a buffered PerformanceObserver
     performance.setResourceTimingBufferSize?.(1000);
 
-    globalThis.__DEVTOOLS_RECORDER__ = { entries, levels: LOG_LEVELS, native };
+    globalThis.__DEVTOOLS_RECORDER__ = recorder;
   } catch {} // a recorder is never worth taking the page down for
 }
 
