@@ -19,6 +19,7 @@ Button      = await zugriff.component('Button'),
 GhostButton = await zugriff.component('GhostButton'),
 Icon        = await zugriff.component('Icon'),
 Nav         = await zugriff.component('Nav'),
+SearchPanel = await zugriff.component('SearchPanel'),
 Settings    = await zugriff.component('Settings');
 
 // :::::: RENDER
@@ -51,6 +52,7 @@ if (route === 'home') {
 
 else {
   await aufbau.init({ css: { theme: 'zombie' }});
+  await aufbau.setTheme('zombie');
 
   // :::::: CONFIG + STATES
 
@@ -89,6 +91,14 @@ else {
     }, []);
 
     return html`
+      <${SearchPanel} 
+        class=${'search-row launcher-search ' + position}
+        class:sticky=${sticky}
+        signal=${query}
+      />
+    `;
+    /*
+    return html`
       <div class=${['search-row launcher-search', sticky && 'sticky', position].filter(Boolean).join(' ')}>
         <${Icon} name="search" className="search-icon" />
         <input
@@ -101,6 +111,7 @@ else {
         />
         ${query.value && html`<${Button} icon="close" onClick=${() => query.value = ''}>`}
       </div>`;
+      */
   }
 
   function AppList () {
@@ -112,8 +123,8 @@ else {
         ${top && html`<${Filter} />`}
 
         <div class="launcher-categories">
-          <button class=${'chip' + (category.value === '' ? ' active' : '')} onClick=${() => category.value = ''}>all</button>
-          ${categories.map(name => html`<button class=${'chip' + (category.value === name ? ' active' : '')} onClick=${() => category.value = name}>${name}</button>`)}
+          <${Button} label='all' class='chip' class:active=${category.value === ''} onClick=${() => category.value = ''} />
+          ${categories.map(name => html`<${Button} label=${name} class='chip' class:active=${category.value === name} onClick=${() => category.value = name} />`)}
         </div>
 
         <ul id="tools">
@@ -155,6 +166,8 @@ else {
 }
 
 // apply filter + pattern to <body>
+//const bg = aufbau.theme.bg;
+//const fg = aufbau.theme.fg;
 const bg = getStyleToken('bg') || '#000000';
 const fg = getStyleToken('fg') || '#c8d0e0';
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
