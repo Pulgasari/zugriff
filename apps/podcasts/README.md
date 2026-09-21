@@ -13,7 +13,11 @@ Subscribe by RSS feed URL, play episodes with a docked player, and keep progress
   to it: description, artwork and the full episode list, read straight from the feed
   and stored nowhere. Subscribe from there, or **remember** it — a shortlist for the
   ones that look interesting but have not earned a subscription yet. A pasted feed
-  URL opens here too.
+  URL opens here too. Two tabs over one query — **podcasts** or single **episodes**
+  (an episode hit is a way into the show it came from) — and two filters that decide
+  what is searched at all: the **storefront** (`country`, which also decides the
+  language of what comes back) and the **field** the term is matched against (title,
+  author, description or genre). Both are remembered.
 - **latest episodes** — a combined, newest-first stream across every subscription.
 - **podcasts view** — grid or list, sorted alphabetically or by most recently
   updated (the feed with the newest episode first).
@@ -48,7 +52,8 @@ reference point (see `.shared/js/app.js`).
 
 ```
 app.js         assembles the handle: modules, state, actions, hotkeys, mount
-modules/       app logic — library, explore, database, player, feed, methods (pure helpers)
+modules/       app logic — library, explore, database, player, feed, search,
+               methods (pure helpers)
 views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail,
                Saved, Explore, ExplorePodcast
 panels/        chrome + overlays — Sidebar, Player, Search dock, Settings
@@ -106,6 +111,13 @@ destructuring the stable module refs); shared components load from
   unsubscribing are plain db writes; the views hear about them through the change
   feed. Only `progress` is held in memory (`app.state.progress`), because it is read
   per row and written while an episode plays.
+- **`modules/search.js`** — the iTunes Search API: `searchPodcasts` and
+  `searchEpisodes` over the same request, with `country` (the storefront) and
+  `attribute` (the field the term is matched against, `ATTRIBUTES`) passed through.
+  `any` is ours, not theirs — it stands for leaving `attribute` out. A parameter the
+  api rejects comes back as HTTP 200 with no results, so that is turned into an error
+  rather than read as "nothing found". The storefront list is
+  `/.shared/json/countries.json`, which `<aufbau-picker src=…>` loads by itself.
 - **`modules/explore.js`** — the same library seen from outside: the directory
   search, a feed read but not stored (`preview`, cached per url for the session) and
   the shortlist, a `shortlist` table of podcasts to come back to. A preview is keyed

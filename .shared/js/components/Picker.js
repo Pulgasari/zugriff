@@ -18,7 +18,9 @@ const normalize = opt => {
   return { value: opt, label: String(opt), icon: null, title: String(opt) };
 };
 
-function Picker ({ options = [], sig, value, onChange, look = 'segments', multiple }) {
+// `src` is a file of options the element loads for itself (json/csv/yaml — see
+// @aufbau/import); `options` and `src` can be used together, the loaded ones come last.
+function Picker ({ options = [], sig, value, onChange, look = 'segments', multiple, src, searchable, placeholder, class: klass }) {
   const current = sig ? sig.value : value;
 
   const change = event => {
@@ -28,7 +30,16 @@ function Picker ({ options = [], sig, value, onChange, look = 'segments', multip
   };
 
   return html`
-    <aufbau-picker class='picker' look=${look} multiple=${multiple} value=${current} onChange=${change}>
+    <aufbau-picker
+      class=${['picker', klass].filter(Boolean).join(' ')}
+      look=${look}
+      multiple=${multiple}
+      placeholder=${placeholder}
+      searchable=${searchable || undefined}
+      src=${src}
+      value=${current}
+      onChange=${change}
+      >
       ${options.map(normalize).map(
         opt => html`
           <aufbau-option

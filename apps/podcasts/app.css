@@ -54,9 +54,14 @@ the markup is: .Modal.add-podcast > main > input, i.note, .results > li > button
 
 /*
 SUGGESTION — explore (views/ExploreView.js, views/ExplorePodcastView.js)
+a row carrying .subscribed is already in the library — it is a way back to it
+rather than an offer. the tabs are a segments picker, the filters two comboboxes.
 markup:
-  .View#explore > header + main > input + [.Button] + [i.note] + [.loading]
-    + [.section] + aufbau-index > aufbau-item > .art + .meta + .title + .ActionMenu
+  .View#explore > header + main > .picker.tabs + input + .filters + [.Button]
+    + [i.note] + [.loading] + [.section]
+    + aufbau-index > aufbau-item > .art + .meta + .title + .ActionMenu
+  (on the episodes tab: aufbau-index.explore-episodes > aufbau-item
+    > .art + .meta + .title + .teaser + .ActionMenu)
   .View#explore-podcast > header(.actions) + main > .art + .info + .section
     + aufbau-index.preview-episodes > aufbau-item > .art + .meta + .title + .teaser + .Link
 
@@ -69,6 +74,14 @@ markup:
 
 .explore-view {
   > main > input { position: sticky; top: 0; z-index: 2; }
+
+  .picker.tabs .picker-option { flex: 1; }
+
+  .filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.5rem;
+  }
 
   .note { color: var(--fg-50, var(--fg)); font-style: normal; }
 
@@ -85,8 +98,12 @@ markup:
     button { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
   }
 
-  (subscribed = already in the library — the row is a way back to it, not an offer)
   aufbau-item.subscribed .title { opacity: 0.6; }
+
+  .explore-episodes {
+    .meta   { display: flex; gap: 0.5rem; }
+    .teaser { margin: 0; opacity: 0.6; font-size: 0.9rem; }
+  }
 }
 
 .explore-podcast-view {

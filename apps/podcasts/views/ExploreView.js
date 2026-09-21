@@ -4,26 +4,39 @@
 // which is the wrong move when the whole point is that you do not know yet: here a
 // hit opens the podcast, and what it is worth is decided after reading it.
 //
-// with no query the view is the shortlist — the podcasts an earlier look put aside.
+// two tabs over the same query: podcasts and single episodes, which is `entity` in
+// the directory's terms. next to them the two filters that decide what a search even
+// looks at — the storefront (`country`, and with it the language of what comes back)
+// and the field the term is matched against (`attribute`).
+//
+// with no query the podcasts tab is the shortlist — the ones an earlier look set aside.
 
-import { useSignal }        from '@aufbau/signals';
+import { useSignal }         from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 
 import Button      from '/.shared/js/components/Button.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
 import Loading     from '/.shared/js/components/Loading.js';
+import Picker      from '/.shared/js/components/Picker.js';
 import View        from '/.shared/js/components/View.js';
 
-import ExploreIndex from './../components/ExploreIndex.js';
+import ExploreEpisodes from './../components/ExploreEpisodes.js';
+import ExploreIndex    from './../components/ExploreIndex.js';
 
 import { useTable }     from './../modules/hooks.js';
 import { looksLikeUrl } from './../modules/methods.js';
 
-const app      = zugriff.app;
-const DEBOUNCE = 300;
+const app       = zugriff.app;
+const DEBOUNCE  = 300;
+const COUNTRIES = '/.shared/json/countries.json';
+const TABS      = [
+  { value: 'podcasts', label: 'podcasts', icon: 'mdi:podcast' },
+  { value: 'episodes', label: 'episodes', icon: 'mdi:playlist-play' },
+];
 
 export default function ExploreView () {
   const query   = app.state.$exploreQuery;
+  const tab     = app.state.$exploreTab;
   const results = useSignal([]);
   const busy    = useSignal(false);
   const note    = useSignal('');
@@ -38,29 +51,38 @@ export default function ExploreView () {
   const subscribedIds = useTable('podcasts',  () => app.db.podcasts.toKeys(),    ['keys']);
   const shortlist     = useTable('shortlist', () => app.db.shortlist.toValues(), ['all']);
 
-  const text = query.trim();
-  const isUrl = looksLikeUrl(text);
+  // podcast hits and episode hits are different shapes, so the list cannot keep the
+  // old tab's rows while the new tab's request is still on the wire
+  useEffect(() => { results.value = []; }, [tab]);
+
+  const text      = query.trim();
+  const isUrl     = looksLikeUrl(text);
+  const country   = app.state.$exploreCountry;
+  const attribute = app.state.$exploreAttribute;
 
   // search-as-you-type: the timer waits out the typing, the controller drops a
-  // request whose query has already moved on. a url is not searched for — it is the
-  // feed itself, and enter opens it.
+  // request whose query has already moved on. changing tab or filter re-runs it,
+  // since every one of them is part of the question. a url is not searched for — it
+  // is the feed itself, and enter opens it.
   useEffect(() => {
     note.value = '';
     if (!text || isUrl) { results.value = []; busy.value = false; return; }
 
     const controller = new AbortController();
+    const search     = tab === 'episodes' ? app.explore.episodes : app.explore.search;
+
     const timer = setTimeout(async () => {
       busy.value = true;
       try {
-        results.value = await app.explore.search(text, { signal: controller.signal });
-        if (!results.value.length) note.value = 'nothing found for that name';
+        results.value = await search(text, { country, attribute, signal: controller.signal });
+        if (!results.value.length) note.value = 'nothing found for that';
       }
       catch (error) { if (error.name !== 'AbortError') note.value = error.message; }
       finally       { if (!controller.signal.aborted) busy.value = false; }
     }, DEBOUNCE);
 
     return () => { clearTimeout(timer); controller.abort(); };
-  }, [text]);
+  }, [text, tab, country, attribute]);
 
   // the frame renders before the tables are in — the field is what this view is
   // for, and it should not wait on a db read to take the caret
@@ -82,10 +104,15 @@ export default function ExploreView () {
     finally       { busy.value = false; }
   };
 
-  const entries = text ? results.value : (shortlist ?? []);
+  // podcasts fall back to the shortlist with no query; episodes have nothing to
+  // stand in for them, so that tab says what to do instead
+  const onEpisodes = tab === 'episodes';
+  const entries    = text ? results.value : (onEpisodes ? [] : shortlist ?? []);
 
   const empty = text
-    ? { icon: 'mdi:magnify-close', title: 'Nothing found', hint: 'Try another name, or paste a feed URL.' }
+    ? { icon: 'mdi:magnify-close', title: 'Nothing found', hint: 'Try another name, another storefront, or paste a feed URL.' }
+    : onEpisodes
+    ? { icon: 'mdi:playlist-play', title: 'Search for an episode', hint: 'Episodes are found by title, author or description across the whole directory.' }
     : {
         icon  : 'bookmark-unfilled',
         title : 'Nothing on the shortlist',
@@ -102,6 +129,14 @@ export default function ExploreView () {
       </header>
 
       <main>
+        <${Picker}
+          class='tabs'
+          look='segments'
+          options=${TABS}
+          value=${tab}
+          onChange=${value => app.state.exploreTab = value}
+          />
+
         <input
           ref=${field}
           type='search'
@@ -111,22 +146,50 @@ export default function ExploreView () {
           onKeyDown=${event => { if (event.key === 'Enter' && isUrl) open(text); }}
           />
 
+        <div class='filters'>
+          <${Picker}
+            class='country'
+            look='combobox'
+            searchable
+            placeholder='storefront …'
+            src=${COUNTRIES}
+            value=${country}
+            onChange=${value => app.state.exploreCountry = value}
+            />
+          <${Picker}
+            class='attribute'
+            look='combobox'
+            placeholder='match …'
+            options=${app.explore.ATTRIBUTES}
+            value=${attribute}
+            onChange=${value => app.state.exploreAttribute = value}
+            />
+        </div>
+
         ${isUrl && html`
           <${Button} icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
 
         ${note.value && html`<i class='note'>${note.value}</i>`}
         ${busy.value && html`<${Loading} text='searching …' />`}
 
-        ${!text && !isUrl && html`<div class='section'><span>Shortlist</span></div>`}
+        ${!text && !isUrl && !onEpisodes && html`<div class='section'><span>Shortlist</span></div>`}
 
-        ${ready && !isUrl && html`
-          <${ExploreIndex}
-            entries=${entries}
-            remembered=${remembered}
-            subscribed=${subscribed}
-            empty=${empty}
-            onSubscribe=${subscribe}
-            />`}
+        ${ready && !isUrl && (onEpisodes
+          ? html`
+            <${ExploreEpisodes}
+              episodes=${entries}
+              remembered=${remembered}
+              subscribed=${subscribed}
+              empty=${empty}
+              />`
+          : html`
+            <${ExploreIndex}
+              entries=${entries}
+              remembered=${remembered}
+              subscribed=${subscribed}
+              empty=${empty}
+              onSubscribe=${subscribe}
+              />`)}
       </main>
     </${View}>
   `;

@@ -33,9 +33,16 @@ app.state.route = { name: 'latest', id: null };
 app.state.$extend({
   busy           : { type: String, value: '' },   // a label while a long task runs
   search         : { type: String, value: '' },   // shared episode filter, written by SearchPanel
-  exploreQuery   : { type: String, value: '' },   // the directory search, its own field
   menuPosition   : { type: 'enum', values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
   playerPosition : { type: 'enum', values: ['top', 'bottom'], value: 'bottom' },
+
+  // the explore view. the query and the tab are where you are right now; the
+  // storefront and the field to match against are how you search, and they say
+  // `persist` because they are a preference, not a position.
+  exploreQuery     : { type: String, value: '' },
+  exploreTab       : { type: 'enum', values: ['podcasts', 'episodes'], value: 'podcasts' },
+  exploreCountry   : { type: String, value: app.explore.localCountry(), persist: true },
+  exploreAttribute : { type: 'enum', values: app.explore.ATTRIBUTES.map(option => option.value), value: app.explore.ANY, persist: true },
 
   // listening progress, keyed by episode id. the one part of the library that does
   // not come out of the db per view — it is read per row and written while playing.

@@ -10,9 +10,9 @@
 
 // :::::: IMPORTS
 
-import { fetchFeed, parseFeed }                  from './feed.js';
+import { fetchFeed, parseFeed }                     from './feed.js';
 import { normalizeUrl, podcastIdByHash, toRecords } from './library.js';
-import { searchPodcasts }                        from './search.js';
+import { ANY, ATTRIBUTES, localCountry, searchEpisodes, searchPodcasts } from './search.js';
 
 // :::::: CONSTANTS
 
@@ -27,17 +27,29 @@ const idOf  = (entry = {}) => entry.id || podcastIdByHash(urlOf(entry));
 
 // :::::: SEARCH
 
+// the directory's own id is replaced by ours, so a result, a shortlist row and a
+// subscription speak about a podcast in one key — which is what makes "already
+// subscribed" a plain lookup instead of a url compare. an episode hit is keyed by
+// its podcast for the same reason: `podcastId` is what its row is read against.
+const keyed = (result) => {
+  const url = normalizeUrl(result.feedUrl);
+  return result.kind === 'episode'
+    ? { ...result, url, podcastId: podcastIdByHash(url) }
+    : { ...result, url, id: podcastIdByHash(url) };
+};
+
 /**
- * search the directory by name. the directory's own id is replaced by ours, so a
- * result, a shortlist row and a subscription speak about a podcast in one key —
- * which is what makes "already subscribed" a plain lookup instead of a url compare.
+ * search the directory by name. `options` are passed through to search.js:
+ * `country` (the storefront), `attribute` (the field the term is matched against),
+ * `limit` and `signal`.
  */
 async function search (term, options) {
-  const results = await searchPodcasts(term, options);
-  return results.map(result => {
-    const url = normalizeUrl(result.feedUrl);
-    return { ...result, url, id: podcastIdByHash(url) };
-  });
+  return (await searchPodcasts(term, options)).map(keyed);
+}
+
+/** the same search over single episodes, each carrying the podcast it belongs to */
+async function episodes (term, options) {
+  return (await searchEpisodes(term, options)).map(keyed);
 }
 
 // :::::: PREVIEW
@@ -117,12 +129,15 @@ async function subscribe (entry) {
 
 // :::::: EXPORT
 
-export { search, preview, shortlist, remember, forget, toggleRemembered, subscribe, idOf, urlOf };
+export { search, episodes, preview, shortlist, remember, forget, toggleRemembered, subscribe, idOf, urlOf };
 
-// the default is app.explore
+// the default is app.explore. the search options ride along on it, so a view reads
+// the whole of exploring off one handle.
 export default {
-  search, preview,
+  search, episodes, preview,
   shortlist, remember, forget, toggleRemembered,
   subscribe,
   idOf, urlOf,
+
+  ANY, ATTRIBUTES, localCountry,
 };
