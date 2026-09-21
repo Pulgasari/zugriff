@@ -9,6 +9,11 @@ Subscribe by RSS feed URL, play episodes with a docked player, and keep progress
 - **add by name or URL** — one field: type a name to search Apple's podcast
   directory, or paste a feed URL to subscribe to it directly. RSS 2.0 and Atom are
   both parsed.
+- **explore** — the same search, but a hit opens the podcast instead of subscribing
+  to it: description, artwork and the full episode list, read straight from the feed
+  and stored nowhere. Subscribe from there, or **remember** it — a shortlist for the
+  ones that look interesting but have not earned a subscription yet. A pasted feed
+  URL opens here too.
 - **latest episodes** — a combined, newest-first stream across every subscription.
 - **podcasts view** — grid or list, sorted alphabetically or by most recently
   updated (the feed with the newest episode first).
@@ -43,8 +48,9 @@ reference point (see `.shared/js/app.js`).
 
 ```
 app.js         assembles the handle: modules, state, actions, hotkeys, mount
-modules/       app logic — library, database, player, feed, methods (pure helpers)
-views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail, Saved
+modules/       app logic — library, explore, database, player, feed, methods (pure helpers)
+views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail,
+               Saved, Explore, ExplorePodcast
 panels/        chrome + overlays — Sidebar, Player, Search dock, Settings
 dialogs/       modal dialogs — Add podcast
 components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, …
@@ -52,7 +58,7 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 
 `app.js` hangs the modules on the handle and seeds the state:
 
-- `app.library` / `app.player` / `app.thumbs` — the modules. `app.library` is read
+- `app.library` / `app.explore` / `app.player` / `app.thumbs` — the modules. `app.library` is read
   synchronously (plain calls, no `.value`); `app.js` awaits `app.library.load()`
   once before mounting, so the first render already has the library.
 - `app.state` — a `signalStore` (`@aufbau/signals`, built in `.shared/js/app/state.js`).
@@ -64,6 +70,9 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 - There is no mirror of podcasts and episodes. The db is the one copy; views read
   the tables they need through `useTable` (`modules/hooks.js`) and reload on
   `@bunker/db`'s change feed, which also carries across tabs.
+- explore routes on the feed url rather than an id (`app.go('explore-podcast', url)`):
+  a podcast that is not subscribed has no record to point at, and the url is the one
+  thing that still means something after a reload.
 - `app.state` — the app's ephemeral ui state on the shared deep signal (`@aufbau/signals`),
   read/written **without** `.value`: `route` (`{name,id}`), `search`, `dialog`, `busy`.
   Leaves are read inside render to stay reactive, so they are never destructured at module
@@ -97,6 +106,13 @@ destructuring the stable module refs); shared components load from
   unsubscribing are plain db writes; the views hear about them through the change
   feed. Only `progress` is held in memory (`app.state.progress`), because it is read
   per row and written while an episode plays.
+- **`modules/explore.js`** — the same library seen from outside: the directory
+  search, a feed read but not stored (`preview`, cached per url for the session) and
+  the shortlist, a `shortlist` table of podcasts to come back to. A preview is keyed
+  by the same `toRecords` a subscription is keyed by, so an episode looked at today
+  and subscribed to tomorrow keeps its id and with it its progress. Subscribing hands
+  the already parsed feed to `library.subscribe`, so it does not go down the proxy
+  twice, and drops the shortlist row.
 - **`modules/hooks.js`** — `useTable(table, read, deps)`: a view's slice of the db,
   reloaded when that table changes, in this tab or another. Returns `null` until
   the first read lands, and remembers the last rows per key so navigating back

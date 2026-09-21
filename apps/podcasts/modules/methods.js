@@ -41,6 +41,11 @@ export function fmtDate (ms) {
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+// does this text look like a feed url rather than a name to search for? one field
+// serves both in the add dialog and in explore, so the answer has to live in one place.
+export const looksLikeUrl = (text = '') =>
+  /^(https?|feed|podcast):\/\//i.test(text) || (!/\s/.test(text) && /\.[a-z]{2,}(\/|$)/i.test(text));
+
 // strip html from a feed description for a one-line teaser
 export function plain (htmlStr = '') {
   const el = document.createElement('div');

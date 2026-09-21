@@ -8,10 +8,10 @@ import Loading from '/.shared/js/components/Loading.js';
 import Modal   from '/.shared/js/components/Modal.js';
 
 import { searchPodcasts } from './../modules/search.js';
+import { looksLikeUrl }   from './../modules/methods.js';
 
-const app          = zugriff.app;
-const DEBOUNCE     = 300;
-const looksLikeUrl = (text) => /^(https?|feed|podcast):\/\//i.test(text) || (!/\s/.test(text) && /\.[a-z]{2,}(\/|$)/i.test(text));     
+const app      = zugriff.app;
+const DEBOUNCE = 300;
 
 function AddPodcastDialog () {
   const query   = useSignal('');

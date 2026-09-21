@@ -31,11 +31,12 @@ const app = zugriff.app;
 const EMPTY_PROGRESS = { position: 0, duration: 0, done: false, doneAt: 0, saved: false, savedAt: 0, updatedAt: 0 };
 
 // :::::: LOAD
-// all three tables in one upgrade, then the progress table into app.state. podcasts and
-// episodes are not read here — the views do that for themselves.
+// every table in one upgrade, then the progress table into app.state. podcasts and
+// episodes are not read here — the views do that for themselves. `shortlist` belongs
+// to modules/explore.js, but the schema is declared once, at boot, in one place.
 
 async function load () {
-  await app.db.setup({ podcasts: {}, episodes: {}, progress: {} });
+  await app.db.setup({ podcasts: {}, episodes: {}, progress: {}, shortlist: {} });
   app.state.progress.replace(await app.db.progress.toMap());
 }
 
@@ -108,13 +109,16 @@ async function store (podcast, eps) {
 /**
  * subscribe to a feed by url. fetches, parses and stores it. throws on a bad feed
  * or an unreachable url so the caller can surface the message.
+ *
+ * `feed` is an already parsed feed — explore.js hands over the one its preview
+ * fetched, so subscribing from there does not go down the proxy a second time.
  */
-async function subscribe (rawUrl) {
+async function subscribe (rawUrl, feed) {
   const url = normalizeUrl(rawUrl);
   const pid = podcastIdByHash(url);
   if (await app.db.podcasts.get(pid)) throw new Error('already subscribed to this feed');
 
-  const parsed = parseFeed(await fetchFeed(url));
+  const parsed = feed ?? parseFeed(await fetchFeed(url));
   if (!parsed.episodes.length) throw new Error('no episodes found in this feed');
 
   const { podcast, episodes: eps } = toRecords(url, parsed);
@@ -243,8 +247,9 @@ function normalizeUrl (raw) {
 
 // :::::: EXPORT
 
-// named exports for direct importers — player.js writes progress
-export { load, stateOf, setProgress, markDone, normalizeUrl };
+// named exports for direct importers — player.js writes progress, explore.js keys a
+// preview the way a subscription would be keyed
+export { load, stateOf, setProgress, markDone, normalizeUrl, podcastIdByHash, toRecords };
 
 // the default is app.library
 export default {
