@@ -232,6 +232,7 @@ function applyTheme (theme) {
       "@aufbau/filters"         : `${pkg}/aufbau/filters/index.js`,
       "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
       "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
+      "@aufbau/gui"             : `${pkg}/aufbau/gui/index.js`,
       "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
       "@aufbau/kits/preact-htm" : `${pkg}/aufbau/kits/preact-htm.js`,
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
