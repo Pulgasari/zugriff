@@ -221,7 +221,10 @@ function applyTheme (theme) {
     return {
       '@/components/' : '/.shared/js/components/', // do not use
       '@/modules/'    : '/.shared/js/modules/',    // do not use
-      
+
+      "@aufbau/api"             : `${pkg}/aufbau/api/index.js`,
+      "@aufbau/ass"             : `${pkg}/aufbau/ass/index.js`,
+      "@aufbau/ass/"            : `${pkg}/aufbau/ass/`,
       "@aufbau/builders/docs"   : `${pkg}/aufbau/builders/docs/index.js`,
       "@aufbau/builders/docs/"  : `${pkg}/aufbau/builders/docs/`,
       "@aufbau/elements"        : `${pkg}/aufbau/elements/index.js`,
