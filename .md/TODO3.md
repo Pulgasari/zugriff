@@ -27,3 +27,7 @@
 // the api answers 429, and a 429 carries no access-control-allow-origin, which is what makes a
 // mask-image (loaded cross-origin in cors mode) fail its cors check in the console.
 ```
+
+## apps (builds)
+
+- [ ] aktuell sind die spaces ober- und unterhalb des app-screens bei den android-capacitor-apps schwarz anstatt bg-farbe des themes zu haben. wenn ich mich recht erinnere, sollte das gerade durch capacitor fixbar sein?
