@@ -10,8 +10,7 @@
 
 import Icon from './Icon.js';
 
-//import aufbau from '@aufbau/runtime';
-import gui      from '@aufbau/runtime/gui.js';
+import gui      from '@aufbau/gui';
 import webfonts from '@aufbau/webfonts';
 import { html, signal, useEffect, useRef } from './../vendors.js';
 import { themeNames, DEFAULT_THEME }       from './../data/themes.js';
@@ -54,9 +53,6 @@ function SettingsButton () {
   `;
 }
 
-// reads the page's app handle off the global runtime (zugriff.app), so a shared
-// component reaches this app's state without prop-drilling. gui.controls returns a
-// live dom subtree, mounted into the panel via a ref.
 function SettingsPanel () {
   const app  = globalThis.zugriff?.app;
   const host = useRef(null);
@@ -65,7 +61,7 @@ function SettingsPanel () {
     if (!app || !host.current) return;
     const spec   = buildSpec(app.config);
     const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));   // the leaf's value, not its signal
-    const panel  = gui.controls(spec, {
+    const panel  = gui.render(spec, {
       values,
       onChange: (next, key) => { if (key != null) app.state[key] = next[key]; },
     });
