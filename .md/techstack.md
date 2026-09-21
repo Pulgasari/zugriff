@@ -6,16 +6,14 @@ Als Framework benutzen wir **preact** in Kombination mit **htx** (eigener Fork v
 
 ## @aufbau
 
-- `@aufbau/elements` — the shared components are thin preact wrappers around the aufbau-elements, so the look comes from aufbau and the api stays preact
-- `@aufbau/filters`
+- `@aufbau/elements` — custom html-elements (webcomponents)
+- `@aufbau/filters` — visual effects/shaders via svg-filter
 - `@aufbau/import`
-- `@aufbau/patterns`
+- `@aufbau/patterns` — svg-patterns
 
 ## @bunker
 
 for caching and storage stuff we gonna use [@bunker](https://github.com/pulgasari/bunker/).
-
-`stored()` in `shared/js/lib/signals.js` is the persisted-signal helper every app uses for its settings.
 
 ## @domina
 
