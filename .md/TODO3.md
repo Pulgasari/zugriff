@@ -18,6 +18,13 @@
   - [ ] search-input (autofokusiert)
   - [ ] iconsets 
 
+## `apps/podcasts`
+- [ ] neuen View "explore" erstellen
+  - [ ] zunächst ist er im prinzip ähnlich zum 'add podcasts'-dialog, zumindest in dem sinne, dass man ne suche hat, und podcasts gelistet werden. aber bei klick auf podcasts, sieht man mehr infos, dessen episoden usw.
+  - [ ] man kann ihn dann manuell subscriben
+  - [ ] zusätzlich sollte man sich podcasts auch merken können (zweck: man weiss noch nicht im der podcast einem taugt, aber er weckt interesse beim exploren, man will ihn später genauer abchecken)
+  - [ ] im Dock verdrahten als viertes.
+
 ---
 
 ```
