@@ -24,6 +24,9 @@
   - [x] man kann ihn dann manuell subscriben
   - [x] zusätzlich sollte man sich podcasts auch merken können (zweck: man weiss noch nicht im der podcast einem taugt, aber er weckt interesse beim exploren, man will ihn später genauer abchecken)
   - [x] im Dock verdrahten als viertes.
+  - [x] `country` über picker wählbar (`/.shared/json/countries.json`, 158 storefronts)
+  - [x] `attribute` über picker wählbar (title / author / description / genre, plus "anything" = parameter weglassen)
+  - [x] tabs im explore-view: podcasts / episodes (`entity=podcast` bzw. `podcastEpisode`)
 
 ---
 
