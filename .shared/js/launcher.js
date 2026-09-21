@@ -28,6 +28,7 @@ Settings    = await zugriff.component('Settings');
 
 if (route === 'home') {
   await aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
+  //await aufbau.boot({ layout: 'landing', theme: 'zombie' });
 
   const Menu = () => html`
     <nav>
