@@ -1,14 +1,15 @@
 # techstack
 
-## @aufbau
+## preact + htx + @aufbau/signals
 
-the core we use gonna be `@aufbau/kits/preact-htm` containing all the
-aufbau-packages under one hood, combined with htm and preact (and some
-preact-extensions).
+Als Framework benutzen wir **preact** in Kombination mit **htx** (eigener Fork von **htm**) und **@aufbau/signals** (eigener Fork von **@preact/signals**).
+
+## @aufbau
 
 - `@aufbau/elements` — the shared components are thin preact wrappers around the aufbau-elements, so the look comes from aufbau and the api stays preact
 - `@aufbau/filters`
 - `@aufbau/import`
+- `@aufbau/patterns`
 
 ## @bunker
 
@@ -20,9 +21,12 @@ for caching and storage stuff we gonna use [@bunker](https://github.com/pulgasar
 
 for dom manipulation stuff we gonna use [@domina](https://github.com/pulgasari/domina/).
 
+- `@domina/methods`
+
 ## utils
 
 - `@pulgasari/is`
+- `@pulgasari/obj`
 - `@pulgasari/str`
 - `@pulgasari/timing`
 
@@ -31,7 +35,9 @@ for dom manipulation stuff we gonna use [@domina](https://github.com/pulgasari/d
 everything else comes off a cdn through the import map in
 `shared/js/boot.js` — yaml, smol-toml, csso, terser,
 html-minifier-terser, culori, pdf-lib, pdfjs, highlight.js, ffmpeg, upng-js.
-nothing is vendored into this repo; the ffmpeg core wasm alone is 32 mb and is
+nothing is vendored into this repo.
+
+the ffmpeg core wasm alone is 32 mb and is
 fetched on first use, then kept by the service worker.
 
 ## caching
