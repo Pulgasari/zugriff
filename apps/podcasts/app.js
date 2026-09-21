@@ -13,6 +13,7 @@ import { createThumbCache } from '/.shared/js/thumbs.js';
 // scope sees whatever was on it at import time, and undefined stays undefined.
 app.db       = app.database;
 app.library  = await app.module('library');
+app.explore  = await app.module('explore');
 app.player   = await app.module('player');
 app.thumbs   = createThumbCache();
 
@@ -32,6 +33,7 @@ app.state.route = { name: 'latest', id: null };
 app.state.$extend({
   busy           : { type: String, value: '' },   // a label while a long task runs
   search         : { type: String, value: '' },   // shared episode filter, written by SearchPanel
+  exploreQuery   : { type: String, value: '' },   // the directory search, its own field
   menuPosition   : { type: 'enum', values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
   playerPosition : { type: 'enum', values: ['top', 'bottom'], value: 'bottom' },
 
@@ -94,9 +96,10 @@ app.effect(() => {
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
 const dockItems = [
-  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'episodes'  },
+  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'latest'    },
   { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
-  { label: 'Later',    icon: 'bookmarks',             view: 'episodes'  },     
+  { label: 'Later',    icon: 'bookmarks',             view: 'saved'     },
+  { label: 'Explore',  icon: 'mdi:compass-outline',   view: 'explore'   },
 //{ label: 'Settings', icon: 'settings',            dialog: 'settings' },
 ];
 
@@ -110,6 +113,11 @@ app.views = {
   podcasts : 'PodcastsView',
   podcast  : 'PodcastDetailView',
   saved    : 'SavedView',
+
+  // explore routes on the feed url rather than an id — a podcast that is not
+  // subscribed has no record to point at (views/ExplorePodcastView.js)
+  explore           : 'ExploreView',
+  'explore-podcast' : 'ExplorePodcastView',
 };
 
 
