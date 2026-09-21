@@ -3,9 +3,10 @@
 // :::::: IMPORTS
 
 import aufbau from '@aufbau/runtime';
-import { effect, signal, signalStore, local } from '@aufbau/signals';
-import webfonts           from '@aufbau/webfonts';
-import { createDB }       from '@bunker/db';
+import { effect, signal, local }   from '@aufbau/signals';
+import { boolSignal, signalStore } from '@aufbau/signals';
+import webfonts                    from '@aufbau/webfonts';
+import { createDB }                from '@bunker/db';
 
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
@@ -71,7 +72,13 @@ async function promptInstall () {
   }
 }
 
-// :::::: STATE
+// :::::: STAT
+
+/*
+const LS = {
+  set : (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+}
+*/
 
 const $doc  = typeof document !== 'undefined' ? document : null;
 const $root = $doc?.documentElement ?? null;
@@ -121,8 +128,9 @@ class ZugriffApp {
     const config = this.config;
 
     const state = signalStore({
+      //dir: { signal: config.dir },
       color    : { type: 'scalar', value: config.color },
-      dir      : { type: 'scalar', value: config.dir },
+      dir      : { type: 'enum',   value: config.dir, values: ['ltr', 'rtl'] },
       font     : { type: String,   value: config.font  ?? 'Manrope' },
       lang     : { type: 'scalar', value: config.lang },
       theme    : { type: 'enum',   values: Object.keys(themes), value: config.theme ?? 'dracula' },
@@ -177,8 +185,8 @@ class ZugriffApp {
 
   // persist a record leaf (app.state[key]) as one localStorage blob under
   // `zugriff:<slug>:<key>`: hydrate first, then write back on any change.
-  // NOTE: still on the deep-signal surface ($signal/$update) — only apps/code uses
-  // it, and that app has not moved to the signalStore surface yet.
+  // NOTE: still on the deep-signal surface ($signal/$update) 
+  // — only apps/code uses it, and that app has not moved to the signalStore surface yet.
   persist = (key, storeKey = `zugriff:${this.slug}:${key}`) => {
     const node = this.state[key];
     if (!node?.$signal) return this;
@@ -199,6 +207,12 @@ class ZugriffApp {
   resetState  = key          => this.state[key] = key in this.config ? this.config[key] : null;
   setDialog   = (id = null)  => this.state.dialog = id;
   setRoute    = (id = null)  => this.state.route  = id;
+
+  // ::: new form after @aufbau/signals update
+  //getState    = this.state.get;
+  //setState    = this.state.set;
+  //toggleState = this.state.toggle;
+  //resetState  = this.state.reset;
 
   // ::: modal helpers (app.state.modal drives an app's overlays)
   openModal   = id => this.state.modal = id;
