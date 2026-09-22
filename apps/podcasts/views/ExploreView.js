@@ -21,9 +21,14 @@ import View        from '/.shared/js/components/View.js';
 import Artwork    from './Artwork.js';
 
 // ::: local modules
-import { useTable }     from './../modules/hooks.js';
-import { looksLikeUrl } from './../modules/methods.js';
-import { plain }        from './../modules/methods.js';
+import { fetchFeed, parseFeed } from './../modules/feed.js';
+import { useTable }             from './../modules/hooks.js';
+import { looksLikeUrl }         from './../modules/methods.js';
+import { plain }                from './../modules/methods.js';
+import { normalizeUrl, podcastIdByHash, toRecords } from './../modules/library.js';
+import { ANY, ATTRIBUTES, localCountry }            from './../modules/search.js';
+import { searchEpisodes, searchPodcasts }           from './../modules/search.js';
+
 
 // :::::: CONSTANTS
 
@@ -49,6 +54,115 @@ const state = {
 const explorer = {};
 explorer.rememberedPodcasts = new Set; // stub
 explorer.subscribedPodcasts = new Set; // stub
+
+// :::::: HELPERS
+
+// a directory hit, a shortlist row and a preview all describe the same podcast, so
+// they are all read through this: the feed url, and our own id derived from it.
+const urlOf = (entry = {}) => normalizeUrl(entry.url || entry.feedUrl || '');
+const idOf  = (entry = {}) => entry.id || podcastIdByHash(urlOf(entry));
+
+// :::::: SEARCH
+
+// the directory's own id is replaced by ours, so a result, a shortlist row and a
+// subscription speak about a podcast in one key — which is what makes "already
+// subscribed" a plain lookup instead of a url compare. an episode hit is keyed by
+// its podcast for the same reason: `podcastId` is what its row is read against.
+const keyed = (result) => {
+  const url = normalizeUrl(result.feedUrl);
+  return result.kind === 'episode'
+    ? { ...result, url, podcastId: podcastIdByHash(url) }
+    : { ...result, url, id: podcastIdByHash(url) };
+};
+
+/**
+ * search the directory by name. `options` are passed through to search.js:
+ * `country` (the storefront), `attribute` (the field the term is matched against),
+ * `limit` and `signal`.
+ */
+async function search (term, options) {
+  return (await searchPodcasts(term, options)).map(keyed);
+}
+
+/** the same search over single episodes, each carrying the podcast it belongs to */
+async function episodes (term, options) {
+  return (await searchEpisodes(term, options)).map(keyed);
+}
+
+// :::::: PREVIEW
+// a feed fetched and parsed but not stored. cached per url for the session: walking
+// out of a podcast and back into it should not go down the proxy again.
+
+const previews = new Map();   // url -> promise of { url, id, feed, podcast, episodes }
+
+/** read a feed without subscribing to it. throws the same way subscribing does. */
+function preview (rawUrl) {
+  const url = normalizeUrl(rawUrl);
+  if (!url) return Promise.reject(new Error('no feed url'));
+  if (previews.has(url)) return previews.get(url);
+
+  const job = (async () => {
+    const feed = parseFeed(await fetchFeed(url));
+    return { url, id: podcastIdByHash(url), feed, ...toRecords(url, feed) };
+  })();
+
+  // a failed fetch must not be what every later visit gets handed back
+  job.catch(() => previews.delete(url));
+
+  previews.set(url, job);
+  return job;
+}
+
+// :::::: SHORTLIST
+// "merken": a podcast that is interesting but has not earned a subscription yet. a
+// table rather than a mirror — the views read it through useTable like any other.
+
+/** what a shortlist row keeps: enough for a list, plus the url to go back to the feed */
+const toRow = (entry) => ({
+  id      : idOf(entry),
+  url     : urlOf(entry),
+  title   : entry.title  || urlOf(entry),
+  author  : entry.author || '',
+  image   : entry.image  || '',
+  genre   : entry.genre  || '',
+  count   : entry.count  ?? entry.episodeCount ?? 0,
+  addedAt : Date.now(),
+});
+
+const shortlist = () => app.db.shortlist.toValues();
+
+async function remember (entry) {
+  const row = toRow(entry);
+  if (!row.url) throw new Error('no feed url to remember');
+  await app.db.shortlist.set(row.id, row);
+  return row;
+}
+
+const forget = (entry) => app.db.shortlist.delete(idOf(entry));
+
+/** returns whether the podcast is on the shortlist afterwards */
+async function toggleRemembered (entry) {
+  const id = idOf(entry);
+  if (await app.db.shortlist.get(id)) { await app.db.shortlist.delete(id); return false; }
+  await remember(entry);
+  return true;
+}
+
+// :::::: SUBSCRIBE
+
+/**
+ * subscribe from an explore entry. reuses the parsed feed when this session has
+ * already previewed it, and drops the shortlist row — the podcast is in the library
+ * now, which is where the shortlist was pointing all along.
+ */
+async function subscribe (entry) {
+  const url = urlOf(entry);
+  const has = previews.has(url) ? await previews.get(url).catch(() => null) : null;
+
+  const podcast = await app.library.subscribe(url, has?.feed);
+  await app.db.shortlist.delete(podcast.id);
+  return podcast;
+}
 
 // :::::: ACTIONS
 
