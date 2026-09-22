@@ -2,8 +2,8 @@
 
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-import { enumSignal, stringSignal, useSignal } from '@aufbau/signals';
-import { useEffect, useRef }     from 'preact/hooks';
+import { boolSignal, enumSignal, stringSignal, useSignal } from '@aufbau/signals';
+import { useEffect, useRef }                               from 'preact/hooks';
 
 // ::: shared components
 import ActionMenu  from '/.shared/js/components/ActionMenu.js';
@@ -43,26 +43,10 @@ const TABS      = [
 
 // :::::: EXPLORER ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-const previews = new Map; // (temp feeds in session) url -> promise of { url, id, feed, podcast, episodes }
-
-const explorer = {};
-explorer.rememberedPodcasts = new Set; // stub
-explorer.subscribedPodcasts = new Set; // stub
-
-const state = {
-  filter : {
-    
-  },
-  search : stringSignal(''),
-  tab    :   enumSignal('podcasts', ['podcasts', 'episodes']),
-};
-
 // ::: helpers
 
 const urlOf = (entry = {}) => normalizeUrl(entry.url || entry.feedUrl || '');
-const idOf  = (entry = {}) => entry.id || podcastIdByHash(urlOf(entry));
-
-// ::: search
+const  idOf = (entry = {}) => entry.id || podcastIdByHash(urlOf(entry));
 
 const keyed = (result) => {
   const url = normalizeUrl(result.feedUrl);
@@ -71,11 +55,27 @@ const keyed = (result) => {
     : { ...result, url, id        : podcastIdByHash(url) };
 };
 
-const 
-search   = async (term, options) => (await searchPodcasts(term, options)).map(keyed),         
-episodes = async (term, options) => (await searchEpisodes(term, options)).map(keyed);         
+// ::: api
 
-// :::::: PREVIEW
+const loadSubscribedPodcasts = useTable('podcasts',  () => app.db.podcasts.toKeys(),    ['keys']);
+const loadRememberedPodcasts = useTable('shortlist', () => app.db.shortlist.toValues(), ['all']);
+
+
+const explorer = {};
+explorer.rememberedPodcasts = new Set (loadRememberedPodcasts?.map(row => row.id) ?? []);
+explorer.subscribedPodcasts = new Set (loadSubscribedPodcasts                     ?? []);
+explorer.searchEpisodes     = async (term, options) => (await searchEpisodes(term, options)).map(keyed);         
+explorer.searchPodcasts     = async (term, options) => (await searchPodcasts(term, options)).map(keyed);         
+
+// ::: state
+
+const previews = new Map; // (temp feeds in session) url -> promise of { url, id, feed, podcast, episodes }
+
+const state = {
+  isReady :   boolSignal (loadSubscribedPodcasts && loadRememberedPodcasts),
+  search  : stringSignal (''),
+  tab     :   enumSignal ('podcasts', ['podcasts', 'episodes']),
+};
 
 function preview (rawUrl) {
   const url = normalizeUrl(rawUrl);
@@ -83,7 +83,8 @@ function preview (rawUrl) {
   if (previews.has(url)) return previews.get(url);
 
   const job = (async () => {
-    const feed = parseFeed(await fetchFeed(url));
+    const fetched = await fetchFeed(url);
+    const feed    = parseFeed(fetched);
     return { url, id: podcastIdByHash(url), feed, ...toRecords(url,feed) };
   })();
 
@@ -95,7 +96,7 @@ function preview (rawUrl) {
 }
 
 const toRow = (entry) => ({
-  id      : idOf(entry),
+  id      :  idOf(entry),
   url     : urlOf(entry),
   title   : entry.title  || urlOf(entry),
   author  : entry.author || '',
@@ -105,6 +106,11 @@ const toRow = (entry) => ({
   addedAt : Date.now(),
 });
 
+// :::::: ACTIONS ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+const forget    = (entry) => app.db.shortlist.delete(idOf(entry));
+const shortlist = ()      => app.db.shortlist.toValues();
+const open      = (url)   => app.go('explore-podcast', url);
 
 async function remember (entry) {
   const row = toRow(entry);
@@ -113,20 +119,12 @@ async function remember (entry) {
   return row;
 }
 
-/** returns whether the podcast is on the shortlist afterwards */
 async function toggleRemembered (entry) {
   const id = idOf(entry);
   if (await app.db.shortlist.get(id)) { await app.db.shortlist.delete(id); return false; }
   await remember(entry);
   return true;
 }
-
-// :::::: ACTIONS ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-const forget    = (entry) => app.db.shortlist.delete(idOf(entry));
-const shortlist = ()      => app.db.shortlist.toValues();
-
-const open   = (url)   => app.go('explore-podcast', url);
 
 const subscribe = async (entry) => {
   if (busy.value) return;
@@ -150,15 +148,9 @@ async function subscribe (entry) {
 
 // :::::: SUB-COMPONENTS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
-const subscribedIds = useTable('podcasts',  () => app.db.podcasts.toKeys(),    ['keys']);
-const shortlist     = useTable('shortlist', () => app.db.shortlist.toValues(), ['all']);
-const ready         = subscribedIds && shortlist;
-const subscribed    = new Set(subscribedIds ?? []);
-const remembered    = new Set(shortlist?.map(row => row.id) ?? []);
-
-const emptySearch   = { icon: 'mdi:magnify-close', title: 'Nothing found',            hint: 'Try another name, another storefront, or paste a feed URL.' };
-const emptyEpisodes = { icon: 'mdi:playlist-play', title: 'Search for an episode',    hint: 'Episodes are found by title, author or description across the whole directory.' };         
-const emptyPodcasts = { icon: 'bookmark-unfilled', title: 'Nothing on the shortlist', hint: 'Search for a podcast, open it, and remember it to come back to it later.' };      
+const EmptySearch   = { icon: 'mdi:magnify-close', title: 'Nothing found',            hint: 'Try another name, another storefront, or paste a feed URL.' };
+const EmptyEpisodes = { icon: 'mdi:playlist-play', title: 'Search for an episode',    hint: 'Episodes are found by title, author or description across the whole directory.' };         
+const EmptyPodcasts = { icon: 'bookmark-unfilled', title: 'Nothing on the shortlist', hint: 'Search for a podcast, open it, and remember it to come back to it later.' };      
 
 function Filter () {
   const search    = stringSignal('');
@@ -189,7 +181,6 @@ function ExploreEpisodesTab () {
   const note    = useSignal('');
   const field   = useRef(null);
   const text    = query.trim();
-  const isUrl   = looksLikeUrl(text);
   const entries = text ? results.value : [];
   
 
@@ -213,7 +204,6 @@ function ExplorePodcastsTab () {
   const note    = useSignal('');
   const field   = useRef(null);
   const text    = query.trim();
-  const isUrl   = looksLikeUrl(text);
   const entries = text ? results.value : shortlist ?? [];
   
 
