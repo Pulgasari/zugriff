@@ -1,4 +1,5 @@
-// podcasts :: components/ExploreEpisodes.js
+// podcasts :: components/ExploreEpisodesIndex.js
+
 // episode hits from the directory. an episode on its own is nothing to subscribe to,
 // so the row is a way into the podcast it came from — which is what every action here
 // does: open it, remember it, or read the episode's page in the store.
@@ -16,45 +17,48 @@ import { plain } from './../modules/methods.js';
 const app    = zugriff.app;
 const TEASER = 200;
 
-function Item ({ episode, remembered, subscribed }) {
-  const open   = () => app.go('explore-podcast', episode.url);
-  const teaser = plain(episode.description).slice(0, TEASER);
+const explorer = {};
+explorer.rememberedPodcasts = new Set; // stub
+explorer.subscribedPodcasts = new Set; // stub
+
+
+
+function EpisodeItem ({ author, date, description, duration, image, link, podcast, podcastId, title, url,     episode, remembered, subscribed }) {
+  const open   = () => app.go('explore-podcast', url);
+  const teaser = plain(description).slice(0, TEASER);
+
+  const isRemembered = explorer.rememberedPodcasts.has(podcastId);
+  const isSubscribed = explorer.subscribedPodcasts.has(podcastId);
 
   return html`
     <aufbau-item class:subscribed=${subscribed}>
-      <${Artwork} aria-label='open podcast' onClick=${open} src=${episode.image} />
+      <${Artwork} aria-label='open podcast' onClick=${open} src=${image} />
 
       <div class='meta'>
-        <${Date} value=${episode.date} />
-        <span class='dur'>${zugriff.fmt.duration(episode.duration)}</span>
+        <${Date} value=${date} />
+        <span class='dur'>${zugriff.fmt.duration(duration)}</span>
       </div>
 
-      <${Button} class='title' label=${episode.title} onClick=${open} />
+      <${Button} class='title' label=${title} onClick=${open} />
 
       ${teaser && html`<p class='teaser'>${teaser}</p>`}
 
       <${ActionMenu} items=${[
         {
           icon    : subscribed ? 'check' : 'mdi:podcast',
-          label   : episode.podcast || 'Podcast',
+          label   : podcast || 'Podcast',
           title   : subscribed ? 'in your library' : 'open this podcast',
           onClick : open,
         },{
           icon    : remembered ? 'bookmark' : 'bookmark-unfilled',
           label   : remembered ? 'Forget'   : 'Remember',
           title   : remembered ? 'Remove the podcast from the shortlist' : 'Keep the podcast for a closer look later',
-          onClick : () => app.explore.toggleRemembered({
-            id     : episode.podcastId,
-            url    : episode.url,
-            title  : episode.podcast,
-            author : episode.author,
-            image  : episode.image,
-          }),
+          onClick : () => app.explore.toggleRemembered({ author, image, url, id: podcastId, title: podcast }),
         },
         // an item with an empty href would render as a button that goes nowhere
-        episode.link && {
+        link && {
           icon  : 'mdi:open-in-new',
-          href  : episode.link,
+          href  : link,
           title : 'open the episode in the store',
         },
       ].filter(Boolean)} />
@@ -62,21 +66,14 @@ function Item ({ episode, remembered, subscribed }) {
   `;
 }
 
-function ExploreEpisodes ({ episodes, remembered, subscribed, empty }) {
+function ExploreEpisodesIndex ({ episodes, remembered, subscribed, empty }) {
   if (!episodes.length) return html`<${Empty} ...${empty} />`;
 
   return html`
-    <${Index} class='explore-episodes' viewmode='list'>
-      ${episodes.map(episode => html`
-        <${Item}
-          key=${episode.id}
-          episode=${episode}
-          remembered=${remembered.has(episode.podcastId)}
-          subscribed=${subscribed.has(episode.podcastId)}
-        />
-      `)}
+    <${Index} viewmode='list'>
+      ${episodes.map(EpisodeItem)}
     </${Index}>
   `;
 }
 
-export default ExploreEpisodes;
+export default ExploreEpisodesIndex;
