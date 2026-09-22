@@ -89,6 +89,8 @@ function ExploreEpisodesTab () {
   const field   = useRef(null);
   const text    = query.trim();
   const isUrl   = looksLikeUrl(text);
+  const entries = text ? results.value : [];
+  
 
   useEffect(() => { results.value = []; }, [tab]);
   
@@ -97,9 +99,7 @@ function ExploreEpisodesTab () {
       <${Filter}/>
       
       <${ExploreEpisodes}
-        episodes=${entries}
-        remembered=${remembered}
-        subscribed=${subscribed}
+        ...${{ entries, remembered, subscribed }}
         empty=${emptyEpisodes}
       />
     </${Tab}>
@@ -113,6 +113,8 @@ function ExplorePodcastsTab () {
   const field   = useRef(null);
   const text    = query.trim();
   const isUrl   = looksLikeUrl(text);
+  const entries = text ? results.value : shortlist ?? [];
+  
 
   useEffect(() => { results.value = []; }, [tab]);
   
@@ -121,9 +123,7 @@ function ExplorePodcastsTab () {
       <${Filter}/>
       
       <${ExploreIndex}
-        entries=${entries}
-        remembered=${remembered}
-        subscribed=${subscribed}
+        ...${{ entries, remembered, subscribed }}
         empty=${emptyPodcasts}
         onSubscribe=${subscribe}
       />
@@ -134,30 +134,18 @@ function ExplorePodcastsTab () {
 // :::::: MAIN COMPONENT
 
 function ExploreView () {
-
-  
-  const onEpisodes = tab === 'episodes';
-  const entries    = text ? results.value : (onEpisodes ? [] : shortlist ?? []);
   
   return html`
-    <${View} [id,title]='explore'>
-    <${View} id,title='explore'>
     <${View} id|title='explore'>
-    <${View} id='explore' title='explore'>
       <main>
         <${Picker} class='tabs' look='segments' signal=${state.tab} />
 
-        ${onEpisodes ? html`<${ExploreEpisodesTab}/>` 
-                     : html`<${ExplorePodcastsTab}/>`}
-        
+        ${(tab === 'episodes') ? html`<${ExploreEpisodesTab}/>` 
+                               : html`<${ExplorePodcastsTab}/>`}
 
-        ${isUrl && html`<${Button} icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
-
+        ${isUrl      && html`<${Button} icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
         ${note.value && html`<i class='note'>${note.value}</i>`}
         ${busy.value && html`<${Loading} text='searching …' />`}
-
-        ${!text && !isUrl && !onEpisodes && html`<div class='section'><span>Shortlist</span></div>`}
-        ${ready && !isUrl && (onEpisodes ? html`` : html``)}
       </main>
     </${View}>
   `;
