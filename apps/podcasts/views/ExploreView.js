@@ -310,15 +310,7 @@ function ExplorePodcastsIndex ({ entries, remembered, subscribed, empty, onSubsc
 
   return html`
     <${Index} viewmode='list'>
-      ${entries.map(entry => html`
-        <${Item}
-          key=${entry.id}
-          entry=${entry}
-          remembered=${remembered.has(entry.id)}
-          subscribed=${subscribed.has(entry.id)}
-          onSubscribe=${onSubscribe}
-        />
-      `)}
+      ${entries.map(ExplorePodcastItem)}
     </${Index}>
   `;
 }
