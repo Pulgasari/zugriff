@@ -37,8 +37,7 @@ const TABS      = [
 
 const state = {
   filter : {
-    attribute : enumSignal(''),
-    country   : enumSignal(''),
+    
   },
   search : stringSignal(''),
   tab    :   enumSignal('podcasts', ['podcasts', 'episodes']),
@@ -47,6 +46,10 @@ const state = {
 // :::::: SUB-COMPONENTS
 
 function Filter () {
+  const search    = stringSignal('');
+  const attribute =   enumSignal('');
+  const country   =   enumSignal('');
+  
   return html`
     <${SearchPanel} placeholder='type to search ...' ref=${field} signal=${query}>
       <${Picker} look='combobox' placeholder='country' signal=${country} src=${COUNTRIES} searchable />
