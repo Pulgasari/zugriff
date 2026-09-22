@@ -11,17 +11,18 @@
 //
 // with no query the podcasts tab is the shortlist — the ones an earlier look set aside.
 
-import { useSignal }         from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
+import { enumSignal, stringSignal, useSignal } from '@aufbau/signals';
+import { useEffect, useRef }     from 'preact/hooks';
 
 import Button      from '/.shared/js/components/Button.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
 import Loading     from '/.shared/js/components/Loading.js';
 import Picker      from '/.shared/js/components/Picker.js';
+import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import View        from '/.shared/js/components/View.js';
 
-import ExploreEpisodes from './../components/ExploreEpisodes.js';
-import ExploreIndex    from './../components/ExploreIndex.js';
+import ExploreEpisodesIndex from './../components/ExploreEpisodesIndex.js';
+import ExplorePodcastsIndex from './../components/ExplorePodcastsIndex.js';
 
 import { useTable }     from './../modules/hooks.js';
 import { looksLikeUrl } from './../modules/methods.js';
@@ -30,11 +31,72 @@ const app       = zugriff.app;
 const DEBOUNCE  = 300;
 const COUNTRIES = '/.shared/json/countries.json';
 const TABS      = [
-  { value: 'podcasts', label: 'podcasts', icon: 'mdi:podcast' },
+  { value: 'podcasts', label: 'podcasts', icon: 'mdi:podcast'       },
   { value: 'episodes', label: 'episodes', icon: 'mdi:playlist-play' },
 ];
 
-export default function ExploreView () {
+const state = {
+  filter : {
+    attribute : enumSignal(''),
+    country   : enumSignal(''),
+  },
+  search : stringSignal(''),
+  tab    :   enumSignal('podcasts', ['podcasts', 'episodes']),
+};
+
+// :::::: SUB-COMPONENTS
+
+function Filter () {
+  return html`
+    <${SearchPanel} placeholder='type to search ...' ref=${field} signal=${query}>
+      <${Picker} look='combobox' placeholder='country' signal=${country} src=${COUNTRIES} searchable />
+      <${Picker} look='combobox' placeholder='match …' signsl=${attribute} />
+    </${SearchPanel}>
+  `;
+}
+
+function Tab ({ children, ...rest }) {
+  return html`
+    <div class='tab' ...${rest}>
+      ${children}
+    </div>
+  `;
+}
+
+function ExploreEpisodesTab () {
+  return html`
+    <${Tab}>
+      <${Filter}/>
+      
+      <${ExploreEpisodes}
+        episodes=${entries}
+        remembered=${remembered}
+        subscribed=${subscribed}
+        empty=${empty}
+      />
+    </${Tab}>
+  `;
+}
+
+function ExplorePodcastsTab () {
+  return html`
+    <${Tab}>
+      <${Filter}/>
+      
+      <${ExploreIndex}
+        entries=${entries}
+        remembered=${remembered}
+        subscribed=${subscribed}
+        empty=${empty}
+        onSubscribe=${subscribe}
+      />
+    </${Tab}>
+  `;
+}
+
+// :::::: MAIN COMPONENT
+
+function ExploreView () {
   const query   = app.state.$exploreQuery;
   const tab     = app.state.$exploreTab;
   const results = useSignal([]);
@@ -137,34 +199,9 @@ export default function ExploreView () {
           onChange=${value => app.state.exploreTab = value}
           />
 
-        <input
-          ref=${field}
-          type='search'
-          placeholder='darknet diaries — or https://example.com/feed.xml'
-          value=${query}
-          onInput=${event => app.state.exploreQuery = event.target.value}
-          onKeyDown=${event => { if (event.key === 'Enter' && isUrl) open(text); }}
-          />
-
-        <div class='filters'>
-          <${Picker}
-            class='country'
-            look='combobox'
-            searchable
-            placeholder='storefront …'
-            src=${COUNTRIES}
-            value=${country}
-            onChange=${value => app.state.exploreCountry = value}
-            />
-          <${Picker}
-            class='attribute'
-            look='combobox'
-            placeholder='match …'
-            options=${app.explore.ATTRIBUTES}
-            value=${attribute}
-            onChange=${value => app.state.exploreAttribute = value}
-            />
-        </div>
+        ${onEpisodes ? html`<${ExploreEpisodesTab}/>` 
+                     : html`<${ExplorePodcastsTab}/>`}
+        
 
         ${isUrl && html`
           <${Button} icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
@@ -173,24 +210,10 @@ export default function ExploreView () {
         ${busy.value && html`<${Loading} text='searching …' />`}
 
         ${!text && !isUrl && !onEpisodes && html`<div class='section'><span>Shortlist</span></div>`}
-
-        ${ready && !isUrl && (onEpisodes
-          ? html`
-            <${ExploreEpisodes}
-              episodes=${entries}
-              remembered=${remembered}
-              subscribed=${subscribed}
-              empty=${empty}
-              />`
-          : html`
-            <${ExploreIndex}
-              entries=${entries}
-              remembered=${remembered}
-              subscribed=${subscribed}
-              empty=${empty}
-              onSubscribe=${subscribe}
-              />`)}
+        ${ready && !isUrl && (onEpisodes ? html`` : html``)}
       </main>
     </${View}>
   `;
 }
+
+export default ExploreView;
