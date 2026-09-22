@@ -1,6 +1,6 @@
 // podcasts :: views/ExploreView.js
 
-// :::::: IMPORT
+// :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 import { enumSignal, stringSignal, useSignal } from '@aufbau/signals';
 import { useEffect, useRef }     from 'preact/hooks';
@@ -29,8 +29,7 @@ import { normalizeUrl, podcastIdByHash, toRecords } from './../modules/library.j
 import { ANY, ATTRIBUTES, localCountry }            from './../modules/search.js';
 import { searchEpisodes, searchPodcasts }           from './../modules/search.js';
 
-
-// :::::: CONSTANTS
+// :::::: CONSTANTS ::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const app       = zugriff.app;
 const COUNTRIES = '/.shared/json/countries.json';
@@ -42,7 +41,7 @@ const TABS      = [
 ];
 
 
-// :::::: EXPLORER
+// :::::: EXPLORER ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const previews = new Map; // (temp feeds in session) url -> promise of { url, id, feed, podcast, episodes }
 
@@ -78,8 +77,6 @@ episodes = async (term, options) => (await searchEpisodes(term, options)).map(ke
 
 // :::::: PREVIEW
 
-
-/** read a feed without subscribing to it. throws the same way subscribing does. */
 function preview (rawUrl) {
   const url = normalizeUrl(rawUrl);
   if (!url) return Promise.reject(new Error('no feed url'));
@@ -97,11 +94,6 @@ function preview (rawUrl) {
   return job;
 }
 
-// :::::: SHORTLIST
-// "merken": a podcast that is interesting but has not earned a subscription yet. a
-// table rather than a mirror — the views read it through useTable like any other.
-
-/** what a shortlist row keeps: enough for a list, plus the url to go back to the feed */
 const toRow = (entry) => ({
   id      : idOf(entry),
   url     : urlOf(entry),
@@ -113,7 +105,6 @@ const toRow = (entry) => ({
   addedAt : Date.now(),
 });
 
-const shortlist = () => app.db.shortlist.toValues();
 
 async function remember (entry) {
   const row = toRow(entry);
@@ -121,8 +112,6 @@ async function remember (entry) {
   await app.db.shortlist.set(row.id, row);
   return row;
 }
-
-const forget = (entry) => app.db.shortlist.delete(idOf(entry));
 
 /** returns whether the podcast is on the shortlist afterwards */
 async function toggleRemembered (entry) {
@@ -132,25 +121,12 @@ async function toggleRemembered (entry) {
   return true;
 }
 
-// :::::: SUBSCRIBE
+// :::::: ACTIONS ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-/**
- * subscribe from an explore entry. reuses the parsed feed when this session has
- * already previewed it, and drops the shortlist row — the podcast is in the library
- * now, which is where the shortlist was pointing all along.
- */
-async function subscribe (entry) {
-  const url = urlOf(entry);
-  const has = previews.has(url) ? await previews.get(url).catch(() => null) : null;
+const forget    = (entry) => app.db.shortlist.delete(idOf(entry));
+const shortlist = ()      => app.db.shortlist.toValues();
 
-  const podcast = await app.library.subscribe(url, has?.feed);
-  await app.db.shortlist.delete(podcast.id);
-  return podcast;
-}
-
-// :::::: ACTIONS
-
-const open = (url) => app.go('explore-podcast', url);
+const open   = (url)   => app.go('explore-podcast', url);
 
 const subscribe = async (entry) => {
   if (busy.value) return;
@@ -163,7 +139,16 @@ const subscribe = async (entry) => {
   finally       { busy.value = false; }
 };
 
-// :::::: SUB-COMPONENTS
+async function subscribe (entry) {
+  const url = urlOf(entry);
+  const has = previews.has(url) ? await previews.get(url).catch(() => null) : null;
+
+  const podcast = await app.library.subscribe(url, has?.feed);
+  await app.db.shortlist.delete(podcast.id);
+  return podcast;
+}
+
+// :::::: SUB-COMPONENTS ::::::::::::::::::::::::::::::::::::::::::::::::::
 
 const subscribedIds = useTable('podcasts',  () => app.db.podcasts.toKeys(),    ['keys']);
 const shortlist     = useTable('shortlist', () => app.db.shortlist.toValues(), ['all']);
@@ -349,7 +334,7 @@ function ExplorePodcastsIndex ({ entries, remembered, subscribed, empty, onSubsc
 }
 
 
-// :::::: MAIN COMPONENT
+// :::::: MAIN COMPONENT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 function ExploreView () {
   
