@@ -1,24 +1,36 @@
 // podcasts :: views/ExploreView.js
 
+// :::::: IMPORT
+
 import { enumSignal, stringSignal, useSignal } from '@aufbau/signals';
 import { useEffect, useRef }     from 'preact/hooks';
 
+// ::: shared components
+import ActionMenu  from '/.shared/js/components/ActionMenu.js';
 import Button      from '/.shared/js/components/Button.js';
+import Date        from '/.shared/js/components/Date.js';
+import Empty       from '/.shared/js/components/Empty.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
+import Index       from '/.shared/js/components/Index.js';
 import Loading     from '/.shared/js/components/Loading.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import View        from '/.shared/js/components/View.js';
 
-import ExploreEpisodesIndex from './../components/ExploreEpisodesIndex.js';
-import ExplorePodcastsIndex from './../components/ExplorePodcastsIndex.js';
+// ::: local components
+import Artwork    from './Artwork.js';
 
+// ::: local modules
 import { useTable }     from './../modules/hooks.js';
 import { looksLikeUrl } from './../modules/methods.js';
+import { plain }        from './../modules/methods.js';
+
+// :::::: CONSTANTS
 
 const app       = zugriff.app;
 const COUNTRIES = '/.shared/json/countries.json';
 const DEBOUNCE  = 300;
+const TEASER    = 200;
 const TABS      = [
   { value: 'podcasts', label: 'podcasts', icon: 'mdi:podcast'       },
   { value: 'episodes', label: 'episodes', icon: 'mdi:playlist-play' },
@@ -31,6 +43,12 @@ const state = {
   search : stringSignal(''),
   tab    :   enumSignal('podcasts', ['podcasts', 'episodes']),
 };
+
+// :::::: EXPLORER
+
+const explorer = {};
+explorer.rememberedPodcasts = new Set; // stub
+explorer.subscribedPodcasts = new Set; // stub
 
 // :::::: ACTIONS
 
@@ -130,6 +148,108 @@ function ExplorePodcastsTab () {
     </${Tab}>
   `;
 }
+
+function ExploreEpisodeItem ({ author, date, description, duration, image, link, podcast, podcastId, title, url,     episode, remembered, subscribed }) {
+  const open   = () => app.go('explore-podcast', url);
+  const teaser = plain(description).slice(0, TEASER);
+
+  const isRemembered = explorer.rememberedPodcasts.has(podcastId);
+  const isSubscribed = explorer.subscribedPodcasts.has(podcastId);
+
+  return html`
+    <aufbau-item class:subscribed=${subscribed}>
+      <${Artwork} aria-label='open podcast' onClick=${open} src=${image} />
+
+      <div class='meta'>
+        <${Date} value=${date} />
+        <span class='dur'>${zugriff.fmt.duration(duration)}</span>
+      </div>
+
+      <${Button} class='title' label=${title} onClick=${open} />
+
+      ${teaser && html`<p class='teaser'>${teaser}</p>`}
+
+      <${ActionMenu} items=${[
+        {
+          icon    : subscribed ? 'check' : 'mdi:podcast',
+          label   : podcast || 'Podcast',
+          title   : subscribed ? 'in your library' : 'open this podcast',
+          onClick : open,
+        },{
+          icon    : remembered ? 'bookmark' : 'bookmark-unfilled',
+          label   : remembered ? 'Forget'   : 'Remember',
+          title   : remembered ? 'Remove the podcast from the shortlist' : 'Keep the podcast for a closer look later',
+          onClick : () => app.explore.toggleRemembered({ author, image, url, id: podcastId, title: podcast }),
+        },
+        // an item with an empty href would render as a button that goes nowhere
+        link && {
+          icon  : 'mdi:open-in-new',
+          href  : link,
+          title : 'open the episode in the store',
+        },
+      ].filter(Boolean)} />
+    </aufbau-item>
+  `;
+}
+
+function ExploreEpisodesIndex ({ episodes, remembered, subscribed, empty }) {
+  if (!episodes.length) return html`<${Empty} ...${empty} />`;
+
+  return html`
+    <${Index} viewmode='list'>
+      ${episodes.map(ExploreEpisodeItem)}
+    </${Index}>
+  `;
+}
+
+function ExplorePodcastItem ({ entry, remembered, subscribed, onSubscribe }) {
+  const open = () => app.go('explore-podcast', entry.url);
+
+  const sub = [entry.author, entry.genre, entry.count ? `${entry.count} episode(s)` : '']
+    .filter(Boolean)
+    .join(' · ');
+
+  return html`
+    <aufbau-item class:subscribed=${subscribed}>
+      <${Artwork} aria-label='open podcast' onClick=${open} src=${entry.image} />
+
+      <div class='meta'>${sub}</div>
+
+      <${Button} class='title' label=${entry.title} onClick=${open} />
+
+      <${ActionMenu} items=${[
+        {
+          icon    : remembered ? 'bookmark' : 'bookmark-unfilled',
+          label   : remembered ? 'Forget'   : 'Remember',
+          title   : remembered ? 'Remove from the shortlist' : 'Keep for a closer look later',
+          onClick : () => app.explore.toggleRemembered(entry),
+        },
+        subscribed
+          ? { icon: 'check', label: 'In library', onClick: () => app.go('podcast', entry.id) }
+          : { icon: 'add',   label: 'Subscribe',  onClick: () => onSubscribe?.(entry) },
+      ]} />
+    </aufbau-item>
+  `;
+}
+
+function ExplorePodcastsIndex ({ entries, remembered, subscribed, empty, onSubscribe }) {
+  if (!entries.length) return html`<${Empty} ...${empty} />`;
+
+  return html`
+    <${Index} viewmode='list'>
+      ${entries.map(entry => html`
+        <${Item}
+          key=${entry.id}
+          entry=${entry}
+          remembered=${remembered.has(entry.id)}
+          subscribed=${subscribed.has(entry.id)}
+          onSubscribe=${onSubscribe}
+        />
+      `)}
+    </${Index}>
+  `;
+}
+
 
 // :::::: MAIN COMPONENT
 
