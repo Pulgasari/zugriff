@@ -51,49 +51,32 @@ const state = {
 
 // :::::: EXPLORER
 
+const previews = new Map; // (temp feeds in session) url -> promise of { url, id, feed, podcast, episodes }
+
 const explorer = {};
 explorer.rememberedPodcasts = new Set; // stub
 explorer.subscribedPodcasts = new Set; // stub
 
-// :::::: HELPERS
+// ::: helpers
 
-// a directory hit, a shortlist row and a preview all describe the same podcast, so
-// they are all read through this: the feed url, and our own id derived from it.
 const urlOf = (entry = {}) => normalizeUrl(entry.url || entry.feedUrl || '');
 const idOf  = (entry = {}) => entry.id || podcastIdByHash(urlOf(entry));
 
-// :::::: SEARCH
+// ::: search
 
-// the directory's own id is replaced by ours, so a result, a shortlist row and a
-// subscription speak about a podcast in one key — which is what makes "already
-// subscribed" a plain lookup instead of a url compare. an episode hit is keyed by
-// its podcast for the same reason: `podcastId` is what its row is read against.
 const keyed = (result) => {
   const url = normalizeUrl(result.feedUrl);
   return result.kind === 'episode'
-    ? { ...result, url, podcastId: podcastIdByHash(url) }
-    : { ...result, url, id: podcastIdByHash(url) };
+    ? { ...result, url, podcastId : podcastIdByHash(url) }
+    : { ...result, url, id        : podcastIdByHash(url) };
 };
 
-/**
- * search the directory by name. `options` are passed through to search.js:
- * `country` (the storefront), `attribute` (the field the term is matched against),
- * `limit` and `signal`.
- */
-async function search (term, options) {
-  return (await searchPodcasts(term, options)).map(keyed);
-}
-
-/** the same search over single episodes, each carrying the podcast it belongs to */
-async function episodes (term, options) {
-  return (await searchEpisodes(term, options)).map(keyed);
-}
+const 
+search   = async (term, options) => (await searchPodcasts(term, options)).map(keyed),         
+episodes = async (term, options) => (await searchEpisodes(term, options)).map(keyed);         
 
 // :::::: PREVIEW
-// a feed fetched and parsed but not stored. cached per url for the session: walking
-// out of a podcast and back into it should not go down the proxy again.
 
-const previews = new Map();   // url -> promise of { url, id, feed, podcast, episodes }
 
 /** read a feed without subscribing to it. throws the same way subscribing does. */
 function preview (rawUrl) {
@@ -103,7 +86,7 @@ function preview (rawUrl) {
 
   const job = (async () => {
     const feed = parseFeed(await fetchFeed(url));
-    return { url, id: podcastIdByHash(url), feed, ...toRecords(url, feed) };
+    return { url, id: podcastIdByHash(url), feed, ...toRecords(url,feed) };
   })();
 
   // a failed fetch must not be what every later visit gets handed back
