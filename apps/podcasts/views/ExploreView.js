@@ -41,13 +41,6 @@ const TABS      = [
   { value: 'episodes', label: 'episodes', icon: 'mdi:playlist-play' },
 ];
 
-const state = {
-  filter : {
-    
-  },
-  search : stringSignal(''),
-  tab    :   enumSignal('podcasts', ['podcasts', 'episodes']),
-};
 
 // :::::: EXPLORER
 
@@ -56,6 +49,14 @@ const previews = new Map; // (temp feeds in session) url -> promise of { url, id
 const explorer = {};
 explorer.rememberedPodcasts = new Set; // stub
 explorer.subscribedPodcasts = new Set; // stub
+
+const state = {
+  filter : {
+    
+  },
+  search : stringSignal(''),
+  tab    :   enumSignal('podcasts', ['podcasts', 'episodes']),
+};
 
 // ::: helpers
 
