@@ -1,4 +1,5 @@
 // podcasts :: components/ExploreIndex.js
+
 // a list of podcasts that are not subscriptions: directory hits and shortlist rows,
 // which are the same record at two points in time. remembering and subscribing are
 // both on the row, so neither needs a detour through the detail view.
@@ -44,7 +45,7 @@ function Item ({ entry, remembered, subscribed, onSubscribe }) {
   `;
 }
 
-function ExploreIndex ({ entries, remembered, subscribed, empty, onSubscribe }) {
+function ExplorePodcastsIndex ({ entries, remembered, subscribed, empty, onSubscribe }) {
   if (!entries.length) return html`<${Empty} ...${empty} />`;
 
   return html`
@@ -62,4 +63,4 @@ function ExploreIndex ({ entries, remembered, subscribed, empty, onSubscribe }) 
   `;
 }
 
-export default ExploreIndex;
+export default ExplorePodcastsIndex;
