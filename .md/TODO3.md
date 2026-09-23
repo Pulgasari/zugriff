@@ -30,6 +30,12 @@
 
 ---
 
+# apps (capacitor builds for android)
+
+- [ ] aktuell sind die spaces ober- und unterhalb des app-screens bei den android-capacitor-apps schwarz anstatt bg-farbe des themes zu haben. wenn ich mich recht erinnere, sollte das gerade durch capacitor fixbar sein?
+- [ ] die android-apps haben alle das default-capacitor-icon, sollten aber eigtl. alle ihr eigenes haben
+
+
 ```
 // the iconify svg api serves one file per `prefix:name`, and a given name is effectively
 // immutable. cache each icon hard (long ttl, no network within it) so the public api is hit
@@ -38,6 +44,3 @@
 // mask-image (loaded cross-origin in cors mode) fail its cors check in the console.
 ```
 
-## apps (builds)
-
-- [ ] aktuell sind die spaces ober- und unterhalb des app-screens bei den android-capacitor-apps schwarz anstatt bg-farbe des themes zu haben. wenn ich mich recht erinnere, sollte das gerade durch capacitor fixbar sein?
