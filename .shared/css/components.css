@@ -138,22 +138,16 @@ aufbau-upload[look="dropzone"], .dropzone {
 
 aufbau-picker, .picker {
   --radius : 0.25rem;
-  display  : inline-flex;
   color    : var(--fg);
 
-  .picker-group {
-    display : flex;
-    gap     : 1px;
-  }
-
   &[look="segments"] {
-    .picker-option {
+    gap: 1px;
+
+    [data-value] {
       background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
       color         : var(--fg);
-      border        : none;
       border-radius : 0;
       padding       : 0.25rem 0.5rem;
-      cursor        : pointer;
 
       &[aria-checked="true"] {
         background : var(--accent);
@@ -162,61 +156,45 @@ aufbau-picker, .picker {
 
       &:first-child { border-radius: var(--radius) 0 0 var(--radius); }
       &:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
-      .picker-mark { display: none; }
     }
   }
 
-}
+  /* combobox: the host is the field. cycle: a single button */
+  &[look="combobox"],
+  &[look="cycle"] > .ui > button {
+    background    : color-mix(in srgb, var(--fg) 5%, transparent);
+    border        : 1px solid var(--fg-25);
+    border-radius : var(--radius);
+    padding       : 0.25rem 0.5rem;
+  }
 
-/* combobox: a field that opens a list in the top layer. the list is a popover,
-   so it gets no colours from the page — it has to bring its own. */
+  &[look="combobox"] {
+    min-width: 10rem;
 
-.picker .picker-field {
-  background    : color-mix(in srgb, var(--fg) 5%, transparent);
-  border        : 1px solid var(--fg-25);
-  border-radius : var(--radius);
-  padding       : 0.25rem 0.5rem;
-  min-width     : 10rem;
-}
-.picker.is-open .picker-field,
-.picker .picker-field:focus-within { border-color: var(--accent); }
+    &:focus-within { border-color: var(--accent); }
+    [role="combobox"] + aufbau-icon { opacity: 0.5; }
+  }
 
-.picker .picker-input {
-  background : transparent;
-  border     : none;
-  outline    : none;
-  color      : var(--fg);
-  font       : inherit;
-  cursor     : inherit;
-}
+  &[look="cycle"] > .ui > button[aria-expanded="true"] { border-color: var(--accent); }
 
-.picker .picker-caret { opacity: 0.5; }
+  /* the list is a popover, it gets no colours from the page and has to bring its own */
+  [role="listbox"] {
+    background    : var(--bg);
+    color         : var(--fg);
+    border        : 1px solid var(--fg-25);
+    border-radius : var(--radius);
+    box-shadow    : 0 8px 32px color-mix(in srgb, #000 45%, transparent);
+    padding       : 0.25rem;
 
-.picker .picker-list {
-  background    : var(--bg);
-  color         : var(--fg);
-  border        : 1px solid var(--fg-25);
-  border-radius : var(--radius);
-  box-shadow    : 0 8px 32px color-mix(in srgb, #000 45%, transparent);
-  padding       : 0.25rem;
-  margin        : 0;
-}
+    > [role="option"] {
+      gap           : 0.4rem;
+      padding       : 0.3rem 0.5rem;
+      border-radius : var(--radius);
 
-.picker .picker-list .picker-option {
-  display       : flex;
-  align-items   : center;
-  gap           : 0.4rem;
-  padding       : 0.3rem 0.5rem;
-  border-radius : var(--radius);
-  cursor        : pointer;
-}
-.picker .picker-list .picker-option:hover,
-.picker .picker-list .picker-option.is-active {
-  background : var(--accent-10);
-}
-.picker .picker-list .picker-option[aria-selected="true"] {
-  background : var(--accent);
-  color      : var(--bg);
+      &:is(:hover, :focus-visible) { background: var(--accent-10); }
+      &[aria-selected="true"]      { background: var(--accent); color: var(--bg); }
+    }
+  }
 }
 
 /* ── toggle (<aufbau-toggle look='switch'>) ─────────────────────────────── */
