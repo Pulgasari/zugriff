@@ -34,3 +34,6 @@
 
 - [ ] aktuell sind die spaces ober- und unterhalb des app-screens bei den android-capacitor-apps schwarz anstatt bg-farbe des themes zu haben. wenn ich mich recht erinnere, sollte das gerade durch capacitor fixbar sein?
 - [ ] die android-apps haben alle das default-capacitor-icon, sollten aber eigtl. alle ihr eigenes haben
+
+### planung/konzeot
+- [ ] außerdem will ich noch ne zweite "bauweise" erschaffen, die die apps bundled anstatt bloß ihre web/live/url zu wrappen. wie könnte man das machen? wad für verschiedene möglichkeiten gäbe es?
