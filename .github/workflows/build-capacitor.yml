@@ -8,11 +8,12 @@ name: Build Capacitor packages
 # Why both exist: a TWA is just Chrome, so an app wrapped that way is stuck with
 # the browser File System Access API — and on Android that API re-confirms every
 # granted folder on each visit, which breaks the "grant a folder once and browse
-# it" model the folder apps rely on. A Capacitor wrapper instead injects a native
-# filesystem bridge (@capacitor/filesystem) whose Storage Access Framework grant
-# is *persisted*, so re-granting is silent. The shared filesystem layer
+# it" model the folder apps rely on. A Capacitor wrapper instead carries the
+# repo's own Saf plugin (.github/capacitor/plugins/SafPlugin.java), which reads
+# picked folders through the Storage Access Framework and *persists* the grant, so
+# a folder stays readable across restarts. The shared filesystem layer
 # (.shared/js/modules/filesystem/) detects the Capacitor runtime and routes through
-# that native fs automatically (see platform.js).
+# it automatically (see platform.js).
 #
 # The template's icons, bar colors and splash are replaced per app by
 # gen-capacitor-res.mjs: launcher icons from apps/<slug>/app.svg, status and
@@ -136,12 +137,11 @@ jobs:
 
           cd "$DIR"
           npm init -y > /dev/null
-          # Capacitor 8 line (targetSdk 36, edge-to-edge) + the native filesystem
-          # plugin and the SAF directory picker the shim (cap-fs.js) talks to. the
-          # system bars need no plugin: SystemBars is part of @capacitor/core 8
+          # Capacitor 8 line (targetSdk 36, edge-to-edge). no npm plugins: the
+          # system bars are SystemBars in @capacitor/core, folder access is the
+          # repo's own Saf plugin, added in the next step
           npm install --no-audit --no-fund \
-            @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8 \
-            @capacitor/filesystem@8 @capawesome/capacitor-file-picker@8
+            @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8
 
           npx cap add android
           npx cap sync android
@@ -153,6 +153,9 @@ jobs:
           # launcher icons from app.svg, status/navigation bar + launch screen in the
           # app color instead of the template's black bars and capacitor logo
           APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-res.mjs "build/${{ matrix.app }}"
+          # the repo's own native plugins (.github/capacitor/plugins/), copied in
+          # and registered in MainActivity
+          node .github/scripts/add-capacitor-plugins.mjs "build/${{ matrix.app }}"
 
       - name: Build ${{ matrix.app }} (Gradle)
         run: |
@@ -186,7 +189,7 @@ jobs:
             -storepass "$STORE_PASS" | grep -A1 'SHA256:' || true
 
       - name: Upload APK + AAB for ${{ matrix.app }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: capacitor-${{ matrix.app }}
           path: |
@@ -207,7 +210,7 @@ jobs:
           path: capacitor
           pattern: capacitor-*
       - name: Bundle them into one artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: capacitor-all             # one download, a capacitor-<slug>/ folder per app
           path: capacitor

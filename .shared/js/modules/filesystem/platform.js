@@ -13,8 +13,9 @@
 // *handle interface* — getDirectoryHandle / getFileHandle / entries / values /
 // getFile / createWritable / removeEntry / isSameEntry / query+requestPermission /
 // .kind / .name. the Capacitor shim below implements that exact interface backed
-// by the native @capacitor/filesystem plugin, so nothing downstream branches on
-// platform: handles.js / FolderLibrary / the apps all speak one interface.
+// by the repo's own native Saf plugin (.github/capacitor/plugins/SafPlugin.java),
+// so nothing downstream branches on platform: handles.js / FolderLibrary / the
+// apps all speak one interface.
 //
 // hydrate/dehydrate key off the *value* (is this a cap handle / a { __capfs }
 // descriptor?), not off isNative(), so the web path stays a pure identity and
@@ -37,8 +38,10 @@ const plugin = name => {
   return p;
 };
 
-const Filesystem = () => plugin('Filesystem');
-const FilePicker = () => plugin('FilePicker');   // @capawesome/capacitor-file-picker
+// storage access framework: pick, list, read, write, create, delete on content://
+// tree uris. @capacitor/filesystem cannot do this, it rejects content:// for
+// readdir and every write
+const Saf = () => plugin('Saf');
 
 // :::::: base64 <-> binary (the plugin speaks base64 for file bodies)
 
@@ -106,19 +109,19 @@ export const extsForMime = pattern => {
   return Object.keys(MIME).filter(ext => prefix ? MIME[ext].startsWith(prefix) : MIME[ext] === want);
 };
 
-// content:// URIs cannot be reliably extended by string concatenation, but file://
-// ones can, and that is the only place a joined child URI is used (create paths).
-// readdir returns each child's real URI, so the read path never joins.
-const joinUri = (parent, name) => `${parent.replace(/\/+$/, '')}/${encodeURIComponent(name)}`;
-
 // :::::: THE CAPACITOR HANDLE SHIM
 //
-// android folder grants come from the Storage Access Framework: a directory is
-// picked with the file-picker plugin, which hands back a *persisted* content://
-// tree URI — the fix for the browser File System Access pain on android (a fresh
-// confirmation every visit). a handle's identity here is its URI. the read path
-// (readdir / readFile / stat) drives every folder app; writes on a SAF tree are
-// best-effort (see createWritable / getFileHandle).
+// android folder grants come from the Storage Access Framework: the Saf plugin
+// opens the system folder picker and persists the grant (takePersistableUriPermission),
+// so a folder stays readable across restarts. a handle's identity is its content://
+// uri, and every uri the plugin returns is a document inside the picked tree, so
+// children are listed, never built by string concatenation.
+
+/** 'granted' while the persisted grant holds. a lost one cannot be re-requested without the picker */
+async function capPermission (uri) {
+  try   { return (await Saf().hasAccess({ uri })).granted ? 'granted' : 'denied'; }
+  catch { return 'denied'; }
+}
 
 class CapFileHandle {
   kind = 'file';
@@ -126,18 +129,17 @@ class CapFileHandle {
 
   /** the live File, read fresh from disk — mirrors FileSystemFileHandle.getFile() */
   async getFile () {
-    let mtime = Date.now(), size;
-    try { const st = await Filesystem().stat({ path: this._uri }); mtime = st.mtime ?? mtime; size = st.size; } catch {}
-    const { data } = await Filesystem().readFile({ path: this._uri });   // base64, no encoding => binary-safe
+    let mtime = Date.now();
+    try { mtime = (await Saf().stat({ uri: this._uri })).mtime || mtime; } catch {}
+    const { data } = await Saf().read({ uri: this._uri });   // base64, the bridge carries strings only
     const buf = b64ToArrayBuffer(typeof data === 'string' ? data : '');
     return new File([buf], this.name, { type: mimeOf(this.name), lastModified: mtime });
   }
 
   /**
-   * a writable that buffers writes and flushes once on close, since the plugin has
-   * no streaming write. good enough for the small files the apps produce. creating
-   * a brand-new file under a SAF content:// tree this way is best-effort;
-   * overwriting an existing file (the common case) is reliable.
+   * a writable that buffers writes and flushes once on close, since the bridge has
+   * no streaming write. good enough for the small files the apps produce. close()
+   * replaces the whole content.
    */
   async createWritable () {
     const uri = this._uri; const chunks = [];
@@ -145,15 +147,15 @@ class CapFileHandle {
       async write (data) { chunks.push(await toArrayBuffer(data)); },
       async close () {
         const buf = await new Blob(chunks).arrayBuffer();
-        await Filesystem().writeFile({ path: uri, data: arrayBufferToB64(buf) });
+        await Saf().write({ uri, data: arrayBufferToB64(buf) });
       },
       async abort () {},
     };
   }
 
   async isSameEntry (other)  { return other?._uri === this._uri; }
-  async queryPermission ()   { return 'granted'; }   // the SAF grant is persisted at pick time
-  async requestPermission () { return 'granted'; }
+  async queryPermission ()   { return capPermission(this._uri); }
+  async requestPermission () { return capPermission(this._uri); }
 }
 
 class CapDirHandle {
@@ -161,24 +163,19 @@ class CapDirHandle {
   constructor (uri, name) { this._uri = uri; this.name = name; }
 
   async #children () {
-    const { files = [] } = await Filesystem().readdir({ path: this._uri });
-    // recent plugin versions return {name,type,uri,size,mtime}; older ones a bare
-    // string name — handle both, falling back to a joined URI when none is given.
-    return files.map(f => typeof f === 'string'
-      ? { name: f, kind: 'file', uri: joinUri(this._uri, f) }
-      : { name: f.name, kind: f.type === 'directory' ? 'directory' : 'file', uri: f.uri ?? joinUri(this._uri, f.name) });
+    const { entries = [] } = await Saf().list({ uri: this._uri });
+    return entries.map(e => ({ name: e.name, kind: e.type === 'directory' ? 'directory' : 'file', uri: e.uri }));
   }
 
-  async *entries () { for (const c of await this.#children()) yield [c.name, c.kind === 'directory' ? new CapDirHandle(c.uri, c.name) : new CapFileHandle(c.uri, c.name)]; }    
+  async *entries () { for (const c of await this.#children()) yield [c.name, c.kind === 'directory' ? new CapDirHandle(c.uri, c.name) : new CapFileHandle(c.uri, c.name)]; }
   async *keys    () { for (const c of await this.#children()) yield c.name; }
   async *values  () { for await (const [, h] of this.entries()) yield h; }
-  
+
   async getDirectoryHandle (name, { create = false } = {}) {
     for (const c of await this.#children())
       if (c.name === name && c.kind === 'directory') return new CapDirHandle(c.uri, c.name);
     if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
-    const uri = joinUri(this._uri, name);
-    await Filesystem().mkdir({ path: uri, recursive: false });
+    const { uri } = await Saf().create({ uri: this._uri, name, directory: true });
     return new CapDirHandle(uri, name);
   }
 
@@ -186,27 +183,33 @@ class CapDirHandle {
     for (const c of await this.#children())
       if (c.name === name && c.kind === 'file') return new CapFileHandle(c.uri, c.name);
     if (!create) throw new DOMException(`${name} not found`, 'NotFoundError');
-    const uri = joinUri(this._uri, name);
-    await Filesystem().writeFile({ path: uri, data: '' });
+    // the mime matters: a provider may append the extension it maps a mime to
+    const { uri } = await Saf().create({ uri: this._uri, name, mime: mimeOf(name) || 'application/octet-stream' });
     return new CapFileHandle(uri, name);
   }
 
+  // a folder goes with everything in it, which is what `recursive` asks for; the
+  // provider offers no non-recursive delete, so a non-empty folder is refused here
   async removeEntry (name, { recursive = false } = {}) {
     for (const c of await this.#children()) if (c.name === name) {
-      if (c.kind === 'directory') await Filesystem().rmdir({ path: c.uri, recursive });
-      else                        await Filesystem().deleteFile({ path: c.uri });
+      if (c.kind === 'directory' && !recursive) {
+        const { entries = [] } = await Saf().list({ uri: c.uri });
+        if (entries.length) throw new DOMException(`${name} is not empty`, 'InvalidModificationError');
+      }
+      await Saf().delete({ uri: c.uri });
       return;
     }
     throw new DOMException(`${name} not found`, 'NotFoundError');
   }
 
   async isSameEntry (other)  { return other?._uri === this._uri; }
-  async queryPermission ()   { return 'granted'; }
-  async requestPermission () { return 'granted'; }
+  async queryPermission ()   { return capPermission(this._uri); }
+  async requestPermission () { return capPermission(this._uri); }
 }
 
-// name a tree URI for display: decode its last path segment, which for a SAF tree
-// URI is the document id (e.g. "primary:Music") — take the part after ':'.
+// name a tree URI for display when the provider gave no name: decode its last path
+// segment, which for a SAF tree URI is the document id (e.g. "primary:Music") —
+// take the part after ':'.
 function nameFromUri (uri) {
   try {
     const last = decodeURIComponent(uri.replace(/\/+$/, '').split('/').pop() || '');
@@ -217,12 +220,11 @@ function nameFromUri (uri) {
 
 async function capPick () {
   try {
-    const res = await FilePicker().pickDirectory();          // persists the grant on android
-    const uri = res?.path ?? res?.uri;
+    const { uri, name } = await Saf().pickTree();   // persists the grant
     if (!uri) return null;
-    return new CapDirHandle(uri, nameFromUri(uri));
+    return new CapDirHandle(uri, name || nameFromUri(uri));
   } catch (err) {
-    if (/cancel/i.test(err?.message || '')) return null;     // normalise user-cancel to null
+    if (err?.code === 'CANCELED' || /cancel/i.test(err?.message || '')) return null;   // normalise user-cancel to null
     throw err;
   }
 }
