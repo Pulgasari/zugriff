@@ -18,9 +18,11 @@
 //
 // needs sharp, which the repo root's package.json already lists.
 //
-// NOTE: bar colors only apply while targetSdk <= 34 (capacitor 6). from targetSdk 35
-// android 15 enforces edge-to-edge and ignores statusBarColor / navigationBarColor;
-// the page then has to paint behind the bars and pad with safe-area insets itself.
+// NOTE: capacitor 8 targets sdk 36, so android 15+ runs edge-to-edge and ignores
+// statusBarColor / navigationBarColor. on a webview >= 140 the page paints behind
+// the bars itself (theme.css, safe-area insets); the colors here are the fallback
+// for older android versions and for older webviews, which capacitor insets
+// natively over the window background.
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';

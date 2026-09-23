@@ -534,7 +534,7 @@ aufbau-slider { width: 100%; }
 
 /* ────────── toast ────────── */
 
-.toasts { position: fixed; left: 0; right: 0; bottom: 1.1rem; display: flex; justify-content: center; pointer-events: none; z-index: 80; }
+.toasts { position: fixed; left: 0; right: 0; bottom: calc(1.1rem + var(--safe-bottom)); display: flex; justify-content: center; pointer-events: none; z-index: 80; }
 .toast {
   padding       : 1rem 1rem;
   border-radius : 999px;
@@ -546,7 +546,7 @@ aufbau-slider { width: 100%; }
    &.err { border-color: color-mix(in oklch, var(--c-null, #e06c75) 55%, var(--line)); color: var(--c-null, #e06c75); }
 }
 
-.toasts { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); z-index: 60;
+.toasts { position: fixed; bottom: calc(1.5rem + var(--safe-bottom)); left: 50%; transform: translateX(-50%); z-index: 60;
   display: flex; flex-direction: column; gap: 0.5rem; align-items: center; pointer-events: none; }
 .toast { background: var(--panel); border: 1px solid var(--line); border-radius: 2rem;
   padding: 0.5rem 1rem; font-size: 0.85rem; box-shadow: var(--shadow); }
@@ -625,7 +625,7 @@ aufbau-slider { width: 100%; }
 @media (max-width: 720px) {
   .z-sidebar {
     position   : fixed;
-    inset      : 0 auto 0 0;
+    inset      : var(--safe-top) auto var(--safe-bottom) var(--safe-left);
     z-index    : 40;
     max-inline-size: min(20rem, 82vw);
     transform  : translateX(-100%);

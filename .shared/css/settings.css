@@ -24,8 +24,8 @@
 
 #app-settings.app-settings-overlay {
   position       : fixed;
-  top            : 3.25rem;
-  right          : 0.75rem;
+  top            : calc(3.25rem + var(--safe-top));
+  right          : calc(0.75rem + var(--safe-right));
   z-index        : 1000;
   width          : min(92vw, 420px);
   max-height     : min(72vh, 640px);

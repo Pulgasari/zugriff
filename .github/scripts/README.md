@@ -55,11 +55,17 @@ durch die der App (`APP_SLUG=files node .github/scripts/gen-capacitor-res.mjs bu
 - **Launch-Screen** in der App-Farbe statt `@drawable/splash` (Capacitor-Logo).
 
 Die Farbe ist `color` aus der Registry, derselbe Wert wie `theme_color` im
-Manifest. Zur Laufzeit übernimmt `.shared/js/modules/bars.js` (über
-`@capacitor/status-bar` und `@hugotomazi/capacitor-navigation-bar`) die Leisten
-bei jedem Theme-Wechsel, inklusive Icon-Kontrast für helle Themes. Braucht `sharp` aus der `package.json` im Repo-Root. Die Leistenfarben
-greifen nur bis `targetSdk` 34 (Capacitor 6); ab 35 erzwingt Android 15
-Edge-to-Edge.
+Manifest. Braucht `sharp` aus der `package.json` im Repo-Root.
+
+**Edge-to-Edge (Capacitor 8, `targetSdk` 36):** Android 15+ ignoriert die
+Leistenfarben. Das WebView läuft unter die Leisten (`SystemBars` in
+`capacitor.config.json`, `viewport-fit=cover`), `html` malt `var(--bg)` dahinter
+und `#app` hält per `env(safe-area-inset-*)` Abstand (`.shared/css/theme.css`).
+Die Leisten haben so automatisch die Theme-Farbe. Den Icon-Kontrast setzt
+`.shared/js/modules/bars.js` über das eingebaute `SystemBars`-Plugin bei jedem
+Theme-Wechsel. Die Farben aus diesem Skript bleiben Fallback für ältere
+Android-Versionen und ältere WebViews (< Chromium 140), bei denen Capacitor das
+WebView nativ einrückt.
 
 ---
 
@@ -92,7 +98,7 @@ stattdessen eine native Filesystem-Bridge (`@capacitor/filesystem`) mit, deren
 (`.shared/js/modules/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt
 automatisch das native FS (siehe `platform.js`).
 
-**Ablauf** (pro App): JDK 17 + Android SDK → Signing-Key bereitstellen →
+**Ablauf** (pro App): Node 22 + JDK 21 + Android SDK 36 → Signing-Key bereitstellen →
 Capacitor-Projekt scaffolden (`gen-capacitor-config.mjs` → `npm i
 @capacitor/{core,cli,android,filesystem}` + `@capawesome/capacitor-file-picker` →
 `cap add android` → `cap sync`) → `gradlew bundleRelease assembleRelease` →

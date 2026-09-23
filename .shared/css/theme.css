@@ -10,6 +10,14 @@
   --line    : color-mix(in oklch, var(--fg) 12%, transparent);
   --hover   : color-mix(in oklch, var(--fg)  7%, transparent);
   --radius  : 0.5rem;
+
+  /* safe-area insets. non-zero where the page runs edge-to-edge: the capacitor
+     wrappers (android 15+ enforces it, viewport-fit=cover opts in) and notched
+     screens. html paints var(--bg) behind the system bars, #app keeps clear */
+  --safe-top    : env(safe-area-inset-top,    0px);
+  --safe-right  : env(safe-area-inset-right,  0px);
+  --safe-bottom : env(safe-area-inset-bottom, 0px);
+  --safe-left   : env(safe-area-inset-left,   0px);
 }
 
 html { -webkit-tap-highlight-color: transparent; }
@@ -32,6 +40,15 @@ body { background : var(--bg); color : var(--fg); }
   display       : flex;
   flex-direction: column;
   overflow      : hidden;
+}
+
+/* the frame keeps clear of the system bars. :root raises the specificity above an
+   app's own #app rule, and content-box clipping keeps an app's #app background
+   (code paints var(--hair)) out of the inset, where html shows var(--bg) instead */
+:root #app {
+  box-sizing      : border-box;
+  padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+  background-clip : content-box;
 }
 
 #app-loading {

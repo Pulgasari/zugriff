@@ -16,7 +16,10 @@ name: Build Capacitor packages
 #
 # The template's icons, bar colors and splash are replaced per app by
 # gen-capacitor-res.mjs: launcher icons from apps/<slug>/app.svg, status and
-# navigation bar plus launch screen in the registry color.
+# navigation bar plus launch screen in the registry color. Capacitor 8 runs the
+# webview edge-to-edge (capacitor.config SystemBars): on current webviews the page
+# paints its own theme behind the bars and pads with env(safe-area-inset-*), the
+# registry color only shows where capacitor insets the webview natively.
 #
 # Like the TWA build, each app is wrapped around its LIVE deployment URL
 # (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —
@@ -61,7 +64,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22   # capacitor 8 cli needs node >= 22
       - name: Extract capacitor apps
         id: parse
         env:
@@ -79,7 +82,7 @@ jobs:
         app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
-      BUILD_TOOLS: '34.0.0'
+      BUILD_TOOLS: '36.0.0'
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
       # stable key from secrets when present, else the throwaway defaults below.
       KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'android' }}
@@ -90,13 +93,13 @@ jobs:
 
       - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22   # capacitor 8 cli needs node >= 22
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21   # capacitor 8's android template compiles against java 21
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Set up the Android SDK
         uses: android-actions/setup-android@v4
@@ -104,7 +107,7 @@ jobs:
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;${BUILD_TOOLS}" > /dev/null
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;${BUILD_TOOLS}" > /dev/null
           # put zipalign + apksigner (used to sign the release artifacts) on PATH
           echo "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/build-tools/${BUILD_TOOLS}" >> "$GITHUB_PATH"
 
@@ -133,13 +136,12 @@ jobs:
 
           cd "$DIR"
           npm init -y > /dev/null
-          # Capacitor 6 line + the native filesystem plugin and the SAF directory
-          # picker the shim (cap-fs.js) talks to, plus the status and navigation
-          # bar plugins .shared/js/modules/bars.js drives on a theme change
+          # Capacitor 8 line (targetSdk 36, edge-to-edge) + the native filesystem
+          # plugin and the SAF directory picker the shim (cap-fs.js) talks to. the
+          # system bars need no plugin: SystemBars is part of @capacitor/core 8
           npm install --no-audit --no-fund \
-            @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 \
-            @capacitor/filesystem@6 @capawesome/capacitor-file-picker@6 \
-            @capacitor/status-bar@6 @hugotomazi/capacitor-navigation-bar@4
+            @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8 \
+            @capacitor/filesystem@8 @capawesome/capacitor-file-picker@8
 
           npx cap add android
           npx cap sync android

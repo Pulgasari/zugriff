@@ -213,7 +213,7 @@
 
 /* ── toast + mobile drawer ───────────────────────────────────────────────── */
 
-.toasts { position: fixed; left: 0; right: 0; bottom: 5.5rem; display: flex; justify-content: center; pointer-events: none; z-index: 80; }
+.toasts { position: fixed; left: 0; right: 0; bottom: calc(5.5rem + var(--safe-bottom)); display: flex; justify-content: center; pointer-events: none; z-index: 80; }
 .toast { padding: 0.6rem 1rem; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 8px 24px rgb(0 0 0 / 0.35); font-size: 0.85rem; }
 .toast.err { border-color: color-mix(in oklch, var(--c-null, #e06c75) 55%, var(--line)); color: var(--c-null, #e06c75); }
 
@@ -221,7 +221,7 @@
 @media (max-width: 860px) {
   .nav-toggle { display: inline-flex; }
   .brand .nav-close { display: inline-flex; }
-  .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 70; width: min(280px, 82vw); transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 4px 0 24px rgb(0 0 0 / 0.35); }
+  .sidebar { position: fixed; inset: var(--safe-top) auto var(--safe-bottom) var(--safe-left); z-index: 70; width: min(280px, 82vw); transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 4px 0 24px rgb(0 0 0 / 0.35); }
   .sidebar.open { transform: translateX(0); }
   .scrim-mobile { display: block; position: fixed; inset: 0; z-index: 65; background: rgb(0 0 0 / 0.5); }
 }
