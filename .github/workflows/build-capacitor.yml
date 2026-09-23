@@ -134,10 +134,12 @@ jobs:
           cd "$DIR"
           npm init -y > /dev/null
           # Capacitor 6 line + the native filesystem plugin and the SAF directory
-          # picker the shim (cap-fs.js) talks to
+          # picker the shim (cap-fs.js) talks to, plus the status and navigation
+          # bar plugins .shared/js/modules/bars.js drives on a theme change
           npm install --no-audit --no-fund \
             @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 \
-            @capacitor/filesystem@6 @capawesome/capacitor-file-picker@6
+            @capacitor/filesystem@6 @capawesome/capacitor-file-picker@6 \
+            @capacitor/status-bar@6 @hugotomazi/capacitor-navigation-bar@4
 
           npx cap add android
           npx cap sync android

@@ -55,7 +55,9 @@ durch die der App (`APP_SLUG=files node .github/scripts/gen-capacitor-res.mjs bu
 - **Launch-Screen** in der App-Farbe statt `@drawable/splash` (Capacitor-Logo).
 
 Die Farbe ist `color` aus der Registry, derselbe Wert wie `theme_color` im
-Manifest. Braucht `sharp` aus der `package.json` im Repo-Root. Die Leistenfarben
+Manifest. Zur Laufzeit übernimmt `.shared/js/modules/bars.js` (über
+`@capacitor/status-bar` und `@hugotomazi/capacitor-navigation-bar`) die Leisten
+bei jedem Theme-Wechsel, inklusive Icon-Kontrast für helle Themes. Braucht `sharp` aus der `package.json` im Repo-Root. Die Leistenfarben
 greifen nur bis `targetSdk` 34 (Capacitor 6); ab 35 erzwingt Android 15
 Edge-to-Edge.
 
