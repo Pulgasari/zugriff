@@ -40,7 +40,6 @@ const TABS      = [
   { value: 'episodes', label: 'episodes', icon: 'mdi:playlist-play' },
 ];
 
-
 // :::::: EXPLORER ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // ::: helpers
@@ -242,19 +241,12 @@ function ExploreEpisodeItem ({ author, date, description, duration, image, link,
 
       ${teaser && html`<p class='teaser'>${teaser}</p>`}
 
+      <${ActionMenu}>
+        <${SubscribeButton} entry=${entry} />
+        <${RememberButton}  entry=${entry} />
+      </${ActionMenu}>
+
       <${ActionMenu} items=${[
-        {
-          icon    : subscribed ? 'check' : 'mdi:podcast',
-          label   : podcast || 'Podcast',
-          title   : subscribed ? 'in your library' : 'open this podcast',
-          onClick : open,
-        },{
-          icon    : remembered ? 'bookmark' : 'bookmark-unfilled',
-          label   : remembered ? 'Forget'   : 'Remember',
-          title   : remembered ? 'Remove the podcast from the shortlist' : 'Keep the podcast for a closer look later',
-          onClick : () => app.explore.toggleRemembered({ author, image, url, id: podcastId, title: podcast }),
-        },
-        // an item with an empty href would render as a button that goes nowhere
         link && {
           icon  : 'mdi:open-in-new',
           href  : link,
@@ -275,12 +267,21 @@ function ExploreEpisodesIndex ({ episodes, remembered, subscribed, empty }) {
   `;
 }
 
-function RememberButton () {
-  const onClick      = () => explorer.toggleRemembered(entry),
+function RememberButton ({ entry }) {
+  const onClick      = () => explorer.toggleRemembered(entry);
   const isRemembered = false;
   const obj = isRemembered
     ? { icon: 'bookmark',          label: 'remembered', title: 'click to forget',   onClick }
     : { icon: 'bookmark-unfilled', label: 'remember',   title: 'click to remember', onClick };
+  
+  return html`<${Button} ...${obj} />`;
+}
+
+function RememberButton ({ entry }) {
+  const isSubscribed = false;
+  const obj = isSubscribed
+    ? { icon: 'check', label: 'In library', onClick: () => app.go('podcast', entry.id) }
+    : { icon: 'add',   label: 'Subscribe',  onClick: () => onSubscribe?.(entry) };
   
   return html`<${Button} ...${obj} />`;
 }
@@ -300,17 +301,10 @@ function ExplorePodcastItem ({ entry, remembered, subscribed, onSubscribe }) {
 
       <${Button} class='title' label=${entry.title} onClick=${open} />
 
-      <${ActionMenu} items=${[
-        {
-          icon    : remembered ? 'bookmark' : 'bookmark-unfilled',
-          label   : remembered ? 'Forget'   : 'Remember',
-          title   : remembered ? 'Remove from the shortlist' : 'Keep for a closer look later',
-          onClick : () => app.explore.toggleRemembered(entry),
-        },
-        subscribed
-          ? { icon: 'check', label: 'In library', onClick: () => app.go('podcast', entry.id) }
-          : { icon: 'add',   label: 'Subscribe',  onClick: () => onSubscribe?.(entry) },
-      ]} />
+      <${ActionMenu}>
+        <${SubscribeButton} entry=${entry} />
+        <${RememberButton}  entry=${entry} />
+      </${ActionMenu}>
     </aufbau-item>
   `;
 }
