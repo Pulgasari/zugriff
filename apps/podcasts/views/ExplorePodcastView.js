@@ -21,6 +21,8 @@ import Artwork         from './../components/Artwork.js';
 import PreviewEpisodes from './../components/PreviewEpisodes.js';
 
 import { useTable }                 from './../modules/hooks.js';
+
+import { preview, subscribe as subscribeTo, toggleRemembered } from './ExploreView.js';
 import { paragraphs, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -38,9 +40,9 @@ export default function ExplorePodcastView ({ id: url }) {
     data.value = null;
     error.value = '';
 
-    app.explore.preview(url)
-      .then (preview => { if (alive) data.value  = preview; })
-      .catch(err     => { if (alive) error.value = err?.message || String(err); });
+    preview(url)
+      .then (result => { if (alive) data.value  = result; })
+      .catch(err    => { if (alive) error.value = err?.message || String(err); });
 
     return () => { alive = false; };
   }, [url]);
@@ -69,7 +71,7 @@ export default function ExplorePodcastView ({ id: url }) {
     if (busy.value) return;
     busy.value = true;
     try {
-      await app.explore.subscribe({ id: podcast.id, url });
+      await subscribeTo({ id: podcast.id, url });
       app.toast.success(`Subscribed to ${podcast.title}`);
       app.go('podcast', podcast.id);
     }
@@ -79,7 +81,7 @@ export default function ExplorePodcastView ({ id: url }) {
 
   // the shortlist row is written from the feed, so it survives a directory that has
   // never heard of this podcast — pasting a feed url is a way in here too.
-  const remember = () => app.explore.toggleRemembered({
+  const remember = () => toggleRemembered({
     id     : podcast.id,
     url,
     title  : podcast.title,
