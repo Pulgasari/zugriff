@@ -1,5 +1,11 @@
 // podcasts :: views/ExploreView.js
 
+/* === REFACTORING ===
+- war auf unnötig zig files zerstreut
+- das ganz modul 'explore' ist eigtl. quatsch, weil das ganze zeug lebt eh nur hier
+- 
+*/
+
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 import { boolSignal, enumSignal, stringSignal, useSignal } from '@aufbau/signals';
@@ -87,7 +93,6 @@ function preview (rawUrl) {
     return { url, id: podcastIdByHash(url), feed, ...toRecords(url,feed) };
   })();
 
-  // a failed fetch must not be what every later visit gets handed back
   job.catch(() => previews.delete(url));
 
   previews.set(url, job);
@@ -244,23 +249,16 @@ function ExploreEpisodeItem ({ author, date, description, duration, image, link,
       <${ActionMenu}>
         <${SubscribeButton} entry=${entry} />
         <${RememberButton}  entry=${entry} />
+        ${link && html`<${Button} href=${link} icon='mdi:open-in-new' />`}
       </${ActionMenu}>
-
-      <${ActionMenu} items=${[
-        link && {
-          icon  : 'mdi:open-in-new',
-          href  : link,
-          title : 'open the episode in the store',
-        },
-      ].filter(Boolean)} />
     </aufbau-item>
   `;
 }
 
-function ExploreEpisodesIndex ({ episodes, remembered, subscribed, empty }) {
-  if (!episodes.length) return html`<${Empty} ...${empty} />`;
-
-  return html`
+function ExploreEpisodesIndex ({ episodes }) {
+  return (!episodes.length) 
+  ? html`<${Empty} ...${empty} />`
+  : html`
     <${Index} viewmode='list'>
       ${episodes.map(ExploreEpisodeItem)}
     </${Index}>
@@ -309,10 +307,10 @@ function ExplorePodcastItem ({ entry, remembered, subscribed, onSubscribe }) {
   `;
 }
 
-function ExplorePodcastsIndex ({ entries, remembered, subscribed, empty, onSubscribe }) {
-  if (!entries.length) return html`<${Empty} ...${empty} />`;
-
-  return html`
+function ExplorePodcastsIndex ({ entries }) {
+  return (!entries.length)
+  : html`<${Empty} ...${empty} />`
+  : html`
     <${Index} viewmode='list'>
       ${entries.map(ExplorePodcastItem)}
     </${Index}>
