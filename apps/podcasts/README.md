@@ -52,7 +52,7 @@ reference point (see `.shared/js/app.js`).
 
 ```
 app.js         assembles the handle: modules, state, actions, hotkeys, mount
-modules/       app logic — library, explore, database, player, feed, search,
+modules/       app logic — library, database, player, feed, search,
                methods (pure helpers)
 views/         routed main content — Latest, Podcasts, PodcastDetail, EpisodeDetail,
                Saved, Explore, ExplorePodcast
@@ -63,7 +63,7 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
 
 `app.js` hangs the modules on the handle and seeds the state:
 
-- `app.library` / `app.explore` / `app.player` / `app.thumbs` — the modules. `app.library` is read
+- `app.library` / `app.player` / `app.thumbs` — the modules. `app.library` is read
   synchronously (plain calls, no `.value`); `app.js` awaits `app.library.load()`
   once before mounting, so the first render already has the library.
 - `app.state` — a `signalStore` (`@aufbau/signals`, built in `.shared/js/app/state.js`).
@@ -118,13 +118,15 @@ destructuring the stable module refs); shared components load from
   api rejects comes back as HTTP 200 with no results, so that is turned into an error
   rather than read as "nothing found". The storefront list is
   `/.shared/json/countries.json`, which `<aufbau-picker src=…>` loads by itself.
-- **`modules/explore.js`** — the same library seen from outside: the directory
-  search, a feed read but not stored (`preview`, cached per url for the session) and
+- **`views/ExploreView.js`** — the same library seen from outside, kept in the view
+  since nothing else needs it (ExplorePodcastView imports the shared pieces from
+  there): the directory search, a feed read but not stored (`preview`, cached per url for the session) and
   the shortlist, a `shortlist` table of podcasts to come back to. A preview is keyed
   by the same `toRecords` a subscription is keyed by, so an episode looked at today
   and subscribed to tomorrow keeps its id and with it its progress. Subscribing hands
   the already parsed feed to `library.subscribe`, so it does not go down the proxy
-  twice, and drops the shortlist row.
+  twice, and drops the shortlist row. Query and tab are module-scope signals; the
+  storefront and the field persist under `podcasts:explore:`.
 - **`modules/hooks.js`** — `useTable(table, read, deps)`: a view's slice of the db,
   reloaded when that table changes, in this tab or another. Returns `null` until
   the first read lands, and remembers the last rows per key so navigating back

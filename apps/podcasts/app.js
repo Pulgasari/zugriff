@@ -13,7 +13,6 @@ import { createThumbCache } from '/.shared/js/thumbs.js';
 // scope sees whatever was on it at import time, and undefined stays undefined.
 app.db       = app.database;
 app.library  = await app.module('library');
-app.explore  = await app.module('explore');
 app.player   = await app.module('player');
 app.thumbs   = createThumbCache();
 
@@ -35,14 +34,6 @@ app.state.$extend({
   search         : { type: String, value: '' },   // shared episode filter, written by SearchPanel
   menuPosition   : { type: 'enum', values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
   playerPosition : { type: 'enum', values: ['top', 'bottom'], value: 'bottom' },
-
-  // the explore view. the query and the tab are where you are right now; the
-  // storefront and the field to match against are how you search, and they say
-  // `persist` because they are a preference, not a position.
-  exploreQuery     : { type: String, value: '' },
-  exploreTab       : { type: 'enum', values: ['podcasts', 'episodes'], value: 'podcasts' },
-  exploreCountry   : { type: String, value: app.explore.localCountry(), persist: true },
-  exploreAttribute : { type: 'enum', values: app.explore.ATTRIBUTES.map(option => option.value), value: app.explore.ANY, persist: true },
 
   // listening progress, keyed by episode id. the one part of the library that does
   // not come out of the db per view — it is read per row and written while playing.
