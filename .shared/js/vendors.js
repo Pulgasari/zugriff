@@ -4,11 +4,7 @@
 
 import { isArray, isObject, isString } from '@pulgasari/is';
 
-// ::: pulgasari utils
-export * from '@pulgasari/is';
-export * from '@pulgasari/obj';
-export * from '@pulgasari/str';
-export * from '@pulgasari/timing';
+
 
 // ::: preact + htm
 //import htm from 'htm';
@@ -31,13 +27,22 @@ const preact = {
 //const html = createHtml(h, Fragment);
 //const htx  = createHtml(h, Fragment);
 
-// htx
-export * from '@pulgasari/htx/adapters/preact.js';
 
 // :::::: EXPORT
 
+// ::: htx
+export * from '@htx/preact';
+
+// ::: preact
 export * from 'preact';
 export * from 'preact/hooks';
-export { signal, Signal, computed, effect, batch, untracked };
 export { preact };
-//export { htm, html, preact };
+
+// ::: signals
+export { signal, Signal, computed, effect, batch, untracked };
+
+// ::: pulgasari utils
+export * from '@pulgasari/is';
+export * from '@pulgasari/obj';
+export * from '@pulgasari/str';
+export * from '@pulgasari/timing';
