@@ -275,6 +275,16 @@ function ExploreEpisodesIndex ({ episodes, remembered, subscribed, empty }) {
   `;
 }
 
+function RememberButton () {
+  const onClick      = () => explorer.toggleRemembered(entry),
+  const isRemembered = false;
+  const obj = isRemembered
+    ? { icon: 'bookmark',          label: 'remembered', title: 'click to forget',   onClick }
+    : { icon: 'bookmark-unfilled', label: 'remember',   title: 'click to remember', onClick };
+  
+  return html`<${Button} ...${obj} />`;
+}
+
 function ExplorePodcastItem ({ entry, remembered, subscribed, onSubscribe }) {
   const open = () => app.go('explore-podcast', entry.url);
 
