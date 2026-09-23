@@ -300,8 +300,12 @@ function applyTheme (theme) {
 
       "@pulgasari/devtools"  : `${pkg}/js-packages/devtools/index.js`,
       "@pulgasari/devtools/" : `${pkg}/js-packages/devtools/`,
-      "@pulgasari/htx"       : `${pkg}/js-packages/htx/index.js`,
-      "@pulgasari/htx/"      : `${pkg}/js-packages/htx/`,
+      //"@pulgasari/htx"       : `${pkg}/js-packages/htx/index.js`,
+      //"@pulgasari/htx/"      : `${pkg}/js-packages/htx/`,
+
+      "@htx/htx"    : `${pkg}/htx/packages/htx/index.js`,
+      "@htx/js"     : `${pkg}/htx/packages/js/index.js`,
+      "@htx/preact" : `${pkg}/htx/packages/preact/index.js`,
 
       // ::: preact + htm — one instance only; dependents pin PREACT via
       // ?external= / ?deps= so esm.sh never ships a second copy
