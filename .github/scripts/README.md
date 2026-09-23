@@ -41,6 +41,24 @@ Capacitor injiziert seine native Bridge trotzdem in die Remote-Seite, sodass
 `@capacitor/filesystem` funktioniert. `appId` ist `dev.zugriff.<slug>` — identisch
 zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
 
+## `gen-capacitor-res.mjs`
+
+Läuft nach `cap add android` und ersetzt die Ressourcen des Capacitor-Templates
+durch die der App (`APP_SLUG=files node .github/scripts/gen-capacitor-res.mjs build/files`):
+
+- **Launcher-Icons** aus `apps/<slug>/app.svg`: legacy (`ic_launcher`,
+  `ic_launcher_round`) und adaptiv (`ic_launcher_foreground` + Hintergrundfarbe).
+  Ein vollflächiges Hintergrund-`<rect>` im SVG wird für den Vordergrund entfernt,
+  der Hintergrund kommt als eigene Ebene in der App-Farbe.
+- **Status- und Navigationsleiste** in der App-Farbe statt schwarz (DayNight-
+  Default des Templates), Icon-Kontrast per Luminanz.
+- **Launch-Screen** in der App-Farbe statt `@drawable/splash` (Capacitor-Logo).
+
+Die Farbe ist `color` aus der Registry, derselbe Wert wie `theme_color` im
+Manifest. Braucht `sharp` aus der `package.json` im Repo-Root. Die Leistenfarben
+greifen nur bis `targetSdk` 34 (Capacitor 6); ab 35 erzwingt Android 15
+Edge-to-Edge.
+
 ---
 
 ## Das `build`-Feld in der Registry

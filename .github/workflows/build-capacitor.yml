@@ -14,6 +14,10 @@ name: Build Capacitor packages
 # (.shared/js/modules/filesystem/) detects the Capacitor runtime and routes through
 # that native fs automatically (see platform.js).
 #
+# The template's icons, bar colors and splash are replaced per app by
+# gen-capacitor-res.mjs: launcher icons from apps/<slug>/app.svg, status and
+# navigation bar plus launch screen in the registry color.
+#
 # Like the TWA build, each app is wrapped around its LIVE deployment URL
 # (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —
 # Capacitor still injects its bridge into that remote page, so the plugins work.
@@ -137,6 +141,14 @@ jobs:
 
           npx cap add android
           npx cap sync android
+
+      - name: Brand the Android resources for ${{ matrix.app }}
+        run: |
+          # sharp, from the repo root's package.json
+          npm install --no-audit --no-fund
+          # launcher icons from app.svg, status/navigation bar + launch screen in the
+          # app color instead of the template's black bars and capacitor logo
+          APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-res.mjs "build/${{ matrix.app }}"
 
       - name: Build ${{ matrix.app }} (Gradle)
         run: |
