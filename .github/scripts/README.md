@@ -41,6 +41,32 @@ Capacitor injiziert seine native Bridge trotzdem in die Remote-Seite, sodass
 `@capacitor/filesystem` funktioniert. `appId` ist `dev.zugriff.<slug>` — identisch
 zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
 
+## `gen-capacitor-res.mjs`
+
+Läuft nach `cap add android` und ersetzt die Ressourcen des Capacitor-Templates
+durch die der App (`APP_SLUG=files node .github/scripts/gen-capacitor-res.mjs build/files`):
+
+- **Launcher-Icons** aus `apps/<slug>/app.svg`: legacy (`ic_launcher`,
+  `ic_launcher_round`) und adaptiv (`ic_launcher_foreground` + Hintergrundfarbe).
+  Ein vollflächiges Hintergrund-`<rect>` im SVG wird für den Vordergrund entfernt,
+  der Hintergrund kommt als eigene Ebene in der App-Farbe.
+- **Status- und Navigationsleiste** in der App-Farbe statt schwarz (DayNight-
+  Default des Templates), Icon-Kontrast per Luminanz.
+- **Launch-Screen** in der App-Farbe statt `@drawable/splash` (Capacitor-Logo).
+
+Die Farbe ist `color` aus der Registry, derselbe Wert wie `theme_color` im
+Manifest. Braucht `sharp` aus der `package.json` im Repo-Root.
+
+**Edge-to-Edge (Capacitor 8, `targetSdk` 36):** Android 15+ ignoriert die
+Leistenfarben. Das WebView läuft unter die Leisten (`SystemBars` in
+`capacitor.config.json`, `viewport-fit=cover`), `html` malt `var(--bg)` dahinter
+und `#app` hält per `env(safe-area-inset-*)` Abstand (`.shared/css/theme.css`).
+Die Leisten haben so automatisch die Theme-Farbe. Den Icon-Kontrast setzt
+`.shared/js/modules/bars.js` über das eingebaute `SystemBars`-Plugin bei jedem
+Theme-Wechsel. Die Farben aus diesem Skript bleiben Fallback für ältere
+Android-Versionen und ältere WebViews (< Chromium 140), bei denen Capacitor das
+WebView nativ einrückt.
+
 ---
 
 ## Das `build`-Feld in der Registry
@@ -72,7 +98,7 @@ stattdessen eine native Filesystem-Bridge (`@capacitor/filesystem`) mit, deren
 (`.shared/js/modules/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt
 automatisch das native FS (siehe `platform.js`).
 
-**Ablauf** (pro App): JDK 17 + Android SDK → Signing-Key bereitstellen →
+**Ablauf** (pro App): Node 22 + JDK 21 + Android SDK 36 → Signing-Key bereitstellen →
 Capacitor-Projekt scaffolden (`gen-capacitor-config.mjs` → `npm i
 @capacitor/{core,cli,android,filesystem}` + `@capawesome/capacitor-file-picker` →
 `cap add android` → `cap sync`) → `gradlew bundleRelease assembleRelease` →

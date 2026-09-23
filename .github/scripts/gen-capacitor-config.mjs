@@ -50,6 +50,15 @@ const outDir   = process.argv[2] || '.';
 // (same rule the TWA script uses, so the appId lines up with dev.zugriff.<slug>)
 const segment = slug.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');
 
+// relative luminance: DARK means light bar icons, for a dark app color
+const isLight = (color) => {
+  const hex = color.length === 4 ? [...color.slice(1)].map(c => c + c).join('') : color.slice(1, 7);
+  const lin = hex.match(/../g)
+    .map(c => parseInt(c, 16) / 255)
+    .map(c => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2] > 0.5;
+};
+
 const config = {
   appId   : `${idPrefix}.${segment}`,
   appName : app.short_name || app.name || slug,
@@ -59,7 +68,18 @@ const config = {
     androidScheme  : 'https',
     cleartext      : false,
   },
-  plugins : {},
+  plugins : {
+    // capacitor 8 runs edge-to-edge. `css` puts the webview under the bars and
+    // hands the page its insets (env() plus --safe-area-inset-*), the hint spares
+    // a layout jump until the viewport-fit=cover meta tag is read. the style sets
+    // the bar icons' contrast from the start; .shared/js/modules/bars.js follows
+    // later theme changes
+    SystemBars : {
+      insetsHandling              : 'css',
+      initialViewportFitValueHint : 'cover',
+      style                       : isLight(app.color) ? 'LIGHT' : 'DARK',
+    },
+  },
 };
 
 // offline fallback: shown only if the device is offline on first launch (with a
@@ -68,7 +88,7 @@ const fallback = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${config.appName}</title>
-<body style="margin:0;display:grid;place-items:center;min-height:100vh;font:16px system-ui;background:#282a36;color:#f8f8f2">
+<body style="margin:0;display:grid;place-items:center;min-height:100vh;font:16px system-ui;background:${app.color};color:#f8f8f2">
   <p style="opacity:.7">Offline — reconnect to open ${config.appName}.</p>
 </body>`;
 

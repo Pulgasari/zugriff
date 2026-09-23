@@ -11,6 +11,7 @@ import { createDB }                from '@bunker/db';
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
 import { toast }         from './modules/toast.js';
+import { syncBars }      from './modules/bars.js';
 
 import { registry } from './data/apps.js';
 import { themes }   from './data/themes.js';
@@ -98,6 +99,7 @@ const applyTheme = preset => {
   }
   const meta = $doc.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = palette.bg;
+  syncBars(palette.bg); // the native bars, inside the capacitor wrapper only
 };
 
 // :::::: APP

@@ -37,3 +37,4 @@
 
 ### planung/konzeot
 - [ ] außerdem will ich noch ne zweite "bauweise" erschaffen, die die apps bundled anstatt bloß ihre web/live/url zu wrappen. wie könnte man das machen? wad für verschiedene möglichkeiten gäbe es?
+  - [ ] appIds: bundled = `dev.zugriff.<appname>`, live-url-wrapper = `dev.zugriff.<appname>.live` (aktuell hat der live-build noch `dev.zugriff.<appname>`, muss umgestellt werden)

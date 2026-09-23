@@ -323,7 +323,7 @@
   .brand .nav-close { display: inline-flex; }
   .sidebar {
     position  : fixed;
-    inset     : 0 auto 0 0;
+    inset     : var(--safe-top) auto var(--safe-bottom) var(--safe-left);
     z-index   : 70;
     width     : min(300px, 84vw);
     transform : translateX(-100%);
