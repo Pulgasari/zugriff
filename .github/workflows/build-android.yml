@@ -152,7 +152,7 @@ jobs:
             -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" | grep -A1 'SHA256:' || true
 
       - name: Upload APK + AAB for ${{ matrix.app }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: android-${{ matrix.app }}
           path: |
@@ -173,7 +173,7 @@ jobs:
           path: android
           pattern: android-*
       - name: Bundle them into one artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: android-all               # one download, an android-<slug>/ folder per app
           path: android

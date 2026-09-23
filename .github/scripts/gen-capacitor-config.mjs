@@ -8,10 +8,10 @@
 // like the TWA, the app is wrapped around its *live* deployment URL rather than
 // bundling its static files: Capacitor's server.url points the webview at
 // https://zugriff.dev/<slug>/, and Capacitor still injects its native
-// bridge into that remote page, so @capacitor/filesystem (and the SAF picker)
-// work — which is the whole point. that native filesystem is what the browser
-// File System Access API can't give a TWA on Android (it re-confirms every
-// granted folder each visit); the SAF grant a Capacitor app takes is persisted.
+// bridge into that remote page, so native plugins (the repo's Saf plugin for
+// folder access) work — which is the whole point. a persisted SAF folder grant is
+// what the browser File System Access API can't give a TWA on Android (it
+// re-confirms every granted folder each visit).
 //
 // it writes two things into <projectDir>:
 //   capacitor.config.json   appId / appName / server.url / android scheme

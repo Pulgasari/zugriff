@@ -38,7 +38,7 @@ Capacitor ein nicht-leeres `webDir` verlangt) — deterministisch und ohne
 interaktives `cap init`. Wie die TWA wird die App um ihre **Live-URL** gewickelt
 (`server.url = https://zugriff.dev/<slug>/`) statt ihre Dateien zu bundlen;
 Capacitor injiziert seine native Bridge trotzdem in die Remote-Seite, sodass
-`@capacitor/filesystem` funktioniert. `appId` ist `dev.zugriff.<slug>` — identisch
+native Plugins (das eigene Saf-Plugin) funktionieren. `appId` ist `dev.zugriff.<slug>` — identisch
 zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
 
 ## `gen-capacitor-res.mjs`
@@ -67,6 +67,14 @@ Theme-Wechsel. Die Farben aus diesem Skript bleiben Fallback für ältere
 Android-Versionen und ältere WebViews (< Chromium 140), bei denen Capacitor das
 WebView nativ einrückt.
 
+## `add-capacitor-plugins.mjs`
+
+Kopiert die eigenen nativen Plugins aus `.github/capacitor/plugins/*.java` in das
+gescaffoldete Android-Projekt (Ziel-Ordner aus der `package`-Zeile) und
+registriert sie in `MainActivity` (`registerPlugin(...)` vor `super.onCreate`).
+npm-Plugins findet `cap sync` selbst, diese hier nicht. Aktuell: `SafPlugin`
+(Ordnerzugriff über SAF, als `Capacitor.Plugins.Saf`).
+
 ---
 
 ## Das `build`-Feld in der Registry
@@ -93,15 +101,17 @@ pro App.
 Browser-**File System Access API** — und die lässt Android bei jedem Besuch jeden
 freigegebenen Ordner neu bestätigen, was das „Ordner einmal freigeben und
 browsen"-Modell der Folder-Apps kaputt macht. Ein Capacitor-Wrapper bringt
-stattdessen eine native Filesystem-Bridge (`@capacitor/filesystem`) mit, deren
-**SAF-Freigabe persistiert** wird. Die geteilte Filesystem-Ebene
+stattdessen das eigene **Saf-Plugin** mit (`.github/capacitor/plugins/SafPlugin.java`),
+das Ordner über das Storage Access Framework liest und die **Freigabe
+persistiert**. `@capacitor/filesystem` taugt dafür nicht: es lehnt `content://`-URIs
+für `readdir` und alle Schreiboperationen ab. Die geteilte Filesystem-Ebene
 (`.shared/js/modules/filesystem/`) erkennt die Capacitor-Laufzeit und nutzt
-automatisch das native FS (siehe `platform.js`).
+automatisch das Plugin (siehe `platform.js`).
 
 **Ablauf** (pro App): Node 22 + JDK 21 + Android SDK 36 → Signing-Key bereitstellen →
 Capacitor-Projekt scaffolden (`gen-capacitor-config.mjs` → `npm i
-@capacitor/{core,cli,android,filesystem}` + `@capawesome/capacitor-file-picker` →
-`cap add android` → `cap sync`) → `gradlew bundleRelease assembleRelease` →
+@capacitor/{core,cli,android}` → `cap add android` → `cap sync`) → Ressourcen und
+eigene Plugins (`gen-capacitor-res.mjs`, `add-capacitor-plugins.mjs`) → `gradlew bundleRelease assembleRelease` →
 APK/AAB **signieren** (Capacitor baut unsigniert: `zipalign`+`apksigner` für die
 APK, `jarsigner` für die AAB) → als Artefakt hochladen. Ausgelöst **manuell** per
 `workflow_dispatch`; der optionale `app`-Input baut nur einen einzelnen Slug
