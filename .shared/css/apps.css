@@ -328,34 +328,27 @@ input  { padding: 0.5rem; width: 100%; }
   }
 }
 
-/* the tree itself — rendered by <aufbau-tree> / <aufbau-tree-item> */
-aufbau-tree, aufbau-tree-item { display: block; }
+/* the tree itself — rendered by <aufbau-tree> / <aufbau-tree-item>. the row is
+   the item's first child div, child items follow it directly */
+aufbau-tree-item {
+  --tree-indent: 0.85rem;
 
-.tree-node {
-  align-items: center;
-  cursor: pointer;
-  display: flex;
-  font-size: 0.85rem;
-  gap: 0.25rem;
-  padding: 0.25rem; 
+  > div {
+    font-size : 0.85rem;
+    gap       : 0.25rem;
+    padding   : 0.25rem;
 
-  &:hover                  { color: var(--fg); background: var(--hover); }
-  &.is-selected            { color: var(--fg); background: var(--accent-25); font-weight: 600; }
-  &.is-selected .tree-icon { color: var(--accent); }
+    &:hover { color: var(--fg); background: var(--hover); }
+  }
+
+  &[selected] > div {
+    color       : var(--fg);
+    background  : var(--accent-25);
+    font-weight : 600;
+
+    > aufbau-icon { color: var(--accent); }
+  }
 }
-
-.tree-toggle {
-  flex: none; display: inline-flex; align-items: center; justify-content: center;
-  border: none; background: none; cursor: pointer;
-  padding: 0; width: 1.1rem; transition: transform 0.12s;
-
-  &.is-expanded { transform: rotate(90deg); }
-}
-
-.tree-spacer   { flex: none; width: 1.1rem; }
-.tree-icon     { flex: none; }
-.tree-label    { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.tree-children { display: flex; flex-direction: column; padding-left: 0.85rem; }
 
 /* VIEW */
 
