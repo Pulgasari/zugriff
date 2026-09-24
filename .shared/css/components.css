@@ -112,109 +112,85 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 aufbau-upload[look="dropzone"], .dropzone {
   display: block;
   width  : 100%;
-
-  .upload-zone {
-    border        : 2px dashed var(--fg-25);
-    border-radius : 0.75rem;
-    padding       : 2.5rem;
-    gap           : 0.6rem;
-    font-size     : 0.9rem;
-    opacity       : 0.75;
-    transition    : border-color 0.15s, background 0.15s, opacity 0.15s;
-  }
-
-  &:hover .upload-zone,
-  &.is-dragging .upload-zone {
-    border-color : var(--accent);
-    background   : var(--accent-10);
-    opacity      : 1;
-  }
-
-  /* apps render their own file list */
-  .upload-list { display: none; }
 }
 
+aufbau-upload[look="dropzone"]::part(zone) {
+  border        : 2px dashed var(--fg-25);
+  border-radius : 0.75rem;
+  padding       : 2.5rem;
+  gap           : 0.6rem;
+  font-size     : 0.9rem;
+  opacity       : 0.75;
+  transition    : border-color 0.15s, background 0.15s, opacity 0.15s;
+  width         : 100%;
+}
+
+aufbau-upload[look="dropzone"]:hover::part(zone),
+aufbau-upload[look="dropzone"]:state(dragging)::part(zone) {
+  border-color : var(--accent);
+  background   : var(--accent-10);
+  opacity      : 1;
+}
+
+/* apps render their own file list */
+aufbau-upload[look="dropzone"]::part(list) { display: none; }
+
 /* ── picker (<aufbau-picker>) ───────────────────────────────────────────── */
+/* the ui lives in the shadow root, reachable as ::part(field|caret|listbox|option|trigger).
+   the selection is the extra part token `selected` */
 
 aufbau-picker, .picker {
   --radius : 0.25rem;
-  display  : inline-flex;
   color    : var(--fg);
-
-  .picker-group {
-    display : flex;
-    gap     : 1px;
-  }
-
-  &[look="segments"] {
-    .picker-option {
-      background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
-      color         : var(--fg);
-      border        : none;
-      border-radius : 0;
-      padding       : 0.25rem 0.5rem;
-      cursor        : pointer;
-
-      &[aria-checked="true"] {
-        background : var(--accent);
-        color      : var(--bg);
-      }
-
-      &:first-child { border-radius: var(--radius) 0 0 var(--radius); }
-      &:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
-      .picker-mark { display: none; }
-    }
-  }
-
 }
 
-/* combobox: a field that opens a list in the top layer. the list is a popover,
-   so it gets no colours from the page — it has to bring its own. */
+aufbau-picker[look="segments"] { gap: 1px; }
 
-.picker .picker-field {
+aufbau-picker[look="segments"]::part(option) {
+  background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
+  color         : var(--fg);
+  border-radius : 0;
+  padding       : 0.25rem 0.5rem;
+}
+
+aufbau-picker[look="segments"]::part(option selected) {
+  background : var(--accent);
+  color      : var(--bg);
+}
+
+/* combobox: the host is the field. cycle: a single button */
+aufbau-picker[look="combobox"],
+aufbau-picker[look="cycle"]::part(trigger) {
   background    : color-mix(in srgb, var(--fg) 5%, transparent);
   border        : 1px solid var(--fg-25);
   border-radius : var(--radius);
   padding       : 0.25rem 0.5rem;
-  min-width     : 10rem;
-}
-.picker.is-open .picker-field,
-.picker .picker-field:focus-within { border-color: var(--accent); }
-
-.picker .picker-input {
-  background : transparent;
-  border     : none;
-  outline    : none;
-  color      : var(--fg);
-  font       : inherit;
-  cursor     : inherit;
 }
 
-.picker .picker-caret { opacity: 0.5; }
+aufbau-picker[look="combobox"] { min-width: 10rem; }
+aufbau-picker[look="combobox"]:focus-within { border-color: var(--accent); }
+aufbau-picker::part(caret) { opacity: 0.5; }
 
-.picker .picker-list {
+/* the list is a popover, it gets no colours from the page and has to bring its own */
+aufbau-picker::part(listbox) {
   background    : var(--bg);
   color         : var(--fg);
   border        : 1px solid var(--fg-25);
   border-radius : var(--radius);
   box-shadow    : 0 8px 32px color-mix(in srgb, #000 45%, transparent);
   padding       : 0.25rem;
-  margin        : 0;
 }
 
-.picker .picker-list .picker-option {
-  display       : flex;
-  align-items   : center;
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option) {
   gap           : 0.4rem;
   padding       : 0.3rem 0.5rem;
   border-radius : var(--radius);
-  cursor        : pointer;
 }
-.picker .picker-list .picker-option:hover,
-.picker .picker-list .picker-option.is-active {
-  background : var(--accent-10);
-}
-.picker .picker-list .picker-option[aria-selected="true"] {
+
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option):hover,
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option):focus-visible { background: var(--accent-10); }
+
+aufbau-picker:is([look="combobox"], [look="cycle"])::part(option selected) {
   background : var(--accent);
   color      : var(--bg);
 }
