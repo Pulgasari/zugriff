@@ -6,7 +6,7 @@
 import zugriff               from './runtime.js';
 import aufbau                from '@aufbau/runtime';
 import { applyFilter }       from '@aufbau/filters';
-import { animatePattern }    from '@aufbau/patterns';
+import { applyPattern }      from '@aufbau/patterns';
 import { computed, signal }  from '@aufbau/signals';
 import getStyleToken         from '@domina/methods/getStyleToken.js';
 import { render }            from 'preact';
@@ -172,4 +172,4 @@ else {
 const bg = getStyleToken('bg') || '#000000';
 const fg = getStyleToken('fg') || '#c8d0e0';
 applyFilter('body', 'glitch-live', { animate: true, speed: "2s" });
-animatePattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
+applyPattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });

@@ -151,7 +151,7 @@ class ZugriffApp {
     // refreshes the boot-time colour cache (see applyTheme).
     state.$onEffects({
       dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
-      font  : value => { if (value) webfonts?.init?.({ name: value, target: '--font' }); },
+      font  : value => { if (value) webfonts.apply(value, { role: '--font' }); },
       lang  : value => { if ($root && value) $root.lang = value; },
       theme : value => applyTheme(value),
       title : value => { if ($doc && value) $doc.title = value; },
