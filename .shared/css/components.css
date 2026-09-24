@@ -112,28 +112,28 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 aufbau-upload[look="dropzone"], .dropzone {
   display: block;
   width  : 100%;
-
-  > button {
-    border        : 2px dashed var(--fg-25);
-    border-radius : 0.75rem;
-    padding       : 2.5rem;
-    gap           : 0.6rem;
-    font-size     : 0.9rem;
-    opacity       : 0.75;
-    transition    : border-color 0.15s, background 0.15s, opacity 0.15s;
-    width         : 100%;
-  }
-
-  &:hover > button,
-  &:state(dragging) > button {
-    border-color : var(--accent);
-    background   : var(--accent-10);
-    opacity      : 1;
-  }
-
-  /* apps render their own file list */
-  > ul { display: none; }
 }
+
+aufbau-upload[look="dropzone"]::part(zone) {
+  border        : 2px dashed var(--fg-25);
+  border-radius : 0.75rem;
+  padding       : 2.5rem;
+  gap           : 0.6rem;
+  font-size     : 0.9rem;
+  opacity       : 0.75;
+  transition    : border-color 0.15s, background 0.15s, opacity 0.15s;
+  width         : 100%;
+}
+
+aufbau-upload[look="dropzone"]:hover::part(zone),
+aufbau-upload[look="dropzone"]:state(dragging)::part(zone) {
+  border-color : var(--accent);
+  background   : var(--accent-10);
+  opacity      : 1;
+}
+
+/* apps render their own file list */
+aufbau-upload[look="dropzone"]::part(list) { display: none; }
 
 /* ── picker (<aufbau-picker>) ───────────────────────────────────────────── */
 /* the ui lives in the shadow root, reachable as ::part(field|caret|listbox|option|trigger).
