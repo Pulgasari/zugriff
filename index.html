@@ -23,17 +23,16 @@
         link('icon', '/icon.svg', { type: 'image/svg+xml' });
         link('stylesheet', '/.shared/css/launcher.css');
       } else {
-        const base = '/' + route;
+        const basePath = '/' + route;
         document.documentElement.dataset.app   = route;
         document.documentElement.dataset.theme = 'dracula';
-        link('manifest', base + '/manifest.json');
-        link('icon', base + '/app.svg', { type: 'image/svg+xml' });
-        link('apple-touch-icon', base + '/app.svg');
+        link('manifest', basePath + '/manifest.json');
+        link('icon', basePath + '/app.svg', { type: 'image/svg+xml' });
+        link('apple-touch-icon', basePath + '/app.svg');
         link('stylesheet', '/.shared/css/explorer.css');
         link('stylesheet', '/.shared/css/apps.css');
-        link('stylesheet', base + '/app.css');
+        link('stylesheet', basePath + '/app.css');
       }
-      //link('stylesheet', '/.shared/css/devtools.css');
     })();
   </script>
 
@@ -53,28 +52,22 @@
 <div id='app'></div>
 
 <script type="module">
-  // the single mount point: await the runtime boot.js started, then hand off to the
-  // launcher module (home/apps/tools) or the route's own app.js (an app route).
   try { await (window.__ZUGRIFF_READY__ ?? import('/.shared/js/runtime.js')); }
   catch (error) { console.error('[shell] runtime not ready:', error); }
 
   const route    = location.pathname.split('/')[1] || 'home';
   const launcher = route === 'home' || route === 'apps' || route === 'tools';
 
-  if (launcher) {
-    await import('/.shared/js/launcher.js');
-  } else {
-    if (route === 'icons') await import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
-    await import('/' + route + '/app.js');
-  }
+  if (launcher) await import('/.shared/js/launcher.js');
+  else          await import('/' + route + '/app.js');
+  
+  if (route === 'icons') await import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
 </script>
 <script type="module">
-  // devtools are opt-in: any ?dev in the query pulls them in, ?dev=off / ?dev=0 keeps them out.
-  // the specifier comes from the importmap boot.js injects.
   const dev = new URLSearchParams(location.search).get('dev');
 
   if (dev !== null && dev !== 'off' && dev !== '0') {
-    try { await import('@pulgasari/devtools/boot.js'); }
+    try           { await import('@pulgasari/devtools/boot.js'); }
     catch (error) { console.error('[shell] devtools not loaded:', error); }
   }
 </script>
