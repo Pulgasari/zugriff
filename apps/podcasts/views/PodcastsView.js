@@ -35,16 +35,19 @@ function PodcastsView () {
           <${IconButton} icon="add" label="Add podcast" onClick=${() => app.state.dialog = 'add'} />
         </div>
       </header>
-
-      <${PodcastsIndex}
-        podcasts=${sortedPodcasts}
-        empty=${{
-          icon  : 'rss', 
-          title : 'No subscriptions yet',
-          hint  : "Paste a podcast's RSS feed URL to subscribe." 
-        }}
+      
+      <main>
+        <${PodcastsIndex}
+          podcasts=${sortedPodcasts}
+          empty=${{
+            icon  : 'rss', 
+            title : 'No subscriptions yet',
+            hint  : "Paste a podcast's RSS feed URL to subscribe." 
+          }}
         />
-    </${View}>`;
+      </main>
+    </${View}>
+  `;
 }
 
 export default PodcastsView;
