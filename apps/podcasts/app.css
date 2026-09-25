@@ -8,13 +8,13 @@ BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
   flex-flow : column;
   
   > header       { order: 1; }
-  > footer       { order: 2; position: sticky; top: 0; }
+  > footer       { order: 2; position: sticky; top: 0; background: var(--bg); }
   > aufbau-index { order: 3; }
 
   > *            { padding: 1rem; }
   > aufbau-index { padding: 0; }
 
-  .search-panel      { width: 100%; background: var(--bg); padding: 1rem;}
+  .search-panel      { width: 100%; }
   aufbau-input       { width: stretch; }
   aufbau-input input { }
 }
