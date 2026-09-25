@@ -12,44 +12,42 @@ const normalize = opt => {
   if (isObject(opt)) return {
     value : opt.value,
     label : opt.label ?? (opt.icon ? '' : String(opt.value)),
-    icon  : opt.icon ?? null,
+    icon  : opt.icon  ?? null,
     title : opt.title ?? opt.label ?? String(opt.value),
   };
   return { value: opt, label: String(opt), icon: null, title: String(opt) };
 };
 
-// `src` is a file of options the element loads for itself (json/csv/yaml — see
-// @aufbau/import); `options` and `src` can be used together, the loaded ones come last.
-function Picker ({ options = [], sig, value, onChange, look = 'segments', multiple, src, searchable, placeholder, class: klass }) {
-  const current = sig ? sig.value : value;
+function Option ({ icon, label, title, value }) {
+  return html`
+    <aufbau-option
+      key=${value}
+      ...${{ icon, label, title, value }}
+    ></aufbau-option>
+  `;
+}
+
+// `src` is a file of options the element loads for itself (json/csv/yaml
+// — see @aufbau/import); `options` and `src` can be used together, the loaded ones come last.      
+function Picker ({ options = [], sig, signal, onChange, searchable, value, ...rest }) {
+  if (sig) signal = sig; // const current = signal ? signal.value : value;
+  
+  if (signal) value   = signal.value;
+  if (signal) options = signal.values;
 
   const change = event => {
     const next = event.detail?.value ?? event.target?.value;
-    if (sig) sig.value = next;
+    if (signal) signal.value = next;
     onChange?.(next);
   };
 
   return html`
     <aufbau-picker
-      class=${['picker', klass].filter(Boolean).join(' ')}
-      look=${look}
-      multiple=${multiple}
-      placeholder=${placeholder}
       searchable=${searchable || undefined}
-      src=${src}
-      value=${current}
       onChange=${change}
-      >
-      ${options.map(normalize).map(
-        opt => html`
-          <aufbau-option
-            key=${opt.value}
-            value=${opt.value}
-            label=${opt.label}
-            icon=${opt.icon}
-            title=${opt.title}
-          ></aufbau-option>
-        `)}
+      ...${{ look, multiple, placeholder, src, value, ...rest }}
+    >
+      ${options.map(normalize).map(Option)}
     </aufbau-picker>
   `;
 }
