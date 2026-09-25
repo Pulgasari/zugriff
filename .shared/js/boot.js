@@ -252,6 +252,7 @@ function applyTheme (theme) {
       "@bunker/core"    : `${pkg}/bunker/core/index.js`,
       "@bunker/db"      : `${pkg}/bunker/db/index.js`,
       "@bunker/kit"     : `${pkg}/bunker/kit/index.js`,
+      "@bunker/opfs"    : `${pkg}/bunker/opfs/index.js`,
       "@bunker/policy"  : `${pkg}/bunker/policy/index.js`,
       "@bunker/storage" : `${pkg}/bunker/storage/index.js`,
       "@bunker/utils"   : `${pkg}/bunker/utils/index.js`,
