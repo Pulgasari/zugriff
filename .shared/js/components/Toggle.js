@@ -1,8 +1,6 @@
 // components/Toggle.js
 // wraps <aufbau-toggle look='switch'>.
 
-import { html } from './../vendors.js';
-
 function Toggle ({ value = false, onChange, label, look = 'switch' }) {
   const change = event => onChange?.(Boolean(event.target?.checked));
 
