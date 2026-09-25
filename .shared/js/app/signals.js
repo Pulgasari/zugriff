@@ -6,9 +6,7 @@
 //
 //   const format = stored('webp', 'image-converter:format');
 
-import { local, session, typedSignal } from '@aufbau/signals';
+import { typedSignal } from '@aufbau/signals';
 
-export const stored   = (value, key, storage = 'local') => typedSignal({ type: 'scalar', value, key, storage });
-export const storedIn = store => (value, key) => stored(value, key, store);
+export const stored = (value, key, storage = 'local') => typedSignal({ type: 'scalar', value, key, storage });
 
-export { local, session };
