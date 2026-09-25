@@ -12,7 +12,7 @@ function SavedView () {
   if (!episodes || !podcasts) return null;
 
   const byId     = Object.fromEntries(episodes.map(ep => [ep.id, ep]));
-  const showById = Object.fromEntries(podcasts.map(p  => [p.id, p]));
+  const showById = Object.fromEntries(podcasts.map(p  =>  [p.id,  p]));
 
   // the saved ids carry the order (newest saved first); the episodes come from the db
   const list = app.library.savedIds()
@@ -27,9 +27,11 @@ function SavedView () {
   };
 
   return html`
-    <${View}>
-      <header><h1>Listen later</h1></header>
-      <${EpisodesIndex} episodes=${list} empty=${empty} />
+    <${View} title='listen later'>
+      <main>
+        ${list && html`<${SearchPanel} />`}
+        <${EpisodesIndex} episodes=${list} empty=${empty} />
+      </main>
     </${View}>
   `;
 }
