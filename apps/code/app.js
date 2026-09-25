@@ -9,14 +9,22 @@ import { disableAndroidKeyboard, enableAndroidKeyboard } from './modules/keyboar
 const app = zugriff.app;
 
 // :::::: STATE
-app.state.modal  = null;                    // active overlay id | null (ephemeral)
-app.state.config = { ...configDefaults };   // chrome / panel prefs (persisted)
-app.state.editor = { ...editorDefaults };   // monaco construction options (persisted)
-app.persist('config');
-app.persist('editor');
+// config and editor are deep: every option is its own signal, read and written as
+// app.state.config.fontSize. both persist, stored options merge over the defaults
+app.state.$extend({
+  modal  : { type: 'scalar', value: null },                                   // active overlay id | null
+  config : { type: 'deep',   value: { ...configDefaults }, persist: true },   // chrome / panel prefs
+  editor : { type: 'deep',   value: { ...editorDefaults }, persist: true },   // monaco construction options
+});
+
+// the overlays are this app's own, one at a time
+app.openModal   = id => app.state.modal = id;
+app.closeModal  = () => app.state.modal = null;
+app.toggleModal = id => app.state.modal = app.state.$modal === id ? null : id;
 
 // :::::: MODULES
 app.commands   = await app.module('commands');
+app.exec       = id => app.commands.get(id)?.exec();
 app.editor     = await app.module('editor');
 app.files      = await app.module('files');
 app.workspaces = await app.module('workspaces');
@@ -62,7 +70,7 @@ app.workspaces.webdav.load().catch(() => {});
 
 function App () {
   const cfg   = app.state.config;
-  const modal = app.state.modal;
+  const modal = app.state.$modal;
 
   return html`
     <div id="workspace">

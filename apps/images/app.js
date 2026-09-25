@@ -53,7 +53,7 @@ function ModeBar () {
       <${Brand} app=${app} />
       <nav class="im-modes">
         ${router.routes.map(m => html`
-          <button class=${'im-mode' + (app.state.route === m.id ? ' active' : '')} key=${m.id}
+          <button class=${'im-mode' + (app.state.$route === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => m.id === 'edit' ? editCurrent() : app.setRoute(m.id)}
                   title=${m.label}>
             <${Icon} name=${m.icon} /> <span>${m.label}</span>

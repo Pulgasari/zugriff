@@ -20,7 +20,7 @@ function copyPrompt (content) {
 
 export default function Detail () {
   const prompt = activePrompt();
-  const isEdit = app.state.editMode;
+  const isEdit = app.state.$editMode;
 
   const [title,   setTitle]   = useState('');
   const [content, setContent] = useState('');

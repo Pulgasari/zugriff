@@ -8,7 +8,7 @@ const { useState } = preact;
 import CodeInputPane from './../components/CodeInputPane.js';
 import Icon          from './../components/Icon.js';
 
-import { stored }    from './../lib/signals.js'; // needs: @aufbau/signals
+import { typedSignal } from '@aufbau/signals';
 
 // ── shared type helpers ───────────────────────────────────────────────────────
 let typeOf    = v => v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v;
@@ -111,7 +111,7 @@ function DataInspectorApp ({
   emptyIcon   = 'mdi:code-json',
   emptyLabel  = 'Paste data and click Inspect',
 }) {
-  let input  = stored('', appID + ':input');
+  let input  = typedSignal({ value: '', key: appID + ':input' });
   let parsed = signal(null);
   let errMsg = signal('');
   let search = signal('');

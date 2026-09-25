@@ -6,7 +6,7 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=image-converter';
 import { Button, Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -14,8 +14,8 @@ const APP_ID = 'image-converter';
 
 // ── state ────────────────────────────────────────────────────────────────────
 let files   = signal([]); // { id, file, status, blobUrl, outName, error }
-let format  = stored( 'webp' , APP_ID + '--format'  );
-let quality = stored( 90     , APP_ID + '--quality' );
+let format  = typedSignal({ value: 'webp', key: APP_ID + '--format' });
+let quality = typedSignal({ value: 90, key: APP_ID + '--quality' });
 let FORMATS = ['jpg', 'png', 'webp'];
 
 // ── helpers ──────────────────────────────────────────────────────────────────

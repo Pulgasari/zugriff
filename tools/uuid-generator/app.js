@@ -6,12 +6,12 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=uuid-generator';
 import { CopyIcon, Icon, Picker, Slider } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
-let count   = stored(5,    'uuidgen:count');
-let version = stored('v4', 'uuidgen:version');
+let count   = typedSignal({ value: 5, key: 'uuidgen:count' });
+let version = typedSignal({ value: 'v4', key: 'uuidgen:version' });
 let uuids   = signal([]);
 let copied  = signal(null);
 

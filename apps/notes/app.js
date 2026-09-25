@@ -30,8 +30,10 @@ const { fs } = zugriff;
 
 // ::: state
 
-app.state.filter    = '';
-app.state.isNavOpen = false;
+app.state.$extend({
+  filter    : { type: 'scalar', value: '' },
+  isNavOpen : { type: 'scalar', value: false },
+});
 
 // durable state — hydrates from + persists to localStorage
 const open = typedSignal({ type: 'scalar', value: null, key: 'notes:open', storage: 'local' });   // { sourceId, path } | null
@@ -59,14 +61,14 @@ const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
 function Sidebar () {
   return html`
-    <aside class=${'sidebar' + (app.state.isNavOpen ? ' open' : '')}>
+    <aside class=${'sidebar' + (app.state.$isNavOpen ? ' open' : '')}>
       <${Brand} app=${app} />
       <${Button} icon='close' aria-label='close' onClick=${closeSidebar} />
       <${SearchPanel} placeholder='filter notes ...' appStateId='filter' />
 
       <${FolderTree}
         lib=${app.lib}
-        filter=${app.state.filter}
+        filter=${app.state.$filter}
         selected=${open.value}
         onOpen=${(sourceId, path) => { open.value = { sourceId, path }; closeSidebar(); }}
         onRemoveSource=${id => { if (open.value?.sourceId === id) open.value = null; }}
@@ -153,7 +155,7 @@ function NotesReader () {
 }
 
 const dockItems = [
-  { icon: 'menu', label: 'menu', onClick: () => app.state.isNavOpen = !app.state.isNavOpen },
+  { icon: 'menu', label: 'menu', onClick: () => app.state.isNavOpen = !app.state.$isNavOpen },
 ];
 
 function App () {

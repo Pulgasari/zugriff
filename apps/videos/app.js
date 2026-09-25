@@ -43,7 +43,7 @@ function ModeBar () {
       <div class="im-brand"><${Icon} name="mdi:movie-open-outline" /> <span>videos</span></div>
       <nav class="im-modes">
         ${router.routes.map(m => html`
-          <button class=${'im-mode' + (app.state.route === m.id ? ' active' : '')} key=${m.id}
+          <button class=${'im-mode' + (app.state.$route === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => app.setRoute(m.id)} title=${m.label}>
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}

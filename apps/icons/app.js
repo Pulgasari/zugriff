@@ -8,9 +8,8 @@
 // favourites from @bunker/db (modules/db.js).
 
 // ::: vendors
-import { signal, computed } from '@aufbau/signals';
+import { computed, signal, typedSignal } from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
-import { stored } from '/.shared/js/app/signals.js';
 import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
@@ -33,17 +32,19 @@ app.db  = await app.module('db');
 // set / search) stay as plain signals — a set is thousands of names, better not deep-wrapped.
 
 app.state.route     = { name: 'home', id: null };   // home | sets | set | search | favorites
-app.state.nav       = false;                          // mobile drawer
-app.state.detail    = null;                           // selected icon name | null
-app.state.setFilter = '';                             // filter on the sets list
-app.state.query     = '';                             // search box
+app.state.$extend({
+  nav       : { type: 'scalar', value: false },   // mobile drawer
+  detail    : { type: 'scalar', value: null },    // selected icon name | null
+  setFilter : { type: 'scalar', value: '' },      // filter on the sets list
+  query     : { type: 'scalar', value: '' },      // search box
+});
 
 const collections = signal(null);   // [{ prefix, name, total, … }] | null
 const setData     = signal(null);   // { prefix, title, total, icons } for route 'set'
 const setLoading  = signal(false);
 const results     = signal([]);
 const searching   = signal(false);
-const itemSize    = stored(88, 'icons:item-size'); // persisted grid zoom
+const itemSize    = typedSignal({ value: 88, key: 'icons:item-size' }); // persisted grid zoom
 
 // :::::: DATA :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -79,7 +80,7 @@ function onSearch (value) {
 // :::::: ACTIONS + HOTKEYS ::::::::::::::::::::::::::::::::::
 // escape backs out of the open sheet, then the mobile drawer
 
-app.actions = { 'dismiss': () => { if (app.state.detail) app.state.detail = null; else app.state.nav = false; } };
+app.actions = { 'dismiss': () => { if (app.state.$detail) app.state.detail = null; else app.state.nav = false; } };
 app.hotKeys = { 'escape': { action: 'dismiss', global: true } };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
@@ -88,7 +89,7 @@ const nfmt = n => n?.toLocaleString?.() ?? String(n ?? 0);
 
 const filteredSets = computed(() => {
   const list = collections.value || [];
-  const q = app.state.setFilter.trim().toLowerCase();
+  const q = app.state.$setFilter.trim().toLowerCase();
   return q ? list.filter(c => c.name.toLowerCase().includes(q) || c.prefix.toLowerCase().includes(q)) : list;
 });
 
@@ -234,7 +235,7 @@ function SearchView () {
   return html`
     <div class="searchview">
       ${searching.value ? html`<${Loading}/>`
-        : app.state.query.trim() ? html`<${IconGrid} names=${results.value} />`
+        : app.state.$query.trim() ? html`<${IconGrid} names=${results.value} />`
         : html`<${Empty} icon='search' hint='Search across every Iconify set.' />`}
     </div>
   `;
@@ -248,7 +249,7 @@ function FavoritesView () {
 }
 
 function Content () {
-  switch (app.state.route.name) {
+  switch (app.state.$route.name) {
     case 'sets':      return html`<${SetsView} />`;
     case 'set':       return html`<${SetView} />`;
     case 'search':    return html`<${SearchView} />`;
@@ -280,7 +281,7 @@ function SizeControl () {
 }
 
 function TopBar () {
-  const r = app.state.route;
+  const r = app.state.$route;
   const grid = r.name === 'set' || r.name === 'search' || r.name === 'favorites';
   return html`
     <header class="topbar">
@@ -290,12 +291,12 @@ function TopBar () {
       ${r.name === 'search'
         ? html`<div class="searchbox big">
             <${Icon} name='search' />
-            <input type="search" placeholder="Search all of Iconify…" autofocus value=${app.state.query} onInput=${e => onSearch(e.target.value)} />
+            <input type="search" placeholder="Search all of Iconify…" autofocus value=${app.state.$query} onInput=${e => onSearch(e.target.value)} />
           </div>`
         : r.name === 'sets'
         ? html`<div class="searchbox">
             <${Icon} name='search' />
-            <input type="search" placeholder="Filter sets…" value=${app.state.setFilter} onInput=${e => app.state.setFilter = e.target.value} />
+            <input type="search" placeholder="Filter sets…" value=${app.state.$setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
         : html`<h1>${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
 
@@ -308,7 +309,7 @@ function TopBar () {
 // ── detail sheet ─────────────────────────────────────────────────────────
 
 function Detail () {
-  const name = app.state.detail;
+  const name = app.state.$detail;
   if (!name) return null;
   const [prefix, icon] = name.split(':');
   const fav = app.db.favs.value.has(name);

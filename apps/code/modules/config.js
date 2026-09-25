@@ -1,6 +1,6 @@
 // apps/code/modules/config.js
 // the app's chrome / panel configuration — plain scalars seeded onto app.state.config
-// (a deep-signal subtree, persisted per app.persist). theme/font/dir live on the
+// (a deep leaf of app.state, persisted by the store). theme/font/dir live on the
 // shared base state, not here.
 
 export const DEFAULTS = {

@@ -7,14 +7,14 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 import { boot, config } from '/.shared/js/app.js?slug=json-formatter';
 import { Icon } from '/.shared/js/components/index.js';
 import { CodeInputPane, CodeOutputPane } from '/.shared/js/components/code.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
 // ── state ──────────────────────────────────────────────────────────────────
 
-const input  = stored('', 'json-formatter:input');
-const indent = stored(2,  'json-formatter:indent');
+const input  = typedSignal({ value: '', key: 'json-formatter:input' });
+const indent = typedSignal({ value: 2, key: 'json-formatter:indent' });
 const output = signal('');
 const status = signal('idle');
 const errMsg = signal('');
