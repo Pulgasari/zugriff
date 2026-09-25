@@ -444,4 +444,9 @@ transform & opacity laufen auf GPU
 
 */
 
+/* :::: view changes :::::::::::::::::::::::::::::::::::::::::
+   the browser's own cross fade, see transitions.js. the frame looks the same
+   before and after, so what visibly moves is the view */
 
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: 180ms; }

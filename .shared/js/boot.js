@@ -178,11 +178,13 @@ function applyTheme (theme) {
   
   
 
+  // hidden until ready. an app page reveals itself once its first view has settled
+  // (transitions.js), any other page on load. the timeout is the failsafe: an app
+  // that crashed on the way must not leave an empty page behind
+  const ready = () => { $root.classList.remove('is-loading'); $root.classList.add('is-ready'); };
   $root.classList.add('is-loading');
-  window.addEventListener('load', () => {
-    $root.classList.remove('is-loading');
-    $root.classList.add('is-ready');
-  });
+  if ($root.dataset.app) setTimeout(ready, 4000);
+  else window.addEventListener('load', ready);
 
   // Merge options: HTML data-attributes < global window config < default options
   const ds = currentScript.dataset;

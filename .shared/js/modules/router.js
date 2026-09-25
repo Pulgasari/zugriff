@@ -10,7 +10,8 @@
 //   router.routes.map(r => … r.id … )        // build a nav; app.state.route is active
 //   app.setRoute('edit')                      // navigate (updates state + url)
 
-import { html } from './../vendors.js';
+import { transition } from './../transitions.js';
+import { html }       from './../vendors.js';
 
 export function createRouter (app, { routes, param = 'route', fallback } = {}) {
   // accept an array ([{ id, component, … }]) or a map ({ id: { component, … } })
@@ -31,8 +32,8 @@ export function createRouter (app, { routes, param = 'route', fallback } = {}) {
 
   const go = id => {
     if (!valid(id)) return;
-    app.state.route = id;
     writeUrl(id);
+    return transition(() => { app.state.route = id; });
   };
 
   // initial route: a valid ?param= wins, else the caller's fallback, else the first
