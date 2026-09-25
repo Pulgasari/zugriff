@@ -273,13 +273,13 @@ function ExploreView () {
   return html`
     <${View} class='explore-view' id|title='explore' tools=${tools}>
       <main>
-        <${Picker} class='tabs' look='segments' options=${TABS} sig=${state.tab} />
+        <${Picker} class='tabs' look='segments' options=${TABS} signal=${state.tab} />
 
         <${SearchPanel} placeholder='darknet diaries — or https://example.com/feed.xml' signal=${state.query} />
 
         <div class='filters'>
-          <${Picker} class='country'   look='combobox' placeholder='storefront …' sig=${state.country} src=${COUNTRIES} searchable />
-          <${Picker} class='attribute' look='combobox' placeholder='match …'      sig=${state.attribute} options=${ATTRIBUTES} />
+          <${Picker} class|placeholder='country'   look='combobox' signal=${state.country} src=${COUNTRIES} searchable />
+          <${Picker} class|placeholder='attribute' look='combobox' signal=${state.attribute} options=${ATTRIBUTES} />
         </div>
 
         ${isUrl      && html`<${Button} icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
