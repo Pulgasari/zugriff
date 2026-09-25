@@ -8,7 +8,7 @@ const app = zugriff.app;
 
 function Artwork ({ src, size = 48, className = '', onClick }) {
   // phase: 'pending' | 'ready' (thumb) | 'orig' (fallback to source) | 'none'
-  const state = useSignal({ value: { url: null, phase: src ? 'pending' : 'none', broken: false }});
+  const state = useSignal({ url: null, phase: src ? 'pending' : 'none', broken: false });
 
   useEffect(() => {
     // read the cache off the handle here, never at module scope: app.js hangs

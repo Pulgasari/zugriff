@@ -10,12 +10,9 @@ import { isArray, isObject, isString } from '@pulgasari/is';
 //import htm from 'htm';
 import * as preactCore  from 'preact';
 import * as preactHooks from 'preact/hooks';
-import { preactSignal, PreactSignal, computed, effect, batch, untracked } from '@aufbau/signals';
+import { Signal, batch, computed, effect, signal, untracked } from '@aufbau/signals';
 
 const { h, Fragment } = preactCore;
-
-const signal = preactSignal;
-const Signal = PreactSignal;
 
 const preact = {
   ...preactCore,

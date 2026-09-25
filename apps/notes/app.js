@@ -2,7 +2,7 @@
 
 // :::::: IMPORT
 
-import { computed, local, signal } from '@aufbau/signals';
+import { computed, signal, typedSignal } from '@aufbau/signals';
 import { useEffect, useState }     from 'preact/hooks';
 
 import FolderLibrary from '/.shared/js/modules/folders.js';
@@ -34,7 +34,7 @@ app.state.filter    = '';
 app.state.isNavOpen = false;
 
 // durable state — hydrates from + persists to localStorage
-const open = signal({ value: null, key: 'notes:open', store: local });   // { sourceId, path } | null
+const open = typedSignal({ type: 'scalar', value: null, key: 'notes:open', storage: 'local' });   // { sourceId, path } | null
 
 const closeSidebar = () => app.state.isNavOpen = false;
 const  openSidebar = () => app.state.isNavOpen = true;

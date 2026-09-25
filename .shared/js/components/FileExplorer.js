@@ -30,7 +30,7 @@ which keeps the sub-views free of prop-drilling.
 
 import { html, useEffect, useRef }  from './../vendors.js';
 import { computed, signal        }  from './../vendors.js';
-import { signal as persist, local } from '@aufbau/signals';
+import { typedSignal }              from '@aufbau/signals';
 
 import Icon        from './Icon.js';
 
@@ -54,7 +54,7 @@ const menu     = signal(null);    // { x, y, entry }
 const dragging = signal(false);
 const busy     = signal(false);   // a write is in flight
 
-const view = persist({ value: 'list', key: 'files:view', store: local });   // 'list' | 'grid'
+const view = typedSignal({ type: 'scalar', value: 'list', key: 'files:view', storage: 'local' });   // 'list' | 'grid'
 
 const writable = computed(() => !!backend.value?.writable);
 
