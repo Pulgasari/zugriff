@@ -3,6 +3,41 @@ NOTE FOR CLAUDE: YOU ARE NOT ALLOWED TO EDIT THIS
 BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
 */
 
+.view {
+  display   : flex;
+  flex-flow : column;
+  
+  > header       { order: 1; }
+  > footer       { order: 2; position: sticky; top: 0; }
+  > aufbau-index { order: 3; }
+
+  > *            { padding: 1rem; }
+  > aufbau-index { padding: 0; }
+
+  .search-panel      { width: 100%; background: var(--bg); padding: 1rem;}
+  aufbau-input       { width: stretch; }
+  aufbau-input input { }
+}
+
+#episode,
+#podcast {
+  > main > .art {
+    max-width: 75%;
+    img { width: stretch; }
+  }
+}
+
+aufbau-item {
+  contain-intrinsic-height: auto 170px;
+  content-visibility: auto;
+  transition-behavior: allow-discrete;
+}
+
+aufbau-item {
+  .meta       { display: flex; justify-content: space-between; }
+  .ActionMenu { display: flex; align-items: center; gap: 0.5rem; }
+}
+
 /*
 SUGGESTION — add-podcast dialog (dialogs/AddPodcastDialog.js)
 the markup is: .Modal.add-podcast > main > input, i.note, .results > li > button
