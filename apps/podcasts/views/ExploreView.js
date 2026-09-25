@@ -279,7 +279,7 @@ function ExploreView () {
   const tools = html`<${IconButton} icon='add' label='Add by URL' onClick=${() => app.state.dialog = 'add'} />`;
 
   return html`
-    <${View} class='explore-view' id='explore' title='Explore' tools=${tools}>
+    <${View} class='explore-view' id|title='explore' tools=${tools}>
       <main>
         <${Picker} class='tabs' look='segments' options=${TABS} sig=${state.tab} />
 
