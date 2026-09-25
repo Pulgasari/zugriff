@@ -1,12 +1,4 @@
 // podcasts :: views/ExploreView.js
-//
-// looking around before committing: a hit opens the podcast instead of subscribing
-// to it. two tabs over one query (podcasts, single episodes) and two filters that
-// decide what is searched at all: the storefront (`country`) and the field the term
-// is matched against (`attribute`). with no query the podcasts tab is the shortlist.
-//
-// everything explore needs lives here. ExplorePodcastView imports the few pieces it
-// shares (preview, subscribe, toggleRemembered) from this file.
 
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -294,11 +286,7 @@ function ExploreView () {
         ${note.value && html`<i class='note'>${note.value}</i>`}
         ${busy.value && html`<${Loading} text='searching …' />`}
 
-        ${!text && tab === 'podcasts' && html`<div class='section'><span>Shortlist</span></div>`}
-
-        ${isReady && !isUrl && html`
-          <${Results} ...${{ tab, entries, empty, remembered, subscribed }} />
-        `}
+        ${isReady && !isUrl && html`<${Results} ...${{ tab, entries, empty, remembered, subscribed }} />`}
       </main>
     </${View}>
   `;
