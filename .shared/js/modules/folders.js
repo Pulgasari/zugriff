@@ -91,12 +91,10 @@ export class FolderLibrary {
       this.perm   = signal('prompt');    // 'granted' | 'prompt' | 'denied'
     }
     else {
-      // a plain object is CONFIG to the signal factory, so a map has to be wrapped
-      // in { value } — signal({}) would leave .value undefined.
-      this.sources  = signal([]);              // [{ id, name, handle, addedAt }]
-      this.perms    = signal({ value: {} });   // id -> permission state
-      this.scanning = signal({ value: {} });   // id -> true while scanning
-      this.trees    = signal({ value: {} });   // id -> scanned tree (the built-in scan)
+      this.sources  = signal([]);   // [{ id, name, handle, addedAt }]
+      this.perms    = signal({});   // id -> permission state
+      this.scanning = signal({});   // id -> true while scanning
+      this.trees    = signal({});   // id -> scanned tree (the built-in scan)
     }
 
     // bind the public surface so callers can `export const load = lib.load`

@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 import aufbau from '@aufbau/runtime';
-import { effect, signal, local }   from '@aufbau/signals';
+import { effect, signal }          from '@aufbau/signals';
 import { boolSignal, signalStore } from '@aufbau/signals';
 import webfonts                    from '@aufbau/webfonts';
 import { createDB }                from '@bunker/db';
@@ -143,8 +143,8 @@ class ZugriffApp {
       dialog : { type: 'scalar', value: null },
       route  : { type: 'scalar', value: null },
     }, {
-      key   : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
-      store : local,
+      key     : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
+      storage : 'local',
     });
 
     // pure side effects — persistence is the store's job. theme additionally

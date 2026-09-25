@@ -10,7 +10,7 @@
 
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-import { local, signalStore, useSignal } from '@aufbau/signals';
+import { signalStore, useSignal } from '@aufbau/signals';
 import { useEffect }                     from 'preact/hooks';
 
 // ::: shared components
@@ -62,7 +62,7 @@ const state = signalStore({
   tab       : { type: 'enum', values: TABS.map(tab => tab.value), value: 'podcasts' },
   country   : { type: String, value: localCountry() },
   attribute : { type: 'enum', values: ATTRIBUTES.map(option => option.value), value: ANY },
-}, { key: 'podcasts:explore:', store: local, persist: ['country', 'attribute'] });
+}, { key: 'podcasts:explore:', storage: 'local', persist: ['country', 'attribute'] });
 
 // :::::: HELPERS ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // a directory hit, a shortlist row and a preview describe the same podcast; the

@@ -2,7 +2,7 @@
 
 // :::::: IMPORT
 
-import { signal as persist, local } from '@aufbau/signals';
+import { typedSignal } from '@aufbau/signals';
 
 import Button  from './Button.js';
 import Icon    from './Icon.js';
@@ -14,7 +14,7 @@ import Tree    from './Tree.js';
 // one persisted expanded-set per key, so repeat renders reuse the same signal
 const expandedStores = new Map;
 const expandedSignal = key => {
-  if (!expandedStores.has(key)) expandedStores.set(key, persist({ value: [], key, store: local }));
+  if (!expandedStores.has(key)) expandedStores.set(key, typedSignal({ type: 'scalar', value: [], key, storage: 'local' }));
   return expandedStores.get(key);
 };
 
