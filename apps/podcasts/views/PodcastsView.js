@@ -1,8 +1,9 @@
 // podcasts :: views/PodcastsView.js
 
-import IconButton       from '/.shared/js/components/IconButton.js';
-import Picker           from '/.shared/js/components/Picker.js';
-import View             from '/.shared/js/components/View.js';
+import IconButton from '/.shared/js/components/IconButton.js';
+import Picker     from '/.shared/js/components/Picker.js';
+import View       from '/.shared/js/components/View.js';
+
 import PodcastsIndex    from './../components/PodcastsIndex.js';
 import { useTable }     from './../modules/hooks.js';
 import { sortPodcasts } from './../modules/methods.js';
