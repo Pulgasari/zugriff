@@ -3,7 +3,7 @@
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 import { signalStore, useSignal } from '@aufbau/signals';
-import { useEffect }                     from 'preact/hooks';
+import { useEffect }              from 'preact/hooks';
 
 // ::: shared components
 import ActionMenu  from '/.shared/js/components/ActionMenu.js';
