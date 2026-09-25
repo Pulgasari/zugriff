@@ -1,5 +1,21 @@
 // .shared/js/vendors.js
 
+/*
+// ::: htx
+export * from '@htx/preact';
+
+// ::: preact
+export * from 'preact';
+export * from 'preact/hooks';
+export * from '@aufbau/signals';
+
+// ::: pulgasari utils
+export * from '@pulgasari/is';
+export * from '@pulgasari/obj';
+export * from '@pulgasari/str';
+export * from '@pulgasari/timing';
+*/
+
 //
 
 import { isArray, isObject, isString } from '@pulgasari/is';
