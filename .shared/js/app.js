@@ -21,9 +21,7 @@ import { html, render } from './vendors.js';
 // :::::: HELPERS
 
 const configFor = slug => (slug && registry.get(slug)) || {};
-
-// a dynamic import resolves to its default export, else the whole namespace
-const pick = mod => mod?.default ?? mod;
+const pick      = mod  => mod?.default ?? mod;
 
 // :::::: PWA
 
@@ -33,8 +31,8 @@ const standalone = () =>
     window.matchMedia?.('(display-mode: window-controls-overlay)')?.matches ||
     window.navigator?.standalone === true));
 
-const canInstall  = signal(false);
-const isInstalled = signal(standalone());
+const canInstall  = signal (false);
+const isInstalled = signal (standalone());
 
 let deferred = null;
 
@@ -107,30 +105,26 @@ const applyTheme = preset => {
 class ZugriffApp {
 
   constructor (slug) {
-    this.slug     = slug;
-    this.config   = configFor(slug);
-    this.baseURL  = new URL(`/${slug}/`, location.origin);   // absolute — loaders resolve against it
-    this.url      = this.baseURL.href;
+    this.baseURL  = new URL(`/${slug}/`, location.origin);
+    this.config   = (slug && registry.get(slug)) || {};
     this.database = createDB('zugriff:' + slug);
+    this.slug     = slug;
     this.state    = this.#createState();
-    this.toast    = toast;
-    this.effect   = effect;
+    this.url      = this.baseURL.href;
 
-    // ::: behaviour registries — actions (named callbacks) + hotkeys wired to them
-    this._actions = createActions();
-    this._hotkeys = createHotkeys(this._actions);
+    this.effect   = effect;
+    this.toast    = toast;
+    
+    // ::: registries
+    this._actions = createActions ();
+    this._hotkeys = createHotkeys (this._actions);
   }
 
   // ::: state
-  // in the constructor, not a class field: a field initialises before the
-  // constructor body has assigned this.config, and both the schema and the effects
-  // read it. $onEffects runs each one right away with the leaf's current value —
-  // after hydration, so a stored theme is applied rather than the declared default.
   #createState () {
     const config = this.config;
 
-    const state = signalStore({
-      //dir: { signal: config.dir },
+    const state = signalStore ({
       color    : { type: 'scalar', value: config.color },
       dir      : { type: 'enum',   value: config.dir, values: ['ltr', 'rtl'] },
       font     : { type: String,   value: config.font  ?? 'Manrope' },
@@ -143,7 +137,7 @@ class ZugriffApp {
       dialog : { type: 'scalar', value: null },
       route  : { type: 'scalar', value: null },
     }, {
-      key     : `zugriff:${config.id ?? 'app'}:`,   // shared prefix; each leaf persists under it
+      key     : `zugriff:${config.id ?? 'app'}:`, // shared prefix; each leaf persists under it
       storage : 'local',
     });
 
