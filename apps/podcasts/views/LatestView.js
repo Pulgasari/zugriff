@@ -50,11 +50,10 @@ export default function LatestView () {
         </div>
       </header>
 
-      <${EpisodesIndex} episodes=${filteredEpisodes} empty=${empty} />
-
-      <footer>
+      <main>
         ${hasSubs && html`<${SearchPanel} placeholder="filter episodes …" />`}
-      </footer>
+        <${EpisodesIndex} episodes=${filteredEpisodes} empty=${empty} />
+      </main>
     </${View}>
   `;
 }
