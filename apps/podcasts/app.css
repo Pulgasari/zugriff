@@ -6,17 +6,20 @@ BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
 .view {
   display   : flex;
   flex-flow : column;
-  
-  > header       { order: 1; }
-  > footer       { order: 2; position: sticky; top: 0; background: var(--bg); }
-  > aufbau-index { order: 3; }
 
-  > *            { padding: 1rem; }
-  > aufbau-index { padding: 0; }
+  > * { padding: 1rem; }
 
-  .search-panel      { width: 100%; }
-  aufbau-input       { width: stretch; }
-  aufbau-input input { }
+  .search-panel { width: 100%; position: sticky; top: 0; }
+  aufbau-input  { width: stretch; }
+
+  .search-panel { background: var(--bg); }
+
+  /*
+  &.episodes-view > main { padding: 0; }
+  &.podcasts-view > main { padding: 0; }
+  &.explorer-view > main { padding: 0; }
+  */
+  > main:has(> aufbau-index) { padding: 0; }
 }
 
 #episode,
