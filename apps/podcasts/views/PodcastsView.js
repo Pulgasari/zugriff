@@ -25,7 +25,7 @@ function PodcastsView () {
       <header>
         <h1>Podcasts</h1>
         <div class="view-tools">
-          <${Picker} signal=${sorting} />
+          <${Picker} signal=${sorting}  look='segments' />
           <${Picker} signal=${viewmode} look='segments' />
           <${IconButton} icon|label='add' onClick=${() => app.state.dialog = 'add'} />    
         </div>
