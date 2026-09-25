@@ -45,7 +45,7 @@ function Picker ({ options = [], sig, signal, onChange, searchable, value, ...re
     <aufbau-picker
       searchable=${searchable || undefined}
       onChange=${change}
-      ...${{ look, multiple, placeholder, src, value, ...rest }}
+      ...${{ value, ...rest }}
     >
       ${options.map(normalize).map(Option)}
     </aufbau-picker>
