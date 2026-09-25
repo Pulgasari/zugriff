@@ -11,6 +11,7 @@ import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
 import { toast }         from './modules/toast.js';
 import { syncBars }      from './modules/bars.js';
+import { reveal, transition } from './transitions.js';
 
 import { registry } from './data/apps.js';
 import { themes }   from './data/themes.js';
@@ -20,6 +21,11 @@ import { html, render } from './vendors.js';
 // :::::: HELPERS
 
 const pick = mod => mod?.default ?? mod;
+
+// the plural of a loader: loads all names at once, resolves to { name: export }.
+// a path keeps its last segment as the key: 'folder/Name' -> Name, '@aufbau/filters' -> filters
+const many = load => (...names) => Promise.all(names.map(name => load(name)))
+  .then(loaded => Object.fromEntries(names.map((name, index) => [name.split('/').pop(), loaded[index]])));
 
 // :::::: PWA
 
@@ -153,6 +159,12 @@ class ZugriffApp {
   module    = name => this.import('modules'    + `/${name}.js`);
   panel     = name => this.import('panels'     + `/${name}.js`);
   view      = name => this.import('views'      + `/${name}.js`);
+
+  components = many(this.component);
+  dialogs    = many(this.dialog);
+  modules    = many(this.module);
+  panels     = many(this.panel);
+  views      = many(this.view);
   
   // ::: actions
   get actions ()    { return this._actions; }
@@ -162,9 +174,10 @@ class ZugriffApp {
   get hotkeys ()    { return this._hotkeys; }
   set hotkeys (map) { this._hotkeys.define(map); }
 
-  // ::: routes. an app with a router gets setRoute rewired to keep the url in sync
-  setRoute = (id = null)       => this.state.route = id;
-  go       = (name, id = null) => this.state.route = { name, id };
+  // ::: routes, each change a view transition (transitions.js). an app with a
+  // router gets setRoute rewired to keep the url in sync
+  setRoute = (id = null)       => transition(() => { this.state.route = id; });
+  go       = (name, id = null) => transition(() => { this.state.route = { name, id }; });
 
   // ::: pwa (install-to-home-screen), lifted off the shared plumbing
   canInstall    = canInstall;
@@ -179,6 +192,7 @@ class ZugriffApp {
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
 
     if (App) render(html`<${App} />`, $target);
+    await reveal($target);   // frame, dock and first view appear together
     return this;
   };
 
@@ -186,5 +200,5 @@ class ZugriffApp {
 
 // :::::: EXPORT
 
-export       { ZugriffApp };
+export       { ZugriffApp, many };
 export default ZugriffApp;

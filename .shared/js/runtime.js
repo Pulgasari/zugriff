@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 import registry          from './data/apps.js';
-import { ZugriffApp }    from './app.js';
+import { ZugriffApp, many } from './app.js';
 import fmt               from './modules/fmt.js';
 import * as fs           from './modules/fs.js';
 import { toast }         from './modules/toast.js';
@@ -63,8 +63,10 @@ const zugriff = {
   toast,
 
   // loaders
-  component : loadComponent,
-  module    : loadModule,
+  component  : loadComponent,
+  components : many(loadComponent),
+  module     : loadModule,
+  modules    : many(loadModule),
   loadComponent,
   loadModule,
 

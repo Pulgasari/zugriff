@@ -11,18 +11,17 @@ import { createThumbCache } from '/.shared/js/thumbs.js';
 // ::: HANDLE
 // before anything is imported that reads the handle: a component captured at module
 // scope sees whatever was on it at import time, and undefined stays undefined.
-app.db       = app.database;
-app.library  = await app.module('library');
-app.player   = await app.module('player');
-app.thumbs   = createThumbCache();
+const { library, player } = await app.modules('library', 'player');
 
-const // shared components
-Dock = await zugriff.component('Dock'),
-Icon = await zugriff.component('Icon'),
-Slot = await zugriff.component('Slot');
+app.db      = app.database;
+app.library = library;
+app.player  = player;
+app.thumbs  = createThumbCache();
 
-const // panels
-PlayerPanel = await app.panel('PlayerPanel');
+const [{ Dock, Icon, Slot }, { PlayerPanel }] = await Promise.all([
+  zugriff.components('Dock', 'Icon', 'Slot'),
+  app.panels('PlayerPanel'),
+]);
 
 // :::: STATE
 // dialog and route are declared by createState; this app's own keys go on the same

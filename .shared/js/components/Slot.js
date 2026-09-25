@@ -39,9 +39,13 @@ function useSlot (kind, entry) {
   return key ? loaded.get(key) ?? null : null;
 }
 
+/** the imports slots have started and not finished, for transitions.js to wait on */
+const pendingSlots = () => [...loading.values()];
+
 function Slot ({ map, name, load = 'view', fallback = null, ...props }) {
   const Component = useSlot(load, map?.[name]);
   return Component ? html`<${Component} ...${props} />` : fallback;
 }
 
+export { pendingSlots };
 export default Slot;
