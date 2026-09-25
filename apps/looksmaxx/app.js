@@ -25,13 +25,15 @@ const config = app.config;
 
 const MAX_DIM = 1400;   // cap the working resolution for a smooth recolour
 
-app.state.status      = '';     // '' | 'loading' | 'segmenting' | 'detecting' | 'error…'
-app.state.hasPhoto    = false;
 app.state.color       = null;   // { r, g, b } | null
-app.state.strength    = 0.85;
-app.state.styleId     = null;   // hairstyle id | 'custom' | null
-app.state.styleScale  = 1;
-app.state.styleOffset = 0;      // fraction of head height, negative = up
+app.state.$extend({
+  status      : { type: 'scalar', value: '' },      // '' | 'loading' | 'segmenting' | 'detecting' | 'error…'
+  hasPhoto    : { type: 'scalar', value: false },
+  strength    : { type: 'scalar', value: 0.85 },
+  styleId     : { type: 'scalar', value: null },    // hairstyle id | 'custom' | null
+  styleScale  : { type: 'scalar', value: 1 },
+  styleOffset : { type: 'scalar', value: 0 },       // fraction of head height, negative = up
+});
 
 // non-reactive working data (plain refs, not signals — they never render directly)
 const work = {
@@ -95,13 +97,13 @@ function compose () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(base, 0, 0);
 
-  if (app.state.color && work.mask) {
-    recolorHair(ctx, { width: canvas.width, height: canvas.height }, work.mask, app.state.color, app.state.strength);
+  if (app.state.$color && work.mask) {
+    recolorHair(ctx, { width: canvas.width, height: canvas.height }, work.mask, app.state.$color, app.state.$strength);
   }
-  if (app.state.styleId && work.styleImg && work.face) {
+  if (app.state.$styleId && work.styleImg && work.face) {
     drawHairstyle(ctx, work.face, work.styleImg, {
       width: canvas.width, height: canvas.height,
-      scale: app.state.styleScale, offsetY: app.state.styleOffset,
+      scale: app.state.$styleScale, offsetY: app.state.$styleOffset,
     });
   }
 }
@@ -133,7 +135,7 @@ function reset () {
 }
 
 function download () {
-  const canvas = view.current; if (!canvas || !app.state.hasPhoto) return;
+  const canvas = view.current; if (!canvas || !app.state.$hasPhoto) return;
   canvas.toBlob(blob => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -164,11 +166,11 @@ function ColorRow () {
   return html`
     <div class="group">
       <div class="group-head"><span>Hair colour</span>
-        ${app.state.color && html`<button class="link" onClick=${() => { app.state.color = null; compose(); }}>none</button>`}
+        ${app.state.$color && html`<button class="link" onClick=${() => { app.state.color = null; compose(); }}>none</button>`}
       </div>
       <div class="swatches">
         ${SWATCHES.map(s => html`
-          <button class=${'swatch' + (isSame(app.state.color, s) ? ' on' : '')}
+          <button class=${'swatch' + (isSame(app.state.$color, s) ? ' on' : '')}
                   title=${s.name} style=${`background:rgb(${s.r},${s.g},${s.b})`}
                   onClick=${() => { app.state.color = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
         <label class="swatch custom" title="Custom colour">
@@ -176,10 +178,10 @@ function ColorRow () {
           <input type="color" onInput=${onCustom} />
         </label>
       </div>
-      ${app.state.color && html`
+      ${app.state.$color && html`
         <label class="slider">
           <span>Intensity</span>
-          <input type="range" min="0" max="1" step="0.01" value=${app.state.strength}
+          <input type="range" min="0" max="1" step="0.01" value=${app.state.$strength}
                  onInput=${e => { app.state.strength = +e.target.value; compose(); }} />
         </label>`}
     </div>`;
@@ -196,28 +198,28 @@ function StyleRow () {
     <div class="group">
       <div class="group-head"><span>Hairstyle</span></div>
       <div class="styles">
-        <button class=${'style none' + (!app.state.styleId ? ' on' : '')} onClick=${() => useStyle(null)}>
+        <button class=${'style none' + (!app.state.$styleId ? ' on' : '')} onClick=${() => useStyle(null)}>
           <${Icon} name="mdi:cancel" /><span>None</span>
         </button>
         ${HAIRSTYLES.map(s => html`
-          <button class=${'style' + (app.state.styleId === s.id ? ' on' : '')} onClick=${() => useStyle(s)}>
+          <button class=${'style' + (app.state.$styleId === s.id ? ' on' : '')} onClick=${() => useStyle(s)}>
             <img src=${s.src} alt=${s.name} /><span>${s.name}</span>
           </button>`)}
-        <label class=${'style upload' + (app.state.styleId === 'custom' ? ' on' : '')}>
+        <label class=${'style upload' + (app.state.$styleId === 'custom' ? ' on' : '')}>
           <${Icon} name="mdi:tray-arrow-up" /><span>Your PNG</span>
           <input type="file" accept="image/png,image/*" hidden onChange=${onCustom} />
         </label>
       </div>
-      ${app.state.styleId && work.face && html`
+      ${app.state.$styleId && work.face && html`
         <label class="slider">
           <span>Size</span>
-          <input type="range" min="0.6" max="1.8" step="0.01" value=${app.state.styleScale}
+          <input type="range" min="0.6" max="1.8" step="0.01" value=${app.state.$styleScale}
                  onInput=${e => { app.state.styleScale = +e.target.value; compose(); }} />
         </label>`}
-      ${app.state.styleId && work.face && html`
+      ${app.state.$styleId && work.face && html`
         <label class="slider">
           <span>Height</span>
-          <input type="range" min="-0.4" max="0.4" step="0.01" value=${app.state.styleOffset}
+          <input type="range" min="-0.4" max="0.4" step="0.01" value=${app.state.$styleOffset}
                  onInput=${e => { app.state.styleOffset = +e.target.value; compose(); }} />
         </label>`}
     </div>`;
@@ -234,7 +236,7 @@ function App () {
       <${Icon} name=${config.icon} />
       <strong>${config.name}</strong>
       <div class="spacer"></div>
-      ${app.state.hasPhoto && html`
+      ${app.state.$hasPhoto && html`
         <label class="ibtn" title="New photo">
           <${Icon} name="mdi:image-refresh-outline" />
           <input type="file" accept="image/*" hidden onChange=${onNew} />
@@ -244,16 +246,16 @@ function App () {
     </header>
 
     <main class="stage">
-      ${!app.state.hasPhoto ? html`<${Dropzone} />` : html`
+      ${!app.state.$hasPhoto ? html`<${Dropzone} />` : html`
         <div class="canvas-wrap">
           <canvas ref=${canvasRef}></canvas>
-          ${app.state.status && html`<div class="overlay-status"><span class="spin"></span>${label(app.state.status)}</div>`}
+          ${app.state.$status && html`<div class="overlay-status"><span class="spin"></span>${label(app.state.$status)}</div>`}
         </div>`}
     </main>
 
-    ${app.state.hasPhoto && html`
+    ${app.state.$hasPhoto && html`
       <footer class="controls">
-        ${app.state.status && !isBusy(app.state.status) && html`<div class="msg">${app.state.status}</div>`}
+        ${app.state.$status && !isBusy(app.state.$status) && html`<div class="msg">${app.state.$status}</div>`}
         <${ColorRow} />
         <${StyleRow} />
       </footer>`}`;

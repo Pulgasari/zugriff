@@ -2,14 +2,14 @@
 // the command palette — search every command, star favourites, run one.
 
 import { useState } from 'preact/hooks';
-import { stored } from '/.shared/js/app/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 import Modal from './Modal.js';
 import Icon  from '/.shared/js/components/Icon.js';
 
 const app = zugriff.app;
 
-export const favoritesSignal = stored([], 'code:favs');
+export const favoritesSignal = typedSignal({ value: [], key: 'code:favs' });
 
 export default function Commands () {
   const [search, setSearch] = useState('');

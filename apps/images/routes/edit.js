@@ -2,10 +2,9 @@
 // edit route (ex image-editor): load the tray's current image into a canvas and
 // adjust / crop / resize / export. editCurrent is the shared "open in editor".
 
-import { signal, computed }   from '@aufbau/signals';
+import { computed, signal, typedSignal }   from '@aufbau/signals';
 import { useEffect, useRef }  from 'preact/hooks';
 import { Icon, IconButton } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/app/signals.js';
 import * as edit from '../modules/edit.js';
 import * as fx   from '../modules/filters.js';
 import { current, isImageFile } from '../modules/state.js';
@@ -30,11 +29,11 @@ const resizeW  = signal(0);
 const resizeH  = signal(0);
 const lockAR   = signal(true);
 
-const exportFmt = stored('image/png', 'images:edit:format');
-const quality   = stored(92, 'images:edit:quality');
-const panelTab  = stored('adjust', 'images:edit:tab'); // 'adjust' | 'effects' | 'resize' | 'export'
+const exportFmt = typedSignal({ value: 'image/png', key: 'images:edit:format' });
+const quality   = typedSignal({ value: 92, key: 'images:edit:quality' });
+const panelTab  = typedSignal({ value: 'adjust', key: 'images:edit:tab' }); // 'adjust' | 'effects' | 'resize' | 'export'
 
-const effect    = stored('none', 'images:edit:effect'); // an @aufbau/filters id, or 'none'
+const effect    = typedSignal({ value: 'none', key: 'images:edit:effect' }); // an @aufbau/filters id, or 'none'
 const effectAmt = signal(1);                             // the effect's `amount`, when it has one
 
 function selectEffect (id) {

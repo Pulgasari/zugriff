@@ -5,8 +5,7 @@
 // streams each file straight off disk via an object url. state is mirrored into
 // signals the ui binds to.
 
-import { signal } from '@aufbau/signals';
-import { stored } from '/.shared/js/app/signals.js';
+import { signal, typedSignal } from '@aufbau/signals';
 import { fileAt } from './db.js';
 
 const audio = new Audio;
@@ -20,9 +19,9 @@ time     = signal(0),
 duration = signal(0),
 error    = signal('');
 
-export const volume  = stored(1, 'audio:volume');
-export const shuffle = stored(false, 'audio:shuffle');
-export const repeat  = stored('off', 'audio:repeat');   // off | all | one
+export const volume  = typedSignal({ value: 1, key: 'audio:volume' });
+export const shuffle = typedSignal({ value: false, key: 'audio:shuffle' });
+export const repeat  = typedSignal({ value: 'off', key: 'audio:repeat' });   // off | all | one
 
 audio.volume = volume.value;
 

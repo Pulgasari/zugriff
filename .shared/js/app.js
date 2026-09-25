@@ -3,10 +3,9 @@
 // :::::: IMPORTS
 
 import aufbau from '@aufbau/runtime';
-import { effect, signal }          from '@aufbau/signals';
-import { boolSignal, signalStore } from '@aufbau/signals';
-import webfonts                    from '@aufbau/webfonts';
-import { createDB }                from '@bunker/db';
+import { effect, signal, signalStore } from '@aufbau/signals';
+import webfonts                        from '@aufbau/webfonts';
+import { createDB }                    from '@bunker/db';
 
 import { createActions } from './modules/actions.js';
 import { createHotkeys } from './modules/hotkeys.js';
@@ -20,8 +19,7 @@ import { html, render } from './vendors.js';
 
 // :::::: HELPERS
 
-const configFor = slug => (slug && registry.get(slug)) || {};
-const pick      = mod  => mod?.default ?? mod;
+const pick = mod => mod?.default ?? mod;
 
 // :::::: PWA
 
@@ -71,13 +69,7 @@ async function promptInstall () {
   }
 }
 
-// :::::: STAT
-
-/*
-const LS = {
-  set : (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
-}
-*/
+// :::::: THEME
 
 const $doc  = typeof document !== 'undefined' ? document : null;
 const $root = $doc?.documentElement ?? null;
@@ -137,7 +129,7 @@ class ZugriffApp {
       dialog : { type: 'scalar', value: null },
       route  : { type: 'scalar', value: null },
     }, {
-      key     : `zugriff:${config.id ?? 'app'}:`, // shared prefix; each leaf persists under it
+      key     : `zugriff:${this.slug}:`, // per app, each leaf persists under it
       storage : 'local',
     });
 
@@ -170,56 +162,9 @@ class ZugriffApp {
   get hotkeys ()    { return this._hotkeys; }
   set hotkeys (map) { this._hotkeys.define(map); }
 
-  // ::: state extension — the mechanism to grow app.state and wire effects.
-  // `seed` is a signalStore schema ({ key: { type, value } }); `effects` are plain
-  // @aufbau/signals effects the caller passes as functions.
-  extend = (seed = {}, effects = []) => {
-    this.state.$extend(seed);
-    for (const fn of [].concat(effects)) if (fn) effect(fn);
-    return this;
-  };
-
-  // persist a record leaf (app.state[key]) as one localStorage blob under
-  // `zugriff:<slug>:<key>`: hydrate first, then write back on any change.
-  // NOTE: still on the deep-signal surface ($signal/$update) 
-  // — only apps/code uses it, and that app has not moved to the signalStore surface yet.
-  persist = (key, storeKey = `zugriff:${this.slug}:${key}`) => {
-    const node = this.state[key];
-    if (!node?.$signal) return this;
-    try { const saved = JSON.parse(localStorage.getItem(storeKey)); if (saved) node.$update(saved); } catch {}
-    let first = true;
-    effect(() => {
-      const snapshot = node.$signal.value;
-      if (first) { first = false; return; }   // the hydrated/seed value is already stored (or intentionally not)
-      try { localStorage.setItem(storeKey, JSON.stringify(snapshot)); } catch {}
-    });
-    return this;
-  };
-
-  // ::: state sugar — `$key` is the leaf's value, the bare name is its signal
-  getState    = key          => this.state['$' + key];
-  setState    = (key, value) => this.state[key] = value;
-  toggleState = (key, force) => this.state[key] = force ?? !this.state['$' + key];
-  resetState  = key          => this.state[key] = key in this.config ? this.config[key] : null;
-  setDialog   = (id = null)  => this.state.dialog = id;
-  setRoute    = (id = null)  => this.state.route  = id;
-
-  // ::: new form after @aufbau/signals update
-  //getState    = this.state.get;
-  //setState    = this.state.set;
-  //toggleState = this.state.toggle;
-  //resetState  = this.state.reset;
-
-  // ::: modal helpers (app.state.modal drives an app's overlays)
-  openModal   = id => this.state.modal = id;
-  closeModal  = () => this.state.modal = null;
-  toggleModal = id => this.state.modal = this.state.$modal === id ? null : id;
-
-  // ::: command dispatch (app.commands is a Map<id, { exec }>)
-  exec = id => this.commands?.get(id)?.exec();
-
-  //
-  go = (name, id = null) => this.state.route = { name, id };
+  // ::: routes. an app with a router gets setRoute rewired to keep the url in sync
+  setRoute = (id = null)       => this.state.route = id;
+  go       = (name, id = null) => this.state.route = { name, id };
 
   // ::: pwa (install-to-home-screen), lifted off the shared plumbing
   canInstall    = canInstall;

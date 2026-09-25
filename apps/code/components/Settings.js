@@ -63,7 +63,7 @@ export default function Settings () {
         <h3>UI</h3>
         <${Dropdown}
           options=${themeNames}
-          selected=${app.state.theme}
+          selected=${app.state.$theme}
           onChange=${event => (app.state.theme = event.currentTarget.value)}
         />
         ${uiToggles.map(UiToggleField)}

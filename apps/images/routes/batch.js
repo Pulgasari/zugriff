@@ -1,14 +1,13 @@
 // zugriff images :: routes/batch.js
 // batch route (ex image-batch-processor): a pipeline of tasks over many images.
 
-import { signal } from '@aufbau/signals';
+import { signal, typedSignal } from '@aufbau/signals';
 import { Icon }   from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/app/signals.js';
 import * as fx    from '../modules/filters.js';
 import { dropEntries, ImgDrop, ToolFileItem } from './tools.js';
 
 const bpFiles = signal([]);
-const bpTasks = stored([], 'images:batch:tasks');
+const bpTasks = typedSignal({ value: [], key: 'images:batch:tasks' });
 // start past the highest persisted id so a newly added task never collides with
 // a restored one (the ids key move/remove/update)
 let _bpId = bpTasks.value.reduce((m, t) => Math.max(m, typeof t.id === 'number' ? t.id : -1), -1) + 1;

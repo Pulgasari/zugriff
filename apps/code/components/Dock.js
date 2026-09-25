@@ -8,7 +8,7 @@ import Tap   from './Tap.js';
 const app = zugriff.app;
 
 export default function Dock () {
-  const modal  = app.state.modal;
+  const modal  = app.state.$modal;
   const config = app.state.config;
 
   return html`

@@ -9,7 +9,7 @@ import { html, signal, computed } from '@aufbau/kits/preact-htm';
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=icon-generator';
 import { Dropzone, Icon, Button } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -19,9 +19,9 @@ const SIZES = [16, 32, 64, 96, 128, 180, 192, 256, 512, 1024];
 
 const files    = signal([]);          // entries from the dropzone
 const source   = signal(null);        // { name, svg, url }
-const sizes    = stored([192, 512], 'icon-generator:sizes');
-const padding  = stored(0,          'icon-generator:padding');   // percent
-const bg       = stored('',         'icon-generator:bg');        // '' = transparent
+const sizes    = typedSignal({ value: [192, 512], key: 'icon-generator:sizes' });
+const padding  = typedSignal({ value: 0, key: 'icon-generator:padding' });   // percent
+const bg       = typedSignal({ value: '', key: 'icon-generator:bg' });        // '' = transparent
 const results  = signal([]);         // { size, blob, url }
 const busy     = signal(false);
 const errMsg   = signal('');

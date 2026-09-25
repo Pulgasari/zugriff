@@ -7,7 +7,7 @@ import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb,
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=colorpicker';
 import { Icon, Picker } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -86,7 +86,7 @@ let clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 // ── global state ──────────────────────────────────────────────────────────────
 let color   = signal(toOklch(parse('#3b82f6')));  // shared across tabs
-let tab     = stored('OKLCH', 'colorpicker:tab');
+let tab     = typedSignal({ value: 'OKLCH', key: 'colorpicker:tab' });
 let TABS    = ['RGB', 'HSL', 'LCH', 'OKLCH', 'Mix', 'Shades'];
 let TAB_MAP = { RGB: RGBTab, HSL: HSLTab, LCH: LCHTab, OKLCH: OKLCHTab, Mix: MixTab, Shades: ShadesTab };
 

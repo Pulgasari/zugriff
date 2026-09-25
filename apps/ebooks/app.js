@@ -5,7 +5,7 @@
 // scalars. the reader engines come from modules/reader.js.
 
 // ::: vendors
-import { signal, computed }  from '@aufbau/signals';
+import { computed, signal, typedSignal }  from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 
 // ::: shared
@@ -21,7 +21,6 @@ const // local
 LibraryView = await app.view('LibraryView'),
 ReaderView  = await app.view('ReaderView');
 
-import { stored } from '/.shared/js/app/signals.js';
 
 // ::: app modules
 import { createPdfReader, createEpubReader } from './modules/reader.js';
@@ -36,10 +35,12 @@ app.fs = zugriff.fs;
 // + the reader prefs are persisted scalars via `stored`.
 
 app.state.route  = { name: 'library', key: null };   // { name:'library' } | { name:'reader', key }
-app.state.search = '';
-app.state.folder = '';                               // '' = all folders, else sourceId
+app.state.$extend({
+  search : { type: 'scalar', value: '' },
+  folder : { type: 'scalar', value: '' },   // '' = all folders, else sourceId
+});
 
-const sort = stored('recent', 'ebooks:sort');        // recent | title | author | added
+const sort = typedSignal({ value: 'recent', key: 'ebooks:sort' });        // recent | title | author | added
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -62,9 +63,9 @@ const sortBooks = (list, mode) => [...list].sort((a, b) =>
                         || (b.addedAt || 0) - (a.addedAt || 0));
 
 const visibleBooks = computed(() => {
-  const q = app.state.search.trim().toLowerCase();
+  const q = app.state.$search.trim().toLowerCase();
   let list = db.books.value;
-  if (app.state.folder) list = list.filter(b => b.sourceId === app.state.folder);
+  if (app.state.$folder) list = list.filter(b => b.sourceId === app.state.$folder);
   if (q) list = list.filter(b =>
     b.title.toLowerCase().includes(q) || authorOf(b).toLowerCase().includes(q) || b.name.toLowerCase().includes(q));
   return sortBooks(list, sort.value);
@@ -87,8 +88,8 @@ function openReader (key) {
 const closeReader = () => { app.state.route = { name: 'library', key: null }; };
 
 // epub reading prefs, remembered across books
-const readerFlow = stored('paginated', 'ebooks:flow');
-const readerFont = stored(100, 'ebooks:font');
+const readerFlow = typedSignal({ value: 'paginated', key: 'ebooks:flow' });
+const readerFont = typedSignal({ value: 100, key: 'ebooks:font' });
 
 function TocPanel ({ items, kind, onPick }) {
   const render = list => html`
@@ -128,7 +129,7 @@ function App () {
     return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
   }
 
-  const route = app.state.route;
+  const route = app.state.$route;
   return route.name === 'reader'
     ? html`<${ReaderView} bookKey=${route.key} key=${route.key} />`
     : html`<main id="app-main"><${LibraryView} /></main>`;

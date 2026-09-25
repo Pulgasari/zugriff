@@ -26,9 +26,11 @@ app.player = player;
 // signals (app.db / app.player), read with `.value`.
 
 app.state.route   = { name: 'songs', id: null };   // songs | albums | artists | album | artist
-app.state.search  = '';
-app.state.sort    = { key: 'artist', dir: 1 };
-app.state.navOpen = false;
+app.state.$extend({
+  search  : { type: 'scalar', value: '' },
+  sort    : { type: 'scalar', value: { key: 'artist', dir: 1 } },
+  navOpen : { type: 'scalar', value: false },
+});
 
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 app.go = (name, id = null) => { app.state.route = { name, id }; app.state.navOpen = false; };
@@ -62,12 +64,12 @@ function dropCovers () { for (const u of coverUrls.values()) URL.revokeObjectURL
 const matches = (t, q) => displayTitle(t).toLowerCase().includes(q) || displayArtist(t).toLowerCase().includes(q) || displayAlbum(t).toLowerCase().includes(q);
 
 const filteredTracks = computed(() => {
-  const q = app.state.search.trim().toLowerCase();
+  const q = app.state.$search.trim().toLowerCase();
   return q ? db.tracks.value.filter(t => matches(t, q)) : db.tracks.value;
 });
 
 const sortedTracks = computed(() => {
-  const { key, dir } = app.state.sort;
+  const { key, dir } = app.state.$sort;
   const val = t => key === 'title'    ? displayTitle(t)
                  : key === 'album'    ? displayAlbum(t)
                  : key === 'duration' ? (t.duration ?? 0)
@@ -81,11 +83,11 @@ const sortedTracks = computed(() => {
 });
 
 const filteredAlbums = computed(() => {
-  const q = app.state.search.trim().toLowerCase();
+  const q = app.state.$search.trim().toLowerCase();
   return q ? db.albums.value.filter(a => a.album.toLowerCase().includes(q) || a.artist.toLowerCase().includes(q)) : db.albums.value;
 });
 const filteredArtists = computed(() => {
-  const q = app.state.search.trim().toLowerCase();
+  const q = app.state.$search.trim().toLowerCase();
   return q ? db.artists.value.filter(a => a.name.toLowerCase().includes(q)) : db.artists.value;
 });
 
@@ -100,7 +102,7 @@ async function removeFolder (s) {
   if (!confirm(`Remove “${s.name}”? Your files stay untouched — this only forgets the folder.`)) return;
   await db.removeFolder(s.id);
 }
-const setSort = key => app.state.sort = app.state.sort.key === key ? { key, dir: -app.state.sort.dir } : { key, dir: 1 };
+const setSort = key => app.state.sort = app.state.$sort.key === key ? { key, dir: -app.state.$sort.dir } : { key, dir: 1 };
 
 // :::::: SHARED BITS :::::::::::::::::::::::::::::::::::::::
 
@@ -120,7 +122,7 @@ function PlayGlyph ({ track }) {
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
 
 function NavItem ({ name, icon, label }) {
-  const active = app.state.route.name === name;
+  const active = app.state.$route.name === name;
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)}>
       <${Icon} name=${icon} /> <span>${label}</span>
@@ -145,7 +147,7 @@ function SourceRow ({ source }) {
 function Sidebar () {
   const needAuth = db.sources.value.some(s => db.perms.value[s.id] !== 'granted');
   return html`
-    <aside class=${'sidebar' + (app.state.navOpen ? ' open' : '')}>
+    <aside class=${'sidebar' + (app.state.$navOpen ? ' open' : '')}>
       <div class="brand">
         <${Icon} name="mdi:music-box-multiple-outline" /> <span>Music</span>
         <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.navOpen = false}><${Icon} name="mdi:close" /></button>
@@ -178,10 +180,10 @@ function Sidebar () {
 
 function SongsTable () {
   const rows = sortedTracks.value;
-  if (!rows.length) return html`<${Empty} q=${app.state.search} />`;
+  if (!rows.length) return html`<${Empty} q=${app.state.$search} />`;
   const head = (key, label, cls = '') => html`
-    <button class=${'th ' + cls + (app.state.sort.key === key ? ' on' : '')} onClick=${() => setSort(key)}>
-      ${label}${app.state.sort.key === key ? html` <${Icon} name=${app.state.sort.dir > 0 ? 'mdi:menu-up' : 'mdi:menu-down'} size=${14} />` : ''}
+    <button class=${'th ' + cls + (app.state.$sort.key === key ? ' on' : '')} onClick=${() => setSort(key)}>
+      ${label}${app.state.$sort.key === key ? html` <${Icon} name=${app.state.$sort.dir > 0 ? 'mdi:menu-up' : 'mdi:menu-down'} size=${14} />` : ''}
     </button>`;
   return html`
     <div class="songs">
@@ -204,7 +206,7 @@ function SongsTable () {
 
 function AlbumsGrid () {
   const rows = filteredAlbums.value;
-  if (!rows.length) return html`<${Empty} q=${app.state.search} />`;
+  if (!rows.length) return html`<${Empty} q=${app.state.$search} />`;
   return html`
     <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
       ${rows.map(a => html`
@@ -240,7 +242,7 @@ function AlbumDetail ({ id }) {
 
 function ArtistsList () {
   const rows = filteredArtists.value;
-  if (!rows.length) return html`<${Empty} q=${app.state.search} />`;
+  if (!rows.length) return html`<${Empty} q=${app.state.$search} />`;
   return html`
     <div class="artists">
       ${rows.map(a => html`
@@ -313,7 +315,7 @@ function Empty ({ q }) {
 // :::::: HEADER + PLAYER :::::::::::::::::::::::::::::::::::
 
 function TopBar () {
-  const r = app.state.route;
+  const r = app.state.$route;
   const title = r.name === 'album' ? 'Album' : r.name === 'artist' ? 'Artist' : r.name[0].toUpperCase() + r.name.slice(1);
   const back  = r.name === 'album' || r.name === 'artist';
   return html`
@@ -325,7 +327,7 @@ function TopBar () {
       <span class="spacer"></span>
       <div class="searchbox">
         <${Icon} name="mdi:magnify" />
-        <input type="search" placeholder="Search…" value=${app.state.search} onInput=${e => app.state.search = e.target.value} />
+        <input type="search" placeholder="Search…" value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
       </div>
       <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" /></button>
       <${Settings} />
@@ -333,11 +335,11 @@ function TopBar () {
 }
 
 function Content () {
-  switch (app.state.route.name) {
+  switch (app.state.$route.name) {
     case 'albums'  : return html`<${AlbumsGrid} />`;
     case 'artists' : return html`<${ArtistsList} />`;
-    case 'album'   : return html`<${AlbumDetail} id=${app.state.route.id} />`;
-    case 'artist'  : return html`<${ArtistDetail} id=${app.state.route.id} />`;
+    case 'album'   : return html`<${AlbumDetail} id=${app.state.$route.id} />`;
+    case 'artist'  : return html`<${ArtistDetail} id=${app.state.$route.id} />`;
     default        : return html`<${SongsTable} />`;
   }
 }
@@ -418,7 +420,7 @@ function App () {
     <>
       <div id="app-main">
         <${Sidebar} />
-        ${app.state.navOpen && html`<div class="scrim-mobile" onClick=${() => app.state.navOpen = false}></div>`}
+        ${app.state.$navOpen && html`<div class="scrim-mobile" onClick=${() => app.state.navOpen = false}></div>`}
         <main class="main">
           <${TopBar} />
           <div class="content"><${Content} /></div>

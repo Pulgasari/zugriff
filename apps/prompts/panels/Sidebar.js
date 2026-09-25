@@ -36,8 +36,8 @@ export default function Sidebar () {
       <div class="search-row">
         <${Icon} name="mdi:magnify" class="search-icon" />
         <input class="search-input" type="text" placeholder="Search…"
-          value=${app.state.search} onInput=${e => app.state.search = e.target.value} />
-        ${app.state.search && html`
+          value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
+        ${app.state.$search && html`
           <button class="icon-btn" onClick=${() => app.state.search = ''}>
             <${Icon} name="mdi:close" />
           </button>`}
@@ -52,13 +52,13 @@ export default function Sidebar () {
         </div>
         <${TagManager} show=${showTags} onClose=${() => setShowTags(false)} />
         <div class="tag-filter-list">
-          <button class=${'tag-filter-btn' + (!app.state.activeTag ? ' active' : '')}
+          <button class=${'tag-filter-btn' + (!app.state.$activeTag ? ' active' : '')}
             onClick=${() => app.state.activeTag = null}>All</button>
           ${app.db.tags.value.map(t => html`
             <button
-              class=${'tag-filter-btn' + (app.state.activeTag === t.id ? ' active' : '')}
+              class=${'tag-filter-btn' + (app.state.$activeTag === t.id ? ' active' : '')}
               style=${{ '--tag-color': t.color }}
-              onClick=${() => app.state.activeTag = app.state.activeTag === t.id ? null : t.id}>
+              onClick=${() => app.state.activeTag = app.state.$activeTag === t.id ? null : t.id}>
               ${t.name}
             </button>`)}
         </div>
@@ -66,7 +66,7 @@ export default function Sidebar () {
 
       <div class="sort-row">
         <span class="section-label">Sort</span>
-        <${Picker} options=${SORTS} value=${app.state.sortBy} onChange=${id => app.state.sortBy = id} />
+        <${Picker} options=${SORTS} value=${app.state.$sortBy} onChange=${id => app.state.sortBy = id} />
       </div>
 
       <div class="prompt-list zebra">

@@ -7,7 +7,7 @@ import UPNG from 'upng-js';
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=pixel-art-creator';
 import { Icon, Picker } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -51,19 +51,19 @@ const makeGrid = (w, h) => Array.from({ length: h }, () => Array(w).fill(null));
 
 // ------ SIGNALS ----------------------------------------------
 
-let palette  = stored( PALETTE, appID + ':palette' );
-let active   = stored('#000000', appID + ':active');
+let palette  = typedSignal({ value: PALETTE, key: appID + ':palette' });
+let active   = typedSignal({ value: '#000000', key: appID + ':active' });
 let tool     = signal('draw');
-let preset   = stored({ w: 16, h: 16 }, appID + ':preset');
+let preset   = typedSignal({ value: { w: 16, h: 16 }, key: appID + ':preset' });
 if (typeof preset.value === 'number') preset.value = { w: preset.value, h: preset.value };
-let grid     = stored(makeGrid(preset.value.w, preset.value.h), appID + ':grid');
-let scale    = stored( 1   , appID + ':scale'    );
-let showBg   = stored( true, appID + ':showBg'   );
-let showGap  = stored( true, appID + ':showGap'  );
-let showGrid = stored( true, appID + ':showGrid' );
-let mirror   = stored( 'none', appID + ':mirror' );
+let grid     = typedSignal({ value: makeGrid(preset.value.w, preset.value.h), key: appID + ':grid' });
+let scale    = typedSignal({ value: 1, key: appID + ':scale' });
+let showBg   = typedSignal({ value: true, key: appID + ':showBg' });
+let showGap  = typedSignal({ value: true, key: appID + ':showGap' });
+let showGrid = typedSignal({ value: true, key: appID + ':showGrid' });
+let mirror   = typedSignal({ value: 'none', key: appID + ':mirror' });
 
-let exportWidth = stored( 512, appID + ':export-width' );
+let exportWidth = typedSignal({ value: 512, key: appID + ':export-width' });
 
 // ------ EFFECTS ----------------------------------------------
 

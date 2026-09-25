@@ -6,7 +6,7 @@ import TagBadge from './TagBadge.js';
 const app = zugriff.app;
 
 export default function PromptItem ({ prompt }) {
-  const isActive = app.state.activeId === prompt.id;
+  const isActive = app.state.$activeId === prompt.id;
 
   return html`
     <div class=${'prompt-item' + (isActive ? ' active' : '')} onClick=${() => app.openPrompt(prompt.id)}>

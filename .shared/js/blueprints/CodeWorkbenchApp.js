@@ -18,7 +18,7 @@ import Icon           from './../components/Icon.js';
 import Toggle         from './../components/Toggle.js';
 
 // muss aufs neue @aufbau/signals umgestellt werden
-import { stored }     from './../lib/signals.js'; 
+import { typedSignal } from '@aufbau/signals';
 
 function CodeWorkbenchApp ({
   appID        = 'app',
@@ -53,14 +53,14 @@ function CodeWorkbenchApp ({
   const oLang = outputLang ?? lang;
   const oExt  = outputExt  ?? langExt;
 
-  const live   = stored(false, appID + ':live');
-  const input  = stored('',    appID + ':input');
+  const live   = typedSignal({ value: false, key: appID + ':live' });
+  const input  = typedSignal({ value: '', key: appID + ':input' });
   const output = signal('');
   const status = signal('idle');
   const errMsg = signal('');
   const stats  = signal(null);
 
-  const fmt = formats ? stored(formats[0].id, appID + ':fmt') : null;
+  const fmt = formats ? typedSignal({ value: formats[0].id, key: appID + ':fmt' }) : null;
 
   const activeFmt  = () => fmt ? formats.find(f => f.id === fmt.value) : null;
   const activeLang = () => activeFmt()?.lang ?? oLang;

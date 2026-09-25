@@ -6,7 +6,7 @@ import { effect, html, signal, useState } from '@aufbau/kits/preact-htm';
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=svg-pixel-pattern-generator';
 import { Icon } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -20,14 +20,14 @@ image-rendering: pixelated;
 */
 
 // ── state ─────────────────────────────────────────────────────────────────────
-let palette = stored(['#e63946','#457b9d','#2a9d8f','#e9c46a','#f4a261','#264653','#ffffff','#000000'], appID + ':palette');
-let active  = stored('#000000', appID + ':active');
-let tool    = stored('draw', appID + ':tool');
-let cols    = stored( 9, appID + ':cols');
-let rows    = stored( 9, appID + ':rows');
-let gap     = stored( 0, appID + ':gap');
-let cellSz  = stored(32, appID + ':cellsz');
-let grid    = stored(makeGrid(cols.value, rows.value, '#ffffff'), appID + ':grid');
+let palette = typedSignal({ value: ['#e63946','#457b9d','#2a9d8f','#e9c46a','#f4a261','#264653','#ffffff','#000000'], key: appID + ':palette' });
+let active  = typedSignal({ value: '#000000', key: appID + ':active' });
+let tool    = typedSignal({ value: 'draw', key: appID + ':tool' });
+let cols    = typedSignal({ value: 9, key: appID + ':cols' });
+let rows    = typedSignal({ value: 9, key: appID + ':rows' });
+let gap     = typedSignal({ value: 0, key: appID + ':gap' });
+let cellSz  = typedSignal({ value: 32, key: appID + ':cellsz' });
+let grid    = typedSignal({ value: makeGrid(cols.value, rows.value, '#ffffff'), key: appID + ':grid' });
 //let grid    = signal(makeGrid(cols.value, rows.value, '#ffffff'));
 
 // wenn cols oder rows sich ändern → grid anpassen

@@ -15,12 +15,14 @@ app.db = db;
 // ephemeral ui state on app.state (deep signal, no `.value`, read inside render). the
 // library itself lives in app.db as its own plain signals.
 
-app.state.search     = '';       // list filter text
-app.state.activeTag  = null;     // tag id filter | null
-app.state.sortBy     = 'name';   // name | createdAt | updatedAt
-app.state.activeId   = null;     // selected prompt id | null
-app.state.editMode   = false;    // false = view, true = edit/create
-app.state.mobilePane = 'list';   // list | detail (mobile only)
+app.state.$extend({
+  search     : { type: 'scalar', value: '' },       // list filter text
+  activeTag  : { type: 'scalar', value: null },     // tag id filter | null
+  sortBy     : { type: 'scalar', value: 'name' },   // name | createdAt | updatedAt
+  activeId   : { type: 'scalar', value: null },     // selected prompt id | null
+  editMode   : { type: 'scalar', value: false },    // false = view, true = edit/create
+  mobilePane : { type: 'scalar', value: 'list' },   // list | detail (mobile only)
+});
 
 // :::::: OPERATIONS
 // cross-cutting ui + db moves the panels reach through the handle
@@ -29,8 +31,8 @@ app.newPrompt  = () => { app.state.activeId = null; app.state.editMode = true;  
 app.openPrompt = id => { app.state.activeId = id;   app.state.editMode = false; app.state.mobilePane = 'detail'; };
 app.cancelEdit = () => { app.state.editMode = false; if (!activePrompt()) { app.state.activeId = null; app.state.mobilePane = 'list'; } };
 app.back       = () => {
-  if      (app.state.editMode)               app.cancelEdit();
-  else if (app.state.mobilePane === 'detail') app.state.mobilePane = 'list';
+  if      (app.state.$editMode)               app.cancelEdit();
+  else if (app.state.$mobilePane === 'detail') app.state.mobilePane = 'list';
 };
 
 app.savePrompt = async data => {
@@ -40,11 +42,11 @@ app.savePrompt = async data => {
 };
 app.removePrompt = async id => {
   await app.db.deletePrompt(id);
-  if (app.state.activeId === id) { app.state.activeId = null; app.state.editMode = false; }
+  if (app.state.$activeId === id) { app.state.activeId = null; app.state.editMode = false; }
 };
 app.removeTag = async id => {
   await app.db.deleteTag(id);
-  if (app.state.activeTag === id) app.state.activeTag = null;
+  if (app.state.$activeTag === id) app.state.activeTag = null;
 };
 
 // :::::: ACTIONS
@@ -55,7 +57,7 @@ app.actions = { 'back': () => app.back() };
 // escape backs out of the edit form / the mobile detail pane
 
 app.hotKeys = {
-  'escape' : { action: 'back', global: true, when: () => app.state.editMode || app.state.mobilePane === 'detail' },
+  'escape' : { action: 'back', global: true, when: () => app.state.$editMode || app.state.$mobilePane === 'detail' },
 };
 
 // :::::: UI
@@ -66,7 +68,7 @@ Detail  = await app.panel('Detail');
 
 function App () {
   return html`
-    <div id="app-main" class=${app.state.mobilePane === 'detail' ? 'mobile-detail' : ''}>
+    <div id="app-main" class=${app.state.$mobilePane === 'detail' ? 'mobile-detail' : ''}>
       <${Sidebar} />
       <${Detail} />
     </div>`;

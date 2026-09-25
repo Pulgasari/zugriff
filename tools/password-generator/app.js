@@ -6,7 +6,7 @@ import { html, signal } from '@aufbau/kits/preact-htm';
 // ::: shared
 import { boot, config } from '/.shared/js/app.js?slug=password-generator';
 import { Icon, Picker, Slider, Toggle } from '/.shared/js/components/index.js';
-import { stored } from '/.shared/js/lib/signals.js';
+import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -22,17 +22,17 @@ let CHARS = {
 let WORDLIST_URL = 'https://raw.githubusercontent.com/EFF/BIP39-English/master/wordlist.txt';
 
 // ── state ─────────────────────────────────────────────────────────────────────
-let mode      = stored('random',   'pwgen:mode');   // random | passphrase | pin
-let length    = stored(16,          'pwgen:length');
-let useUpper  = stored(true,        'pwgen:upper');
-let useLower  = stored(true,        'pwgen:lower');
-let useDigits = stored(true,        'pwgen:digits');
-let useSymbols= stored(false,       'pwgen:symbols');
-let noSimilar = stored(false,       'pwgen:nosimilar');
-let wordCount = stored(4,           'pwgen:words');
-let separator = stored('-',         'pwgen:sep');
-let pinLength = stored(6,           'pwgen:pinlen');
-let count     = stored(5,           'pwgen:count');
+let mode      = typedSignal({ value: 'random', key: 'pwgen:mode' });   // random | passphrase | pin
+let length    = typedSignal({ value: 16, key: 'pwgen:length' });
+let useUpper  = typedSignal({ value: true, key: 'pwgen:upper' });
+let useLower  = typedSignal({ value: true, key: 'pwgen:lower' });
+let useDigits = typedSignal({ value: true, key: 'pwgen:digits' });
+let useSymbols= typedSignal({ value: false, key: 'pwgen:symbols' });
+let noSimilar = typedSignal({ value: false, key: 'pwgen:nosimilar' });
+let wordCount = typedSignal({ value: 4, key: 'pwgen:words' });
+let separator = typedSignal({ value: '-', key: 'pwgen:sep' });
+let pinLength = typedSignal({ value: 6, key: 'pwgen:pinlen' });
+let count     = typedSignal({ value: 5, key: 'pwgen:count' });
 let passwords = signal([]);
 let copied    = signal(null);
 let   wordlist  = null;

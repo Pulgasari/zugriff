@@ -5,7 +5,7 @@ import IconButton  from '/.shared/js/components/IconButton.js';
 import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Index       from '/.shared/js/components/Index.js';
 import Picker      from '/.shared/js/components/Picker.js';
-import SearchInput from '/.shared/js/components/SearchInput.js';
+import SearchPanel from '/.shared/js/components/SearchPanel.js';
 
 const app = zugriff.app;
 
@@ -56,7 +56,7 @@ function LibraryView () {
             />`
         : html`
           <div class="lib-controls">
-            <${SearchInput} signal=${app.state.search} placeholder='Search title or author…' />
+            <${SearchPanel} placeholder='Search title or author…' appStateId='search' />
             <${Picker}      signal=${sort.value} options=${['recent', 'title', 'author', 'added']} />
           </div>
 
@@ -65,7 +65,7 @@ function LibraryView () {
             
             ${books.length
               ? html`<${BooksIndex}/>`
-              : app.state.search 
+              : app.state.$search 
                 ? html`<${EmptySearch}/>`
                 : html`<${EmptyLibrary}/>`
             }
