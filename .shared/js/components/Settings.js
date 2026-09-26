@@ -25,13 +25,13 @@ const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 // the rest comes verbatim from the app's registry settings schema (font, dir, …). 
 // the font enum's values are filled from the webfont catalog at build time, the registry stays import-free.
 
-function buildSpec (config) {
+function buildSpec (config, themes) {
   const fonts      = webfonts?.fonts ?? [];
   const fontValues = [['', 'default'], ...fonts.map(f => [f.id, f.name])];
   const labelOf    = key => key[0].toUpperCase() + key.slice(1);
 
   const spec = {
-    theme: { type: 'enum', look: 'combobox', values: gestalt.themes, default: 'dracula', label: 'Theme' },
+    theme: { type: 'enum', look: 'combobox', values: themes, default: 'dracula', label: 'Theme' },
   };
   for (const [key, entry] of Object.entries(config.settings ?? {}))
     spec[key] = { label: labelOf(key), ...entry, ...(key === 'font' ? { values: fontValues } : {}) };
@@ -59,14 +59,21 @@ function SettingsPanel () {
 
   useEffect(() => {
     if (!app || !host.current) return;
-    const spec   = buildSpec(app.config);
-    const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));   // the leaf's value, not its signal
-    const panel  = gui.render(spec, {
-      values,
-      onChange: (next, key) => { if (key != null) app.state[key] = next[key]; },
+    let closed = false;
+
+    // the theme names come from aufbau's themes.css, loaded once on the first open
+    gestalt.themes().then(themes => {
+      if (closed) return;
+      const spec   = buildSpec(app.config, themes);
+      const values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));   // the leaf's value, not its signal
+      const panel  = gui.render(spec, {
+        values,
+        onChange: (next, key) => { if (key != null) app.state[key] = next[key]; },
+      });
+      host.current?.replaceChildren(panel);
     });
-    host.current.replaceChildren(panel);
-    return () => host.current?.replaceChildren();
+
+    return () => { closed = true; host.current?.replaceChildren(); };
   }, [app]);
 
   if (!app) return null;
