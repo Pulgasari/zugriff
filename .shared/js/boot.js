@@ -227,8 +227,6 @@ function applyTheme ({ prefix }) {
       "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,
       "@aufbau/signals/"        : `${pkg}/aufbau/signals/`,
       "@aufbau/store"           : `${pkg}/aufbau/store/index.js`,
-      "@aufbau/stylesheet"      : `${pkg}/aufbau/stylesheet/index.js`,
-      "@aufbau/stylesheet/"     : `${pkg}/aufbau/stylesheet/`,
       "@aufbau/svg/"            : `${pkg}/aufbau/svg/`,
       "@aufbau/webfonts"        : `${pkg}/aufbau/webfonts/index.js`,
       "@aufbau/webfonts/"       : `${pkg}/aufbau/webfonts/`,
