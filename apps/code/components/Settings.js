@@ -9,7 +9,8 @@ import Picker from './Picker.js';
 import Toggle from './Toggle.js';
 import Dropdown from './Dropdown.js';
 
-const app = zugriff.app;
+const app    = zugriff.app;
+const themes = await gestalt.themes();   // the presets of aufbau's themes.css
 
 const editorPickers = [
   { key: 'fontSize'         , options: [8, 9, 10, 11, 12, 13, 14, 16, 18] },
@@ -62,7 +63,7 @@ export default function Settings () {
       <div class="section">
         <h3>UI</h3>
         <${Dropdown}
-          options=${gestalt.themes}
+          options=${themes}
           selected=${app.state.$theme}
           onChange=${event => (app.state.theme = event.currentTarget.value)}
         />
