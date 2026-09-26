@@ -3,7 +3,7 @@
 the single classic <head> script every page loads. it replaces the old
 theme-boot.js + importmap.js pair:
 
-1. apply the stored theme colours to :root before first paint (no FOUC)
+1. apply the stored theme to :root before first paint (no FOUC)
 2. inject the framework importmap + modulepreloads
 3. (optional) register a service worker
 
@@ -109,30 +109,17 @@ function initDevTools (force = false) {
 }
   
 // :::::: Task 2: Theme Boot (Synchronous - Prevents FOUC)
-function applyTheme (theme) {
-  if (!theme.prefix) return;
-  const HEX = /^#[0-9a-f]{3,8}$/i;
+// the theme leaf of the app's store (zugriff:<slug>:theme), set before the first
+// paint. themes.css resolves every color from --theme, so the name is all it takes
+function applyTheme ({ prefix }) {
+  const slug = $root.dataset.app;
+  if (!prefix || !slug) return;
   try {
-    let background = '';
-
-    for (const key of theme.keys) {
-      const raw = localStorage.getItem(`${theme.prefix}:${key}`);
-      if (raw === null) continue;
-
-      let value;
-      try { value = JSON.parse(raw); } catch { continue; }
-      if (typeof value !== 'string' || !HEX.test(value)) continue;
-
-      $root.style.setProperty(`--${key}`, value);
-      if (key === 'bg') background = value;
-    }
-
-    if (background) {
-      $root.style.background = 'var(--bg)';
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.content = background;
-    }
-  } catch {}
+    const theme = JSON.parse(localStorage.getItem(`${prefix}:${slug}:theme`));
+    if (typeof theme !== 'string' || !theme) return;
+    $root.style.setProperty('--theme', theme);
+    $root.dataset.theme = theme;
+  } catch {} // storage may be blocked, a stored value may be broken
 }
 
   // :::::: Task 3: Import Map & Preloads Injection
@@ -197,8 +184,7 @@ function applyTheme (theme) {
       scope : ds.swScope ?? userConfig.swScope ?? undefined,
     },
     theme: {
-      prefix : ds.themePrefix ?? userConfig.themePrefix ?? 'zugriff:theme',
-      keys   : userConfig.themeKeys || ['bg', 'fg', 'accent'],
+      prefix : ds.themePrefix ?? userConfig.themePrefix ?? 'zugriff',
     },
     preload     : userConfig.preload || [],
     imports: Object.assign(getImportMap(), userConfig.imports || {})
@@ -238,8 +224,6 @@ function applyTheme (theme) {
       "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
       "@aufbau/kits/preact-htm" : `${pkg}/aufbau/kits/preact-htm.js`,
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
-      "@aufbau/runtime"         : `${pkg}/aufbau/runtime/index.js`,
-      "@aufbau/runtime/"        : `${pkg}/aufbau/runtime/`,
       "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,
       "@aufbau/signals/"        : `${pkg}/aufbau/signals/`,
       "@aufbau/store"           : `${pkg}/aufbau/store/index.js`,

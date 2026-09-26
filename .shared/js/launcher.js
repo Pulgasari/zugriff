@@ -4,7 +4,7 @@
 // it reads the route from the pathname and renders either the landing page (home) or the app/tool grid.
 
 import zugriff               from './runtime.js';
-import aufbau                from '@aufbau/runtime';
+import aufbau                from '@aufbau/api';
 import { applyFilter }       from '@aufbau/filters';
 import { applyPattern }      from '@aufbau/patterns';
 import { computed, signal }  from '@aufbau/signals';
@@ -27,8 +27,7 @@ Settings    = await zugriff.component('Settings');
 // ::: Page: Home
 
 if (route === 'home') {
-  await aufbau.init({ css: { theme: 'zombie', layout: 'landing' }});
-  //await aufbau.boot({ layout: 'landing', theme: 'zombie' });
+  await aufbau.boot({ css: { layout: 'landing', theme: 'zombie', themes: false } });   // themes.css comes with index.css
 
   const Menu = () => html`
     <nav>
@@ -52,8 +51,7 @@ if (route === 'home') {
 // ::: Page: Apps | Tools
 
 else {
-  await aufbau.init({ css: { theme: 'zombie' }});
-  await aufbau.setTheme('zombie');
+  await aufbau.boot({ css: { theme: 'zombie', themes: false } });
 
   // :::::: CONFIG + STATES
 

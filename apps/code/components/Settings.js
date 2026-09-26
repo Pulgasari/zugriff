@@ -3,7 +3,7 @@
 // section (Monaco theme + construction options).
 
 import { html } from './../vendors.js';
-import { themeNames } from '/.shared/js/data/themes.js';
+import { gestalt } from '@aufbau/api';
 import Modal from './Modal.js';
 import Picker from './Picker.js';
 import Toggle from './Toggle.js';
@@ -62,7 +62,7 @@ export default function Settings () {
       <div class="section">
         <h3>UI</h3>
         <${Dropdown}
-          options=${themeNames}
+          options=${gestalt.themes}
           selected=${app.state.$theme}
           onChange=${event => (app.state.theme = event.currentTarget.value)}
         />

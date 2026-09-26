@@ -2,9 +2,9 @@
 
 img { max-width: 100%; }
 
-/* colors */
+/* colors, on body where the theme resolves (theme.css) */
 
-:root {
+body {
   --bg-d-1: color-mix(in oklch, black 10%, var(--bg));
   --bg-d-2: color-mix(in oklch, black 25%, var(--bg));
   --bg-d-3: color-mix(in oklch, black 50%, var(--bg));
@@ -443,10 +443,3 @@ pointer-events: none;
 transform & opacity laufen auf GPU
 
 */
-
-/* :::: view changes :::::::::::::::::::::::::::::::::::::::::
-   the browser's own cross fade, see transitions.js. the frame looks the same
-   before and after, so what visibly moves is the view */
-
-::view-transition-old(root),
-::view-transition-new(root) { animation-duration: 180ms; }
