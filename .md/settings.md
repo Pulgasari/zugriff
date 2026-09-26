@@ -23,7 +23,6 @@ three types so far — `boolean`, `enum`, `color`.
 
 ### themes
 
-- a preset is only three colours (`bg`, `fg`, `accent`) in `shared/js/data/themes.js`.
-- everything else in the palette is derived from those in `shared/css/theme.css`, so the panel writes three custom properties
-onto `:root` and the whole thing repaints.
+- a theme is a preset name of `aufbau/css/themes.css` or any css color, set as `--theme` through `aufbau.gestalt`.
+- themes.css derives `--bg`, `--fg`, `--accent` from it on `body`, and `shared/css/theme.css` derives the rest of the palette from those.
 - editing a colour by hand switches the preset to `custom`.

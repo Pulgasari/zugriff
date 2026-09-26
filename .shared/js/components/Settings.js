@@ -1,7 +1,7 @@
 // components/Settings.js
 // the settings surface. `settingsOpen` is the single shared open-state signal;
 // `Settings` is the app-facing control — a gear button plus a panel built by
-// @aufbau/runtime/gui.js straight from the app's settings schema, so every app
+// @aufbau/gui straight from the app's settings schema, so every app
 // gets a settings ui from its registry entry with no per-app plumbing. a change
 // writes into zugriff.app.state, which drives the shared state effects
 // (theme/font/dir apply + persist).
@@ -10,10 +10,10 @@
 
 import Icon from './Icon.js';
 
-import gui      from '@aufbau/gui';
-import webfonts from '@aufbau/webfonts';
+import { gestalt } from '@aufbau/api';
+import gui         from '@aufbau/gui';
+import webfonts    from '@aufbau/webfonts';
 import { html, signal, useEffect, useRef } from './../vendors.js';
-import { themeNames, DEFAULT_THEME }       from './../data/themes.js';
 
 // :::::: STATE
 
@@ -31,7 +31,7 @@ function buildSpec (config) {
   const labelOf    = key => key[0].toUpperCase() + key.slice(1);
 
   const spec = {
-    theme: { type: 'enum', look: 'combobox', values: themeNames, default: DEFAULT_THEME, label: 'Theme' },
+    theme: { type: 'enum', look: 'combobox', values: gestalt.themes, default: 'dracula', label: 'Theme' },
   };
   for (const [key, entry] of Object.entries(config.settings ?? {}))
     spec[key] = { label: labelOf(key), ...entry, ...(key === 'font' ? { values: fontValues } : {}) };

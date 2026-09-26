@@ -2,7 +2,7 @@
 
 // :::::: IMPORTS
 
-import aufbau from '@aufbau/runtime';
+import aufbau                          from '@aufbau/api';
 import { effect, signal, signalStore } from '@aufbau/signals';
 import webfonts                        from '@aufbau/webfonts';
 import { createDB }                    from '@bunker/db';
@@ -14,7 +14,6 @@ import { syncBars }      from './modules/bars.js';
 import { reveal, transition } from './transitions.js';
 
 import { registry } from './data/apps.js';
-import { themes }   from './data/themes.js';
 
 import { html, render } from './vendors.js';
 
@@ -80,22 +79,19 @@ async function promptInstall () {
 const $doc  = typeof document !== 'undefined' ? document : null;
 const $root = $doc?.documentElement ?? null;
 
-const THEME_PREFIX = 'zugriff:theme';   // :bg / :fg / :accent — read by boot.js pre-paint
-const COLOR_KEYS   = ['bg', 'fg', 'accent'];
+const bodyReady = () => $doc.body ? Promise.resolve() : new Promise(resolve => $doc.addEventListener('DOMContentLoaded', resolve, { once: true }));
 
-const writeColor = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} };
+// a preset of aufbau/css/themes.css or any css color. gestalt sets --theme, the
+// css derives the rest, and the resolved bg feeds what css cannot reach
+const applyTheme = async theme => {
+  if (!$root || !theme) return;
+  await aufbau.gestalt.set({ theme });
+  await bodyReady();
 
-const applyTheme = preset => {
-  const palette = themes[preset];
-  if (!$root || !palette) return;
-  $root.dataset.theme = preset;
-  for (const key of COLOR_KEYS) {
-    $root.style.setProperty(`--${key}`, palette[key]);
-    writeColor(`${THEME_PREFIX}:${key}`, palette[key]);
-  }
-  const meta = $doc.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = palette.bg;
-  syncBars(palette.bg); // the native bars, inside the capacitor wrapper only
+  const { bg } = aufbau.gestalt.colors();
+  const meta   = $doc.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = bg;
+  syncBars(bg); // the native bars, inside the capacitor wrapper only
 };
 
 // :::::: APP
@@ -127,7 +123,7 @@ class ZugriffApp {
       dir      : { type: 'enum',   value: config.dir, values: ['ltr', 'rtl'] },
       font     : { type: String,   value: config.font  ?? 'Manrope' },
       lang     : { type: 'scalar', value: config.lang },
-      theme    : { type: 'enum',   values: Object.keys(themes), value: config.theme ?? 'dracula' },
+      theme    : { type: String,   value: config.theme ?? 'dracula' },
       title    : { type: 'scalar', value: config.title ?? config.name ?? null },
       viewport : { type: 'scalar', value: config.viewport },
 
@@ -139,8 +135,8 @@ class ZugriffApp {
       storage : 'local',
     });
 
-    // pure side effects — persistence is the store's job. theme additionally
-    // refreshes the boot-time colour cache (see applyTheme).
+    // pure side effects, persistence is the store's job. boot.js reads the stored
+    // theme before the first paint
     state.$onEffects({
       dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
       font  : value => { if (value) webfonts.apply(value, { role: '--font' }); },
@@ -186,7 +182,8 @@ class ZugriffApp {
 
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {
-    await aufbau.init(this.config.aufbau);
+    // themes.css comes with index.css, the theme is the app's own
+    await aufbau.boot({ ...this.config.aufbau, css: { themes: false, theme: this.state.$theme } });
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);

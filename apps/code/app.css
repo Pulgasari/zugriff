@@ -5,10 +5,11 @@
    ./../base.css + shared/css/theme.css. this sheet is only the editor's chrome;
    Monaco brings its own stylesheet (linked in index.html). */
 
-:root {
-  --fontSize : 12px;
-  --hair     : var(--line);
-  --zebra    : color-mix(in oklch, var(--bg), black 8%);
+:root { --fontSize: 12px; }   /* app.js writes it on the root */
+
+body {
+  --hair  : var(--line);
+  --zebra : color-mix(in oklch, var(--bg), black 8%);
 }
 
 /* a code app wants a monospace UI */
@@ -175,7 +176,7 @@
 
 /* ── keyboard ───────────────────────────────────────────────────────────── */
 
-:root {
+body {
   --keyboard-btn-bg       : color-mix(in oklch, var(--bg), var(--fg) 12%);
   --keyboard-btn-fg       : var(--fg);
   --keyboard-btn-radius   : 4px;

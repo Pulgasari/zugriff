@@ -1,4 +1,4 @@
-:root {
+body {
   /*
   --ui   : system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --mono : 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -13,7 +13,7 @@
 
   /* safe-area insets. non-zero where the page runs edge-to-edge: the capacitor
      wrappers (android 15+ enforces it, viewport-fit=cover opts in) and notched
-     screens. html paints var(--bg) behind the system bars, #app keeps clear */
+     screens. body's background covers the canvas behind the system bars, #app keeps clear */
   --safe-top    : env(safe-area-inset-top,    0px);
   --safe-right  : env(safe-area-inset-right,  0px);
   --safe-bottom : env(safe-area-inset-bottom, 0px);
@@ -31,7 +31,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-html { background : var(--bg); }
 body { background : var(--bg); color : var(--fg); }
 
 /* boot() renders the app straight into #app; make it the viewport frame */
@@ -44,7 +43,7 @@ body { background : var(--bg); color : var(--fg); }
 
 /* the frame keeps clear of the system bars. :root raises the specificity above an
    app's own #app rule, and content-box clipping keeps an app's #app background
-   (code paints var(--hair)) out of the inset, where html shows var(--bg) instead */
+   (code paints var(--hair)) out of the inset, where the page shows var(--bg) instead */
 :root #app {
   box-sizing      : border-box;
   padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
@@ -65,42 +64,14 @@ a { color: var(--accent); }
 
 ::selection { background: var(--accent-25); }
 
-/* shared/css/theme.css
-   themes are selected via <html data-theme='...'>, the boot helper sets it
-   from the app config. every theme only has to provide the base tokens —
-   everything derived is computed further down. */
-
-:root {
-  --accent : red;
-
-  &[data-theme="dark"] {
-    --bg : #151515;
-    --fg : white;
-  }
-  &[data-theme="light"] {
-    --bg : white;
-    --fg : black;
-  }
-  &[data-theme="oled"] {
-    --bg : black;
-    --fg : white;
-  }
-  &[data-theme="dracula"] {
-    --accent   : #ff79c6;
-    --accent-2 : #f1fa8c;
-    --accent-3 : #50fa7b;
-    --success  : #50fa7b;
-    --bg       : #282a36;
-    --fg       : #f8f8f2;
-    --zebra    : color-mix(in oklch, var(--bg), black 5%);
-    --active   : var(--accent);
-  }
-}
+/* the themes are @aufbau/css/themes.css (imported by index.css). a preset
+   lands on body, so every token derived from --bg, --fg and --accent is set on
+   body too: on :root it would miss the preset. */
 
 /* ── derived tokens ─────────────────────────────────────────────────────── */
 
-:root {
-  
+body {
+  --zebra : color-mix(in oklch, var(--bg), black 5%);
 
   --fg-d-1: color-mix(in oklch, black 10%, var(--fg));
   --fg-d-2: color-mix(in oklch, black 25%, var(--fg));

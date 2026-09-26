@@ -1,3 +1,5 @@
+/* the themes first: --theme, the presets and --bg, --fg, --accent (see theme.css) */
+@import url('https://code.pulgasari.dev/aufbau/css/themes.css');
 @import url('./theme.css');
 @import url('./layout.css');
 @import url('./components.css');
