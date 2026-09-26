@@ -129,6 +129,7 @@ class ZugriffApp {
 
       // ui-frame state every app shares — persisted too: a dialog left open reopens
       dialog : { type: 'scalar', value: null },
+      panel  : { type: 'scalar', value: null },
       route  : { type: 'scalar', value: null },
     }, {
       key     : `zugriff:${this.slug}:`, // per app, each leaf persists under it
@@ -174,6 +175,10 @@ class ZugriffApp {
   // router gets setRoute rewired to keep the url in sync
   setRoute = (id = null)       => transition(() => { this.state.route = id; });
   go       = (name, id = null) => transition(() => { this.state.route = { name, id }; });
+
+  // ::: dialogs and panels, one of each open at a time. the same id closes it again
+  toggleDialog = id => { this.state.dialog = this.state.$dialog === id ? null : id; };
+  togglePanel  = id => { this.state.panel  = this.state.$panel  === id ? null : id; };
 
   // ::: pwa (install-to-home-screen), lifted off the shared plumbing
   canInstall    = canInstall;

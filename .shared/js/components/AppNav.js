@@ -15,7 +15,7 @@ const items = [
 function AppNavItem ({ icon, label, dialog, panel, route, onClick, ...rest }) {
   if (dialog) onClick = () => zugriff.app.toggleDialog(dialog);
   if (panel)  onClick = () => zugriff.app.togglePanel(panel);
-  if (route)  onClick = () => zugriff.app.openRoute(route); // go(route)
+  if (route)  onClick = () => zugriff.app.go(route);
   
   return html`<${Button} class='AppNavItem' ...${{ icon, label, onClick, ...rest }} />`;
 }
