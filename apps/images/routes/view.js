@@ -5,10 +5,11 @@ import { signal, effect }   from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { useGesture } from '@aufbau/gestures/preact';
 import { Icon, IconButton } from '/.shared/js/components/index.js';
-import * as pwa from '/.shared/js/app/pwa.js';
 import * as fx  from '../modules/filters.js';
 import { shots, idx, current, many, fmtSize, setFiles, vError } from '../modules/state.js';
 import { editCurrent } from './edit.js';
+
+const pwa = zugriff.app;   // canInstall, isInstalled, promptInstall
 
 const zoom   = signal(1);              // 1 = fit to stage
 const pan    = signal({ x: 0, y: 0 });
