@@ -215,6 +215,8 @@ function applyTheme ({ prefix }) {
       "@aufbau/ass/"            : `${pkg}/aufbau/ass/`,
       "@aufbau/builders/docs"   : `${pkg}/aufbau/builders/docs/index.js`,
       "@aufbau/builders/docs/"  : `${pkg}/aufbau/builders/docs/`,
+      "@aufbau/devtools"        : `${pkg}/aufbau/devtools/index.js`,
+      "@aufbau/devtools/"       : `${pkg}/aufbau/devtools/`,
       "@aufbau/elements"        : `${pkg}/aufbau/elements/index.js`,
       "@aufbau/elements/"       : `${pkg}/aufbau/elements/`,
       "@aufbau/filters"         : `${pkg}/aufbau/filters/index.js`,
@@ -285,8 +287,6 @@ function applyTheme ({ prefix }) {
       "@pulgasari/timing"           : `${pkg}/js-packages/timing/index.js`,
       "@pulgasari/url"              : `${pkg}/js-packages/url/index.js`,
 
-      "@pulgasari/devtools"  : `${pkg}/js-packages/devtools/index.js`,
-      "@pulgasari/devtools/" : `${pkg}/js-packages/devtools/`,
       //"@pulgasari/htx"       : `${pkg}/js-packages/htx/index.js`,
       //"@pulgasari/htx/"      : `${pkg}/js-packages/htx/`,
 
