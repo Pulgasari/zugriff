@@ -1,25 +1,4 @@
-.ghost-btn {
-  display       : flex;
-  align-items   : center;
-  gap           : 0.3rem;
-  background    : transparent;
-  border        : none;
-  color         : var(--fg);
-  cursor        : pointer;
-  font-size     : 0.75rem;
-  opacity       : 0.45;
-  padding       : 0.15rem 0.3rem;
-  border-radius : 0.3rem;
-  transition    : opacity 0.15s;
 
-   &:hover,
-   &.active { opacity: 1; }
-}
-
-
-/* fallback flex spacer, so the header gear pushes to the right in apps that
-   don't already define one. base.css loads before an app's own app.css, so any
-   app that styles .spacer itself still wins. */
 .spacer { flex: 1 1 auto; }
 
 #app-settings.app-settings-overlay {
