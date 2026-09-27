@@ -14,8 +14,7 @@ Brand      = await zugriff.component('Brand'),
 Empty      = await zugriff.component('Empty'),
 Icon       = await zugriff.component('Icon'),
 IconButton = await zugriff.component('IconButton'),
-InstallTip = await zugriff.component('InstallTip'),
-Settings   = await zugriff.component('Settings');
+InstallTip = await zugriff.component('InstallTip');
 
 const // local
 LibraryView = await app.view('LibraryView'),

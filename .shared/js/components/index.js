@@ -20,7 +20,7 @@ export * from './Shell.js';
 export * from './Sidebar.js';
 export * from './Slider.js';
 export * from './Taplet.js';
-export * from './../app/toast.js';
+export * from './../modules/toast.js';
 export * from './Tree.js';
 export * from './Toggle.js';
 export * from './Waveform.js';

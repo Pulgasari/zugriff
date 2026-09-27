@@ -14,13 +14,14 @@ import { setFiles, revokeAll, vError }  from './modules/state.js';
 // ::: routes + router
 import { routes }       from './routes/index.js';
 import { editCurrent }  from './routes/edit.js';
-import { createRouter } from '/.shared/js/app/router.js';
+import { createRouter } from '/.shared/js/modules/router.js';
 
 // ::: shared components
 const
-Brand    = await zugriff.component('Brand'),
-Icon     = await zugriff.component('Icon'),
-Settings = await zugriff.component('Settings');
+Brand          = await zugriff.component('Brand'),
+Icon           = await zugriff.component('Icon'),
+SettingsButton = await zugriff.component('Settings', 'SettingsButton'),
+SettingsModal  = await zugriff.component('Settings', 'SettingsModal');
 
 // ::: the app handle — the data layer hangs off it as app.lib
 const app = zugriff.app;
@@ -59,7 +60,7 @@ function ModeBar () {
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
-      <div class="im-modebar-actions"><${Settings}/></div>
+      <div class="im-modebar-actions"><${SettingsButton} /><${SettingsModal} /></div>
     </header>`;
 }
 

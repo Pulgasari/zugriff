@@ -1,4 +1,4 @@
-// .shared/js/app/router.js
+// .shared/js/modules/router.js
 // a tiny query-param router bound to app.state.route. an app declares its routes
 // once (id + component, plus whatever nav metadata it wants), the router resolves
 // the initial route from ?<param>= and keeps the url in sync on navigation. it

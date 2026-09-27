@@ -6,8 +6,8 @@
 // launched clip into the player. the runtime binds zugriff (+ zugriff.app, html) to window
 // before this runs, so nothing here imports the runtime.
 
-import { Icon, Settings } from '/.shared/js/components/index.js';
-import { createRouter }   from '/.shared/js/app/router.js';
+import { Icon, SettingsButton, SettingsModal } from '/.shared/js/components/index.js';
+import { createRouter }   from '/.shared/js/modules/router.js';
 import { useEffect }      from 'preact/hooks';
 
 import lib          from './modules/library.js';
@@ -48,7 +48,7 @@ function ModeBar () {
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
-      <div class="im-modebar-actions"><${Settings} /></div>
+      <div class="im-modebar-actions"><${SettingsButton} /><${SettingsModal} /></div>
     </header>`;
 }
 

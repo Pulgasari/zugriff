@@ -6,6 +6,7 @@ import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Index       from '/.shared/js/components/Index.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
+import { SettingsButton, SettingsModal } from '/.shared/js/components/Settings.js';
 
 const app = zugriff.app;
 
@@ -41,7 +42,7 @@ function LibraryView () {
           ${db.pending.value > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${db.pending.value} left</span>`}
           <${IconButton} icon="refresh"    label="Rescan folders" onClick=${() => db.rescanAll()} />
           <${IconButton} icon='folder-add' label='Add folder'     onClick=${addFolder} />
-          <${Settings} />
+          <${SettingsButton} /><${SettingsModal} />
         </div>
       </header>
 
