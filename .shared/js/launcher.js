@@ -10,7 +10,6 @@ import { applyPattern }      from '@aufbau/patterns';
 import { computed, signal }  from '@aufbau/signals';
 import getStyleToken         from '@domina/methods/getStyleToken.js';
 import { render }            from 'preact';
-import { useEffect, useRef } from 'preact/hooks';
 
 const route = window.location.pathname.split('/')[1] || 'home';
 
@@ -80,13 +79,8 @@ else {
   // :::::: COMPONENTS
 
   function Filter () {
-    const ref      = useRef(null);
     const position = 'bottom';
     const sticky   = true;
-
-    useEffect(() => {
-      if (launcher.value('filter-autofocus')) ref.current?.focus();
-    }, []);
 
     return html`
       <${SearchPanel} 

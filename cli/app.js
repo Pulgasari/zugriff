@@ -3,23 +3,22 @@
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
 // ::: vendors
-import aufbau, { html, preact } from '@aufbau/kits/preact-htm';
-import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
+import { Terminal } from '@xterm/xterm';
 
 // ::: local: app
-import * as config from './app.config.js';
+import { terminalOptions } from './app.config.js';
 
 // ::: local: shared
-import Nav     from '/.shared/js/components/Nav.js';
-import Settings, { SettingsButton } from '/.shared/js/components/Settings.js';
-import { themeGroup } from '/.shared/js/lib/settings.js';
-import { vfs } from '/.shared/js/modules/opfs.js';
+import zugriff                           from '/.shared/js/runtime.js';
+import Nav                               from '/.shared/js/components/Nav.js';
+import { SettingsButton, SettingsPanel } from '/.shared/js/components/Settings.js';
+import { vfs }                           from '/.shared/js/modules/opfs.js';
+import { html, signal, useEffect, useRef } from '/.shared/js/vendors.js';
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
 
-aufbau.init(config.aufbau);
-const { useEffect, useRef, signal } = preact;
+const app = zugriff.app;
 
 // Signal tracking loaded WASM tools
 const loadedCommands = signal(new Set(['help', 'init', 'clear', 'ls', 'upload', 'download', 'rm']));
@@ -30,7 +29,7 @@ function TerminalView() {
   useEffect(() => {
     if (!terminalRef.current) return;
 
-    const term = new Terminal (config.terminal);
+    const term = new Terminal (terminalOptions());
 
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
@@ -131,7 +130,7 @@ function App() {
       </div>
     </header>
 
-    <${Settings} groups=${[themeGroup]} />
+    <${SettingsPanel} />
     
     <main id="app-main">
       <${TerminalView} />
@@ -279,4 +278,4 @@ async function triggerFileDownload(filename, term) {
 }
 
 // Mount Root
-preact.render(html`<${App} />`, document.getElementById('app'));
+app.init({ App });
