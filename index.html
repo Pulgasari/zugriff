@@ -67,7 +67,7 @@
   const dev = new URLSearchParams(location.search).get('dev');
 
   if (dev !== null && dev !== 'off' && dev !== '0') {
-    try           { await import('@pulgasari/devtools/boot.js'); }
+    try           { await import('@aufbau/devtools/boot.js'); }
     catch (error) { console.error('[shell] devtools not loaded:', error); }
   }
 </script>
