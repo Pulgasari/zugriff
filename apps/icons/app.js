@@ -13,14 +13,15 @@ import { useEffect, useRef } from 'preact/hooks';
 import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
-ActionMenu = await zugriff.component('ActionMenu'),
-Button     = await zugriff.component('Button'),
-Dock       = await zugriff.component('Dock'),
-Empty      = await zugriff.component('Empty'),
-Icon       = await zugriff.component('Icon'),
-IconButton = await zugriff.component('IconButton'),
-Loading    = await zugriff.component('Loading'),
-Settings   = await zugriff.component('Settings');
+ActionMenu     = await zugriff.component('ActionMenu'),
+Button         = await zugriff.component('Button'),
+Dock           = await zugriff.component('Dock'),
+Empty          = await zugriff.component('Empty'),
+Icon           = await zugriff.component('Icon'),
+IconButton     = await zugriff.component('IconButton'),
+Loading        = await zugriff.component('Loading'),
+SettingsButton = await zugriff.component('Settings', 'SettingsButton'),
+SettingsModal  = await zugriff.component('Settings', 'SettingsModal');
 
 // ::: the app handle
 const app = zugriff.app;
@@ -302,7 +303,7 @@ function TopBar () {
 
       <span class="spacer"></span>
       ${grid && html`<${SizeControl} />`}
-      <${Settings} />
+      <${SettingsButton} /><${SettingsModal} />
     </header>`;
 }
 

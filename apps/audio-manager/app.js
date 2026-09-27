@@ -8,7 +8,7 @@ import { computed }  from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
 
 // ::: shared
-import { Icon, IconButton, InstallTip, Settings } from '/.shared/js/components/index.js';
+import { Icon, IconButton, InstallTip, SettingsButton, SettingsModal } from '/.shared/js/components/index.js';
 
 // ::: app modules
 import * as db     from './modules/db.js';
@@ -330,7 +330,7 @@ function TopBar () {
         <input type="search" placeholder="Search…" value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
       </div>
       <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" /></button>
-      <${Settings} />
+      <${SettingsButton} /><${SettingsModal} />
     </header>`;
 }
 

@@ -19,8 +19,7 @@ Button      = await zugriff.component('Button'),
 GhostButton = await zugriff.component('GhostButton'),
 Icon        = await zugriff.component('Icon'),
 Nav         = await zugriff.component('Nav'),
-SearchPanel = await zugriff.component('SearchPanel'),
-Settings    = await zugriff.component('Settings');
+SearchPanel = await zugriff.component('SearchPanel');
 
 // :::::: RENDER
 
