@@ -5,6 +5,7 @@ const app = zugriff.app;
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
 import { createThumbCache } from '/.shared/js/thumbs.js';
+import { SettingsView }     from '/.shared/js/components/Settings.js';
 
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -97,7 +98,7 @@ const dockItems = [
   { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
   { label: 'Later',    icon: 'bookmarks',             view: 'saved'     },
   { label: 'Explore',  icon: 'mdi:compass-outline',   view: 'explore'   },
-//{ label: 'Settings', icon: 'settings',            dialog: 'settings' },
+  { label: 'Settings', icon: 'settings',              view: 'settings'  },
 ];
 
 app.dialogs = {
@@ -110,6 +111,7 @@ app.views = {
   podcasts : 'PodcastsView',
   podcast  : 'PodcastDetailView',
   saved    : 'SavedView',
+  settings : SettingsView,
 
   // explore routes on the feed url rather than an id — a podcast that is not
   // subscribed has no record to point at (views/ExplorePodcastView.js)
