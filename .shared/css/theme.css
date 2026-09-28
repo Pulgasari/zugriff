@@ -33,7 +33,8 @@ where the page shows var(--bg) instead
   padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
 }
 
-/* move to: podcasts */
+/* move to: podcasts 
+or move to: aufbau/css/surfaces.css */
 
 @container style(--theme: oled) {
   body {
