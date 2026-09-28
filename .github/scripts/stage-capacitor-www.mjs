@@ -36,7 +36,11 @@ const packages = process.env.PKG_SOURCE || join('build', '_pkg');
 const aufbau = join(ROOT, packages, 'aufbau');
 if (!existsSync(aufbau)) execFileSync('git', ['clone', '--quiet', '--depth', '1', 'https://github.com/Pulgasari/aufbau.git', aufbau], { stdio: 'inherit' });
 
-const { bundle } = await import(pathToFileURL(join(aufbau, 'bundler', 'index.js')));
+// the bundler's own dependencies (esbuild for the vendor step)
+const bundler = join(aufbau, 'bundler');
+if (!existsSync(join(bundler, 'node_modules'))) execFileSync('npm', ['install', '--no-audit', '--no-fund', '--silent'], { cwd: bundler, stdio: 'inherit' });
+
+const { bundle } = await import(pathToFileURL(join(bundler, 'index.js')));
 const { summary } = await bundle({ ...config({ out: resolve(outDir, 'www'), packages, slug }), root: ROOT });
 
 const text = `### www: ${slug}\n\n${summary}\n`;

@@ -27,9 +27,9 @@ name: Build Android (Capacitor) Packages
 #
 # The app's files ship inside the apk: stage-capacitor-www.mjs stages the app,
 # .shared and the first-party packages into www/ with @aufbau/bundler (config:
-# bundler.config.js), capacitor serves them from
-# https://localhost/. third-party modules (esm.sh, jsdelivr, unpkg) still come
-# over the network, the step summary of each run lists what is left.
+# bundler.config.js), third-party modules (esm.sh, jsdelivr, unpkg) vendored
+# from npm, capacitor serves them from https://localhost/. the step summary of
+# each run lists what still goes over the network.
 #
 # build-android-capacitor-live.yml runs this workflow with `live`: then each app
 # is wrapped around its LIVE deployment URL (server.url =

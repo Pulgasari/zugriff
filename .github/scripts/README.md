@@ -56,11 +56,16 @@ dem die App gebündelt wird. Die Config legt fest:
   bunker, htx, js-packages …), als `www/_pkg/<repo>/`; fehlende werden aus
   `github.com/Pulgasari/<repo>` geklont, jedes `https://code.pulgasari.dev` zeigt
   danach auf `/_pkg`, auch die Importmap aus `boot.js`
+- die Module von Dritten (esm.sh, jsdelivr, unpkg) als `www/_vendor/…`: der Bundler
+  liest jede URL als npm-Paket, installiert es aus der npm-Registry (jsr über
+  npm.jsr.io) und baut mit esbuild ein Browser-Modul daraus. Die Einträge der
+  Importmap aus `boot.js` kommen als `window.__BOOT_CONFIG__.imports` in die
+  `index.html`, ausgeschriebene URLs werden direkt ersetzt
 - `/` wird beim Start zu `/<slug>/`: Capacitor öffnet `https://localhost/`, und die
   Shell liest die Route aus dem Pfad
 
-Am Ende steht die Zusammenfassung des Bundlers: welche Pakete lokal sind, die
-Größe und was **weiter übers Netz** geht (esm.sh, jsdelivr, unpkg, APIs …), in CI
+Am Ende steht die Zusammenfassung des Bundlers: welche Pakete und Module lokal
+sind, die Größe und was **weiter übers Netz** geht (Icons, APIs …), in CI
 auch in der Step-Summary. Das ist die Liste, die die nächsten Schritte des
 Bundlers abarbeiten (siehe `aufbau/bundler/concept.md`).
 
