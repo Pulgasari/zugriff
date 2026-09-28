@@ -8,18 +8,11 @@ BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
   flex-flow : column;
 
   > * { padding: 1rem; }
-
-  .search-panel { width: 100%; position: sticky; top: 0; }
-  aufbau-input  { width: stretch; }
+  > main:has(> aufbau-index) { padding: 0; }
 
   .search-panel { background: var(--bg); }
-
-  /*
-  &.episodes-view > main { padding: 0; }
-  &.podcasts-view > main { padding: 0; }
-  &.explorer-view > main { padding: 0; }
-  */
-  > main:has(> aufbau-index) { padding: 0; }
+  .search-panel { width: 100%; position: sticky; top: 0; }
+  aufbau-input  { width: stretch; }
 }
 
 #episode,
@@ -31,9 +24,9 @@ BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
 }
 
 aufbau-item {
-  contain-intrinsic-height: auto 170px;
-  content-visibility: auto;
-  transition-behavior: allow-discrete;
+  contain-intrinsic-height : auto 170px;
+  content-visibility       : auto;
+  transition-behavior      : allow-discrete;
 }
 
 aufbau-item {

@@ -24,11 +24,13 @@
 // :::::: IMPORTS
 
 import Icon from './Icon.js';
+import View from './View.js';
 
 import { gestalt } from '@aufbau/api';
 import gui         from '@aufbau/gui';
 import webfonts    from '@aufbau/webfonts';
-import { html, signal, useEffect, useRef } from './../vendors.js';
+
+import { signal, useEffect, useRef } from './../vendors.js';
 
 // :::::: STATE
 
@@ -46,8 +48,10 @@ function sharedSpec (config, themes) {
   const fonts = [['', 'default'], ...(webfonts?.fonts ?? []).map(font => [font.id, font.name])];
   const spec  = { theme: { type: 'enum', look: 'combobox', values: themes, default: 'dracula', label: 'Theme' } };
 
-  for (const [key, entry] of Object.entries(config.settings ?? {}))
-    spec[key] = { label: labelOf(key), ...entry, ...(entry.source === 'webfonts' ? { values: fonts } : {}) };
+  for (const [key, entry] of Object.entries(config.settings ?? {})) {
+    const wf = entry.source === 'webfonts' ? { values: fonts } : {};
+    spec[key] = { label: labelOf(key), ...entry, ...wf };
+  }
 
   return spec;
 }
@@ -135,23 +139,24 @@ function SettingsPanel ({ open = settingsOpen.value, onClose = closeSettings, ..
 
 function SettingsView (props) {
   return html`
-    <section class="settings-view">
-      <header><h2 class="settings-title">Settings</h2></header>
+    <${View} class='settings-view' title='settings'>
       <${Settings} ...${props} />
-    </section>
+    </${View}>
   `;
 }
 
 // :::::: EXPORT
 
 export {
-  closeSettings,
   Settings,
   SettingsButton,
   SettingsModal,
-  settingsOpen,
   SettingsPanel,
   SettingsView,
+  
+  settingsOpen,
+
+  closeSettings,
   toggleSettings,
 };
 export default Settings;
