@@ -21,9 +21,6 @@ body {
   --accent-a50 : color-mix(in oklch, var(--accent) 50%, transparent);
 }
 
-.Dock     { background-color: var(--bg-d-1); }
-.Dock > * { background-color: var(--bg-d-2); border: none; border-radius: 0; }
-
 /* typo */
 
 code, kbd { font-family: var(--mono); }
@@ -120,8 +117,13 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 
 /* DOCK */
 
-.Dock        { text-transform: uppercase; }
-.Dock button { text-transform: uppercase; }
+#app-dock, .dock, .Dock { 
+  background-color: var(--bg-d-1);
+  text-transform: uppercase;
+
+  > *    { background-color: var(--bg-d-2); border: none; border-radius: 0; }
+  button { text-transform: uppercase; }
+}
 
 /* EMPTY */
 
@@ -143,18 +145,19 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 
 /* INDEX */
 
-aufbau-index[viewmode="list"]                    { gap: 0; }
-aufbau-index[viewmode="list"] > *:nth-child(odd) { background-color: #0001; }
-
-
-aufbau-index[viewmode="list"] > * {
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns : 100px auto;
-  grid-template-rows    : 1fr;
-  /* grid: 1fr 1fr / 1fr 2fr; */
-  > *             { grid-column: 2; }
-  > *:first-child { grid-column: 1; grid-row: span 4; }
+aufbau-index[viewmode="list"] { 
+  gap: 0;
+  
+  > *:nth-child(odd) { background-color: #0001; }
+  > * {
+    display : grid;
+    gap     : 0.75rem;
+    grid-template-columns : 100px auto;
+    grid-template-rows    : 1fr;
+    /* grid: 1fr 1fr / 1fr 2fr; */
+    > *             { grid-column: 2; }
+    > *:first-child { grid-column: 1; grid-row: span 4; }
+  }
 }
 
 .art, .artwork {
