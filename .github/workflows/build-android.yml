@@ -1,4 +1,4 @@
-name: Build Android packages
+name: Build Android (Bubblewrap) Packages
 
 # Packages the PWAs whose registry entry sets build.android == 'bubblewrap' in
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
