@@ -1,5 +1,17 @@
 // ebooks :: views/ReaderView.js
 
+import { useEffect, useRef } from 'preact/hooks';
+
+import Empty      from '/.shared/js/components/Empty.js';
+import Icon       from '/.shared/js/components/Icon.js';
+import IconButton from '/.shared/js/components/IconButton.js';
+
+import TocPanel from './../components/TocPanel.js';
+import { createEpubReader, createPdfReader } from './../modules/reader.js';
+
+const app = zugriff.app;
+const { closeReader, db, readerFlow, readerFont, readerUi } = app;
+
 function ReaderView ({ bookKey }) {
   const stageRef = useRef(null);
   const engineRef = useRef(null);
@@ -130,3 +142,6 @@ function ReaderView ({ bookKey }) {
       </footer>
     </div>`;
 }
+
+export       { ReaderView };
+export default ReaderView;

@@ -2,131 +2,88 @@
 // the ebook library + reader on the shared handle. the runtime binds zugriff (+ zugriff.app,
 // html) to window before this runs, so nothing here imports the runtime. the library lives
 // in the db module (app.db); ephemeral ui state on app.state; reading prefs are persisted
-// scalars. the reader engines come from modules/reader.js.
+// signals. the views read all of it off the handle.
 
-// ::: vendors
-import { computed, signal, typedSignal }  from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
-
-// ::: shared
-const
-Brand      = await zugriff.component('Brand'),
-Empty      = await zugriff.component('Empty'),
-Icon       = await zugriff.component('Icon'),
-IconButton = await zugriff.component('IconButton'),
-InstallTip = await zugriff.component('InstallTip');
-
-const // local
-LibraryView = await app.view('LibraryView'),
-ReaderView  = await app.view('ReaderView');
-
-
-// ::: app modules
-import { createPdfReader, createEpubReader } from './modules/reader.js';
-
-// ::: the app handle
 const app = zugriff.app;
+
+// :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::
+
+import { computed, signal, typedSignal } from '@aufbau/signals';
+import { useEffect }                     from 'preact/hooks';
+
+// :::::: HANDLE ::::::::::::::::::::::::::::::::::::::::::::
+// before the views are imported: a component captured at module scope sees whatever
+// was on the handle at import time
+
 app.db = await app.module('db');
 app.fs = zugriff.fs;
 
 // :::::: STATE ::::::::::::::::::::::::::::::::::::::::::::::
-// ephemeral ui state on app.state (no `.value`); the library is app.db (plain signals). sort
-// + the reader prefs are persisted scalars via `stored`.
 
-app.state.route  = { name: 'library', key: null };   // { name:'library' } | { name:'reader', key }
+app.state.route = { name: 'library', key: null };   // { name:'library' } | { name:'reader', key }
 app.state.$extend({
   search : { type: 'scalar', value: '' },
   folder : { type: 'scalar', value: '' },   // '' = all folders, else sourceId
 });
 
-const sort = typedSignal({ value: 'recent', key: 'ebooks:sort' });        // recent | title | author | added
-
-// :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
-
-const authorOf = b   => b.author || '';
-const pct      = key => app.db.progressOf(key)?.percent ?? 0;
-
-// a stable pastel from a title, for the placeholder cover
-function hueOf (str = '') {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-  return h % 360;
-}
-
-const sortBooks = (list, mode) => [...list].sort((a, b) =>
-    mode === 'title'  ? a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
-  : mode === 'author' ? authorOf(a).localeCompare(authorOf(b), undefined, { sensitivity: 'base' })
-                        || a.title.localeCompare(b.title)
-  : mode === 'added'  ? (b.addedAt || 0) - (a.addedAt || 0)
-  : /* recent */        (db.progressOf(b.key)?.lastOpenedAt || 0) - (db.progressOf(a.key)?.lastOpenedAt || 0)
-                        || (b.addedAt || 0) - (a.addedAt || 0));
-
-const visibleBooks = computed(() => {
-  const q = app.state.$search.trim().toLowerCase();
-  let list = db.books.value;
-  if (app.state.$folder) list = list.filter(b => b.sourceId === app.state.$folder);
-  if (q) list = list.filter(b =>
-    b.title.toLowerCase().includes(q) || authorOf(b).toLowerCase().includes(q) || b.name.toLowerCase().includes(q));
-  return sortBooks(list, sort.value);
-});
-
-const continueReading = computed(() =>
-  db.books.value
-    .filter(b => db.progressOf(b.key)?.lastOpenedAt)
-    .sort((a, b) => (db.progressOf(b.key).lastOpenedAt) - (db.progressOf(a.key).lastOpenedAt))
-    .slice(0, 12));
-
-// :::::: READER VIEW :::::::::::::::::::::::::::::::::::::::
-
-const readerUi = signal({ ready: false });
-
-function openReader (key) {
-  app.state.route = { name: 'reader', key };
-  app.db.markOpened(key);
-}
-const closeReader = () => { app.state.route = { name: 'library', key: null }; };
+app.sort = typedSignal({ key: 'ebooks:sort', value: 'recent', values: ['recent', 'title', 'author', 'added'] });
 
 // epub reading prefs, remembered across books
-const readerFlow = typedSignal({ value: 'paginated', key: 'ebooks:flow' });
-const readerFont = typedSignal({ value: 100, key: 'ebooks:font' });
+app.readerFlow = typedSignal({ key: 'ebooks:flow', value: 'paginated' });
+app.readerFont = typedSignal({ key: 'ebooks:font', value: 100 });
+app.readerUi   = signal({ ready: false });
 
-function TocPanel ({ items, kind, onPick }) {
-  const render = list => html`
-    <ul class="toc-list">
-      ${(list || []).map((it, i) => html`
-        <li key=${i}>
-          <button class="toc-link" onClick=${() => onPick(kind === 'pdf' ? it.dest : it.href)}>${it.label || 'Untitled'}</button>
-          ${it.children?.length ? render(it.children) : null}
-        </li>`)}
-    </ul>`;
-  return html`
-    <aside class="toc-panel">
-      <div class="toc-head">Contents</div>
-      ${items == null
-        ? html`<div class="toc-loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`
-        : items.length ? render(items) : html`<div class="toc-empty">No contents in this book.</div>`}
-    </aside>`;
-}
+// :::::: LIBRARY :::::::::::::::::::::::::::::::::::::::::::
+
+const authorOf     = book => book.author || '';
+const lastOpenedOf = book => app.db.progressOf(book.key)?.lastOpenedAt || 0;
+const compare      = (a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' });
+
+const sortBooks = (list, mode) => [...list].sort((a, b) =>
+    mode === 'title'  ? compare(a.title, b.title)
+  : mode === 'author' ? compare(authorOf(a), authorOf(b)) || compare(a.title, b.title)
+  : mode === 'added'  ? (b.addedAt || 0) - (a.addedAt || 0)
+  : /* recent */        lastOpenedOf(b) - lastOpenedOf(a) || (b.addedAt || 0) - (a.addedAt || 0));
+
+app.visibleBooks = computed(() => {
+  const query = app.state.$search.trim().toLowerCase();
+  let list = app.db.books.value;
+  if (app.state.$folder) list = list.filter(book => book.sourceId === app.state.$folder);
+  if (query) list = list.filter(book => [book.title, authorOf(book), book.name].some(text => text.toLowerCase().includes(query)));
+  return sortBooks(list, app.sort.value);
+});
+
+app.percentOf = key => app.db.progressOf(key)?.percent ?? 0;
 
 // :::::: ACTIONS :::::::::::::::::::::::::::::::::::::::::::
 
-async function addFolder () {
-  if (!fs.supported()) { flash('This browser can’t open folders — try Chrome, Edge or another Chromium browser.', 'err'); return; }
+app.openReader = key => {
+  app.state.route = { name: 'reader', key };
+  app.db.markOpened(key);
+};
+
+app.closeReader = () => { app.state.route = { name: 'library', key: null }; };
+
+app.addFolder = async () => {
+  if (!app.fs.supported()) return app.toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.');
   try {
-    const rec = await db.addFolder();
-    if (rec) app.toast({ success: `Added ${rec.name}` });
+    const source = await app.db.addFolder();
+    if (source) app.toast.success(`Added ${source.name}`);
   }
-  catch (e) { app.toast(e); }
-}
+  catch (error) { app.toast.error(error); }
+};
+
+// :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
+
+const { LibraryView, ReaderView } = await app.views('LibraryView', 'ReaderView');
+const Icon = await zugriff.component('Icon');
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
-  useEffect(() => { db.load().catch(app.toast); }, []);
+  useEffect(() => { app.db.load().catch(error => app.toast.error(error)); }, []);
 
-  if (!db.ready.value) {
-    return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
-  }
+  if (!app.db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   const route = app.state.$route;
   return route.name === 'reader'
