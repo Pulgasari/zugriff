@@ -18,18 +18,20 @@ aufbau-picker, .picker {
   color    : var(--fg);
 }
 
-aufbau-picker[look="segments"] { gap: 1px; }
+aufbau-picker[look="segments"] { 
+   gap: 1px;
 
-aufbau-picker[look="segments"]::part(option) {
-  background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
-  color         : var(--fg);
-  border-radius : 0;
-  padding       : 0.25rem 0.5rem;
-}
-
-aufbau-picker[look="segments"]::part(option selected) {
-  background : var(--accent);
-  color      : var(--bg);
+   &::part(option) {
+     background    : var(--bg);
+     color         : var(--fg);
+      
+     --padding : small;
+   }
+   
+   &::part(option selected) {
+     background : var(--accent);
+     color      : var(--bg);
+   }
 }
 
 /* combobox: the host is the field. cycle: a single button */
@@ -38,11 +40,16 @@ aufbau-picker[look="cycle"]::part(trigger) {
   background    : color-mix(in srgb, var(--fg) 5%, transparent);
   border        : 1px solid var(--fg-25);
   border-radius : var(--radius);
-  padding       : 0.25rem 0.5rem;
+  
+  --padding: small;
 }
 
-aufbau-picker[look="combobox"] { min-width: 10rem; }
-aufbau-picker[look="combobox"]:focus-within { border-color: var(--accent); }
+aufbau-picker[look="combobox"] { 
+   min-width: 10rem; 
+   
+   &:focus-within { border-color: var(--accent); }
+}
+
 aufbau-picker::part(caret) { opacity: 0.5; }
 
 /* the list is a popover, it gets no colours from the page and has to bring its own */
