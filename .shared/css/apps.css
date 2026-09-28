@@ -88,6 +88,36 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .crumb      { white-space: nowrap; }
 .crumb.last { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
 
+/* CONTEXT-MENU */
+
+.context-menu {
+  position     : fixed;
+  z-index      : 40;
+  min-width    : 160px;
+  padding      : 0.25rem;
+  border       : 1px solid var(--line);
+  border-radius: var(--radius);
+  background   : var(--panel);
+  box-shadow   : 0 8px 24px rgb(0 0 0 / 0.35);
+  
+  button {
+     display      : flex;
+     align-items  : center;
+     gap          : 0.50rem;
+     width        : 100%;
+     padding      : 0.50rem;
+     border       : 0;
+     border-radius: calc(var(--radius) - 2px);
+     background   : transparent;
+     color        : var(--fg);
+     font         : inherit;
+     text-align   : left;
+     cursor       : pointer;
+   
+     &:hover { background: var(--accent-25); }
+   }
+}
+
 /* DOCK */
 
 .Dock        { text-transform: uppercase; }
