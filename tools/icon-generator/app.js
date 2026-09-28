@@ -4,12 +4,14 @@
 // global.php: an svg goes in, the png sizes a web app manifest needs come out.
 
 // ::: vendors
-import { html, signal, computed } from '@aufbau/kits/preact-htm';
+import { html, signal, computed } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=icon-generator';
+import defineTool from '/.shared/js/tool.js';
 import { Dropzone, Icon, Button } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('icon-generator');
 
 // ::: local
 
@@ -221,4 +223,4 @@ function App () {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

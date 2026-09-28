@@ -1,9 +1,11 @@
 // tools/base64-decoder/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=base64-decoder';
-import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
 
-const App = CodeTransformerApp({
+const { boot } = defineTool('base64-decoder');
+
+const App = CodeWorkbenchApp({
   appID       : 'base64-decoder',
   lang        : 'plaintext',
   langExt     : 'txt',
@@ -14,4 +16,4 @@ const App = CodeTransformerApp({
   ),
 });
 
-boot({ config, App });
+boot({ App });

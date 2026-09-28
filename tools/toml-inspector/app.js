@@ -1,8 +1,10 @@
 // tools/toml-inspector/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=toml-inspector';
-import { DataInspectorApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { DataInspectorApp } from '/.shared/js/blueprints/index.js';
 import { parse } from 'smol-toml';
+
+const { boot } = defineTool('toml-inspector');
 
 const App = DataInspectorApp({
   appID       : 'toml-inspector',
@@ -13,4 +15,4 @@ const App = DataInspectorApp({
   emptyLabel  : 'Paste TOML and click Inspect',
 });
 
-boot({ config, App });
+boot({ App });

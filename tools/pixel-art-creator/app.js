@@ -1,13 +1,15 @@
 // tools/pixel-art-creator/app.js
 
 // ::: vendors
-import { effect, html, signal, useRef, useState } from '@aufbau/kits/preact-htm';
+import { effect, html, signal, useRef, useState } from '/.shared/js/vendors.js';
 import UPNG from 'upng-js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=pixel-art-creator';
+import defineTool from '/.shared/js/tool.js';
 import { Icon, Picker } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('pixel-art-creator');
 
 // ::: local
 
@@ -428,4 +430,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

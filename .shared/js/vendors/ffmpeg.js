@@ -1,4 +1,4 @@
-// shared/js/lib/ffmpeg.js
+// .shared/js/vendors/ffmpeg.js
 //
 // one loader for the three audio apps. the ~32 mb core wasm is not in this
 // repo — it comes off the cdn on first use and the service worker keeps it

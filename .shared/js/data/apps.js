@@ -1,4 +1,4 @@
-// shared/js/registry.js
+// .shared/js/data/apps.js
 // ---------------------
 // registry.get('ebooks')     -> the resolved entry, or null
 // registry.getAll('tool')    -> every tool entry (omit the arg for all)

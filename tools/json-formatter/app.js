@@ -1,13 +1,15 @@
 // tools/json-formatter/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=json-formatter';
+import defineTool from '/.shared/js/tool.js';
 import { Icon } from '/.shared/js/components/index.js';
 import { CodeInputPane, CodeOutputPane } from '/.shared/js/components/code.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('json-formatter');
 
 // ::: local
 
@@ -93,4 +95,4 @@ function App () {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

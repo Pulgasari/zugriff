@@ -1,9 +1,11 @@
 // tools/xml-minifyer/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=xml-minifyer';
-import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
 
-const App = CodeTransformerApp({
+const { boot } = defineTool('xml-minifyer');
+
+const App = CodeWorkbenchApp({
   appID       : 'xml-minifyer',
   lang        : 'xml',
   langExt     : 'xml',
@@ -17,4 +19,4 @@ const App = CodeTransformerApp({
   },
 });
 
-boot({ config, App });
+boot({ App });

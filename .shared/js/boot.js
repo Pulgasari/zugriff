@@ -224,7 +224,6 @@ function applyTheme ({ prefix }) {
       "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
       "@aufbau/gui"             : `${pkg}/aufbau/gui/index.js`,
       "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
-      "@aufbau/kits/preact-htm" : `${pkg}/aufbau/kits/preact-htm.js`,
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
       "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,
       "@aufbau/signals/"        : `${pkg}/aufbau/signals/`,

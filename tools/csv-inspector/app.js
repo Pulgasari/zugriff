@@ -1,8 +1,10 @@
 // tools/csv-inspector/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=csv-inspector';
-import { DataInspectorApp } from '/.shared/js/patterns/index.js';
-import { csvParse } from '/.shared/js/lib/data-converters.js';
+import defineTool from '/.shared/js/tool.js';
+import { DataInspectorApp } from '/.shared/js/blueprints/index.js';
+import { csvParse } from '/.shared/js/vendors/data-converters.js';
+
+const { boot } = defineTool('csv-inspector');
 
 const App = DataInspectorApp({
   appID       : 'csv-inspector',
@@ -13,4 +15,4 @@ const App = DataInspectorApp({
   emptyLabel  : 'Paste CSV and click Inspect',
 });
 
-boot({ config, App });
+boot({ App });

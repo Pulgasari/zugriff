@@ -1,13 +1,15 @@
 // tools/pdf-extractor/app.js
 
 // ::: vendors
-import { computed, html, signal, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { computed, html, signal, useEffect, useRef } from '/.shared/js/vendors.js';
 import { PDFDocument } from 'pdf-lib';
 import * as PDFJS from 'pdfjs';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=pdf-extractor';
+import defineTool from '/.shared/js/tool.js';
 import { Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
+
+const { boot } = defineTool('pdf-extractor');
 
 // ::: local
 
@@ -230,4 +232,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

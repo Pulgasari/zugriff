@@ -1,10 +1,12 @@
 // tools/css-minifyer/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=css-minifyer';
-import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
 import { minify } from 'csso';
 
-const App = CodeTransformerApp({
+const { boot } = defineTool('css-minifyer');
+
+const App = CodeWorkbenchApp({
   appID       : 'css-minifyer',
   lang        : 'css',
   langExt     : 'css',
@@ -13,4 +15,4 @@ const App = CodeTransformerApp({
   execute     : src => minify(src).css,
 });
 
-boot({ config, App });
+boot({ App });

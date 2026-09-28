@@ -1,13 +1,15 @@
 // tools/colorpicker/app.js
 
 // ::: vendors
-import { html, signal, useState } from '@aufbau/kits/preact-htm';
+import { html, signal, useState } from '/.shared/js/vendors.js';
 import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb, modeOklab, modeOklch, modeRgb, parse, useMode } from 'culori';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=colorpicker';
+import defineTool from '/.shared/js/tool.js';
 import { Icon, Picker } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('colorpicker');
 
 // ::: local
 
@@ -327,4 +329,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

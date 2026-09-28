@@ -1,10 +1,12 @@
 // tools/toml-converter/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=toml-converter';
-import { CodeConverterApp } from '/.shared/js/patterns/index.js';
-import { convert } from '/.shared/js/lib/data-converters.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
+import { convert } from '/.shared/js/vendors/data-converters.js';
 
-const App = CodeConverterApp({
+const { boot } = defineTool('toml-converter');
+
+const App = CodeWorkbenchApp({
   appID       : 'toml-converter',
   inputLang   : 'toml',
   inputExt    : 'toml',
@@ -19,4 +21,4 @@ const App = CodeConverterApp({
   execute     : (src, fmt) => convert(src, 'toml', fmt),
 });
 
-boot({ config, App });
+boot({ App });

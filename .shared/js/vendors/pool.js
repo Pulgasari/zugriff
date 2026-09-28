@@ -1,4 +1,4 @@
-// shared/js/lib/pool.js
+// .shared/js/vendors/pool.js
 //
 // a bounded concurrency gate. hand it async jobs and it runs at most `max` of
 // them at once, queueing the rest — so a burst of work (a page of thumbnails,

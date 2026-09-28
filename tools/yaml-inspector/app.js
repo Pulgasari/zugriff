@@ -1,8 +1,10 @@
 // tools/yaml-inspector/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=yaml-inspector';
-import { DataInspectorApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { DataInspectorApp } from '/.shared/js/blueprints/index.js';
 import { parse, stringify } from 'yaml';
+
+const { boot } = defineTool('yaml-inspector');
 
 const App = DataInspectorApp({
   appID       : 'yaml-inspector',
@@ -14,4 +16,4 @@ const App = DataInspectorApp({
   emptyLabel  : 'Paste YAML and click Inspect',
 });
 
-boot({ config, App });
+boot({ App });
