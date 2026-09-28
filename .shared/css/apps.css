@@ -408,6 +408,34 @@ aufbau-tree-item[selected]::part(row) {
 
 aufbau-tree-item[selected]::part(icon) { color: var(--accent); }
 
+
+ /* ── dropzone (<aufbau-upload look='dropzone'>) ───── */
+
+aufbau-upload[look="dropzone"], .dropzone {
+  display: block;
+  width  : 100%;
+
+  &::part(zone) {
+    border        : 2px dashed var(--fg-25);
+    border-radius : 0.75rem;
+    padding       : 2.5rem;
+    gap           : 0.6rem;
+    opacity       : 0.75;
+    transition    : border-color 0.15s, background 0.15s, opacity 0.15s;
+    width         : 100%;
+  }
+  
+  &:hover::part(zone),
+  &:state(dragging)::part(zone) {
+    border-color : var(--accent);
+    background   : var(--accent-10);
+    opacity      : 1;
+  }
+
+  /* apps render their own file list */
+  &::part(list) { display: none; }
+}
+  
 /* VIEW */
 
 .View header {
