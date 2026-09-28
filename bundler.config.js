@@ -3,7 +3,8 @@
 // capacitor build (.github/scripts/stage-capacitor-www.mjs): the root shell,
 // .shared and the app where vercel's rewrite puts it on the live site, the
 // first-party packages as local copies, the third-party modules vendored, the
-// icons as svgs, only the fonts in use, and / moved to the app.
+// icons as svgs, only the fonts in use, / moved to the app, and whatever nothing
+// reaches dropped.
 //
 //   node <aufbau>/bundler/cli.js bundler.config.js slug=notes out=build/notes/www packages=build/_pkg
 
@@ -53,6 +54,14 @@ export default ({ out, packages = 'build/_pkg', slug }) => ({
   icons : {
     element : '@aufbau/elements/AufbauIcon.js',
     path    : '/_icons',
+  },
+
+  // everything nothing reaches goes. the app's entry is loaded by a path built
+  // from the route, components and the app's own views, dialogs, panels by name
+  prune : {
+    entries : [`/${slug}/app.js`],
+    keep    : ['/.shared/js/components/', `/${slug}/`, '/_pkg/aufbau/css/'],   // aufbau's css: looks, skins by name
+    origins : ['https://zugriff.dev'],
   },
 
   // capacitor opens https://localhost/, the shell reads its route from the path
