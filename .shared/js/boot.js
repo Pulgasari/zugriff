@@ -223,6 +223,8 @@ function applyTheme ({ prefix }) {
       "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
       "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
       "@aufbau/gui"             : `${pkg}/aufbau/gui/index.js`,
+      "@aufbau/icons"           : `${pkg}/aufbau/icons/index.js`,
+      "@aufbau/icons/"          : `${pkg}/aufbau/icons/`,
       "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
       "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,

@@ -61,6 +61,12 @@ dem die App gebündelt wird. Die Config legt fest:
   npm.jsr.io) und baut mit esbuild ein Browser-Modul daraus. Die Einträge der
   Importmap aus `boot.js` kommen als `window.__BOOT_CONFIG__.imports` in die
   `index.html`, ausgeschriebene URLs werden direkt ersetzt
+- die Icons, die im Code vorkommen, als SVGs in `www/_icons/provide.js`, das sie
+  `<aufbau-icon>` per `AufbauIcon.provide()` übergibt; die iconify-API braucht es
+  nur noch für Namen, die erst zur Laufzeit entstehen
+- von den Webfonts nur die, die CSS und JS beim Namen nennen (Manrope, JetBrains
+  Mono), weitere über `keep` in der Config; der Katalog und damit die Settings
+  bieten nur diese an
 - `/` wird beim Start zu `/<slug>/`: Capacitor öffnet `https://localhost/`, und die
   Shell liest die Route aus dem Pfad
 

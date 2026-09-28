@@ -2,8 +2,8 @@
 // the www/ of one app for @aufbau/bundler (aufbau/bundler), used by the
 // capacitor build (.github/scripts/stage-capacitor-www.mjs): the root shell,
 // .shared and the app where vercel's rewrite puts it on the live site, the
-// first-party packages as local copies, the third-party modules vendored, and /
-// moved to the app.
+// first-party packages as local copies, the third-party modules vendored, the
+// icons as svgs, only the fonts in use, and / moved to the app.
 //
 //   node <aufbau>/bundler/cli.js bundler.config.js slug=notes out=build/notes/www packages=build/_pkg
 
@@ -49,6 +49,12 @@ export default ({ out, packages = 'build/_pkg', slug }) => ({
     source : packages,
   },
 
+  // the svgs of the icons found in the staged files, provided to <aufbau-icon>
+  icons : {
+    element : '@aufbau/elements/AufbauIcon.js',
+    path    : '/_icons',
+  },
+
   // capacitor opens https://localhost/, the shell reads its route from the path
   start : `/${slug}/`,
 
@@ -59,5 +65,13 @@ export default ({ out, packages = 'build/_pkg', slug }) => ({
     importmap : importmapOf('.shared/js/boot.js'),
     inject    : imports => `<script>window.__BOOT_CONFIG__ = { imports: ${JSON.stringify(imports)} };</script>`,
     path      : '/_vendor',
+  },
+
+  // the fonts the shared css and the app state name (manrope, jetbrains mono),
+  // the settings offer those. more go into keep
+  webfonts : {
+    catalog : '_pkg/aufbau/webfonts/data.js',
+    keep    : [],
+    scan    : true,
   },
 });
