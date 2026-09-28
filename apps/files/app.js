@@ -5,10 +5,13 @@
 // module. the app draws its own chrome and owns the #app root.
 
 // ::: shared components
+import Brand        from '/.shared/js/components/Brand.js';
 import Button       from '/.shared/js/components/Button.js';
 import FileExplorer from '/.shared/js/components/FileExplorer.js';
 import Icon         from '/.shared/js/components/Icon.js';
+import IconButton   from '/.shared/js/components/IconButton.js';
 import InstallTip   from '/.shared/js/components/InstallTip.js';
+import Sidebar      from '/.shared/js/components/Sidebar.js';
 
 // ::: vendors
 import { computed }  from '@aufbau/signals';
@@ -19,6 +22,12 @@ const app = zugriff.app;
 app.db = await app.module('db');
 
 const { fs } = zugriff;
+
+// the sidebar is a drawer on a phone
+app.state.$extend({ isNavOpen: { type: 'scalar', value: false } });
+
+const closeNav = () => app.state.isNavOpen = false;
+const openNav  = () => app.state.isNavOpen = true;
 
 // :::::: BACKEND
 const backend = computed(() => {
@@ -90,29 +99,28 @@ function Reconnect () {
     </div>`;
 }
 
-function Sidebar () {
-  const f = app.db.folder.value;
+function FolderSidebar () {
+  const folder = app.db.folder.value;
   return html`
-    <aside class="sidebar">
-      <div class="brand">
-        <${Icon} name="folder" /> <span>Files</span>
-      </div>
+    <${Sidebar} class='fe-side' isOpen=${app.state.$isNavOpen} onClose=${closeNav}>
+      <${Brand} app=${app} />
 
       <div class="fe-current">
         <span class="fe-current-label">open folder</span>
-        <div class="fe-current-name" title=${f.name}>
-          <${Icon} name="folder-open" /> <span>${f.name}</span>
+        <div class="fe-current-name" title=${folder.name}>
+          <${Icon} name="folder-open" /> <span>${folder.name}</span>
         </div>
         <div class="fe-current-actions">
-          <${Button} class='small' icon='mdi:folder-swap-outline' label='change' onClick=${chooseFolder} />
-          <${Button} class='small ghost' icon='close' label='close' onClick=${closeFolder} />
+          <${Button} class='small'       icon='mdi:folder-swap-outline' label='change' onClick=${() => { closeNav(); chooseFolder(); }} />
+          <${Button} class='small ghost' icon='close'                   label='close'  onClick=${() => { closeNav(); closeFolder(); }} />
         </div>
       </div>
 
       <div class="fe-side-foot">
         <${InstallTip} />
       </div>
-    </aside>`;
+    </${Sidebar}>
+  `;
 }
 
 // :::::: APP
@@ -129,8 +137,12 @@ function App () {
        : isLoading()      ? html`<${Icon} name='loading' />`
        : isWelcome()      ? html`<${Welcome} />`
        : isNotGranted()   ? html`<${Reconnect} />`
-       : html`<main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`;
-     //: html`<${Sidebar} /><main id="app-main"><${FileExplorer} backend=${backend.value} /></main>`;
+       : html`
+         <${FolderSidebar} />
+         <main id="app-main">
+           <${IconButton} class='fe-menu' icon='menu' label='Folder' onClick=${openNav} />
+           <${FileExplorer} backend=${backend.value} />
+         </main>`;
 }
 
 // :::::: BOOT

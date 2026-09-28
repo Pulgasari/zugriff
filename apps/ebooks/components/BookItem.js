@@ -3,18 +3,21 @@
 import Cover    from './Cover.js';
 import Progress from '/.shared/js/components/Progress.js';
 
+const app = zugriff.app;
+
 function BookItem ({ book }) {
-  const p = pct(book.key);
+  const percent = app.percentOf(book.key);
   return html`
-    <button class='' onClick=${() => openReader(book.key)} title=${book.name}>
-      <${Cover} book=${book} />
-      <div class='meta'>
+    <button class="book" onClick=${() => app.openReader(book.key)} title=${book.name}>
+      <${Cover} book=${book} className="book-cover" />
+      <div class="book-meta">
         <div class="book-title">${book.title}</div>
-        ${book.author && html`<div class='author'>${book.author}</div>`}
+        ${book.author && html`<div class="book-author">${book.author}</div>`}
       </div>
-      ${p > 0 && html`<${Progress} value=${Math.round(p * 100)} />`}
+      ${percent > 0 && html`<${Progress} class="book-progress" value=${Math.round(percent * 100)} />`}
     </button>
   `;
 }
 
+export       { BookItem };
 export default BookItem;

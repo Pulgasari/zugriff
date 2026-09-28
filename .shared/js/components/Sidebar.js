@@ -3,7 +3,7 @@
 // a wide screen, a slide-in drawer with a scrim on a phone. it is controlled —
 // the app owns the open/close signal and the content:
 //
-//   <${Sidebar} open=${navOpen.value} onClose=${() => navOpen.value = false}>
+//   <${Sidebar} isOpen=${navOpen.value} onClose=${() => navOpen.value = false}>
 //     …nav content…
 //   <//>
 //

@@ -22,7 +22,7 @@ import PreviewEpisodes from './../components/PreviewEpisodes.js';
 
 import { useTable }                 from './../modules/hooks.js';
 
-import { preview, subscribe as subscribeTo, toggleRemembered } from './ExploreView.js';
+import { preview, subscribeAction, toggleRemembered } from './ExploreView.js';
 import { paragraphs, sortEpisodes } from './../modules/methods.js';
 
 const app = zugriff.app;
@@ -30,7 +30,6 @@ const app = zugriff.app;
 export default function ExplorePodcastView ({ id: url }) {
   const data  = useSignal(null);   // { id, feed, podcast, episodes }
   const error = useSignal('');
-  const busy  = useSignal(false);
 
   const subscribedIds = useTable('podcasts',  () => app.db.podcasts.toKeys(),    ['keys']);
   const shortlist     = useTable('shortlist', () => app.db.shortlist.toValues(), ['all']);
@@ -67,18 +66,6 @@ export default function ExplorePodcastView ({ id: url }) {
   const paras      = paragraphs(podcast.description);
   const sorted     = sortEpisodes(episodes, 'newest');
 
-  const subscribe = async () => {
-    if (busy.value) return;
-    busy.value = true;
-    try {
-      await subscribeTo({ id: podcast.id, url });
-      app.toast.success(`Subscribed to ${podcast.title}`);
-      app.go('podcast', podcast.id);
-    }
-    catch (err) { app.toast.error(err); }
-    finally     { busy.value = false; }
-  };
-
   // the shortlist row is written from the feed, so it survives a directory that has
   // never heard of this podcast — pasting a feed url is a way in here too.
   const remember = () => toggleRemembered({
@@ -101,9 +88,7 @@ export default function ExplorePodcastView ({ id: url }) {
             title=${remembered ? 'Remove from the shortlist' : 'Keep for a closer look later'}
             onClick=${remember}
             />
-          ${subscribed
-            ? html`<${Button} icon='check' label='In library' onClick=${() => app.go('podcast', podcast.id)} />`
-            : html`<${Button} icon='add'   label='Subscribe'  onClick=${subscribe} disabled=${busy.value} />`}
+          <${Button} ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
         </div>
       </header>
 

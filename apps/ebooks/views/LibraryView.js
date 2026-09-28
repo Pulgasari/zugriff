@@ -1,75 +1,80 @@
 // ebooks :: views/LibraryView.js
 
-import Brand       from '/.shared/js/components/Brand.js';
+import Button      from '/.shared/js/components/Button.js';
+import Empty       from '/.shared/js/components/Empty.js';
+import Icon        from '/.shared/js/components/Icon.js';
 import IconButton  from '/.shared/js/components/IconButton.js';
-import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Index       from '/.shared/js/components/Index.js';
+import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
+import View        from '/.shared/js/components/View.js';
 import { SettingsButton, SettingsModal } from '/.shared/js/components/Settings.js';
+
+import BookItem     from './../components/BookItem.js';
+import SourceStatus from './../components/SourceStatus.js';
 
 const app = zugriff.app;
 
-// :::::: SUB-COMPONENTS
+// :::::: PARTS
 
-function BooksIndex () {
+function BooksIndex ({ books }) {
   return html`
     <${Index} viewmode='grid' item-size='150px' gap='1rem'>
-      ${books.map(b => html`<aufbau-item key=${b.key}><${BookCard} book=${b} /></aufbau-item>`)}
+      ${books.map(book => html`<aufbau-item key=${book.key}><${BookItem} book=${book} /></aufbau-item>`)}
     </${Index}>
   `;
 }
 
-function EmptyLibrary () {
-  return html`<${Empty} icon='mdi:book-outline' title='No books here yet' hint='Scanning may still be running, or this folder has no EPUB/PDF files.' />`;
+// one chip per folder once there is more than one
+function FolderBar () {
+  const sources = app.db.sources.value;
+  if (sources.length < 2) return null;
+  const chip = (id, label) => html`
+    <button key=${id} class=${'chip' + (app.state.$folder === id ? ' active' : '')} onClick=${() => app.state.folder = id}>${label}</button>`;
+  return html`<div class="folder-bar">${chip('', 'All')}${sources.map(source => chip(source.id, source.name))}</div>`;
 }
 
-function EmptySearch () {
-  return html`<${Empty} icon='mdi:magnify-close' title='Nothing matches your search' hint='' />`;
-}
+const EmptyLibrary = () => html`<${Empty} icon='mdi:book-outline' title='No books here yet' hint='Scanning may still be running, or this folder has no EPUB/PDF files.' />`;
+const EmptySearch  = () => html`<${Empty} icon='mdi:magnify-close' title='Nothing matches your search' />`;
 
-// :::::: MAIN COMPONENT
+const NoFolders = () => html`
+  <${Empty} icon='books' title='Your library is empty'
+    hint='Add a folder of EPUB and PDF files. It stays on your device — only the folder permission is remembered.'
+    action=${html`<${Button} icon='folder-add' label='Add a folder' onClick=${app.addFolder} />`} />`;
+
+// :::::: VIEW
 
 function LibraryView () {
-  const books      = visibleBooks.value;
-  const cont       = continueReading.value;
-  const hasFolders = app.db.sources.value.length > 0;
+  const books   = app.visibleBooks.value;
+  const pending = app.db.pending.value;
+
+  const tools = html`
+    ${pending > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${pending} left</span>`}
+    <${IconButton} icon='refresh'    label='Rescan folders' onClick=${() => app.db.rescanAll()} />
+    <${IconButton} icon='folder-add' label='Add folder'     onClick=${app.addFolder} />
+    <${SettingsButton} /><${SettingsModal} />
+  `;
 
   return html`
-    <${View} class='library'>
-      <header>
-        <div class="lib-tools">
-          ${db.pending.value > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${db.pending.value} left</span>`}
-          <${IconButton} icon="refresh"    label="Rescan folders" onClick=${() => db.rescanAll()} />
-          <${IconButton} icon='folder-add' label='Add folder'     onClick=${addFolder} />
-          <${SettingsButton} /><${SettingsModal} />
-        </div>
-      </header>
-
+    <${View} class='library' tools=${tools}>
       <${SourceStatus} />
-      <${InstallTip}/>
+      <${InstallTip} />
 
-      ${!hasFolders
-        ? html`
-          <${Empty} icon='books' title="Your library is empty"
-            hint="Add a folder of EPUB and PDF files. It stays on your device — only the folder permission is remembered."
-            action=${html`<${Button} icon='folder-add' label='Add a folder' onClick=${addFolder} />`} 
-            />`
+      ${!app.db.sources.value.length
+        ? html`<${NoFolders} />`
         : html`
           <div class="lib-controls">
             <${SearchPanel} placeholder='Search title or author…' appStateId='search' />
-            <${Picker}      signal=${sort.value} options=${['recent', 'title', 'author', 'added']} />
+            <${Picker}      signal=${app.sort} />
           </div>
+          <${FolderBar} />
 
           <section class="shelf">
             <h2>All books <span>${books.length}</span></h2>
-            
-            ${books.length
-              ? html`<${BooksIndex}/>`
-              : app.state.$search 
-                ? html`<${EmptySearch}/>`
-                : html`<${EmptyLibrary}/>`
-            }
+            ${books.length ? html`<${BooksIndex} books=${books} />`
+              : app.state.$search ? html`<${EmptySearch} />`
+              : html`<${EmptyLibrary} />`}
           </section>`}
     </${View}>
   `;

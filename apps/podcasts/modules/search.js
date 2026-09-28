@@ -40,10 +40,10 @@ const DEFAULT_COUNTRY = 'US';
  * that is not comes back as an api error, which the note in the view then says, and
  * the picker is right there.
  */
+// a language tag Intl.Locale rejects (some webviews report one) falls back
 export function localCountry () {
-  const locale = globalThis.navigator?.language || '';
-  const region = new Intl.Locale(locale || 'en-US').maximize?.().region;
-  return region || DEFAULT_COUNTRY;
+  try   { return new Intl.Locale(globalThis.navigator?.language || 'en-US').maximize?.().region || DEFAULT_COUNTRY; }
+  catch { return DEFAULT_COUNTRY; }
 }
 
 // :::::: FETCH

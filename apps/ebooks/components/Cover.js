@@ -1,15 +1,25 @@
 // ebooks :: components/Cover.js
 
-// a cover: the extracted image if we have it, otherwise a titled placeholder
+import { useEffect, useRef } from 'preact/hooks';
+import Icon                  from '/.shared/js/components/Icon.js';
+
+// a stable pastel from a title, for the placeholder cover
+function hueOf (text = '') {
+  let hash = 0;
+  for (let index = 0; index < text.length; index++) hash = (hash * 31 + text.charCodeAt(index)) >>> 0;
+  return hash % 360;
+}
+
+// the extracted image if there is one, otherwise a titled placeholder
 function Cover ({ book, className = '' }) {
   const ref = useRef(null);
   useEffect(() => {
-    const el = ref.current;
-    if (!el || !book.cover) return;
+    const element = ref.current;
+    if (!element || !book.cover) return;
     const url = URL.createObjectURL(book.cover);
-    el.style.backgroundImage = `url("${url}")`;
-    el.classList.add('has-img');
-    return () => { URL.revokeObjectURL(url); el.style.backgroundImage = ''; el.classList.remove('has-img'); };
+    element.style.backgroundImage = `url("${url}")`;
+    element.classList.add('has-img');
+    return () => { URL.revokeObjectURL(url); element.style.backgroundImage = ''; element.classList.remove('has-img'); };
   }, [book.cover]);
 
   return html`
@@ -25,4 +35,5 @@ function Cover ({ book, className = '' }) {
   `;
 }
 
+export       { Cover };
 export default Cover;
