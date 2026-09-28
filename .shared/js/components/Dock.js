@@ -8,12 +8,12 @@ function DockNavItem ({ icon, label, dialog, panel, route, view, onClick, ...res
   if (route)  onClick = () => zugriff.app.go(route); // go(route)
   if (view)   onClick = () => zugriff.app.go(view);
   
-  return html`<${Button} class='DockNavItem col' ...${{ icon, label, onClick, ...rest }} />`;
+  return html`<${Button} class='col' ...${{ icon, label, onClick, ...rest }} />`;
 }
 
 function Dock ({ items = [], ...rest }) {
   return html`
-    <aside class='Dock' id='app-dock' ...${rest}>
+    <aside class='Dock dock' id='app-dock' ...${rest}>
       ${items.map(DockNavItem)}
     </aside>
   `;
