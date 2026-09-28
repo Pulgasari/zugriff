@@ -114,6 +114,14 @@ Theme-Wechsel. Die Farben aus diesem Skript bleiben Fallback für ältere
 Android-Versionen und ältere WebViews (< Chromium 140), bei denen Capacitor das
 WebView nativ einrückt.
 
+## `allow-capacitor-assets.mjs`
+
+Läuft nach `cap add android`. Das Android-Template von Capacitor packt die
+Web-Assets mit einem `ignoreAssetsPattern`, das alles mit Punkt am Anfang
+weglässt (`.*`). zugriffs Shell liegt in `.shared/`, ein gebündelter Build hätte
+also kein `boot.js` und zeigte nur weiß. Das Skript nimmt `.*` aus dem Pattern,
+`.git`, `.svn` usw. bleiben draußen.
+
 ## `add-capacitor-plugins.mjs`
 
 Kopiert die eigenen nativen Plugins aus `.github/capacitor/plugins/*.java` in das

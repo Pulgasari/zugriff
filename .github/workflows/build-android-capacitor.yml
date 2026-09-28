@@ -202,6 +202,8 @@ jobs:
           # the repo's own native plugins (.github/capacitor/plugins/), copied in
           # and registered in MainActivity
           node .github/scripts/add-capacitor-plugins.mjs "build/${{ matrix.app }}"
+          # the template's aapt pattern drops dotted names, .shared/ has to go in
+          node .github/scripts/allow-capacitor-assets.mjs "build/${{ matrix.app }}"
 
       - name: Build ${{ matrix.app }} (Gradle)
         run: |
