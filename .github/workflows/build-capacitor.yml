@@ -1,4 +1,4 @@
-name: Build Capacitor packages
+name: Build Android (via Capacitor | Live) Packages
 
 # Packages the PWAs whose registry entry sets build.android == 'capacitor' in
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app —
@@ -26,7 +26,7 @@ name: Build Capacitor packages
 # (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —
 # Capacitor still injects its bridge into that remote page, so the plugins work.
 #
-# ── SIGNING ──────────────────────────────────────────────────────────────────
+# ── SIGNING ─────────────────────────────────────────────────────────
 # With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
 # ANDROID_KEY_PASSWORD / ANDROID_KEY_ALIAS set, the artifacts are signed with that
 # stable key — the same app identity every run, Play-uploadable and usable for
@@ -38,7 +38,7 @@ name: Build Capacitor packages
 # single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>
 # package. appIds follow dev.zugriff.<slug>, the same as the TWA package ids, so
 # the file is shared. Exact commands: .github/scripts/README.md.
-# ─────────────────────────────────────────────────────────────────────────────
+# ───────────────────────────────────────────────────────────────────
 
 on:
   workflow_dispatch:        # manual only — packaging never runs on a commit
