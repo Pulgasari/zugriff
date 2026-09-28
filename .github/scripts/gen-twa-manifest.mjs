@@ -22,13 +22,13 @@
 //   KEY_ALIAS       key alias inside the keystore (default android)
 //   APP_ID_PREFIX   reverse-dns prefix for the packageId
 //                   (default dev.zugriff — reverse-dns of zugriff.dev; the
-//                    packageId is `${APP_ID_PREFIX}.${slug}`, e.g. dev.zugriff.notes,
-//                    matching the /.well-known/assetlinks.json entries; a variant
-//                    that is not the app's first gets a suffix, see android.js)
+//                    packageId is `${APP_ID_PREFIX}.${slug}.bw`, e.g.
+//                    dev.zugriff.notes.bw, and the name `Notes (bw)`, see
+//                    android.js. /.well-known/assetlinks.json lists these ids)
 
 import { TwaManifest } from '@bubblewrap/core';
 import { registry }    from './../../.shared/js/data/apps.js';
-import { idOf }        from './android.js';
+import { idOf, nameOf } from './android.js';
 
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-twa-manifest: APP_SLUG is required'); process.exit(1); }
@@ -40,7 +40,10 @@ const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';
 const alias       = process.env.KEY_ALIAS || 'android';
 
 const twa = await TwaManifest.fromWebManifest(manifestUrl);
-twa.packageId  = idOf(registry.get(slug), 'bubblewrap');   // see android.js
+// id and name of the bubblewrap variant, Podcasts (bw), see android.js
+twa.packageId    = idOf(registry.get(slug), 'bubblewrap');
+twa.name         = nameOf(registry.get(slug), 'bubblewrap');
+twa.launcherName = twa.name;
 twa.signingKey = { path: keystore, alias };
 
 await twa.saveToFile(out);

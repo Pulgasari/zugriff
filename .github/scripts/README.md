@@ -37,8 +37,8 @@ Standardmäßig liefert Capacitor das von `stage-capacitor-www.mjs` gestagete
 (`server.url = https://zugriff.dev/<slug>/`, dazu ein `www/index.html` als
 Offline-Fallback, weil Capacitor ein nicht-leeres `webDir` verlangt); Capacitor
 injiziert seine native Bridge trotzdem in die Remote-Seite, sodass native Plugins
-(das eigene Saf-Plugin) funktionieren. `appId` ist `dev.zugriff.<slug>` — identisch
-zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
+(das eigene Saf-Plugin) funktionieren. `appId` und Name kommen aus `android.js`
+(siehe „Namen, IDs, Dateien“).
 
 ## `stage-capacitor-www.mjs`
 
@@ -83,11 +83,10 @@ Bundlers abarbeiten (siehe `aufbau/bundler/concept.md`).
 ### Devtools und `-dev`-Builds
 
 `export const devtools` in `bundler.config.js` schaltet für den Capacitor-Build
-(`capacitor`) einen zweiten Build pro App zu: `<slug>-dev` mit `@aufbau/devtools`
-und eruda, geöffnet mit `?dev`, als eigene App (`dev.zugriff.<slug>.dev`, Name
-mit `(dev)`), also parallel installierbar. Der normale Build lässt die Devtools
-weg (`exclude` in prune), nur der kleine Recorder aus `@aufbau/devtools/recorder.js`
-bleibt. Artefakte: `android-capacitor-<slug>` und `android-capacitor-<slug>-dev`.
+(`capacitor`) einen zweiten Build pro App zu: mit `@aufbau/devtools` und eruda,
+geöffnet mit `?dev`, als eigene App `Podcasts (dev)` (`dev.zugriff.<slug>.dev`),
+also parallel installierbar. Der normale Build lässt die Devtools weg (`exclude`
+in prune), nur der kleine Recorder aus `@aufbau/devtools/recorder.js` bleibt.
 
 ## `gen-capacitor-res.mjs`
 
@@ -138,10 +137,21 @@ Fehlt das Feld, wird die App für Android nicht gebaut. Die Discover-Skripte
 lesen es und liefern die jeweilige Build-Matrix (`get-capacitor-apps.js` mit
 `BUILDER` für beide Capacitor-Varianten), `android.js` hält die Regeln dazu.
 
-Die **erste** Variante ist die Haupt-Variante der App und behält die ID
-`dev.zugriff.<slug>`. Jede weitere bekommt die Variante angehängt
-(`dev.zugriff.<slug>.capacitor`) und im Namen `(capacitor)` — so lassen sich die
-Varianten einer App nebeneinander installieren.
+### Namen, IDs, Dateien
+
+`android.js` hält die Regeln. Nur der gebündelte Capacitor-Build ist die App
+selbst, jede andere Variante trägt ein Kürzel in Name, ID und Datei, so lassen
+sich alle nebeneinander installieren:
+
+| Variante          | Name              | ID                          | Datei                            |
+|-------------------|-------------------|-----------------------------|----------------------------------|
+| `capacitor`       | `Podcasts`        | `dev.zugriff.podcasts`      | `podcasts-202612011212.apk`      |
+| `capacitor` + dev | `Podcasts (dev)`  | `dev.zugriff.podcasts.dev`  | `podcasts-202612011212-dev.apk`  |
+| `capacitor-live`  | `Podcasts (live)` | `dev.zugriff.podcasts.live` | `podcasts-202612011212-live.apk` |
+| `bubblewrap`      | `Podcasts (bw)`   | `dev.zugriff.podcasts.bw`   | `podcasts-202612011212-bw.apk`   |
+
+Der Stempel ist die Minute, in der der Lauf startet (Berliner Zeit), für alle
+Builds eines Laufs derselbe. Dazu jeweils die `.aab`.
 
 | Wert             | Workflow                           | App im APK |
 |------------------|------------------------------------|------------|
@@ -225,17 +235,11 @@ muss das dort angepasst werden.
 
 ### Wo landen die APKs?
 
-Jeder Matrix-Job lädt sein `*-<slug>`-Artefakt hoch; ein abschließender
-`collect`-Job sammelt alle in **ein** Artefakt pro Lauf:
-
-- `android-bubblewrap-all`     — je App ein `android-bubblewrap-<slug>/`-Ordner
-- `android-capacitor-live-all` — je App ein `android-capacitor-live-<slug>/`-Ordner
-- `android-capacitor-all`      — je App ein `android-capacitor-<slug>/`-Ordner
-
-Zu finden unter dem jeweiligen Run im **Actions**-Tab, Abschnitt „Artifacts".
-Artefakte laufen nach der Retention ab (Einzel-Artefakte 14 Tage, das
-gesammelte 30 Tage) — für dauerhafte Ablage die APKs herunterladen oder auf ein
-GitHub Release heben.
+Jede APK und jede AAB ist ein eigenes Artefakt, **ungezippt** (`archive: false`)
+und nach der Datei benannt, also z. B. `podcasts-202612011212.apk` — der Download
+ist direkt die Datei. Zu finden unter dem jeweiligen Run im **Actions**-Tab,
+Abschnitt „Artifacts". Sie laufen nach 14 Tagen ab — für dauerhafte Ablage
+herunterladen oder auf ein GitHub Release heben.
 
 ---
 
@@ -289,10 +293,10 @@ keytool -list -v -keystore zugriff-release.keystore -alias zugriff \
   -storepass '<STORE_PASS>' | grep SHA256
 ```
 
-Diese SHA-256 je App-`package_name` (`dev.zugriff.<slug>`) in die **eine**
-Root-Datei `/.well-known/assetlinks.json` eintragen (enthält schon die manuell
-gebauten `dev.zugriff.ebooks` + `dev.zugriff.notes`). Da alle Apps denselben Key
-teilen, ist die SHA-256 für alle Einträge identisch.
+Diese SHA-256 je App-`package_name` der TWA-Builds (`dev.zugriff.<slug>.bw`) in
+die **eine** Root-Datei `/.well-known/assetlinks.json` eintragen (enthält noch die
+früher manuell gebauten `dev.zugriff.ebooks` + `dev.zugriff.notes`). Da alle Apps
+denselben Key teilen, ist die SHA-256 für alle Einträge identisch.
 
 ## `img-proxy.php`
 
