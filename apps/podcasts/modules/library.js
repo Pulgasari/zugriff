@@ -112,15 +112,18 @@ async function store (podcast, eps) {
  *
  * `feed` is an already parsed feed — the explore view hands over the one its preview
  * fetched, so subscribing from there does not go down the proxy a second time.
+ * `onStep` hears 'reading' and 'saving' as the work gets there.
  */
-async function subscribe (rawUrl, feed) {
+async function subscribe (rawUrl, feed, { onStep } = {}) {
   const url = normalizeUrl(rawUrl);
   const pid = podcastIdByHash(url);
   if (await app.db.podcasts.get(pid)) throw new Error('already subscribed to this feed');
 
+  if (!feed) onStep?.('reading');
   const parsed = feed ?? parseFeed(await fetchFeed(url));
   if (!parsed.episodes.length) throw new Error('no episodes found in this feed');
 
+  onStep?.('saving');
   const { podcast, episodes: eps } = toRecords(url, parsed);
   const record = { ...podcast, addedAt: Date.now() };
   await store(record, eps);

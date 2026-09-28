@@ -2,7 +2,7 @@
 
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-import { signalStore, useSignal } from '@aufbau/signals';
+import { signal, signalStore, useSignal } from '@aufbau/signals';
 import { useEffect }              from 'preact/hooks';
 
 // ::: shared components
@@ -126,22 +126,30 @@ async function toggleRemembered (entry) {
   return true;
 }
 
-/** reuses an already previewed feed and drops the shortlist row */
-async function subscribe (entry) {
-  const url     = urlOf(entry);
-  const cached  = previews.has(url) ? await previews.get(url).catch(() => null) : null;
-  const podcast = await app.library.subscribe(url, cached?.feed);
-  await app.db.shortlist.delete(podcast.id);
-  return podcast;
-}
+// podcast id -> the step a subscription is at, 'reading' | 'saving'. module scope,
+// so a row shows it after a rerender and the preview view shares it
+const subscribing = signal({});
 
-async function subscribeAndOpen (entry) {
+const setStep = (id, step) => {
+  const { [id]: _, ...rest } = subscribing.value;
+  subscribing.value = step ? { ...rest, [id]: step } : rest;
+};
+
+/** reuses an already previewed feed and drops the shortlist row. the view stays where it is */
+async function subscribe (entry) {
+  const id = idOf(entry);
+  if (subscribing.value[id]) return;
+  const url = urlOf(entry);
+  setStep(id, 'reading');
   try {
-    const podcast = await subscribe(entry);
+    const cached  = previews.has(url) ? await previews.get(url).catch(() => null) : null;
+    const podcast = await app.library.subscribe(url, cached?.feed, { onStep: step => setStep(id, step) });
+    await app.db.shortlist.delete(podcast.id);
     app.toast.success(`Subscribed to ${podcast.title}`);
-    app.go('podcast', podcast.id);
+    return podcast;
   }
   catch (error) { app.toast.error(error); }
+  finally       { setStep(id, null); }
 }
 
 const open = (url) => app.go('explore-podcast', url);
@@ -151,9 +159,15 @@ const rememberAction = (podcast, isRemembered) => isRemembered
   ? { icon: 'bookmark',          label: 'Forget',   title: 'Remove from the shortlist',    onClick: () => toggleRemembered(podcast) }
   : { icon: 'bookmark-unfilled', label: 'Remember', title: 'Keep for a closer look later', onClick: () => toggleRemembered(podcast) };
 
-const subscribeAction = (podcast, isSubscribed) => isSubscribed
-  ? { icon: 'check', label: 'In library', onClick: () => app.go('podcast', podcast.id) }
-  : { icon: 'add',   label: 'Subscribe',  onClick: () => subscribeAndOpen(podcast) };
+const STEPS = { reading: 'Reading feed …', saving: 'Saving …' };
+
+// subscribe, the step while it runs, then the way into the library
+function subscribeAction (podcast, isSubscribed) {
+  const step = subscribing.value[podcast.id];
+  return isSubscribed ? { icon: 'check', label: 'In library', onClick: () => app.go('podcast', podcast.id) }
+       : step         ? { icon: 'svg-spinners:bars-scale-middle', label: STEPS[step], disabled: true }
+       :                { icon: 'add', label: 'Subscribe', onClick: () => subscribe(podcast) };
+}
 
 // :::::: SUB-COMPONENTS :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -294,5 +308,5 @@ function ExploreView () {
 
 // :::::: EXPORT :::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-export { preview, subscribe, toggleRemembered };
+export { preview, subscribe, subscribeAction, toggleRemembered };
 export default ExploreView;
