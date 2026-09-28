@@ -18,7 +18,7 @@ function importmapOf (file) {
   let map = null;
   const noop    = () => {};
   const element = () => ({ addEventListener: noop, after: node => { if (node.type === 'importmap') map = JSON.parse(node.textContent); }, append: noop, classList: { add: noop, remove: noop, toggle: noop }, dataset: {}, setAttribute: noop, style: {} });
-  const document = { addEventListener: noop, body: null, createDocumentFragment: element, createElement: tag => ({ ...element(), tagName: tag }), currentScript: { ...element(), src: 'https://zugriff.dev/.shared/js/boot.js' }, documentElement: element(), head: element(), querySelector: () => null };
+  const document = { addEventListener: noop, write: noop, body: null, createDocumentFragment: element, createElement: tag => ({ ...element(), tagName: tag }), currentScript: { ...element(), src: 'https://zugriff.dev/.shared/js/boot.js' }, documentElement: element(), head: element(), querySelector: () => null };
   const console  = { debug: noop, error: noop, info: noop, log: noop, trace: noop, warn: noop };
   const window   = { addEventListener: noop, console, document, localStorage: { getItem: () => null, setItem: noop }, location: new URL('https://zugriff.dev/'), navigator: {} };
 
@@ -31,7 +31,11 @@ function importmapOf (file) {
   return map;
 }
 
-export default ({ out, packages = 'build/_pkg', slug }) => ({
+// the capacitor build makes a second, `-dev` build of every app with devtools
+// when this is set. the regular one leaves @aufbau/devtools and eruda out
+export const devtools = true;
+
+export default ({ dev = false, out, packages = 'build/_pkg', slug }) => ({
   out,
   root : '.',
 
@@ -62,6 +66,7 @@ export default ({ out, packages = 'build/_pkg', slug }) => ({
   // aufbau declares its own runtime css in its package.json
   prune : {
     entries : [`/${slug}/app.js`],
+    exclude : dev ? [] : ['@aufbau/devtools/boot.js'],   // the recorder stays, it is tiny
     keep    : [`/${slug}/`],
     loaders : {
       'zugriff.component'  : '/.shared/js/components/{name}.js',
@@ -70,13 +75,14 @@ export default ({ out, packages = 'build/_pkg', slug }) => ({
     origins : ['https://zugriff.dev'],
   },
 
-  // capacitor opens https://localhost/, the shell reads its route from the path
-  start : `/${slug}/`,
+  // capacitor opens https://localhost/, the shell reads its route from the path.
+  // the dev build opens with ?dev, devtools on
+  start : `/${slug}/${dev ? '?dev' : ''}`,
 
   // boot.js builds the importmap itself, the local entries reach it as
   // __BOOT_CONFIG__.imports, which it lays over its own
   vendor : {
-    exclude   : [/\/eruda@/],   // the devtools console, only behind ?dev
+    exclude   : dev ? [] : [/\/eruda@/],   // the devtools console, only behind ?dev
     importmap : importmapOf('.shared/js/boot.js'),
     inject    : imports => `<script>window.__BOOT_CONFIG__ = { imports: ${JSON.stringify(imports)} };</script>`,
     path      : '/_vendor',

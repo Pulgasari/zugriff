@@ -25,6 +25,10 @@ name: Build Android (Capacitor) Packages
 # paints its own theme behind the bars and pads with env(safe-area-inset-*), the
 # registry color only shows where capacitor insets the webview natively.
 #
+# With `devtools` set in bundler.config.js every app is built twice: without
+# @aufbau/devtools, and as <slug>-dev with them, opened on ?dev, its own app id
+# (….dev) so both install side by side.
+#
 # The app's files ship inside the apk: stage-capacitor-www.mjs stages the app,
 # .shared and the first-party packages into www/ with @aufbau/bundler (config:
 # bundler.config.js), third-party modules (esm.sh, jsdelivr, unpkg) vendored
@@ -101,9 +105,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # { app, dev }: dev is '' or '-dev', the second build with devtools that
+      # bundler.config.js asks for (`devtools`), bundled builds only
       matrix:
-        app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
+        include: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
+      DEVTOOLS: ${{ matrix.dev && '1' || '' }}
       LIVE: ${{ inputs.live && '1' || '' }}
       KIND: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}   # artifact prefix
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
@@ -202,7 +209,7 @@ jobs:
           OUT="app/build/outputs"
           APK_IN="$OUT/apk/release/app-release-unsigned.apk"
           AAB_IN="$OUT/bundle/release/app-release.aab"
-          SLUG="${{ matrix.app }}"
+          SLUG="${{ matrix.app }}${{ matrix.dev }}"
 
           # APK: zipalign then apksigner
           zipalign -f 4 "$APK_IN" "aligned.apk"
@@ -221,13 +228,13 @@ jobs:
           keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
             -storepass "$STORE_PASS" | grep -A1 'SHA256:' || true
 
-      - name: Upload APK + AAB for ${{ matrix.app }}
+      - name: Upload APK + AAB for ${{ matrix.app }}${{ matrix.dev }}
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.KIND }}-${{ matrix.app }}
+          name: ${{ env.KIND }}-${{ matrix.app }}${{ matrix.dev }}
           path: |
-            build/${{ matrix.app }}/android/${{ matrix.app }}-release.apk
-            build/${{ matrix.app }}/android/${{ matrix.app }}-release.aab
+            build/${{ matrix.app }}/android/${{ matrix.app }}${{ matrix.dev }}-release.apk
+            build/${{ matrix.app }}/android/${{ matrix.app }}${{ matrix.dev }}-release.aab
           if-no-files-found: error
           retention-days: 14
 

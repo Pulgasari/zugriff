@@ -30,6 +30,7 @@
 //                   route; vercel rewrites /<slug>/ to /apps/<slug>/, so the
 //                   /apps/ path is internal only and 404s if requested directly)
 //   LIVE            1 for a live build (build.android: 'capacitor-live')
+//   DEVTOOLS        1 for the -dev build: `.dev` on the appId, `(dev)` in the name
 //   APP_ID_PREFIX   reverse-dns prefix for the appId
 //                   (default dev.zugriff — appId is `${APP_ID_PREFIX}.${segment}`,
 //                    e.g. dev.zugriff.files, matching /.well-known/assetlinks.json
@@ -50,6 +51,7 @@ const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/
 const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');
 const outDir   = process.argv[2] || '.';
 const live     = process.env.LIVE === '1';
+const dev      = process.env.DEVTOOLS === '1';
 
 // the id and name of this variant: plain for the app's main one, see android.js
 const variant = live ? 'capacitor-live' : 'capacitor';
@@ -64,8 +66,8 @@ const isLight = (color) => {
 };
 
 const config = {
-  appId   : idOf(app, variant),
-  appName : nameOf(app, variant),
+  appId   : idOf(app, variant) + (dev ? '.dev' : ''),
+  appName : nameOf(app, variant) + (dev ? ' (dev)' : ''),
   webDir  : 'www',
   server  : {
     ...(live ? { url: appUrl } : {}),   // live: wrap the deployment, exactly like the TWA

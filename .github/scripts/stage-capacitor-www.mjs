@@ -14,6 +14,7 @@
 //
 // env:
 //   APP_SLUG    (required)  the app's registry slug
+//   DEVTOOLS    1 for the -dev build, with @aufbau/devtools and opened on ?dev
 //   PKG_SOURCE  where the package repos are, or get cloned to (default build/_pkg)
 
 import { execFileSync } from 'node:child_process';
@@ -41,8 +42,9 @@ const bundler = join(aufbau, 'bundler');
 if (!existsSync(join(bundler, 'node_modules'))) execFileSync('npm', ['install', '--no-audit', '--no-fund', '--silent'], { cwd: bundler, stdio: 'inherit' });
 
 const { bundle } = await import(pathToFileURL(join(bundler, 'index.js')));
-const { summary } = await bundle({ ...config({ out: resolve(outDir, 'www'), packages, slug }), root: ROOT });
+const dev = process.env.DEVTOOLS === '1';
+const { summary } = await bundle({ ...config({ dev, out: resolve(outDir, 'www'), packages, slug }), root: ROOT });
 
-const text = `### www: ${slug}\n\n${summary}\n`;
+const text = `### www: ${slug}${dev ? '-dev' : ''}\n\n${summary}\n`;
 console.log('\n' + text);
 if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, text);

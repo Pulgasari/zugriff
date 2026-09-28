@@ -80,6 +80,15 @@ sind, die Größe und was **weiter übers Netz** geht (Icons, APIs …), in CI
 auch in der Step-Summary. Das ist die Liste, die die nächsten Schritte des
 Bundlers abarbeiten (siehe `aufbau/bundler/concept.md`).
 
+### Devtools und `-dev`-Builds
+
+`export const devtools` in `bundler.config.js` schaltet für den Capacitor-Build
+(`capacitor`) einen zweiten Build pro App zu: `<slug>-dev` mit `@aufbau/devtools`
+und eruda, geöffnet mit `?dev`, als eigene App (`dev.zugriff.<slug>.dev`, Name
+mit `(dev)`), also parallel installierbar. Der normale Build lässt die Devtools
+weg (`exclude` in prune), nur der kleine Recorder aus `@aufbau/devtools/recorder.js`
+bleibt. Artefakte: `android-capacitor-<slug>` und `android-capacitor-<slug>-dev`.
+
 ## `gen-capacitor-res.mjs`
 
 Läuft nach `cap add android` und ersetzt die Ressourcen des Capacitor-Templates
