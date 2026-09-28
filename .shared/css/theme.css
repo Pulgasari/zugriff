@@ -36,6 +36,9 @@ where the page shows var(--bg) instead
 /* move to: podcasts */
 
 @container style(--theme: oled) {
+  body {
+    --line: color-mix(in oklch, var(--fg) 15%, transparent);
+  }
   #app {
     .view > header { border-bottom : 1px solid var(--line); }
     #app-dock      { border-top    : 1px solid var(--line); }
