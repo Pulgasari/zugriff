@@ -1,9 +1,12 @@
-name: Build Android (via Capacitor | Live) Packages
+name: Build Android (Capacitor) Packages
 
-# Packages the PWAs whose registry entry sets build.android == 'capacitor' in
-# .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app —
-# the Capacitor counterpart to build-android.yml (which does the same with
-# Bubblewrap/TWA). An app targets exactly one android builder.
+# Packages the apps whose registry entry sets build.android == 'capacitor' in
+# .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
+# An app targets exactly one android builder:
+#
+#   bubblewrap      build-android-bubblewrap.yml      a TWA around the live url
+#   capacitor-live  build-android-capacitor-live.yml  a webview on the live url
+#   capacitor       this workflow                     the files inside the apk
 #
 # Why both exist: a TWA is just Chrome, so an app wrapped that way is stuck with
 # the browser File System Access API — and on Android that API re-confirms every
@@ -22,14 +25,15 @@ name: Build Android (via Capacitor | Live) Packages
 # paints its own theme behind the bars and pads with env(safe-area-inset-*), the
 # registry color only shows where capacitor insets the webview natively.
 #
-# Like the TWA build, each app is wrapped around its LIVE deployment URL
-# (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —
-# Capacitor still injects its bridge into that remote page, so the plugins work.
+# The app's files ship inside the apk: stage-capacitor-www.mjs stages the app,
+# .shared and the first-party packages into www/, capacitor serves them from
+# https://localhost/. third-party modules (esm.sh, jsdelivr, unpkg) still come
+# over the network, the step summary of each run lists what is left.
 #
-# build-bundle.yml calls this workflow with mode 'bundle' for the third variant,
-# build.android == 'capacitor-bundle': no server.url, the app's files and the
-# first-party packages are staged into www/ by stage-bundle.mjs and ship inside
-# the apk. everything else is the same.
+# build-android-capacitor-live.yml runs this workflow with `live`: then each app
+# is wrapped around its LIVE deployment URL (server.url =
+# https://zugriff.dev/<slug>/) like the TWA, and nothing is staged. Capacitor
+# still injects its bridge into that remote page, so the plugins work.
 #
 # ── SIGNING ─────────────────────────────────────────────────────────
 # With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
@@ -52,23 +56,23 @@ on:
         description: 'single app slug to build (empty = all capacitor apps)'
         required: false
         default: ''
-  workflow_call:            # build-bundle.yml
+  workflow_call:            # build-android-capacitor-live.yml
     inputs:
       app:
         type: string
         required: false
         default: ''
-      mode:
-        description: "'live' wraps the deployment url, 'bundle' ships the files"
-        type: string
+      live:
+        description: 'wrap the deployment url instead of shipping the files'
+        type: boolean
         required: false
-        default: 'live'
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: build-capacitor-${{ inputs.mode || 'live' }}-${{ github.ref }}
+  group: build-${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -86,7 +90,7 @@ jobs:
         id: parse
         env:
           APP_FILTER: ${{ inputs.app }}
-          BUILDER: ${{ inputs.mode == 'bundle' && 'capacitor-bundle' || 'capacitor' }}
+          BUILDER: ${{ inputs.live && 'capacitor-live' || 'capacitor' }}
         run: node .github/scripts/get-capacitor-apps.js
 
   # Job 2 — one parallel build per app slug
@@ -99,8 +103,8 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
-      BUNDLE: ${{ inputs.mode == 'bundle' && '1' || '' }}
-      KIND: ${{ inputs.mode == 'bundle' && 'bundle' || 'capacitor' }}   # artifact prefix
+      LIVE: ${{ inputs.live && '1' || '' }}
+      KIND: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}   # artifact prefix
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
       BUILD_TOOLS: '36.0.0'
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
@@ -147,20 +151,20 @@ jobs:
               -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
           fi
 
-      - name: Stage the bundled www/ for ${{ matrix.app }}
-        if: ${{ env.BUNDLE == '1' }}
+      - name: Stage www/ for ${{ matrix.app }}
+        if: ${{ env.LIVE != '1' }}
         run: |
           # the app, .shared and the first-party package repos (cloned into
           # build/_pkg), the package origin rewritten to the local copy. what
           # still reaches the network lands in the step summary
-          APP_SLUG="${{ matrix.app }}" PKG_SOURCE=build/_pkg node .github/scripts/stage-bundle.mjs "build/${{ matrix.app }}"
+          APP_SLUG="${{ matrix.app }}" PKG_SOURCE=build/_pkg node .github/scripts/stage-capacitor-www.mjs "build/${{ matrix.app }}"
 
       - name: Scaffold the Capacitor project for ${{ matrix.app }}
         run: |
           DIR="build/${{ matrix.app }}"
           mkdir -p "$DIR"
-          # capacitor.config.json (live: server.url -> app + www/ offline fallback,
-          # bundle: no server.url, the staged www/)
+          # capacitor.config.json (the staged www/, or with LIVE server.url -> app
+          # plus a www/ offline fallback)
           APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-config.mjs "$DIR"
 
           cd "$DIR"
@@ -236,11 +240,11 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           path: packages
-          pattern: ${{ inputs.mode == 'bundle' && 'bundle' || 'capacitor' }}-*
+          pattern: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}-*
       - name: Bundle them into one artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.mode == 'bundle' && 'bundle' || 'capacitor' }}-all   # one download, a <kind>-<slug>/ folder per app
+          name: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}-all   # one download, a <kind>-<slug>/ folder per app
           path: packages
           if-no-files-found: warn
           retention-days: 30

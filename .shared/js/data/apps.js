@@ -35,7 +35,7 @@ const entries = [
 
   // ── apps
   { // zugriff.dev/audio-manager/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'audio-manager',
     name        : 'Audio Manager',
@@ -45,7 +45,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/code/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     categories  : ['code', 'files'],
     description : 'A mobile-first code editor — edit a local folder or your GitHub repos with Monaco, a code keyboard and a command palette.',    
     icon        : 'mdi:code-braces',
@@ -55,7 +55,7 @@ const entries = [
     type        : 'app',
   },
   { // zugriff.dev/ebooks/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'ebooks',
     name        : 'eBooks',
@@ -64,7 +64,7 @@ const entries = [
     categories  : ['docs', 'media'],
   },
   { // zugriff.dev/feeds/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'feeds',
     name        : 'RSS Reader',
@@ -74,7 +74,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/files/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     categories  : ['files'],
     description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
     icon        : 'mdi:folder-outline',
@@ -84,7 +84,7 @@ const entries = [
     type        : 'app',
   },
   { // zugriff.dev/icons/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     categories  : ['design'],
     type        : 'app',
     slug        : 'icons',
@@ -94,7 +94,7 @@ const entries = [
     description : 'Browse and search the whole Iconify library by set, copy or download any icon, and keep favourites.',
   },
   { // zugriff.dev/images/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'images',
     name        : 'Images',
@@ -139,7 +139,7 @@ const entries = [
     color       : '#1e1b2e',
   },
   { // zugriff.dev/notes/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'notes',
     name        : 'Notes',
@@ -148,7 +148,7 @@ const entries = [
     categories  : ['files', 'docs'],
   },
   { // zugriff.dev/podcasts/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',
@@ -157,7 +157,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/prompts/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'prompts',
     name        : 'Prompt Manager',
@@ -167,7 +167,7 @@ const entries = [
     categories  : ['tool'],
   },
   { // zugriff.dev/videos/
-    build       : { android: 'capacitor' },
+    build       : { android: 'capacitor-live' },
     type        : 'app',
     slug        : 'videos',
     name        : 'Videos',

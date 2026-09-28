@@ -1,7 +1,7 @@
 // .github/scripts/gen-capacitor-res.mjs
 //
 // replaces the capacitor template's android resources with the app's own, after
-// `cap add android` has written the template (see build-capacitor.yml):
+// `cap add android` has written the template (see build-android-capacitor.yml):
 //
 //   launcher icons   mipmap-*/ic_launcher{,_round,_foreground}.png from apps/<slug>/app.svg,
 //                    plus values/ic_launcher_background.xml -> the app color

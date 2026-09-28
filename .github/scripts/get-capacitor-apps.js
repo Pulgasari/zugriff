@@ -2,7 +2,7 @@
 //
 // sibling of get-bubblewrap-apps.js: emits the json array of app slugs whose
 // registry entry sets build.android === BUILDER ('capacitor' by default, or
-// 'capacitor-bundle') — the matrix the build-capacitor workflow packages. an app
+// 'capacitor-live') — the matrix build-android-capacitor.yml packages. an app
 // targets exactly one android builder. a single app asked for by APP_FILTER is
 // built with either capacitor builder, so an app can try the other variant.
 

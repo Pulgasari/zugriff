@@ -1,8 +1,8 @@
 // .github/scripts/get-bubblewrap-apps.js
 //
 // emits the json array of app slugs whose registry entry sets
-// build.android === 'bubblewrap' — the matrix the build-android (twa/bubblewrap)
-// workflow packages. sibling of get-capacitor-apps.js; an app targets exactly one
+// build.android === 'bubblewrap' — the matrix build-android-bubblewrap.yml (twa)
+// packages. sibling of get-capacitor-apps.js; an app targets exactly one
 // android builder.
 
 import fs from 'node:fs';

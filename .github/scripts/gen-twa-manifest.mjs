@@ -2,7 +2,7 @@
 //
 // writes a Bubblewrap `twa-manifest.json` for one app, deterministically and
 // without any of Bubblewrap's interactive `init` prompts — which is what makes
-// the Android build runnable in CI (see .github/workflows/build-android.yml).
+// the Android build runnable in CI (see .github/workflows/build-android-bubblewrap.yml).
 //
 // it leans on @bubblewrap/core's own TwaManifest.fromWebManifest(), so the file
 // is always shaped for the installed Bubblewrap version: it fetches the app's

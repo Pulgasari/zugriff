@@ -1,7 +1,7 @@
 // .github/scripts/add-capacitor-plugins.mjs
 //
 // adds the repo's own native capacitor plugins to a scaffolded android project,
-// after `cap add android` (see build-capacitor.yml). npm plugins are found by
+// after `cap add android` (see build-android-capacitor.yml). npm plugins are found by
 // `cap sync`; these live in .github/capacitor/plugins/ as plain java sources, so
 // they are copied in by hand and registered in MainActivity.
 //

@@ -1,10 +1,11 @@
-name: Build Android (Bubblewrap) Packages
+name: Build Android (Bubblewrap | Live) Packages
 
 # Packages the PWAs whose registry entry sets build.android == 'bubblewrap' in
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
 # Each app is wrapped as a Trusted Web Activity pointing at its live deployment
 # with Bubblewrap — Google's official TWA tool, the same engine PWABuilder uses
-# under the hood.
+# under the hood. the siblings are build-android-capacitor-live.yml and
+# build-android-capacitor.yml.
 #
 # ── SIGNING ──────────────────────────────────────────────────────────
 # With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
@@ -32,7 +33,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: build-android-${{ github.ref }}
+  group: build-android-bubblewrap-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -151,7 +152,7 @@ jobs:
       - name: Upload APK + AAB for ${{ matrix.app }}
         uses: actions/upload-artifact@v7
         with:
-          name: android-${{ matrix.app }}
+          name: android-bubblewrap-${{ matrix.app }}
           path: |
             build/${{ matrix.app }}/*.apk
             build/${{ matrix.app }}/*.aab
@@ -167,12 +168,12 @@ jobs:
       - name: Download every app's packages
         uses: actions/download-artifact@v7
         with:
-          path: android
-          pattern: android-*
+          path: android-bubblewrap
+          pattern: android-bubblewrap-*
       - name: Bundle them into one artifact
         uses: actions/upload-artifact@v7
         with:
-          name: android-all               # one download, an android-<slug>/ folder per app
-          path: android
+          name: android-bubblewrap-all    # one download, an android-bubblewrap-<slug>/ folder per app
+          path: android-bubblewrap
           if-no-files-found: warn
           retention-days: 30

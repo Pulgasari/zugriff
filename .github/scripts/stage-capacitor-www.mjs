@@ -1,10 +1,10 @@
-// .github/scripts/stage-bundle.mjs
+// .github/scripts/stage-capacitor-www.mjs
 //
-// stages the webDir of a bundled capacitor build (build.android: 'capacitor-bundle'):
-// instead of wrapping the live url, the app's own files ship inside the apk and
-// capacitor serves them from https://localhost/.
+// stages the webDir of a capacitor build (build.android: 'capacitor'): instead of
+// wrapping the live url, the app's own files ship inside the apk and capacitor
+// serves them from https://localhost/.
 //
-//   APP_SLUG=files PKG_SOURCE=build/_pkg node .github/scripts/stage-bundle.mjs build/files
+//   APP_SLUG=files PKG_SOURCE=build/_pkg node .github/scripts/stage-capacitor-www.mjs build/files
 //
 // <projectDir>/www/ becomes a copy of the site as the app sees it:
 //
@@ -39,8 +39,8 @@ import { registry } from './../../.shared/js/data/apps.js';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 const slug = process.env.APP_SLUG;
-if (!slug) { console.error('stage-bundle: APP_SLUG is required'); process.exit(1); }
-if (!registry.get(slug)) { console.error(`stage-bundle: no app "${slug}" in the registry`); process.exit(1); }
+if (!slug) { console.error('stage-capacitor-www: APP_SLUG is required'); process.exit(1); }
+if (!registry.get(slug)) { console.error(`stage-capacitor-www: no app "${slug}" in the registry`); process.exit(1); }
 
 const outDir    = process.argv[2] || join('build', slug);
 const www       = join(outDir, 'www');
@@ -134,7 +134,7 @@ await writeFile(index, (await readFile(index, 'utf8')).replace(/<head>/, `<head>
 
 const bytes = (await Promise.all((await walk(www)).map(file => stat(file)))).reduce((sum, info) => sum + info.size, 0);
 const lines = [
-  `### bundle: ${slug}`,
+  `### www: ${slug}`,
   '',
   `staged ${(bytes / 1024 / 1024).toFixed(1)} mb into \`${www}\`, packages: ${[...repos].sort().filter(repo => !missingRepos.includes(repo)).join(', ') || 'none'}`,
   '',
