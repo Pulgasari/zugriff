@@ -23,7 +23,7 @@ function toEntry (file) {
 function Dropzone ({
   accept   = '*/*',
   multiple = true,
-  sig,
+  signal,
   what     = 'files',
   text,
   onFiles,
@@ -39,7 +39,7 @@ function Dropzone ({
       if (!files.length) return;
 
       const entries = files.map(toEntry);
-      if (sig) sig.value = [...sig.value, ...entries];
+      if (signal) signal.value = [...signal.value, ...entries];
       onFiles?.(entries);
 
       // consume — the app owns the list from here on
@@ -48,7 +48,7 @@ function Dropzone ({
 
     el.addEventListener('aufbau-upload', handler);
     return () => el.removeEventListener('aufbau-upload', handler);
-  }, [sig, onFiles]);
+  }, [signal, onFiles]);
 
   return html`
     <aufbau-upload

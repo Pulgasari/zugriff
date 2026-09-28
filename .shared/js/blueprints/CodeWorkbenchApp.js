@@ -110,7 +110,7 @@ function CodeWorkbenchApp ({
 
         <div class="panes">
           <${CodeInputPane}
-            sig=${input}
+            signal=${input}
             lang=${iLang}
             filename=${filenameInput}
             placeholder=${placeholder}
@@ -119,7 +119,7 @@ function CodeWorkbenchApp ({
             uploadAccept=${uploadAccept}
           />
           <${CodeOutputPane}
-            sig=${output}
+            signal=${output}
             lang=${activeLang()}
             filename=${filenameOutput()}
             placeholder=${outputPlaceholder}

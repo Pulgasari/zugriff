@@ -351,9 +351,9 @@ function UsedColors() {
   `;
 }
 
-function NumberInput ({ signal: sig }) {
+function NumberInput ({ signal }) {
   return html`
-    <input type='number' value=${sig.value} onInput=${() => sig.value = sig.target.value} />
+    <input type='number' value=${signal.value} onInput=${event => signal.value = Number(event.target.value)} />
   `;
 }
 
@@ -361,8 +361,8 @@ function Toolbar () {
   return html`
     <div class="toolbar">
         
-      <${Picker} options=${TOOLS} sig=${tool} />
-      <${Picker} options=${SCALES} sig=${scale} />
+      <${Picker} options=${TOOLS} signal=${tool} />
+      <${Picker} options=${SCALES} signal=${scale} />
       <div class="divider" />
       
       <${MirrorToggle} />

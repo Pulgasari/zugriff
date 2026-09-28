@@ -47,7 +47,7 @@ function setCursor (el, pos) {
 // ── component ──────────────────────────────────────────────────────────────
 
 function CodeInputPane ({
-  filename, sig,
+  filename, signal,
   placeholder   = 'Paste code here …',
   lang          = 'javascript',
   title         = 'Input',
@@ -68,7 +68,7 @@ function CodeInputPane ({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (el.textContent === sig.value && shownLang.current === lang) return;
+    if (el.textContent === signal.value && shownLang.current === lang) return;
 
     let cancelled = false;
 
@@ -78,24 +78,24 @@ function CodeInputPane ({
 
       const langChanged = shownLang.current !== lang;
       shownLang.current = lang;
-      if (el.textContent === sig.value && !langChanged) return;
+      if (el.textContent === signal.value && !langChanged) return;
 
       const focused = document.activeElement === el;
       const pos     = focused ? getCursor(el) : 0;
 
-      el.textContent = sig.value;
+      el.textContent = signal.value;
       el.removeAttribute('data-highlighted');
-      if (sig.value) hljs.highlightElement(el);
-      if (focused) setCursor(el, Math.min(pos, sig.value.length));
+      if (signal.value) hljs.highlightElement(el);
+      if (focused) setCursor(el, Math.min(pos, signal.value.length));
     });
 
     return () => { cancelled = true; };
-  }, [sig.value, lang]);
+  }, [signal.value, lang]);
 
   const onInput = () => {
     const el  = ref.current;
     const pos = getCursor(el);
-    sig.value = el.textContent;
+    signal.value = el.textContent;
     el.removeAttribute('data-highlighted');
     if (el.textContent) hljs.highlightElement(el);
     setCursor(el, pos);
@@ -116,8 +116,8 @@ function CodeInputPane ({
     onInput();
   };
 
-  const clear  = () => sig.value = '';
-  const copy   = () => navigator.clipboard.writeText(sig.value);
+  const clear  = () => signal.value = '';
+  const copy   = () => navigator.clipboard.writeText(signal.value);
   const select = () => {
     const range = document.createRange();
     range.selectNodeContents(ref.current);
@@ -128,7 +128,7 @@ function CodeInputPane ({
   const download = () => {
     if (!filename) return;
     const a = Object.assign(document.createElement('a'), {
-      href     : URL.createObjectURL(new Blob([sig.value], { type: 'text/plain' })),
+      href     : URL.createObjectURL(new Blob([signal.value], { type: 'text/plain' })),
       download : filename,
     });
     a.click();
@@ -138,7 +138,7 @@ function CodeInputPane ({
   const onFileChange = event => {
     const file = event.target.files?.[0];
     if (!file) return;
-    file.text().then(text => sig.value = text);
+    file.text().then(text => signal.value = text);
     event.target.value = '';
   };
   const triggerUpload = () => fileRef.current?.click();
@@ -151,7 +151,7 @@ function CodeInputPane ({
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(res.statusText);
-        sig.value = await res.text();
+        signal.value = await res.text();
       } catch (error) {
         alert('Fetch failed: ' + error.message);
       }
@@ -169,7 +169,7 @@ function CodeInputPane ({
             <${GhostButton} icon="mdi:upload" text="Upload" onClick=${triggerUpload} />
           `}
           ${couldURL && html`<${GhostButton} icon="mdi:web" text="URL" onClick=${loadFromURL} />`}
-          ${sig.value && html`
+          ${signal.value && html`
             <${GhostButton} icon="mdi:content-copy" text="Copy" onClick=${copy} />
             ${(filename || couldDownload) && html`<${GhostButton} icon="mdi:download"   text="Download" onClick=${download} />`}
             ${couldSelect                 && html`<${GhostButton} icon="mdi:select-all" text="Select"   onClick=${select}   />`}
@@ -191,7 +191,7 @@ function CodeInputPane ({
       </div>
 
       <div class="pane-footer">
-        ${sig.value && html`<span class="char-count">${sig.value.length} chars</span>`}
+        ${signal.value && html`<span class="char-count">${signal.value.length} chars</span>`}
       </div>
 
       <${Prompt} />
