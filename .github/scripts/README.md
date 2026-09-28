@@ -70,9 +70,10 @@ dem die App gebündelt wird. Die Config legt fest:
 - `/` wird beim Start zu `/<slug>/`: Capacitor öffnet `https://localhost/`, und die
   Shell liest die Route aus dem Pfad
 - zum Schluss fliegt alles raus, was von der `index.html` aus nicht erreicht wird
-  (Imports, Importmap, CSS, Pfade in Strings). Ganz bleiben die Verzeichnisse, aus
-  denen per Name geladen wird: `.shared/js/components/`, die App selbst und
-  aufbaus `css/`
+  (Imports, Importmap, CSS, Pfade in Strings). Komponenten, die per
+  `zugriff.component('Name')` geladen werden, bleiben einzeln (`loaders` in der
+  Config), die App selbst bleibt ganz, aufbaus `css/` deklariert aufbau selbst.
+  `BUNDLER_WHY=<pfad>` zeigt, warum eine Datei drin ist
 
 Am Ende steht die Zusammenfassung des Bundlers: welche Pakete und Module lokal
 sind, die Größe und was **weiter übers Netz** geht (Icons, APIs …), in CI

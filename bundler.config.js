@@ -57,10 +57,16 @@ export default ({ out, packages = 'build/_pkg', slug }) => ({
   },
 
   // everything nothing reaches goes. the app's entry is loaded by a path built
-  // from the route, components and the app's own views, dialogs, panels by name
+  // from the route and stays whole with its views, dialogs, panels, css.
+  // components load by name through the runtime, each call keeps its component.
+  // aufbau declares its own runtime css in its package.json
   prune : {
     entries : [`/${slug}/app.js`],
-    keep    : ['/.shared/js/components/', `/${slug}/`, '/_pkg/aufbau/css/'],   // aufbau's css: looks, skins by name
+    keep    : [`/${slug}/`],
+    loaders : {
+      'zugriff.component'  : '/.shared/js/components/{name}.js',
+      'zugriff.components' : '/.shared/js/components/{name}.js',
+    },
     origins : ['https://zugriff.dev'],
   },
 
