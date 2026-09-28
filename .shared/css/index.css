@@ -6,17 +6,22 @@
 @import url('./settings.css');
 @import url('./apps.css');
 
+/* CUSTOM PROPS */
+@property --font      { syntax: "<string>"; inherits: false; initial-value: "Manrope"; }
+@property --font-code { syntax: "<string>"; inherits: false; initial-value: "JetBrains Mono"; }    
+@property --font-size { syntax: "<length>"; inherits: false; initial-value: 12px; }
+
 /* TYPO */
 :root {
   --font      : "Manrope";
-  --font-code : 'Fira Code', 'Cascadia Code', "JetBrains Mono", monospace;
-  --fontSize  : 12px;
+  --font-code : "JetBrains Mono", monospace;
+  --font-size : 12px;
 }
-* { font-family: var(--font); }
-html, body { font-size: var(--fontSize); }
+*          { font-family : var(--font); }
+html, body { font-size   : var(--font-size); }
 
 
-
+/*
 ::view-transition-old(root) { animation: page-out 180ms ease both; }
 ::view-transition-new(root) { animation: page-in  350ms cubic-bezier(.22, 1, .36, 1) both; }      
 
@@ -28,3 +33,4 @@ html, body { font-size: var(--fontSize); }
   from { filter: blur(3px); opacity: 0; transform: translateY(8px); }
   to   { filter: blur(0);   opacity: 1; transform: translateY(0);   }
 }
+*/
