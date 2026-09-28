@@ -1,6 +1,6 @@
 name: Build Android (Capacitor) Packages
 
-# Packages the apps whose registry entry sets build.android == 'capacitor' in
+# Packages the apps whose registry entry lists build.android 'capacitor' in
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
 # An app can list several android variants (see .github/scripts/android.js):
 #
@@ -26,7 +26,8 @@ name: Build Android (Capacitor) Packages
 # registry color only shows where capacitor insets the webview natively.
 #
 # The app's files ship inside the apk: stage-capacitor-www.mjs stages the app,
-# .shared and the first-party packages into www/, capacitor serves them from
+# .shared and the first-party packages into www/ with @aufbau/bundler (config:
+# bundler.config.js), capacitor serves them from
 # https://localhost/. third-party modules (esm.sh, jsdelivr, unpkg) still come
 # over the network, the step summary of each run lists what is left.
 #

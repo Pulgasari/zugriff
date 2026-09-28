@@ -43,22 +43,26 @@ zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`
 ## `stage-capacitor-www.mjs`
 
 Stellt für den Capacitor-Build (`build.android: 'capacitor'`) das `www/` zusammen,
-das ins APK kommt (`APP_SLUG=podcasts PKG_SOURCE=build/_pkg node .github/scripts/stage-capacitor-www.mjs build/podcasts`):
+das ins APK kommt (`APP_SLUG=podcasts PKG_SOURCE=build/_pkg node .github/scripts/stage-capacitor-www.mjs build/podcasts`).
+
+Die Arbeit macht **`@aufbau/bundler`** (`aufbau/bundler/`) mit der
+`bundler.config.js` aus dem Repo-Root. Der Bundler kommt aus dem aufbau-Checkout
+unter den Paketen (fehlt er, wird aufbau geklont), ist also dasselbe aufbau, mit
+dem die App gebündelt wird. Die Config legt fest:
 
 - `index.html`, `icon.svg`, `logo.svg` und `.shared/` aus dem Repo-Root,
   `apps/<slug>/` als `www/<slug>/` (dort, wo es der Vercel-Rewrite live hinlegt)
 - die first-party Pakete, die `code.pulgasari.dev` ausliefert (aufbau, domina,
-  bunker, htx, js-packages …), als `www/_pkg/<repo>/`. Welche, liest das Skript aus
-  den gestageten Dateien, fehlende klont es aus `github.com/Pulgasari/<repo>`.
-  Ohne `.git`, `.github`, `_`, `test`, `www` und `node_modules`
-- jedes `https://code.pulgasari.dev` in den gestageten Dateien wird zu `/_pkg`,
-  damit zeigt auch die Importmap aus `boot.js` aufs Gerät
-- ein Start-Skript in `index.html` setzt `/` auf `/<slug>/`: Capacitor öffnet
-  `https://localhost/`, und die Shell liest die Route aus dem Pfad
+  bunker, htx, js-packages …), als `www/_pkg/<repo>/`; fehlende werden aus
+  `github.com/Pulgasari/<repo>` geklont, jedes `https://code.pulgasari.dev` zeigt
+  danach auf `/_pkg`, auch die Importmap aus `boot.js`
+- `/` wird beim Start zu `/<slug>/`: Capacitor öffnet `https://localhost/`, und die
+  Shell liest die Route aus dem Pfad
 
-Am Ende listet es, was **weiter übers Netz** geladen wird (esm.sh, jsdelivr,
-unpkg, APIs …), in CI auch in der Step-Summary. Das ist die Liste dessen, was ein
-echter Bundler noch übernehmen muss.
+Am Ende steht die Zusammenfassung des Bundlers: welche Pakete lokal sind, die
+Größe und was **weiter übers Netz** geht (esm.sh, jsdelivr, unpkg, APIs …), in CI
+auch in der Step-Summary. Das ist die Liste, die die nächsten Schritte des
+Bundlers abarbeiten (siehe `aufbau/bundler/concept.md`).
 
 ## `gen-capacitor-res.mjs`
 
