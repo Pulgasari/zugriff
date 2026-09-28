@@ -3,40 +3,7 @@
 
 /* ── chips ──────────────────────────────────────────────────────────────── */
 
-.chip {
-  display       : flex;
-  align-items   : center;
-  padding       : 0.25rem 0.50rem;
-  border-radius : 0.25rem;
-  font-size     : 0.75rem;
-  border        : 1px solid color-mix(in oklch, var(--fg) 25%, transparent);
-  background    : transparent;
-  color         : var(--fg);
 
-  &:hover  { 
-    border-color : var(--accent); 
-    color        : var(--accent); 
-  }
-  
-  &.active {
-    background   : var(--accent);
-    border-color : var(--accent);
-    color        : var(--bg);
-    font-weight  : 600;
-  }
-}
-
-.badge {
-  font-size      : 0.65rem;
-  font-weight    : 600;
-  padding        : 0.15rem 0.45rem;
-  border-radius  : 2rem;
-  background     : var(--accent-25);
-  color          : var(--accent);
-  letter-spacing : 0.05em;
-  text-transform : uppercase;
-  vertical-align : middle;
-}
 
 
 
