@@ -16,64 +16,69 @@
 aufbau-picker, .picker {
   --radius : 0.25rem;
   color    : var(--fg);
-}
 
-aufbau-picker[look="segments"] { 
-   gap: 1px;
+   &[look="segments"] { 
+      gap: 1px;
+   
+      &::part(option) {
+        background    : var(--bg);
+        color         : var(--fg);
+         
+        --padding : small;
+      }
+      
+      &::part(option selected) {
+        background : var(--accent);
+        color      : var(--bg);
+      }
+   }
 
-   &::part(option) {
+   /* combobox: the host is the field. cycle: a single button */
+   &[look="combobox"],
+   &[look="cycle"]::part(trigger) {
+     background    : color-mix(in srgb, var(--fg) 5%, transparent);
+     border        : 1px solid var(--fg-25);
+     border-radius : var(--radius);
+     
+     --padding: small;
+   }
+   
+   &[look="combobox"] { 
+      min-width: 10rem; 
+      
+      &:focus-within { border-color: var(--accent); }
+   }
+
+   &::part(caret) { opacity: 0.5; }
+   
+   /* the list is a popover, it gets no colours from the page and has to bring its own */
+   &::part(listbox) {
      background    : var(--bg);
      color         : var(--fg);
-      
-     --padding : small;
+     border        : 1px solid var(--fg-25);
+     border-radius : var(--radius);
+     box-shadow    : 0 8px 32px color-mix(in srgb, #000 45%, transparent);
+     padding       : tiny;
+   }
+
+   &[look="combobox"], 
+   &[look="cycle"] {
+      &::part(option) {
+        --gap         : small;
+        --padding     : small;
+        border-radius : var(--radius);
+
+        &:hover, &:focus-visible { background: var(--accent-10); }
+      }
+      &::part(option selected) {
+        background : var(--accent);
+        color      : var(--bg);
+      }
    }
    
-   &::part(option selected) {
-     background : var(--accent);
-     color      : var(--bg);
-   }
-}
 
-/* combobox: the host is the field. cycle: a single button */
-aufbau-picker[look="combobox"],
-aufbau-picker[look="cycle"]::part(trigger) {
-  background    : color-mix(in srgb, var(--fg) 5%, transparent);
-  border        : 1px solid var(--fg-25);
-  border-radius : var(--radius);
-  
-  --padding: small;
-}
-
-aufbau-picker[look="combobox"] { 
-   min-width: 10rem; 
    
-   &:focus-within { border-color: var(--accent); }
-}
-
-aufbau-picker::part(caret) { opacity: 0.5; }
-
-/* the list is a popover, it gets no colours from the page and has to bring its own */
-aufbau-picker::part(listbox) {
-  background    : var(--bg);
-  color         : var(--fg);
-  border        : 1px solid var(--fg-25);
-  border-radius : var(--radius);
-  box-shadow    : 0 8px 32px color-mix(in srgb, #000 45%, transparent);
-  padding       : 0.25rem;
-}
-
-aufbau-picker:is([look="combobox"], [look="cycle"])::part(option) {
-  gap           : 0.4rem;
-  padding       : 0.3rem 0.5rem;
-  border-radius : var(--radius);
-}
-
-aufbau-picker:is([look="combobox"], [look="cycle"])::part(option):hover,
-aufbau-picker:is([look="combobox"], [look="cycle"])::part(option):focus-visible { background: var(--accent-10); }
-
-aufbau-picker:is([look="combobox"], [look="cycle"])::part(option selected) {
-  background : var(--accent);
-  color      : var(--bg);
+   
 }
 
 /* ── toggle (<aufbau-toggle look='switch'>) ─────────────────────────────── */
