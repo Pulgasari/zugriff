@@ -29,7 +29,7 @@
   border-right  : 1px solid var(--line);
 }
 
-.fe-brand {
+.fe-side #app-brand {
   display    : flex;
   align-items: center;
   gap        : 0.5rem;
@@ -143,22 +143,12 @@
 
 /* ── narrow screens ──────────────────────────────────────────────────────── */
 
-@media (max-width: 760px) {
-  .fe-app { flex-direction: column; }
-  .fe-side {
-    width        : auto;
-    flex-direction: row;
-    align-items  : center;
-    flex-wrap    : wrap;
-    gap          : 0.6rem;
-    border-right : 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .fe-brand      { padding: 0; }
-  .fe-current    { flex: 1 1 auto; flex-direction: row; align-items: center; gap: 0.6rem; }
-  .fe-current-label { display: none; }
-  .fe-current-name  { flex: 1 1 auto; min-width: 0; }
-  .fe-current-actions { flex: none; }
-  .fe-side-foot  { margin-top: 0; flex-basis: 100%; }
-  .fe-tip        { display: none; }
+/* the shared Sidebar turns .fe-side into a drawer below 720px, the menu button opens it */
+.fe-menu { display: none; }
+
+@media (max-width: 720px) {
+  #app-main { flex-direction: column; }
+  .fe-menu  { display: inline-flex; align-self: flex-start; }
+  .fe-side  { width: min(20rem, 82vw); }
+  .fe-tip   { display: none; }
 }
