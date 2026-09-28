@@ -3,38 +3,12 @@
 // fetching and parsing podcast feeds, entirely in the browser.
 //
 // the catch with a client-side-only podcast app: almost no podcast feed sends
-// CORS headers, so a direct `fetch()` from a page is blocked. so we try direct
-// first (it is faster and keeps the request between the browser and the feed),
-// and on failure fall back to a CORS proxy. `{url}` in the template is replaced
-// with the encoded feed url; a template without the placeholder gets it appended.
+// CORS headers. modules/http.js goes around it: natively inside capacitor, in a
+// browser direct first and then through the CORS proxy.
 
-export const URL_PROXY_RSS = 'https://api.allorigins.win/raw?url={url}';
+import { getText } from '/.shared/js/modules/http.js';
 
-// exported because the search endpoint needs the same escape hatch — it is the
-// generic "route this through the CORS proxy" helper, not an rss-only one.
-export function viaProxy (url) {
-  const enc = encodeURIComponent(url);
-  return URL_PROXY_RSS.includes('{url}') ? URL_PROXY_RSS.replaceAll('{url}', enc) : URL_PROXY_RSS + enc;
-}
-
-async function get (url) {
-  const res = await fetch(url, { redirect: 'follow', headers: { accept: 'application/rss+xml, application/xml, text/xml, */*' } });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.text();
-}
-
-/**
- * fetch a feed's xml. tries a direct request first; on any failure (CORS,
- * network, http error) retries through the proxy. throws with a
- * human message when both routes fail.
- */
-async function fetchFeed (url) {
-  try   { return await get(url); }
-  catch { /* almost always CORS — fall through to the proxy */ }
-
-  try         { return await get(viaProxy(url)); }
-  catch (err) { throw new Error(`could not reach the feed — direct and proxy both failed (${err.message})`); }
-}
+const fetchFeed = url => getText(url, { accept: 'application/rss+xml, application/xml, text/xml, */*' });
 
 // ── parsing ────────────────────────────────────────────────────────────────
 

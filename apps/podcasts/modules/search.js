@@ -5,11 +5,12 @@
 // actually subscribe to, which is the only field here we truly need.
 //
 // whether apple sends CORS headers has a habit of changing, so this takes the same
-// route feed.js does: direct first, then through the configured proxy.
+// route feed.js does, through modules/http.js: natively inside capacitor, in a
+// browser direct first and then through the CORS proxy.
 
 // :::::: IMPORTS
 
-import { viaProxy } from './feed.js';
+import { getJson } from '/.shared/js/modules/http.js';
 
 // :::::: CONSTANTS
 
@@ -47,25 +48,14 @@ export function localCountry () {
 
 // :::::: FETCH
 
-async function getJson (url, signal) {
-  const response = await fetch(url, { signal, headers: { accept: 'application/json' } });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
-}
-
-/** direct first, then through the proxy; an abort is the caller moving on, not a failure */
+/** an abort is the caller moving on, not a failure */
 async function request (params, signal) {
-  const url = `${ENDPOINT}?${params}`;
   let data;
 
-  try         { data = await getJson(url, signal); }
+  try         { data = await getJson(`${ENDPOINT}?${params}`, { signal }); }
   catch (error) {
     if (error.name === 'AbortError') throw error;
-    try         { data = await getJson(viaProxy(url), signal); }
-    catch (err) {
-      if (err.name === 'AbortError') throw err;
-      throw new Error(`could not reach the podcast directory (${err.message})`);
-    }
+    throw new Error(`could not reach the podcast directory (${error.message})`);
   }
 
   // a rejected parameter comes back as HTTP 200 with no results — without this it

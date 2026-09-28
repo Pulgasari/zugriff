@@ -1,41 +1,19 @@
 // apps/feeds/feed.js
 //
 // fetching and parsing feeds in the browser — the article-flavoured cousin of
-// apps/podcasts/feed.js. same CORS reality: almost no feed sends CORS headers,
-// so a direct fetch is tried first and, on failure, retried through a proxy the
-// user controls in settings (`{url}` is replaced with the encoded feed url).
+// apps/podcasts/feed.js. same CORS reality: almost no feed sends CORS headers.
+// modules/http.js goes around it: natively inside capacitor, in a browser direct
+// first and then through the proxy the user controls in settings (`{url}` is
+// replaced with the encoded feed url).
 //
 // on top of plain RSS/Atom it understands YouTube: a channel's feed is Atom
 // with yt:/media: extensions (a video id, a thumbnail, a description), and a
 // channel *page* url can be turned into its feed url — see resolveYouTube.
 
-export const DEFAULT_PROXY = 'https://api.allorigins.win/raw?url={url}';
+import { getText, PROXY } from '/.shared/js/modules/http.js';
 
-function viaProxy (proxy, url) {
-  const tpl = (proxy || '').trim();
-  if (!tpl) return null;
-  const enc = encodeURIComponent(url);
-  return tpl.includes('{url}') ? tpl.replaceAll('{url}', enc) : tpl + enc;
-}
-
-async function get (url, accept) {
-  const res = await fetch(url, { redirect: 'follow', headers: accept ? { accept } : {} });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.text();
-}
-
-/** fetch text, direct first then via the proxy. `accept` sets the Accept header. */
-export async function fetchText (url, proxy = DEFAULT_PROXY, accept) {
-  let directError;
-  try { return await get(url, accept); }
-  catch (err) { directError = err; }
-
-  const proxied = viaProxy(proxy, url);
-  if (!proxied) throw new Error(`could not reach ${url} (${directError.message}). set a CORS proxy in settings.`);
-
-  try { return await get(proxied, accept); }
-  catch (err) { throw new Error(`could not reach the feed — direct and proxy both failed (${err.message})`); }
-}
+/** fetch text. `accept` sets the Accept header, an empty `proxy` leaves the direct route only */
+export const fetchText = (url, proxy = PROXY, accept) => getText(url, { accept, proxy });
 
 /** fetch a feed's xml */
 export const fetchFeed = (url, proxy) =>
@@ -159,7 +137,7 @@ const PLAYLIST_FEED = id => `https://www.youtube.com/feeds/videos.xml?playlist_i
  *  - @handle · /user/… · /c/… · a video   → the page is fetched (via proxy) and
  *                                           its channelId scraped out
  */
-export async function resolveYouTube (input, proxy = DEFAULT_PROXY) {
+export async function resolveYouTube (input, proxy = PROXY) {
   const raw = (input || '').trim();
   if (!raw) return null;
 
