@@ -192,7 +192,7 @@ function applyTheme ({ prefix }) {
   const { preload, sw, theme } = config;
 
   // Run tasks sequentially
-  initDevTools(true);
+  initDevTools();   // eruda only behind ?dev, remembered for the tab
   applyTheme(config.theme);
   injectImportMapAndPreloads(config.imports, config.preload, currentScript.src);
   registerServiceWorker(config.sw);
