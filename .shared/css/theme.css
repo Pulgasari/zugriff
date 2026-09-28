@@ -1,11 +1,11 @@
-/* move to: reset.css / aufbau.css */
+/* move to: aufbau/css/reset.css / aufbau/css/aufbau.css */
 
 html { -webkit-tap-highlight-color: transparent; }
 body { -webkit-font-smoothing: antialiased; }
 
-/* move to: tokens.css */
+/* move to: aufbau/css/tokens.css */
 
-/* move to: mobile.css */
+/* move to: aufbau/css/mobile.css */
 
 /*
 safe-area insets. non-zero where the page runs edge-to-edge:
@@ -33,7 +33,7 @@ where the page shows var(--bg) instead
   padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
 }
 
-/* move to: podcasts 
+/* move to: zugriff/apps/podcasts/app.css
 or move to: aufbau/css/surfaces.css */
 
 @container style(--theme: oled) {
@@ -50,16 +50,11 @@ or move to: aufbau/css/surfaces.css */
 
 
 
-
-
-
 body {
-
-  /* app chrome tokens, derived from the theme */
   --panel   : color-mix(in oklch, var(--bg) 90%, black);
   --panel-2 : color-mix(in oklch, var(--bg) 80%, black);
-  --line    : color-mix(in oklch, var(--fg) 10%, transparent);
-  --hover   : color-mix(in oklch, var(--fg)  7%, transparent);
+  --line    : color-mix(in oklch, var(--fg) 15%, transparent);
+  --hover   : color-mix(in oklch, var(--fg) 10%, transparent);
   --radius  : 0.5rem;
 }
 
@@ -146,10 +141,5 @@ body {
   --button-secondary-bg : color-mix(in srgb, var(--fg) 50%, var(--bg));
 }
 
-/* data type colors — used by the inspector patterns */
-:root {
-  --c-string : #98c379;
-  --c-number : #d19a66;
-  --c-bool   : #56b6c2;
-  --c-null   : #e06c75;
-}
+
+
