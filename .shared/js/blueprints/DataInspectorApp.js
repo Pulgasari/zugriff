@@ -147,7 +147,7 @@ function DataInspectorApp ({
         <div class="layout">
 
           <div class="input-col">
-            <${CodeInputPane} sig=${input} lang=${lang} placeholder=${placeholder} />
+            <${CodeInputPane} signal=${input} lang=${lang} placeholder=${placeholder} />
             <div class="input-actions">
               <button class="btn primary" onClick=${doParse} disabled=${!input.value}>
                 <${Icon} name="mdi:magnify" /> Inspect

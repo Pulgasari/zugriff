@@ -189,7 +189,7 @@ function App () {
     <div id="app-body">
 
       <${Dropzone} accept="image/svg+xml,.svg" multiple=${false}
-                   sig=${files} onFiles=${onFiles} what="an app.svg" />
+                   signal=${files} onFiles=${onFiles} what="an app.svg" />
 
       ${errMsg.value && html`
         <div class="err-block">

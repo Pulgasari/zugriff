@@ -35,16 +35,16 @@ function Highlighted ({ code, lang, innerRef }) {
 }
 
 function CodeOutputPane ({
-  sig, status, errorMessage, filename, stats,
+  signal, status, errorMessage, filename, stats,
   lang        = 'javascript',
   title       = 'Output',
   placeholder = 'Output appears here…',
 }) {
-  const hasOut = !!sig.value;
+  const hasOut = !!signal.value;
   const s      = stats?.value;
   const codeRef = useRef(null);
 
-  const copy   = () => navigator.clipboard.writeText(sig.value);
+  const copy   = () => navigator.clipboard.writeText(signal.value);
   const select = () => {
     if (!codeRef.current) return;
     const range = document.createRange();
@@ -56,7 +56,7 @@ function CodeOutputPane ({
   const download = () => {
     if (!filename) return;
     const a = Object.assign(document.createElement('a'), {
-      href     : URL.createObjectURL(new Blob([sig.value], { type: 'text/plain' })),
+      href     : URL.createObjectURL(new Blob([signal.value], { type: 'text/plain' })),
       download : filename,
     });
     a.click();
@@ -86,7 +86,7 @@ function CodeOutputPane ({
             <${Icon} name="mdi:alert-circle-outline" /><pre>${errorMessage?.value}</pre>
           </div>
         `}
-        ${hasOut && html`<${Highlighted} code=${sig.value} lang=${lang} innerRef=${codeRef} />`}
+        ${hasOut && html`<${Highlighted} code=${signal.value} lang=${lang} innerRef=${codeRef} />`}
       </div>
 
       <div class="pane-footer">

@@ -74,8 +74,8 @@ function App () {
     <div id="app-body">
 
       <div class="panes">
-        <${CodeInputPane}  lang='json' sig=${input}  placeholder="Paste JSON here…" filename="input.json" />
-        <${CodeOutputPane} lang='json' sig=${output} filename="formatted.json"
+        <${CodeInputPane}  lang='json' signal=${input}  placeholder="Paste JSON here…" filename="input.json" />
+        <${CodeOutputPane} lang='json' signal=${output} filename="formatted.json"
                            status=${status} errorMessage=${errMsg}
                            placeholder="Formatted JSON appears here…" />
       </div>

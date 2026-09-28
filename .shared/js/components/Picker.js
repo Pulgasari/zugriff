@@ -33,7 +33,7 @@ function Option ({ icon, label, title, value }) {
 // options too, given `options` win over them
 function Picker ({ options, signal, onChange, searchable, value, ...rest }) {
   if (signal) value = signal.value;
-  options ??= signal?.$values ?? [];
+  options ??= signal?.values ?? [];
 
   const change = event => {
     const next = event.detail?.value ?? event.target?.value;

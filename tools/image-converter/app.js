@@ -116,7 +116,7 @@ function App() {
   return html`
     <div id="app-body">
     
-      <${Dropzone} accept='image/*' multiple=${true} sig=${files} what='images' />
+      <${Dropzone} accept='image/*' multiple=${true} signal=${files} what='images' />
       
       ${list.length > 0 && html`
         

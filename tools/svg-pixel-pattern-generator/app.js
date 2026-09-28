@@ -221,16 +221,16 @@ function Palette() {
 }
 
 // ── SizeInput ─────────────────────────────────────────────────────────────────
-function SizeInput({ label, sig, min=1, max=64, onChange }) {
+function SizeInput({ label, signal, min=1, max=64, onChange }) {
   return html`
     <div class="size-field">
       <span class="size-label">${label}</span>
-      <button class="sz-btn" onClick=${() => { let v = Math.max(min, sig.value-1); sig.value=v; onChange?.(v); }}>
+      <button class="sz-btn" onClick=${() => { let v = Math.max(min, signal.value-1); signal.value=v; onChange?.(v); }}>
         <${Icon} name="mdi:minus" />
       </button>
-      <input type="number" class="field sz-input" min=${min} max=${max} value=${sig.value}
-        onInput=${e => { let v = Math.max(min, Math.min(max, +e.target.value)); sig.value=v; onChange?.(v); }} />
-      <button class="sz-btn" onClick=${() => { let v = Math.min(max, sig.value+1); sig.value=v; onChange?.(v); }}>
+      <input type="number" class="field sz-input" min=${min} max=${max} value=${signal.value}
+        onInput=${e => { let v = Math.max(min, Math.min(max, +e.target.value)); signal.value=v; onChange?.(v); }} />
+      <button class="sz-btn" onClick=${() => { let v = Math.min(max, signal.value+1); signal.value=v; onChange?.(v); }}>
         <${Icon} name="mdi:plus" />
       </button>
     </div>`;
@@ -274,8 +274,8 @@ function App() {
           </button>
         </div>
         <div class="divider" />
-        <${SizeInput} label="W" sig=${cols} />
-        <${SizeInput} label="H" sig=${rows} />
+        <${SizeInput} label="W" signal=${cols} />
+        <${SizeInput} label="H" signal=${rows} />
         <div class="divider" />
         <div class="tool-group">
           <button class="tool-btn" title="Zoom out" onClick=${() => cellSz.value = Math.max(8, cellSz.value - 4)}>
