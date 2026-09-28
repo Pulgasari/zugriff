@@ -2,7 +2,7 @@ name: Build Android (Capacitor) Packages
 
 # Packages the apps whose registry entry sets build.android == 'capacitor' in
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
-# An app targets exactly one android builder:
+# An app can list several android variants (see .github/scripts/android.js):
 #
 #   bubblewrap      build-android-bubblewrap.yml      a TWA around the live url
 #   capacitor-live  build-android-capacitor-live.yml  a webview on the live url
