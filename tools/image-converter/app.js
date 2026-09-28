@@ -121,7 +121,7 @@ function App() {
       ${list.length > 0 && html`
         
         <div id='app-options'>
-          <${Picker} options=${FORMATS} sig=${format} />
+          <${Picker} options=${FORMATS} signal=${format} />
           <${QualitySlider} />
         </div>
         

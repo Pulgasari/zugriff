@@ -361,8 +361,8 @@ function Toolbar () {
   return html`
     <div class="toolbar">
         
-      <${Picker} options=${TOOLS} sig=${tool} />
-      <${Picker} options=${SCALES} sig=${scale} />
+      <${Picker} options=${TOOLS} signal=${tool} />
+      <${Picker} options=${SCALES} signal=${scale} />
       <div class="divider" />
       
       <${MirrorToggle} />
