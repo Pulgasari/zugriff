@@ -18,6 +18,10 @@
 //   www/index.html          a tiny offline-fallback page (Capacitor requires a
 //                           non-empty webDir even when server.url is set)
 //
+// with BUNDLE=1 the app is not wrapped around its url: there is no server.url,
+// capacitor serves the webDir that stage-bundle.mjs staged, and no fallback is
+// written over it.
+//
 //   APP_SLUG=files node .github/scripts/gen-capacitor-config.mjs build/files
 //
 // env:
@@ -26,6 +30,7 @@
 //   APP_URL         full app url (default `${SITE_BASE}/${slug}/` — the public
 //                   route; vercel rewrites /<slug>/ to /apps/<slug>/, so the
 //                   /apps/ path is internal only and 404s if requested directly)
+//   BUNDLE          1 for a bundled build (build.android: 'capacitor-bundle')
 //   APP_ID_PREFIX   reverse-dns prefix for the appId
 //                   (default dev.zugriff — appId is `${APP_ID_PREFIX}.${segment}`,
 //                    e.g. dev.zugriff.files, matching /.well-known/assetlinks.json
@@ -45,6 +50,7 @@ const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/
 const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');
 const idPrefix = process.env.APP_ID_PREFIX || 'dev.zugriff';
 const outDir   = process.argv[2] || '.';
+const bundle   = process.env.BUNDLE === '1';
 
 // a valid Android package segment: only [a-zA-Z0-9_], never leading with a digit
 // (same rule the TWA script uses, so the appId lines up with dev.zugriff.<slug>)
@@ -64,7 +70,7 @@ const config = {
   appName : app.short_name || app.name || slug,
   webDir  : 'www',
   server  : {
-    url            : appUrl,           // wrap the live deployment, exactly like the TWA
+    ...(bundle ? {} : { url: appUrl }),   // live: wrap the deployment, exactly like the TWA
     androidScheme  : 'https',
     cleartext      : false,
   },
@@ -94,7 +100,7 @@ const fallback = `<!doctype html>
 
 await mkdir(join(outDir, 'www'), { recursive: true });
 await writeFile(join(outDir, 'capacitor.config.json'), JSON.stringify(config, null, 2) + '\n');
-await writeFile(join(outDir, 'www', 'index.html'), fallback);
+if (!bundle) await writeFile(join(outDir, 'www', 'index.html'), fallback);
 
 console.log(`gen-capacitor-config: wrote ${join(outDir, 'capacitor.config.json')}`);
-console.log(`  appId ${config.appId}  ·  url ${config.server.url}`);
+console.log(`  appId ${config.appId}  ·  ${bundle ? 'bundled www/' : `url ${config.server.url}`}`);

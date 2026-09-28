@@ -41,6 +41,26 @@ Capacitor injiziert seine native Bridge trotzdem in die Remote-Seite, sodass
 native Plugins (das eigene Saf-Plugin) funktionieren. `appId` ist `dev.zugriff.<slug>` — identisch
 zu den TWA-`packageId`s, teilt sich also dieselbe `/.well-known/assetlinks.json`.
 
+## `stage-bundle.mjs`
+
+Stellt für den **gebündelten** Capacitor-Build (`build.android: 'capacitor-bundle'`)
+das `www/` zusammen (`APP_SLUG=podcasts PKG_SOURCE=build/_pkg node .github/scripts/stage-bundle.mjs build/podcasts`):
+
+- `index.html`, `icon.svg`, `logo.svg` und `.shared/` aus dem Repo-Root,
+  `apps/<slug>/` als `www/<slug>/` (dort, wo es der Vercel-Rewrite live hinlegt)
+- die first-party Pakete, die `code.pulgasari.dev` ausliefert (aufbau, domina,
+  bunker, htx, js-packages …), als `www/_pkg/<repo>/`. Welche, liest das Skript aus
+  den gestageten Dateien, fehlende klont es aus `github.com/Pulgasari/<repo>`.
+  Ohne `.git`, `.github`, `_`, `test`, `www` und `node_modules`
+- jedes `https://code.pulgasari.dev` in den gestageten Dateien wird zu `/_pkg`,
+  damit zeigt auch die Importmap aus `boot.js` aufs Gerät
+- ein Start-Skript in `index.html` setzt `/` auf `/<slug>/`: Capacitor öffnet
+  `https://localhost/`, und die Shell liest die Route aus dem Pfad
+
+Am Ende listet es, was **weiter übers Netz** geladen wird (esm.sh, jsdelivr,
+unpkg, APIs …), in CI auch in der Step-Summary. Das ist die Liste dessen, was ein
+echter Bundler noch übernehmen muss.
+
 ## `gen-capacitor-res.mjs`
 
 Läuft nach `cap add android` und ersetzt die Ressourcen des Capacitor-Templates
@@ -82,12 +102,19 @@ npm-Plugins findet `cap sync` selbst, diese hier nicht. Aktuell: `SafPlugin`
 Der Ziel-Builder einer App steht in ihrem Eintrag in `.shared/js/data/apps.js`:
 
 ```js
-build: { android: 'capacitor' }   // oder 'bubblewrap'
+build: { android: 'capacitor' }   // oder 'capacitor-bundle', 'bubblewrap'
 ```
 
 Fehlt das Feld, wird die App für Android nicht gebaut. Jede App zielt auf genau
 einen Builder — die beiden Discover-Skripte oben lesen dieses Feld und liefern
-die jeweilige Build-Matrix.
+die jeweilige Build-Matrix (`get-capacitor-apps.js` mit `BUILDER` für beide
+Capacitor-Varianten).
+
+| Wert               | Workflow              | App im APK |
+|--------------------|-----------------------|------------|
+| `bubblewrap`       | `build-android.yml`   | TWA um die Live-URL |
+| `capacitor`        | `build-capacitor.yml` | WebView auf die Live-URL (`server.url`) |
+| `capacitor-bundle` | `build-bundle.yml`    | die Dateien selbst, aus `www/` |
 
 ---
 
@@ -116,6 +143,23 @@ APK/AAB **signieren** (Capacitor baut unsigniert: `zipalign`+`apksigner` für di
 APK, `jarsigner` für die AAB) → als Artefakt hochladen. Ausgelöst **manuell** per
 `workflow_dispatch`; der optionale `app`-Input baut nur einen einzelnen Slug
 statt der ganzen Matrix.
+
+---
+
+## Gebündelter Build: `.github/workflows/build-bundle.yml`
+
+Die dritte Variante: die App lädt nicht ihre Live-URL, ihre Dateien liegen im
+APK. Der Workflow ruft `build-capacitor.yml` mit `mode: bundle` auf — gleiche
+Toolchain, gleiches Signing, zusätzlich `stage-bundle.mjs` vor dem Scaffolding und
+kein `server.url` in `capacitor.config.json`. Artefakte: `bundle-<slug>`,
+gesammelt `bundle-all`.
+
+Gebaut werden die Apps mit `build.android: 'capacitor-bundle'`. Ein einzelner
+`app`-Input baut auch eine App, die sonst live (`capacitor`) gebaut wird — so lässt
+sich die gebündelte Variante ausprobieren, ohne die Registry zu ändern.
+
+Noch nicht offline: alles, was nicht von `code.pulgasari.dev` kommt (esm.sh,
+jsdelivr, unpkg, Icons, APIs). Die Step-Summary jedes Laufs listet es.
 
 ---
 

@@ -1,0 +1,33 @@
+name: Build Android (via Capacitor | Bundled) Packages
+
+# the third android variant, next to build-android.yml (bubblewrap, live) and
+# build-capacitor.yml (capacitor, live): the app does not load its deployment,
+# its files ship inside the apk. apps opt in with build.android ==
+# 'capacitor-bundle' in .shared/js/data/apps.js; a single `app` given here is
+# built this way whatever its registry entry says, as long as it targets
+# capacitor, so a live app can try the bundle.
+#
+# it runs build-capacitor.yml in mode 'bundle': same toolchain, signing and
+# artifacts (bundle-<slug>, bundle-all), plus stage-bundle.mjs, which copies the
+# app, .shared and the first-party packages (aufbau, domina, bunker …) into www/.
+# third-party modules (esm.sh, jsdelivr, unpkg) are still loaded over the
+# network, the step summary of each run lists what is left.
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'single app slug to build (empty = all capacitor-bundle apps)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-capacitor.yml
+    with:
+      app: ${{ inputs.app }}
+      mode: bundle
+    secrets: inherit

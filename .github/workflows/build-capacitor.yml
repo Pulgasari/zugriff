@@ -26,6 +26,11 @@ name: Build Android (via Capacitor | Live) Packages
 # (server.url = https://zugriff.dev/<slug>/) rather than bundling its files —
 # Capacitor still injects its bridge into that remote page, so the plugins work.
 #
+# build-bundle.yml calls this workflow with mode 'bundle' for the third variant,
+# build.android == 'capacitor-bundle': no server.url, the app's files and the
+# first-party packages are staged into www/ by stage-bundle.mjs and ship inside
+# the apk. everything else is the same.
+#
 # ── SIGNING ─────────────────────────────────────────────────────────
 # With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
 # ANDROID_KEY_PASSWORD / ANDROID_KEY_ALIAS set, the artifacts are signed with that
@@ -47,12 +52,23 @@ on:
         description: 'single app slug to build (empty = all capacitor apps)'
         required: false
         default: ''
+  workflow_call:            # build-bundle.yml
+    inputs:
+      app:
+        type: string
+        required: false
+        default: ''
+      mode:
+        description: "'live' wraps the deployment url, 'bundle' ships the files"
+        type: string
+        required: false
+        default: 'live'
 
 permissions:
   contents: read
 
 concurrency:
-  group: build-capacitor-${{ github.ref }}
+  group: build-capacitor-${{ inputs.mode || 'live' }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -70,6 +86,7 @@ jobs:
         id: parse
         env:
           APP_FILTER: ${{ inputs.app }}
+          BUILDER: ${{ inputs.mode == 'bundle' && 'capacitor-bundle' || 'capacitor' }}
         run: node .github/scripts/get-capacitor-apps.js
 
   # Job 2 — one parallel build per app slug
@@ -82,6 +99,8 @@ jobs:
       matrix:
         app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
+      BUNDLE: ${{ inputs.mode == 'bundle' && '1' || '' }}
+      KIND: ${{ inputs.mode == 'bundle' && 'bundle' || 'capacitor' }}   # artifact prefix
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
       BUILD_TOOLS: '36.0.0'
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
@@ -128,11 +147,20 @@ jobs:
               -dname "CN=zugriff ${{ matrix.app }}, OU=test, O=pulgasari, C=DE"
           fi
 
+      - name: Stage the bundled www/ for ${{ matrix.app }}
+        if: ${{ env.BUNDLE == '1' }}
+        run: |
+          # the app, .shared and the first-party package repos (cloned into
+          # build/_pkg), the package origin rewritten to the local copy. what
+          # still reaches the network lands in the step summary
+          APP_SLUG="${{ matrix.app }}" PKG_SOURCE=build/_pkg node .github/scripts/stage-bundle.mjs "build/${{ matrix.app }}"
+
       - name: Scaffold the Capacitor project for ${{ matrix.app }}
         run: |
           DIR="build/${{ matrix.app }}"
           mkdir -p "$DIR"
-          # capacitor.config.json (server.url -> live app) + www/ offline fallback
+          # capacitor.config.json (live: server.url -> app + www/ offline fallback,
+          # bundle: no server.url, the staged www/)
           APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-config.mjs "$DIR"
 
           cd "$DIR"
@@ -191,7 +219,7 @@ jobs:
       - name: Upload APK + AAB for ${{ matrix.app }}
         uses: actions/upload-artifact@v7
         with:
-          name: capacitor-${{ matrix.app }}
+          name: ${{ env.KIND }}-${{ matrix.app }}
           path: |
             build/${{ matrix.app }}/android/${{ matrix.app }}-release.apk
             build/${{ matrix.app }}/android/${{ matrix.app }}-release.aab
@@ -207,12 +235,12 @@ jobs:
       - name: Download every app's packages
         uses: actions/download-artifact@v7
         with:
-          path: capacitor
-          pattern: capacitor-*
+          path: packages
+          pattern: ${{ inputs.mode == 'bundle' && 'bundle' || 'capacitor' }}-*
       - name: Bundle them into one artifact
         uses: actions/upload-artifact@v7
         with:
-          name: capacitor-all             # one download, a capacitor-<slug>/ folder per app
-          path: capacitor
+          name: ${{ inputs.mode == 'bundle' && 'bundle' || 'capacitor' }}-all   # one download, a <kind>-<slug>/ folder per app
+          path: packages
           if-no-files-found: warn
           retention-days: 30
