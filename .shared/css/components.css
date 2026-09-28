@@ -148,7 +148,7 @@ aufbau-slider { width: 100%; }
 .prompt-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
 
 /* ── search row ─────────────────────────────────────────────────────────── */
-
+/*
 .search-row {
   display       : flex;
   align-items   : center;
@@ -168,7 +168,7 @@ aufbau-slider { width: 100%; }
   font-size  : 0.85rem;
 }
 .search-input::placeholder { opacity: 0.35; }
-
+*/
 /* ── stats ──────────────────────────────────────────────────────────────── */
 
 .stats-bar {
