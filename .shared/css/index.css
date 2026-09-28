@@ -1,5 +1,7 @@
 /* the themes first: --theme, the presets and --bg, --fg, --accent (see theme.css) */
+@import url('https://code.pulgasari.dev/aufbau/css/tokens.css');
 @import url('https://code.pulgasari.dev/aufbau/css/themes.css');
+
 @import url('./theme.css');
 @import url('./layout.css');
 /*@import url('./components.css');*/
@@ -7,9 +9,6 @@
 @import url('./apps.css');
 
 /* CUSTOM PROPS */
-@property --font      { syntax: "<string>"; inherits: false; initial-value: "Manrope"; }
-@property --font-code { syntax: "<string>"; inherits: false; initial-value: "JetBrains Mono"; }    
-@property --font-size { syntax: "<length>"; inherits: false; initial-value: 12px; }
 
 /* TYPO */
 :root {
