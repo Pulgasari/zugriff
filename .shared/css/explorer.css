@@ -10,7 +10,7 @@
    colours come from the theme tokens, so it repaints with the rest of zugriff. */
 
 #app.files,
-.view.#files,
+.view#files,
 .fx {
   
 flex       : 1 1 auto;
