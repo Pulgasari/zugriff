@@ -16,43 +16,16 @@
 * { font-family: var(--font); }
 html, body { font-size: var(--fontSize); }
 
-@view-transition {
-  navigation: auto;
-}
 
-::view-transition-old(root) {
-  animation: page-out 180ms ease both;
-}
 
-::view-transition-new(root) {
-  animation: page-in 350ms cubic-bezier(.22, 1, .36, 1) both;
-}
+::view-transition-old(root) { animation: page-out 180ms ease both; }
+::view-transition-new(root) { animation: page-in  350ms cubic-bezier(.22, 1, .36, 1) both; }      
 
 @keyframes page-out {
-  to {
-    opacity: 0;
-    transform: translateY(-6px);
-    filter: blur(3px);
-  }
+  to { filter: blur(3px); opacity: 0; transform: translateY(-6px); }
 }
 
 @keyframes page-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-    filter: blur(3px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation: none;
-  }
+  from { filter: blur(3px); opacity: 0; transform: translateY(8px); }
+  to   { filter: blur(0);   opacity: 1; transform: translateY(0);   }
 }
