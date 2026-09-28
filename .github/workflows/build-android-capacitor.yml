@@ -26,8 +26,14 @@ name: Build Android (Capacitor) Packages
 # registry color only shows where capacitor insets the webview natively.
 #
 # With `devtools` set in bundler.config.js every app is built twice: without
-# @aufbau/devtools, and as <slug>-dev with them, opened on ?dev, its own app id
-# (….dev) so both install side by side.
+# @aufbau/devtools, and as the dev build with them, opened on ?dev.
+#
+# Names, ids and files per variant (.github/scripts/android.js), all installable
+# side by side, each file its own unzipped artifact:
+#
+#   Podcasts         dev.zugriff.podcasts        podcasts-202612011212.apk
+#   Podcasts (dev)   dev.zugriff.podcasts.dev    podcasts-202612011212-dev.apk
+#   Podcasts (live)  dev.zugriff.podcasts.live   podcasts-202612011212-live.apk
 #
 # The app's files ship inside the apk: stage-capacitor-www.mjs stages the app,
 # .shared and the first-party packages into www/ with @aufbau/bundler (config:
@@ -105,14 +111,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # { app, dev }: dev is '' or '-dev', the second build with devtools that
-      # bundler.config.js asks for (`devtools`), bundled builds only
+      # { app, dev, file }: dev is '' or '-dev', the second build with devtools
+      # that bundler.config.js asks for (`devtools`), bundled builds only. file
+      # is the apk/aab name, podcasts-202612011212-dev (android.js)
       matrix:
         include: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
       DEVTOOLS: ${{ matrix.dev && '1' || '' }}
       LIVE: ${{ inputs.live && '1' || '' }}
-      KIND: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}   # artifact prefix
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
       BUILD_TOOLS: '36.0.0'
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
@@ -209,50 +215,39 @@ jobs:
           OUT="app/build/outputs"
           APK_IN="$OUT/apk/release/app-release-unsigned.apk"
           AAB_IN="$OUT/bundle/release/app-release.aab"
-          SLUG="${{ matrix.app }}${{ matrix.dev }}"
+          FILE="${{ matrix.file }}"
 
           # APK: zipalign then apksigner
           zipalign -f 4 "$APK_IN" "aligned.apk"
           apksigner sign \
             --ks "$KEYSTORE_PATH" --ks-key-alias "$KEY_ALIAS" \
             --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" \
-            --out "${SLUG}-release.apk" "aligned.apk"
+            --out "${FILE}.apk" "aligned.apk"
 
           # AAB: jarsigner (bundles are signed with the same key)
           jarsigner -keystore "$KEYSTORE_PATH" \
             -storepass "$STORE_PASS" -keypass "$KEY_PASS" \
-            -signedjar "${SLUG}-release.aab" "$AAB_IN" "$KEY_ALIAS"
+            -signedjar "${FILE}.aab" "$AAB_IN" "$KEY_ALIAS"
 
       - name: Print signing SHA-256 (for assetlinks.json)
         run: |
           keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
             -storepass "$STORE_PASS" | grep -A1 'SHA256:' || true
 
-      - name: Upload APK + AAB for ${{ matrix.app }}${{ matrix.dev }}
+      # one artifact per file and unzipped (archive: false), named after it:
+      # podcasts-202612011212.apk downloads as that file
+      - name: Upload ${{ matrix.file }}.apk
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ env.KIND }}-${{ matrix.app }}${{ matrix.dev }}
-          path: |
-            build/${{ matrix.app }}/android/${{ matrix.app }}${{ matrix.dev }}-release.apk
-            build/${{ matrix.app }}/android/${{ matrix.app }}${{ matrix.dev }}-release.aab
+          path: build/${{ matrix.app }}/android/${{ matrix.file }}.apk
+          archive: false
           if-no-files-found: error
           retention-days: 14
 
-  # Job 3 — gather every app's packages into one downloadable artifact
-  collect:
-    needs: build-capacitor
-    if: ${{ !cancelled() && needs.build-capacitor.result != 'skipped' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download every app's packages
-        uses: actions/download-artifact@v7
-        with:
-          path: packages
-          pattern: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}-*
-      - name: Bundle them into one artifact
+      - name: Upload ${{ matrix.file }}.aab
         uses: actions/upload-artifact@v7
         with:
-          name: ${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}-all   # one download, a <kind>-<slug>/ folder per app
-          path: packages
-          if-no-files-found: warn
-          retention-days: 30
+          path: build/${{ matrix.app }}/android/${{ matrix.file }}.aab
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

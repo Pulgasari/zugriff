@@ -17,8 +17,11 @@ name: Build Android (Bubblewrap | Live) Packages
 #
 # To go stable: create one keystore (or share one across apps), add the four
 # secrets, then read the value the "Print signing SHA-256" step logs into the
-# single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>
+# single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>.bw
 # package. Exact commands: .github/scripts/README.md.
+#
+# The app is Notes (bw), dev.zugriff.notes.bw, the files notes-<stamp>-bw.apk/.aab,
+# each an unzipped artifact of its own (see .github/scripts/android.js).
 # ────────────────────────────────────────────────────────────────────
 
 on:
@@ -60,8 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      # { app, file }: file is the apk/aab name, notes-202612011212-bw (android.js)
       matrix:
-        app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
+        include: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into the TWA)
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
@@ -143,37 +147,28 @@ jobs:
           ./gradlew bundleRelease assembleRelease --stacktrace --console=plain --no-daemon
 
           bubblewrap build --skipPwaValidation      # -> app-release-signed.apk + app-release-bundle.aab
+          mv app-release-signed.apk "${{ matrix.file }}.apk"
+          mv app-release-bundle.aab "${{ matrix.file }}.aab"
 
       - name: Print signing SHA-256 (for assetlinks.json)
         run: |
           keytool -list -v -keystore "$KEYSTORE_PATH" -alias "$KEY_ALIAS" \
             -storepass "$BUBBLEWRAP_KEYSTORE_PASSWORD" | grep -A1 'SHA256:' || true
 
-      - name: Upload APK + AAB for ${{ matrix.app }}
+      # one artifact per file and unzipped (archive: false), named after it:
+      # notes-202612011212-bw.apk downloads as that file
+      - name: Upload ${{ matrix.file }}.apk
         uses: actions/upload-artifact@v7
         with:
-          name: android-bubblewrap-${{ matrix.app }}
-          path: |
-            build/${{ matrix.app }}/*.apk
-            build/${{ matrix.app }}/*.aab
+          path: build/${{ matrix.app }}/${{ matrix.file }}.apk
+          archive: false
           if-no-files-found: error
           retention-days: 14
 
-  # Job 3 — gather every app's packages into one downloadable artifact
-  collect:
-    needs: build-android
-    if: ${{ !cancelled() && needs.build-android.result != 'skipped' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download every app's packages
-        uses: actions/download-artifact@v7
-        with:
-          path: android-bubblewrap
-          pattern: android-bubblewrap-*
-      - name: Bundle them into one artifact
+      - name: Upload ${{ matrix.file }}.aab
         uses: actions/upload-artifact@v7
         with:
-          name: android-bubblewrap-all    # one download, an android-bubblewrap-<slug>/ folder per app
-          path: android-bubblewrap
-          if-no-files-found: warn
-          retention-days: 30
+          path: build/${{ matrix.app }}/${{ matrix.file }}.aab
+          archive: false
+          if-no-files-found: error
+          retention-days: 14

@@ -31,10 +31,10 @@
 //                   /apps/ path is internal only and 404s if requested directly)
 //   LIVE            1 for a live build (build.android: 'capacitor-live')
 //   DEVTOOLS        1 for the -dev build: `.dev` on the appId, `(dev)` in the name
-//   APP_ID_PREFIX   reverse-dns prefix for the appId
-//                   (default dev.zugriff — appId is `${APP_ID_PREFIX}.${segment}`,
-//                    e.g. dev.zugriff.files, matching /.well-known/assetlinks.json
-//                    and the TWA package ids)
+//   APP_ID_PREFIX   reverse-dns prefix for the appId (default dev.zugriff)
+//
+// names and ids by variant come from android.js: Podcasts dev.zugriff.podcasts,
+// Podcasts (dev) ….podcasts.dev, Podcasts (live) ….podcasts.live
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -53,7 +53,7 @@ const outDir   = process.argv[2] || '.';
 const live     = process.env.LIVE === '1';
 const dev      = process.env.DEVTOOLS === '1';
 
-// the id and name of this variant: plain for the app's main one, see android.js
+// the variant, for its id and name (android.js)
 const variant = live ? 'capacitor-live' : 'capacitor';
 
 // relative luminance: DARK means light bar icons, for a dark app color
@@ -66,8 +66,8 @@ const isLight = (color) => {
 };
 
 const config = {
-  appId   : idOf(app, variant) + (dev ? '.dev' : ''),
-  appName : nameOf(app, variant) + (dev ? ' (dev)' : ''),
+  appId   : idOf(app, variant, { dev }),
+  appName : nameOf(app, variant, { dev }),
   webDir  : 'www',
   server  : {
     ...(live ? { url: appUrl } : {}),   // live: wrap the deployment, exactly like the TWA

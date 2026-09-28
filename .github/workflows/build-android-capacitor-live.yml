@@ -4,7 +4,8 @@ name: Build Android (Capacitor | Live) Packages
 # .shared/js/data/apps.js: a capacitor webview on the app's live deployment url
 # (server.url = https://zugriff.dev/<slug>/), nothing of the app inside the apk.
 # it runs build-android-capacitor.yml with `live`: same toolchain, signing and
-# plugins, artifacts android-capacitor-live-<slug> and android-capacitor-live-all.
+# plugins. the app is Podcasts (live), dev.zugriff.podcasts.live, the files
+# podcasts-202612011212-live.apk/.aab, see .github/scripts/android.js.
 
 on:
   workflow_dispatch:        # manual only — packaging never runs on a commit
