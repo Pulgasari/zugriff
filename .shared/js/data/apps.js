@@ -148,7 +148,7 @@ const entries = [
     categories  : ['files', 'docs'],
   },
   { // zugriff.dev/podcasts/
-    build       : { android: 'capacitor-live' },
+    build       : { android: ['capacitor-live', 'capacitor'] },
     type        : 'app',
     slug        : 'podcasts',
     name        : 'Podcasts',

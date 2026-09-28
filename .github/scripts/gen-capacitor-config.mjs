@@ -38,6 +38,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { registry } from './../../.shared/js/data/apps.js';
+import { idOf, nameOf } from './android.js';
 
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-capacitor-config: APP_SLUG is required'); process.exit(1); }
@@ -47,13 +48,11 @@ if (!app || app.type !== 'app') { console.error(`gen-capacitor-config: no app "$
 
 const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
 const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');
-const idPrefix = process.env.APP_ID_PREFIX || 'dev.zugriff';
 const outDir   = process.argv[2] || '.';
 const live     = process.env.LIVE === '1';
 
-// a valid Android package segment: only [a-zA-Z0-9_], never leading with a digit
-// (same rule the TWA script uses, so the appId lines up with dev.zugriff.<slug>)
-const segment = slug.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');
+// the id and name of this variant: plain for the app's main one, see android.js
+const variant = live ? 'capacitor-live' : 'capacitor';
 
 // relative luminance: DARK means light bar icons, for a dark app color
 const isLight = (color) => {
@@ -65,8 +64,8 @@ const isLight = (color) => {
 };
 
 const config = {
-  appId   : `${idPrefix}.${segment}`,
-  appName : app.short_name || app.name || slug,
+  appId   : idOf(app, variant),
+  appName : nameOf(app, variant),
   webDir  : 'www',
   server  : {
     ...(live ? { url: appUrl } : {}),   // live: wrap the deployment, exactly like the TWA

@@ -24,11 +24,9 @@ Key. Wird vom Workflow pro App aufgerufen.
 ## `get-capacitor-apps.js`
 
 Gibt ein JSON-Array der App-Slugs aus, deren Registry-Eintrag in
-`.shared/js/data/apps.js` `build.android === BUILDER` setzt (`capacitor` oder
-`capacitor-live`) — die Matrix der beiden **Capacitor**-Builds. Jede App zielt auf
-genau einen Android-Builder. Ist `APP_FILTER` gesetzt (der `app`-Dispatch-Input),
-wird auf genau diesen Slug eingegrenzt, und zwar für beide Capacitor-Varianten:
-so lässt sich eine App auch in der jeweils anderen bauen.
+`.shared/js/data/apps.js` die Variante `BUILDER` enthält (`capacitor` oder
+`capacitor-live`) — die Matrix der beiden **Capacitor**-Builds. Ist `APP_FILTER`
+gesetzt (der `app`-Dispatch-Input), wird auf genau diesen Slug eingegrenzt.
 
 ## `gen-capacitor-config.mjs`
 
@@ -103,13 +101,18 @@ npm-Plugins findet `cap sync` selbst, diese hier nicht. Aktuell: `SafPlugin`
 Der Ziel-Builder einer App steht in ihrem Eintrag in `.shared/js/data/apps.js`:
 
 ```js
-build: { android: 'capacitor' }   // oder 'capacitor-live', 'bubblewrap'
+build: { android: 'capacitor' }                     // eine Variante
+build: { android: ['capacitor-live', 'capacitor'] }  // mehrere
 ```
 
-Fehlt das Feld, wird die App für Android nicht gebaut. Jede App zielt auf genau
-einen Builder — die beiden Discover-Skripte oben lesen dieses Feld und liefern
-die jeweilige Build-Matrix (`get-capacitor-apps.js` mit `BUILDER` für beide
-Capacitor-Varianten).
+Fehlt das Feld, wird die App für Android nicht gebaut. Die Discover-Skripte
+lesen es und liefern die jeweilige Build-Matrix (`get-capacitor-apps.js` mit
+`BUILDER` für beide Capacitor-Varianten), `android.js` hält die Regeln dazu.
+
+Die **erste** Variante ist die Haupt-Variante der App und behält die ID
+`dev.zugriff.<slug>`. Jede weitere bekommt die Variante angehängt
+(`dev.zugriff.<slug>.capacitor`) und im Namen `(capacitor)` — so lassen sich die
+Varianten einer App nebeneinander installieren.
 
 | Wert             | Workflow                           | App im APK |
 |------------------|------------------------------------|------------|
@@ -146,8 +149,7 @@ scaffolden (`gen-capacitor-config.mjs` → `npm i @capacitor/{core,cli,android}`
 assembleRelease` → APK/AAB **signieren** (Capacitor baut unsigniert:
 `zipalign`+`apksigner` für die APK, `jarsigner` für die AAB) → als Artefakt
 hochladen. Ausgelöst **manuell** per `workflow_dispatch`; der optionale
-`app`-Input baut nur einen einzelnen Slug statt der ganzen Matrix, auch einen,
-der sonst live gebaut wird.
+`app`-Input baut nur einen einzelnen Slug statt der ganzen Matrix.
 
 Noch nicht offline: alles, was nicht von `code.pulgasari.dev` kommt (esm.sh,
 jsdelivr, unpkg, Icons, APIs). Die Step-Summary jedes Laufs listet es.
