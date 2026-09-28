@@ -159,6 +159,38 @@ aufbau-button, button, .btn, .button {
 a.icon-btn             { text-decoration: none; }
 a.icon-btn:hover       { color: var(--accent); opacity: 1; }
 
+/* CHIP */
+
+.chip {
+  display       : flex;
+  align-items   : center;
+  border-radius : 0.25rem;
+  font-size     : 0.75rem;
+  border        : 1px solid currentcolor;
+  background    : transparent;
+  color         : var(--fg);
+
+  &:hover  { color: var(--accent); }
+  
+  &.active {
+    background   : var(--accent);
+    border-color : var(--accent);
+    color        : var(--bg);
+    font-weight  : 600;
+  }
+}
+
+.badge {
+  font-size      : 0.65rem;
+  font-weight    : 600;
+  padding        : 0.15rem 0.45rem;
+  border-radius  : 2rem;
+  background     : var(--accent-25);
+  color          : var(--accent);
+  letter-spacing : 0.05em;
+  text-transform : uppercase;
+  vertical-align : middle;
+}
 
 /* CRUMBS */
 
