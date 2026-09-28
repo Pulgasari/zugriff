@@ -1,10 +1,12 @@
 // tools/json-converter/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=json-converter';
-import { CodeConverterApp } from '/.shared/js/patterns/index.js';
-import { convert } from '/.shared/js/lib/data-converters.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
+import { convert } from '/.shared/js/vendors/data-converters.js';
 
-const App = CodeConverterApp({
+const { boot } = defineTool('json-converter');
+
+const App = CodeWorkbenchApp({
   appID       : 'json-converter',
   inputLang   : 'json',
   inputExt    : 'json',
@@ -19,4 +21,4 @@ const App = CodeConverterApp({
   execute     : (src, fmt) => convert(src, 'json', fmt),
 });
 
-boot({ config, App });
+boot({ App });

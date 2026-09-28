@@ -1,7 +1,9 @@
 // tools/json-inspector/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=json-inspector';
-import { DataInspectorApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { DataInspectorApp } from '/.shared/js/blueprints/index.js';
+
+const { boot } = defineTool('json-inspector');
 
 const App = DataInspectorApp({
   appID       : 'json-inspector',
@@ -14,4 +16,4 @@ const App = DataInspectorApp({
   emptyLabel  : 'Paste JSON and click Inspect',
 });
 
-boot({ config, App });
+boot({ App });

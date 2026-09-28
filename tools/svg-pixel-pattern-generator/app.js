@@ -1,12 +1,14 @@
 // tools/svg-pixel-pattern-generator/app.js
 
 // ::: vendors
-import { effect, html, signal, useState } from '@aufbau/kits/preact-htm';
+import { effect, html, signal, useState } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=svg-pixel-pattern-generator';
+import defineTool from '/.shared/js/tool.js';
 import { Icon } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('svg-pixel-pattern-generator');
 
 // ::: local
 
@@ -298,4 +300,4 @@ function App() {
   `;
 }
 
-boot({ config, App });
+boot({ App });

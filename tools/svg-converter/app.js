@@ -1,12 +1,14 @@
 // tools/svg-converter/app.js
 
 // ::: vendors
-import { html, signal, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, signal, useEffect, useRef } from '/.shared/js/vendors.js';
 import { PDFDocument } from 'pdf-lib';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=svg-converter';
+import defineTool from '/.shared/js/tool.js';
 import { Dropzone, Icon, Slider } from '/.shared/js/components/index.js';
+
+const { boot } = defineTool('svg-converter');
 
 // ::: local
 
@@ -241,4 +243,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

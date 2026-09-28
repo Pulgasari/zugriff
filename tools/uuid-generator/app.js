@@ -1,12 +1,14 @@
 // tools/uuid-generator/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=uuid-generator';
+import defineTool from '/.shared/js/tool.js';
 import { CopyIcon, Icon, Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('uuid-generator');
 
 // ::: local
 
@@ -94,4 +96,4 @@ function App() {
   `;
 }
 
-boot({ config, App });
+boot({ App });

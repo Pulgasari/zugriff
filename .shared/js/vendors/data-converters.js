@@ -1,4 +1,4 @@
-// shared/js/lib/data-converters.js
+// .shared/js/vendors/data-converters.js
 
 import { stringify as yamlStringify, parse as yamlParse } from 'yaml';
 import { parse as tomlParse } from 'smol-toml';

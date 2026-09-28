@@ -1,4 +1,4 @@
-// shared/js/lib/thumbs.js
+// .shared/js/thumbs.js
 //
 // a local, client-only thumbnail cache. hand it an image url and it returns a
 // small webp copy from the origin private file system (@bunker/opfs), one file
@@ -16,7 +16,7 @@
 //
 // shared on purpose: any zugriff app can keep its artwork small the same way.
 //
-//   import { createThumbCache } from './../../shared/js/lib/thumbs.js';
+//   import { createThumbCache } from '/.shared/js/thumbs.js';
 //   const thumbs = createThumbCache({ proxy: () => corsProxy.value });
 //   const url = await thumbs.request(imageUrl);   // -> blob object-url or null
 //

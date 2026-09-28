@@ -1,12 +1,14 @@
 // tools/password-generator/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=password-generator';
+import defineTool from '/.shared/js/tool.js';
 import { Icon, Picker, Slider, Toggle } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('password-generator');
 
 // ::: local
 
@@ -264,4 +266,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

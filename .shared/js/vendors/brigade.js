@@ -1,4 +1,4 @@
-// shared/js/lib/brigade.js
+// .shared/js/vendors/brigade.js
 //
 // a small web-worker pool — a "brigade" of identical workers that chew through
 // a queue of like jobs in parallel. you give it a worker module url; it spins

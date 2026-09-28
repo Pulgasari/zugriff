@@ -1,9 +1,11 @@
 // tools/base64-encoder/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=base64-encoder';
-import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
 
-const App = CodeTransformerApp({
+const { boot } = defineTool('base64-encoder');
+
+const App = CodeWorkbenchApp({
   appID       : 'base64-encoder',
   lang        : 'plaintext',
   langExt     : 'txt',
@@ -12,4 +14,4 @@ const App = CodeTransformerApp({
   execute     : src => btoa(String.fromCharCode(...new TextEncoder().encode(src))),
 });
 
-boot({ config, App });
+boot({ App });

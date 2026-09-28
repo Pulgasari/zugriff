@@ -1,14 +1,16 @@
 // tools/audio-snippets-generator/app.js
 
 // ::: vendors
-import { html, signal, useEffect, useRef } from '@aufbau/kits/preact-htm';
+import { html, signal, useEffect, useRef } from '/.shared/js/vendors.js';
 import { fetchFile } from '@ffmpeg/util';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=audio-snippets-generator';
-import { loadFFmpeg } from '/.shared/js/lib/ffmpeg.js';
+import defineTool from '/.shared/js/tool.js';
+import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
 import { Dropzone, Button, GhostButton, Icon, Picker } from '/.shared/js/components/index.js';
-import { WaveformWithHandles } from '/.shared/js/components/media.js';
+import { WaveformWithHandles } from '/.shared/js/components/index.js';
+
+const { boot } = defineTool('audio-snippets-generator');
 
 // ::: local
 
@@ -305,4 +307,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

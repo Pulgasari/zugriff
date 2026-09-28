@@ -3,15 +3,16 @@
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
 // ::: vendors
-import { html } from '@aufbau/kits/preact-htm';
+import { html } from '/.shared/js/vendors.js';
 
 // ::: shared
-// this app pulls its own registry entry in through the module url — change the
-// slug to yours after adding a `{ type: 'tool', slug: '<slug>', … }` entry to
-// shared/js/registry.js. `config` is that entry; boot reads the title, theme and
-// aufbau options off it, and wraps a tool in the shared Shell from its type.
-import { boot, config } from '/.shared/js/app.js?slug=template';
+// this app takes its registry entry by the slug — change it to yours after
+// adding a `{ type: 'tool', slug: '<slug>', … }` entry to .shared/js/data/apps.js.
+// `config` is that entry, boot mounts the app in the shared Shell.
+import defineTool from '/.shared/js/tool.js';
 import { Icon } from '/.shared/js/components/index.js';
+
+const { boot, config } = defineTool('template');
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -25,4 +26,4 @@ function App () {
 
 // :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
 
-boot({ config, App });
+boot({ App });

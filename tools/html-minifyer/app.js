@@ -1,10 +1,12 @@
 // tools/html-minifyer/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=html-minifyer';
-import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
 import { minify } from 'html-minifier-terser';
 
-const App = CodeTransformerApp({
+const { boot } = defineTool('html-minifyer');
+
+const App = CodeWorkbenchApp({
   appID       : 'html-minifyer',
   lang        : 'xml',
   langExt     : 'html',
@@ -21,4 +23,4 @@ const App = CodeTransformerApp({
   }),
 });
 
-boot({ config, App });
+boot({ App });

@@ -1,12 +1,14 @@
 // tools/image-batch-processor/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=image-batch-processor';
+import defineTool from '/.shared/js/tool.js';
 import { Dropzone, GhostButton, Icon } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('image-batch-processor');
 
 // ── state ────────────────────────────────────────────────────────────
 let files = signal([]);
@@ -444,4 +446,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

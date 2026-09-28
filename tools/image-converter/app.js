@@ -1,12 +1,14 @@
 // tools/image-converter/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=image-converter';
+import defineTool from '/.shared/js/tool.js';
 import { Button, Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
+
+const { boot } = defineTool('image-converter');
 
 // ::: local
 
@@ -139,4 +141,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

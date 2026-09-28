@@ -1,9 +1,11 @@
 // tools/json-minifyer/app.js
 
-import { boot, config } from '/.shared/js/app.js?slug=json-minifyer';
-import { CodeTransformerApp } from '/.shared/js/patterns/index.js';
+import defineTool from '/.shared/js/tool.js';
+import { CodeWorkbenchApp } from '/.shared/js/blueprints/index.js';
 
-const App = CodeTransformerApp({
+const { boot } = defineTool('json-minifyer');
+
+const App = CodeWorkbenchApp({
   appID       : 'json-minifyer',
   lang        : 'json',
   langExt     : 'json',
@@ -12,4 +14,4 @@ const App = CodeTransformerApp({
   execute     : src => JSON.stringify(JSON.parse(src)),
 });
 
-boot({ config, App });
+boot({ App });

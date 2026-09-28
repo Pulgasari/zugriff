@@ -1,11 +1,13 @@
 // tools/downloader/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=downloader';
+import defineTool from '/.shared/js/tool.js';
 import { Icon } from '/.shared/js/components/index.js';
+
+const { boot } = defineTool('downloader');
 
 // ::: local
 
@@ -61,4 +63,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });

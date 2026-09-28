@@ -1,8 +1,7 @@
 // blueprints/CodeWorkbenchApp.js
 /*
-input pane -> execute() -> output pane. this is one blueprint, not two: the
-old CodeTransformerApp was exactly this with `formats` left out, so both of
-its names still work (see patterns/index.js).
+input pane -> execute() -> output pane. without `formats` it transforms, with
+them it converts.
 
 const App = CodeWorkbenchApp({ appID, lang, execute });
 

@@ -1,13 +1,15 @@
 // tools/audio-converter/app.js
 
 // ::: vendors
-import { html, signal } from '@aufbau/kits/preact-htm';
+import { html, signal } from '/.shared/js/vendors.js';
 import { fetchFile } from '@ffmpeg/util';
 
 // ::: shared
-import { boot, config } from '/.shared/js/app.js?slug=audio-converter';
-import { loadFFmpeg } from '/.shared/js/lib/ffmpeg.js';
+import defineTool from '/.shared/js/tool.js';
+import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
 import { Dropzone, Icon, Picker } from '/.shared/js/components/index.js';
+
+const { boot } = defineTool('audio-converter');
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let files     = signal([]);
@@ -139,4 +141,4 @@ function App() {
     </div>`;
 }
 
-boot({ config, App });
+boot({ App });
