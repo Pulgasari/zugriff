@@ -6,7 +6,7 @@ name: Build Android (Bubblewrap) Packages
 # with Bubblewrap — Google's official TWA tool, the same engine PWABuilder uses
 # under the hood.
 #
-# ── SIGNING ──────────────────────────────────────────────────────────────────
+# ── SIGNING ──────────────────────────────────────────────────────────
 # With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
 # ANDROID_KEY_PASSWORD / ANDROID_KEY_ALIAS set, the artifacts are signed with that
 # stable key — the same app identity every run, Play-uploadable and usable for
@@ -18,7 +18,7 @@ name: Build Android (Bubblewrap) Packages
 # secrets, then read the value the "Print signing SHA-256" step logs into the
 # single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>
 # package. Exact commands: .github/scripts/README.md.
-# ─────────────────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────────
 
 on:
   workflow_dispatch:        # manual only — packaging never runs on a commit
