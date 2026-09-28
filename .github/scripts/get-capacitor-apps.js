@@ -1,24 +1,23 @@
 // .github/scripts/get-capacitor-apps.js
 //
-// sibling of get-bubblewrap-apps.js: emits the json array of app slugs whose
-// registry entry sets build.android === 'capacitor' — the matrix the
-// build-capacitor workflow packages. an app targets exactly one android builder.
+// sibling of get-bubblewrap-apps.js: emits the matrix build-android-capacitor.yml
+// packages, one { app, dev } per build of the apps built as BUILDER ('capacitor'
+// by default, or 'capacitor-live'), see android.js. with `devtools` set in
+// bundler.config.js a bundled app is built a second time with dev: '-dev'.
 
 import fs from 'node:fs';
-import { registry } from './../../.shared/js/data/apps.js';
+import { devtools } from './../../bundler.config.js';
+import { slugsFor } from './android.js';
 
 // optional single-app filter, set by the workflow's `app` dispatch input
-const only = process.env.APP_FILTER?.trim();
+const only    = process.env.APP_FILTER?.trim();
+const builder = process.env.BUILDER || 'capacitor';
 
-const apps = registry
-  .getAll('app')
-  .filter((app) => app.build?.android === 'capacitor')
-  .filter((app) => !only || app.slug === only)
-  .map((app) => app.slug);
+const builds = slugsFor(builder, only).flatMap(app => builder === 'capacitor' && devtools ? [{ app, dev: '' }, { app, dev: '-dev' }] : [{ app, dev: '' }]);
 
-const output = JSON.stringify(apps);
-console.log(only ? `found capacitor apps (filtered to "${only}"): ${output}`
-                 : `found capacitor apps: ${output}`);
+const output = JSON.stringify(builds);
+console.log(only ? `found ${builder} builds (filtered to "${only}"): ${output}`
+                 : `found ${builder} builds: ${output}`);
 
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(process.env.GITHUB_OUTPUT, `apps=${output}\n`);

@@ -26,66 +26,14 @@ const $root = document.documentElement;
 // ──────── TASKS ──────────────────────────────────
 
 // :::::: Task 0: Devtools Recorder
-/*
-the devtools panel is a module at the end of <body>, so it only starts watching
-long after boot, the runtime and the app have already logged — which is exactly
-the window where the interesting failures happen. this records from <head> into a
-plain array that the panel drains when it mounts.
-
-it buffers and forwards, nothing else. no ui, no imports, no work: whatever the
-panel wants to do with the entries is the panel's problem. it runs unconditionally
-rather than behind ?dev, because a reload to turn devtools on is a reload that
-loses the very error you wanted to look at.
-
-known cost: the page's own console calls now report boot.js as their call site in
-the browser's native devtools. unavoidable when wrapping console, and the reason
-this stays as thin as it is.
-*/
-const LOG_LEVELS = ['debug', 'error', 'info', 'log', 'trace', 'warn'];
-const LOG_MAX    = 500;
-
+// @aufbau/devtools/recorder.js records console calls and failed loads from here
+// on, for the devtools console that mounts much later (see its README). it has to
+// run before anything else and synchronously: written in while this classic
+// script runs, the parser loads and runs it right after, ahead of the rest of
+// <head>. an appended <script> would load async and could come too late.
+// importScripts() exists in workers only
 function initDevRecorder () {
-  try {
-    const entries  = [];
-    const native   = {};
-    const recorder = { entries, levels: LOG_LEVELS, native, onPush: null };
-
-    // arguments are kept as live references, not serialised: an inspector needs
-    // the real object, and the ring buffer keeps the retention bounded. onPush
-    // lets the devtools console take live entries without wrapping console a
-    // second time; it stays null until a panel claims it, and the buffer fills
-    // either way, so the recorder is useful on its own
-    const push = (level, args) => {
-      const entry = { level, args, time: Date.now() };
-      entries.push(entry);
-      if (entries.length > LOG_MAX) entries.shift();
-      try { recorder.onPush?.(entry); } catch {}
-    };
-
-    for (const level of LOG_LEVELS) {
-      native[level]  = console[level]?.bind(console) ?? (() => {});
-      console[level] = (...args) => { push(level, args); native[level](...args); };
-    }
-
-    // capture phase, because a failed <img>/<script>/<link> fires an error event
-    // that does not bubble and never shows up in the console at all
-    addEventListener('error', (event) => {
-      const target = event.target;
-      const source = target && target !== window && (target.src || target.href);
-      push('error', source ? [`failed to load: ${source}`] : [event.error ?? event.message]);
-    }, true);
-
-    addEventListener('unhandledrejection', (event) => push('error', ['unhandled rejection:', event.reason]));
-    addEventListener('securitypolicyviolation', (event) =>
-      push('error', [`csp blocked ${event.blockedURI} (${event.violatedDirective})`]));
-
-    // the resource timing buffer silently drops everything past 250 entries, and
-    // an importmap this size blows through that before the first paint. the data
-    // panel reads the buffer through a buffered PerformanceObserver
-    performance.setResourceTimingBufferSize?.(1000);
-
-    globalThis.__DEVTOOLS_RECORDER__ = recorder;
-  } catch {} // a recorder is never worth taking the page down for
+  document.write('<script src="https://code.pulgasari.dev/aufbau/devtools/recorder.js"><\/script>');
 }
 
 initDevRecorder();
@@ -192,7 +140,7 @@ function applyTheme ({ prefix }) {
   const { preload, sw, theme } = config;
 
   // Run tasks sequentially
-  initDevTools(true);
+  initDevTools();   // eruda only behind ?dev, remembered for the tab
   applyTheme(config.theme);
   injectImportMapAndPreloads(config.imports, config.preload, currentScript.src);
   registerServiceWorker(config.sw);
@@ -223,6 +171,8 @@ function applyTheme ({ prefix }) {
       "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
       "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
       "@aufbau/gui"             : `${pkg}/aufbau/gui/index.js`,
+      "@aufbau/icons"           : `${pkg}/aufbau/icons/index.js`,
+      "@aufbau/icons/"          : `${pkg}/aufbau/icons/`,
       "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
       "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
       "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,

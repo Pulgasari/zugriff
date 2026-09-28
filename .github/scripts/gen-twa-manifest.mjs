@@ -2,7 +2,7 @@
 //
 // writes a Bubblewrap `twa-manifest.json` for one app, deterministically and
 // without any of Bubblewrap's interactive `init` prompts — which is what makes
-// the Android build runnable in CI (see .github/workflows/build-android.yml).
+// the Android build runnable in CI (see .github/workflows/build-android-bubblewrap.yml).
 //
 // it leans on @bubblewrap/core's own TwaManifest.fromWebManifest(), so the file
 // is always shaped for the installed Bubblewrap version: it fetches the app's
@@ -23,9 +23,12 @@
 //   APP_ID_PREFIX   reverse-dns prefix for the packageId
 //                   (default dev.zugriff — reverse-dns of zugriff.dev; the
 //                    packageId is `${APP_ID_PREFIX}.${slug}`, e.g. dev.zugriff.notes,
-//                    matching the /.well-known/assetlinks.json entries)
+//                    matching the /.well-known/assetlinks.json entries; a variant
+//                    that is not the app's first gets a suffix, see android.js)
 
 import { TwaManifest } from '@bubblewrap/core';
+import { registry }    from './../../.shared/js/data/apps.js';
+import { idOf }        from './android.js';
 
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-twa-manifest: APP_SLUG is required'); process.exit(1); }
@@ -35,13 +38,9 @@ const manifestUrl = process.env.MANIFEST_URL || `${base}/${slug}/manifest.json`;
 const out         = process.argv[2] || 'twa-manifest.json';
 const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';
 const alias       = process.env.KEY_ALIAS || 'android';
-const idPrefix    = process.env.APP_ID_PREFIX || 'dev.zugriff';
-
-// a valid Android package segment: only [a-zA-Z0-9_], never leading with a digit
-const segment = slug.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');
 
 const twa = await TwaManifest.fromWebManifest(manifestUrl);
-twa.packageId  = `${idPrefix}.${segment}`;
+twa.packageId  = idOf(registry.get(slug), 'bubblewrap');   // see android.js
 twa.signingKey = { path: keystore, alias };
 
 await twa.saveToFile(out);

@@ -3,20 +3,23 @@
 // writes a Capacitor project scaffold for one app, deterministically and without
 // any interactive `cap init` — the counterpart to gen-twa-manifest.mjs on the
 // Bubblewrap side, and what makes the Android build runnable in CI (see
-// .github/workflows/build-capacitor.yml).
+// .github/workflows/build-android-capacitor.yml).
 //
-// like the TWA, the app is wrapped around its *live* deployment URL rather than
-// bundling its static files: Capacitor's server.url points the webview at
-// https://zugriff.dev/<slug>/, and Capacitor still injects its native
-// bridge into that remote page, so native plugins (the repo's Saf plugin for
-// folder access) work — which is the whole point. a persisted SAF folder grant is
-// what the browser File System Access API can't give a TWA on Android (it
-// re-confirms every granted folder each visit).
+// by default (build.android: 'capacitor') capacitor serves the webDir that
+// stage-capacitor-www.mjs staged, the app's files ship inside the apk.
 //
-// it writes two things into <projectDir>:
-//   capacitor.config.json   appId / appName / server.url / android scheme
-//   www/index.html          a tiny offline-fallback page (Capacitor requires a
-//                           non-empty webDir even when server.url is set)
+// with LIVE=1 (build.android: 'capacitor-live') the app is wrapped around its
+// *live* deployment URL like the TWA: Capacitor's server.url points the webview
+// at https://zugriff.dev/<slug>/, and Capacitor still injects its native bridge
+// into that remote page, so native plugins (the repo's Saf plugin for folder
+// access) work. a persisted SAF folder grant is what the browser File System
+// Access API can't give a TWA on Android (it re-confirms every granted folder
+// each visit).
+//
+// it writes into <projectDir>:
+//   capacitor.config.json   appId / appName / server.url (live) / android scheme
+//   www/index.html          live only: a tiny offline-fallback page (Capacitor
+//                           requires a non-empty webDir even when server.url is set)
 //
 //   APP_SLUG=files node .github/scripts/gen-capacitor-config.mjs build/files
 //
@@ -26,6 +29,8 @@
 //   APP_URL         full app url (default `${SITE_BASE}/${slug}/` — the public
 //                   route; vercel rewrites /<slug>/ to /apps/<slug>/, so the
 //                   /apps/ path is internal only and 404s if requested directly)
+//   LIVE            1 for a live build (build.android: 'capacitor-live')
+//   DEVTOOLS        1 for the -dev build: `.dev` on the appId, `(dev)` in the name
 //   APP_ID_PREFIX   reverse-dns prefix for the appId
 //                   (default dev.zugriff — appId is `${APP_ID_PREFIX}.${segment}`,
 //                    e.g. dev.zugriff.files, matching /.well-known/assetlinks.json
@@ -34,6 +39,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { registry } from './../../.shared/js/data/apps.js';
+import { idOf, nameOf } from './android.js';
 
 const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-capacitor-config: APP_SLUG is required'); process.exit(1); }
@@ -43,12 +49,12 @@ if (!app || app.type !== 'app') { console.error(`gen-capacitor-config: no app "$
 
 const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
 const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');
-const idPrefix = process.env.APP_ID_PREFIX || 'dev.zugriff';
 const outDir   = process.argv[2] || '.';
+const live     = process.env.LIVE === '1';
+const dev      = process.env.DEVTOOLS === '1';
 
-// a valid Android package segment: only [a-zA-Z0-9_], never leading with a digit
-// (same rule the TWA script uses, so the appId lines up with dev.zugriff.<slug>)
-const segment = slug.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');
+// the id and name of this variant: plain for the app's main one, see android.js
+const variant = live ? 'capacitor-live' : 'capacitor';
 
 // relative luminance: DARK means light bar icons, for a dark app color
 const isLight = (color) => {
@@ -60,11 +66,11 @@ const isLight = (color) => {
 };
 
 const config = {
-  appId   : `${idPrefix}.${segment}`,
-  appName : app.short_name || app.name || slug,
+  appId   : idOf(app, variant) + (dev ? '.dev' : ''),
+  appName : nameOf(app, variant) + (dev ? ' (dev)' : ''),
   webDir  : 'www',
   server  : {
-    url            : appUrl,           // wrap the live deployment, exactly like the TWA
+    ...(live ? { url: appUrl } : {}),   // live: wrap the deployment, exactly like the TWA
     androidScheme  : 'https',
     cleartext      : false,
   },
@@ -94,7 +100,7 @@ const fallback = `<!doctype html>
 
 await mkdir(join(outDir, 'www'), { recursive: true });
 await writeFile(join(outDir, 'capacitor.config.json'), JSON.stringify(config, null, 2) + '\n');
-await writeFile(join(outDir, 'www', 'index.html'), fallback);
+if (live) await writeFile(join(outDir, 'www', 'index.html'), fallback);
 
 console.log(`gen-capacitor-config: wrote ${join(outDir, 'capacitor.config.json')}`);
-console.log(`  appId ${config.appId}  ·  url ${config.server.url}`);
+console.log(`  appId ${config.appId}  ·  ${live ? `url ${config.server.url}` : 'staged www/'}`);

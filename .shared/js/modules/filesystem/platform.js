@@ -23,8 +23,9 @@
 
 // :::::: THE BRIDGE
 //
-// the npm @capacitor/* packages are never bundled into what the webview loads
-// (server.url points at the live origin — see the build-capacitor workflow). what
+// the npm @capacitor/* packages are never part of what the webview loads, neither
+// the live origin (capacitor-live) nor the staged www/ (capacitor), see the
+// build-android-capacitor workflow. what
 // *is* there is the bridge Capacitor injects as globalThis.Capacitor, with every
 // installed plugin under Capacitor.Plugins. so we reach the plugins through that
 // and keep the import map free of capacitor entries.

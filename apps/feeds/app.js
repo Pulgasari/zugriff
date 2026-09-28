@@ -9,10 +9,10 @@ import { useEffect, useRef }  from 'preact/hooks';
 
 // ::: shared
 import { Icon, Image, Settings } from '/.shared/js/components/index.js';
+import { PROXY }                 from '/.shared/js/modules/http.js';
 
 // ::: app modules
 import * as db           from './modules/db.js';
-import { DEFAULT_PROXY } from './modules/feed.js';
 
 // ::: the app handle
 const app = zugriff.app;
@@ -30,7 +30,7 @@ app.state.$extend({
   busy    : { type: 'scalar', value: '' },      // a label while a long task runs
 });
 
-const proxy = typedSignal({ value: DEFAULT_PROXY, key: 'feeds:proxy' });
+const proxy = typedSignal({ value: PROXY, key: 'feeds:proxy' });
 
 app.go    = (name, id = null) => { app.state.route = { name, id }; app.state.navOpen = false; };
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
@@ -317,9 +317,9 @@ function SettingsDialog () {
              directly first, then through this proxy. <code>{url}</code> is replaced with the feed
              URL. Clear it to use direct requests only.</span>
           <input ref=${val} class="modal-input" type="text" value=${proxy.value}
-                 placeholder=${DEFAULT_PROXY} onInput=${e => proxy.value = e.target.value} />
+                 placeholder=${PROXY} onInput=${e => proxy.value = e.target.value} />
           <div class="field-row">
-            <button class="btn ghost small" onClick=${() => proxy.value = DEFAULT_PROXY}>Reset to default</button>
+            <button class="btn ghost small" onClick=${() => proxy.value = PROXY}>Reset to default</button>
             <button class="btn ghost small" onClick=${() => proxy.value = ''}>Direct only</button>
           </div>
         </label>
