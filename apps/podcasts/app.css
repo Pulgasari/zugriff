@@ -10,7 +10,7 @@ BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
   > * { padding: 1rem; }
   > main:has(> aufbau-index) { padding: 0; }
 
-  .search-panel { background: var(--bg); }
+  .search-panel { background: var(--color-bg); }
   .search-panel { width: 100%; position: sticky; top: 0; }
   aufbau-input  { width: stretch; }
 }
