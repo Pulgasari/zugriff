@@ -1,6 +1,7 @@
 // podcasts :: views/SavedView.js
 
 import EpisodesIndex from './../components/EpisodesIndex.js';
+import SearchPanel   from '/.shared/js/components/SearchPanel.js';
 import View          from '/.shared/js/components/View.js';
 import { useTable }  from './../modules/hooks.js';
 

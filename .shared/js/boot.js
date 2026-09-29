@@ -56,17 +56,18 @@ function initDevTools (force = false) {
   } catch {} // storage may be blocked in incognito
 }
   
-// :::::: Task 2: Theme Boot (Synchronous - Prevents FOUC)
-// the theme leaf of the app's store (zugriff:<slug>:theme), set before the first
-// paint. themes.css resolves every color from --theme, so the name is all it takes
-function applyTheme ({ prefix }) {
+// :::::: Task 2: Palette Boot (Synchronous - Prevents FOUC)
+// the palette leaf of the app's store (zugriff:<slug>:palette), set before the
+// first paint. palettes.css resolves every color from --palette, so the name is
+// all it takes
+function applyPalette ({ prefix }) {
   const slug = $root.dataset.app;
   if (!prefix || !slug) return;
   try {
-    const theme = JSON.parse(localStorage.getItem(`${prefix}:${slug}:theme`));
-    if (typeof theme !== 'string' || !theme) return;
-    $root.style.setProperty('--theme', theme);
-    $root.dataset.theme = theme;
+    const palette = JSON.parse(localStorage.getItem(`${prefix}:${slug}:palette`));
+    if (typeof palette !== 'string' || !palette) return;
+    $root.style.setProperty('--palette', palette);
+    $root.dataset.palette = palette;
   } catch {} // storage may be blocked, a stored value may be broken
 }
 
@@ -131,17 +132,17 @@ function applyTheme ({ prefix }) {
       type  : ds.swType  ?? userConfig.swType  ?? 'module',  // 'module' | 'classic'
       scope : ds.swScope ?? userConfig.swScope ?? undefined,
     },
-    theme: {
-      prefix : ds.themePrefix ?? userConfig.themePrefix ?? 'zugriff',
+    palette: {
+      prefix : ds.palettePrefix ?? userConfig.palettePrefix ?? 'zugriff',
     },
     preload     : userConfig.preload || [],
     imports: Object.assign(getImportMap(), userConfig.imports || {})
   };
-  const { preload, sw, theme } = config;
+  const { preload, sw } = config;
 
   // Run tasks sequentially
   initDevTools();   // eruda only behind ?dev, remembered for the tab
-  applyTheme(config.theme);
+  applyPalette(config.palette);
   injectImportMapAndPreloads(config.imports, config.preload, currentScript.src);
   registerServiceWorker(config.sw);
   initRuntime();

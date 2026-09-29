@@ -62,7 +62,7 @@ else {
   }
 
   const categories = zugriff.registry.categories(page.cat);
-  const config     = { slug: page.slug, name: page.name, theme: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };
+  const config     = { slug: page.slug, name: page.name, palette: 'dracula', lang: 'en', aufbau: { elements: { mode: 'auto' } } };
   const query      = signal('');
   const category   = signal('');
 

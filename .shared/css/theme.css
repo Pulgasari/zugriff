@@ -1,9 +1,6 @@
-/* move to: aufbau/css/reset.css / aufbau/css/aufbau.css */
+/* move to: aufbau/css/aufbau.css */
 
 html { -webkit-tap-highlight-color: transparent; }
-body { -webkit-font-smoothing: antialiased; }
-
-/* move to: aufbau/css/tokens.css */
 
 /* move to: aufbau/css/mobile.css */
 
@@ -29,14 +26,13 @@ where the page shows var(--bg) instead
 
 :root #app {
   background-clip : content-box;
-  box-sizing      : border-box;
   padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
 }
 
 /* move to: zugriff/apps/podcasts/app.css
 or move to: aufbau/css/surfaces.css */
 
-@container style(--theme: oled) {
+@container style(--palette: oled) {
   body {
     --line: color-mix(in oklch, var(--fg) 15%, transparent);
   }
@@ -47,9 +43,6 @@ or move to: aufbau/css/surfaces.css */
   }
 }
 
-
-
-
 body {
   --panel   : color-mix(in oklch, var(--bg) 90%, black);
   --panel-2 : color-mix(in oklch, var(--bg) 80%, black);
@@ -58,18 +51,12 @@ body {
   --radius  : 0.5rem;
 }
 
-
-
 html, body { height: 100%; }
 
 body {
-  font-family         : var(--ui);
-  font-size           : 14px;
   overflow            : hidden;
   overscroll-behavior : none;
 }
-
-body { background : var(--bg); color : var(--fg); }
 
 #app {
   display   : flex;
@@ -88,58 +75,22 @@ a { color: var(--accent); }
 
 ::selection { background: var(--accent-25); }
 
-
 /* ── derived tokens ─────────────────────────────────────────────────────── */
 
 body {
   --zebra : color-mix(in oklch, var(--bg), black 5%);
 
-  --fg-d-1: color-mix(in oklch, black 10%, var(--fg));
-  --fg-d-2: color-mix(in oklch, black 25%, var(--fg));
-  --fg-d-3: color-mix(in oklch, black 50%, var(--fg));
-  --fg-d-4: color-mix(in oklch, black 75%, var(--fg));
-  --fg-l-1: color-mix(in oklch, white 10%, var(--fg));
-  --fg-l-2: color-mix(in oklch, white 25%, var(--fg));
-  --fg-l-3: color-mix(in oklch, white 50%, var(--fg));
-  --fg-l-4: color-mix(in oklch, white 75%, var(--fg));
-
-  --mix-100 : color-mix(in oklch, var(--bg) 10%, var(--fg) 90%);
-  --mix-200 : color-mix(in oklch, var(--bg) 20%, var(--fg) 80%);
-  --mix-300 : color-mix(in oklch, var(--bg) 30%, var(--fg) 70%);
-  --mix-400 : color-mix(in oklch, var(--bg) 40%, var(--fg) 60%);
-  --mix-500 : color-mix(in oklch, var(--bg) 50%, var(--fg) 50%);
-  --mix-600 : color-mix(in oklch, var(--bg) 60%, var(--fg) 40%);
-  --mix-700 : color-mix(in oklch, var(--bg) 70%, var(--fg) 30%);
-  --mix-800 : color-mix(in oklch, var(--bg) 80%, var(--fg) 20%);
-  --mix-900 : color-mix(in oklch, var(--bg) 90%, var(--fg) 10%);
-  
-  --accent-5  : hsl(from var(--accent) h s l / 0.05);
   --accent-10 : hsl(from var(--accent) h s l / 0.10);
   --accent-25 : hsl(from var(--accent) h s l / 0.25);
   --accent-50 : hsl(from var(--accent) h s l / 0.50);
   --accent-75 : hsl(from var(--accent) h s l / 0.75);
 
-
-
-  --bgd-10  : hsl(from var(--bg) h s calc(l - 10%));
-  --bgd-20  : hsl(from var(--bg) h s calc(l - 20%));
-  --bgd-30  : hsl(from var(--bg) h s calc(l - 30%));
-  --bgd-40  : hsl(from var(--bg) h s calc(l - 40%));
-  --bgd-50  : hsl(from var(--bg) h s calc(l - 50%));
-  
-
   --fg-25 : hsl(from var(--fg) h s l / 0.25);
   --fg-50 : hsl(from var(--fg) h s l / 0.50);
   --fg-75 : hsl(from var(--fg) h s l / 0.75);
 
-  --bg-darker-10  : hsl(from var(--bg) h s calc(l - 10%));
-  --bg-lighter-10 : hsl(from var(--bg) h s calc(l + 10%));
-
   --shadow : 0 0 5px color-mix(in srgb, var(--bg) 90%, black);
 
-  --button-primary-bg   : var(--accent);
-  --button-secondary-bg : color-mix(in srgb, var(--fg) 50%, var(--bg));
+  --button-primary-bg : var(--accent);
 }
-
-
 

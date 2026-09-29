@@ -1,22 +1,8 @@
-/* reset */
-
-img { max-width: 100%; }
-
-/* colors, on body where the theme resolves (theme.css) */
+/* colors, on body where the palette resolves (palettes.css) */
 
 body {
-  --bg-d-1: color-mix(in oklch, black 10%, var(--bg));
-  --bg-d-2: color-mix(in oklch, black 25%, var(--bg));
-  --bg-d-3: color-mix(in oklch, black 50%, var(--bg));
-  --bg-d-4: color-mix(in oklch, black 75%, var(--bg));
-  
-  --bg-l-1: color-mix(in oklch, white 10%, var(--bg));
-  --bg-l-2: color-mix(in oklch, white 25%, var(--bg));
-  --bg-l-3: color-mix(in oklch, white 50%, var(--bg));
-  --bg-l-4: color-mix(in oklch, white 75%, var(--bg));
-
-  --bg-darker  : color-mix(in oklch, black 10%, var(--bg));
-  --bg-darkest : color-mix(in oklch, black 25%, var(--bg));
+  --bg-d-1 : color-mix(in oklch, black 10%, var(--bg));
+  --bg-d-2 : color-mix(in oklch, black 25%, var(--bg));
 
   --accent-a50 : color-mix(in oklch, var(--accent) 50%, transparent);
 }
@@ -38,12 +24,9 @@ code, kbd { font-family: var(--mono); }
   padding       : unset;
 }
 
-button.unreal { display: contents; }
-
 /* spacings */
 
 aufbau-item { gap: 0.5rem; padding: 0.75rem; }
-
 
 #app-main { flex: 1; overflow-y: auto; }
 .Dock     { flex-shrink: 0; }
@@ -55,7 +38,6 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .Dock > * { gap: 0.5rem; padding: 0.75rem; }
 
 .Dock aufbau-icon { font-size: 2rem; }
-
 
 /* BASIC LAYOUT */
 
@@ -82,13 +64,10 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 /* BU'TON */
 
 aufbau-button, button, .btn, .button {
-  align-items   : center;
   background    : var(--panel-2);
   border        : 1px solid var(--line);
   border-radius : var(--radius);
   color         : var(--fg);
-  cursor        : pointer;
-  display       : inline-flex;
   font          : inherit;
   font-size     : 0.85rem;
   gap           : 0.25rem;
@@ -96,7 +75,7 @@ aufbau-button, button, .btn, .button {
   transition    : opacity 0.25s;
   
   &:hover:not(:disabled) { opacity: 1.00; border-color: var(--accent-50); }
-  &:disabled             { opacity: 0.25; cursor: default; cursor: not-allowed; }
+  &:disabled             { opacity: 0.25; cursor: not-allowed; }
 
   &.danger  { color: var(--c-null, #e06c75); }
   &.danger:hover:not(:disabled) { background: color-mix(in oklch, var(--c-null, #e06c75) 15%, transparent); }      
@@ -143,7 +122,6 @@ aufbau-button, button, .btn, .button {
 .ibtn:disabled { opacity: 0.4; cursor: default; }
 .ibtn.active { color: var(--accent); background: var(--accent-25); }
 
-
 /* ── button modifiers ───────────────────────────────────────────────────── */
 /* base `button, .btn` is defined at the top of this file — these are the
    modifiers the apps kept redefining locally. */
@@ -180,53 +158,11 @@ a.icon-btn:hover       { color: var(--accent); opacity: 1; }
   }
 }
 
-.badge {
-  font-size      : 0.65rem;
-  font-weight    : 600;
-  padding        : 0.15rem 0.45rem;
-  border-radius  : 2rem;
-  background     : var(--accent-25);
-  color          : var(--accent);
-  letter-spacing : 0.05em;
-  text-transform : uppercase;
-  vertical-align : middle;
-}
-
 /* CRUMBS */
 
 .crumbs     { display: flex; align-items: center; flex-wrap: nowrap; gap: 0.5rem; overflow: hidden; }
 .crumb      { white-space: nowrap; }
 .crumb.last { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
-
-/* CONTEXT-MENU */
-
-.context-menu {
-  position     : fixed;
-  z-index      : 40;
-  min-width    : 160px;
-  padding      : 0.25rem;
-  border       : 1px solid var(--line);
-  border-radius: var(--radius);
-  background   : var(--panel);
-  box-shadow   : 0 8px 24px rgb(0 0 0 / 0.35);
-  
-  button {
-     display      : flex;
-     align-items  : center;
-     gap          : 0.50rem;
-     width        : 100%;
-     padding      : 0.50rem;
-     border       : 0;
-     border-radius: calc(var(--radius) - 2px);
-     background   : transparent;
-     color        : var(--fg);
-     font         : inherit;
-     text-align   : left;
-     cursor       : pointer;
-   
-     &:hover { background: var(--accent-25); }
-   }
-}
 
 /* DOCK */
 
@@ -301,14 +237,11 @@ aufbau-item {
   }
 }
 
-
-
 /*.art, .not-a-button,*/
 .meta > button,
 aufbau-item .title {
   display: contents!important;
 }
-
 
 /* INSTALL-TIP */
 
@@ -332,8 +265,6 @@ aufbau-item .title {
 }
 
 /* MODAL */
-
-
 
 .modal main .results {
   /*max-height: 50%;*/
@@ -444,31 +375,6 @@ input  { padding: 0.5rem; width: 100%; }
   .reconnect .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 }
 
-.tree-filter {
-  display    : flex;
-  align-items: center;
-  gap        : 0.4rem;
-  margin     : 0 0.75rem 0.5rem;
-  padding    : 0.3rem 0.55rem;
-  border     : 1px solid var(--line);
-  border-radius: var(--radius);
-  background : var(--bg);
-  
-  &:focus-within { border-color: var(--accent); }
-  
-  .icon { color: var(--fg-50, var(--fg)); flex: none; }
-  input {
-    flex: 1 1 auto; 
-    min-width: 0;
-    border: none; 
-    background: none; 
-    color: var(--fg); 
-    font: inherit; 
-    font-size: 0.85rem; 
-    outline: none;
-  }
-}
-
 /* the tree itself — rendered by <aufbau-tree> / <aufbau-tree-item>. the row lives
    in the item's shadow root, reachable as ::part(row|icon|label) */
 aufbau-tree-item { --tree-indent: 0.85rem; }
@@ -488,7 +394,6 @@ aufbau-tree-item[selected]::part(row) {
 }
 
 aufbau-tree-item[selected]::part(icon) { color: var(--accent); }
-
 
  /* ── dropzone (<aufbau-upload look='dropzone'>) ───── */
 
@@ -531,16 +436,7 @@ aufbau-upload[look="dropzone"], .dropzone {
 
 /* OTHER STUFF */
 
-input {
-  width: stretch;
-  width: 100%;
-}
-
-
-.art img {
-  border-radius: 50%;
-  border-radius: 0.25rem;
-}
+.art img { border-radius: 0.25rem; }
 
 .View > header button {
   border: 2px solid color-mix(in oklch, currentcolor, transparent 75%);
@@ -549,24 +445,7 @@ input {
   padding: 0.25rem;
 }
 
-
-
-
-
-
 /*  */
-
-.ActionMenu {}
-.ContextMenu {}
-.NavMenu {}
-
-.Modal {}
-.Panel {}
-.Toast {}
-.View {}
-
-.Button {}
-.Icon {}
 
 .videoplayer {
   position: relative;
@@ -586,14 +465,8 @@ input {
 
 /* */
 
-.col, .flow-y  { display: flex; flex-direction: column; }
-.row, .flow-x  { display: flex; flex-direction: row; }
-.scroll-x      { overflow-x: auto; }
-.scroll-y      { overflow-y: auto; }
-.sticky-bottom { position: sticky; bottom: 0; }
-.sticky-top    { position: sticky; top:    0; }
-.sticky-left   { position: sticky; left:   0; }
-.sticky-right  { position: sticky; right:  0; }
+.col { display: flex; flex-direction: column; }
+.row { display: flex; flex-direction: row; }
 
 /*
 contain: layout;

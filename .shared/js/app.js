@@ -81,11 +81,11 @@ const $root = $doc?.documentElement ?? null;
 
 const bodyReady = () => $doc.body ? Promise.resolve() : new Promise(resolve => $doc.addEventListener('DOMContentLoaded', resolve, { once: true }));
 
-// a preset of aufbau/css/themes.css or any css color. gestalt sets --theme, the
-// css derives the rest, and the resolved bg feeds what css cannot reach
-const applyTheme = async theme => {
-  if (!$root || !theme) return;
-  await aufbau.gestalt.set({ theme });
+// a preset of aufbau/css/palettes.css or any css color. gestalt sets --palette,
+// the css derives the rest, and the resolved bg feeds what css cannot reach
+const applyPalette = async palette => {
+  if (!$root || !palette) return;
+  await aufbau.gestalt.set({ palette });
   await bodyReady();
 
   const { bg } = aufbau.gestalt.colors();
@@ -123,7 +123,7 @@ class ZugriffApp {
       dir      : { type: 'enum',   value: config.dir, values: ['ltr', 'rtl'] },
       font     : { type: String,   value: config.font  ?? 'Manrope' },
       lang     : { type: 'scalar', value: config.lang },
-      theme    : { type: String,   value: config.theme ?? 'dracula' },
+      palette  : { type: String,   value: config.palette ?? 'dracula' },
       title    : { type: 'scalar', value: config.title ?? config.name ?? null },
       viewport : { type: 'scalar', value: config.viewport },
 
@@ -137,13 +137,13 @@ class ZugriffApp {
     });
 
     // pure side effects, persistence is the store's job. boot.js reads the stored
-    // theme before the first paint
+    // palette before the first paint
     state.$onEffects({
-      dir   : value => { if ($root && value) $root.setAttribute('dir', value); },
-      font  : value => { if (value) webfonts.apply(value, { role: '--font' }); },
-      lang  : value => { if ($root && value) $root.lang = value; },
-      theme : value => applyTheme(value),
-      title : value => { if ($doc && value) $doc.title = value; },
+      dir     : value => { if ($root && value) $root.setAttribute('dir', value); },
+      font    : value => { if (value) webfonts.apply(value, { role: '--font' }); },
+      lang    : value => { if ($root && value) $root.lang = value; },
+      palette : value => applyPalette(value),
+      title   : value => { if ($doc && value) $doc.title = value; },
     });
 
     return state;
@@ -187,8 +187,8 @@ class ZugriffApp {
 
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {
-    // themes.css comes with index.css, the theme is the app's own
-    await aufbau.boot({ ...this.config.aufbau, css: { themes: false, theme: this.state.$theme } });
+    // palettes.css and themes.css come with index.css, the palette is the app's own
+    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, theme: false, themes: false } });
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
