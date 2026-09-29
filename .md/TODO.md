@@ -4,6 +4,13 @@
 - [ ] geteilter editor-panel um mehrere files nebeneinander einzusehen/bearbeiten
 - [ ] files in der fileList sticky machen können
 - [ ] editor-settings je filetype/ext setzbar
+- [ ] sonderbehandlung im editor für kommentare
+  - [ ] option für: `font`
+  - [ ] option für: `font-size` default 0.75 bezogen auf editors font-size
+  - [ ] option für: `italic` bool
+  - [ ] option für: `opacity` 0.25 bis 1.00 in 0.5 steps
+  - [ ] möglichkeit für sondercomments (zb "startet mit `todo:`) welche besonders hervorgehoben und/oder erfasst werden, zb um sie aufzulisten.oder hinzuspringen
+  - [ ] evtl. md-syntax/-highlighting
 
 ## `apps/icons`
 - [ ] icons favorisieren
