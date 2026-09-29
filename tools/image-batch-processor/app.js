@@ -236,7 +236,7 @@ function      BlurTaskPane (props) {
   return html`
     <${TaskPane} ...${props}>
       <input type="range" min=1 max=20 value=${p.radius}
-        onInput=${e => updateTask(id, { radius: +e.target.value })} style="flex:1;accent-color:var(--accent)" />
+        onInput=${e => updateTask(id, { radius: +e.target.value })} style="flex:1;accent-color:var(--color-ink)" />
       <span class="task-val">${p.radius}px</span>
     </${TaskPane}>
   `;
@@ -323,7 +323,7 @@ function WatermarkTaskPane (props) {
       <label class="task-label">Opacity</label>
       <input type="range" min=0 max=1 step=0.05 value=${p.opacity}
         onInput=${e => updateTask(id, { opacity: +e.target.value })}
-        style="width:80px;accent-color:var(--accent)" />
+        style="width:80px;accent-color:var(--color-ink)" />
       ${POSITIONS.map(([v, l]) => html`
         <button class=${'chip' + (p.pos === v ? ' active' : '')}
           onClick=${() => updateTask(id, { pos: v })} title=${l}>
@@ -338,7 +338,7 @@ function      RangeTaskPane ({ task, index, total, min, max, step = 1, unit = ''
     <${TaskPane} ...${{ task, index, total }}>
       <input type="range" min=${min} max=${max} step=${step} value=${p.value}
         onInput=${e => updateTask(id, { value: +e.target.value })}
-        style="flex:1;accent-color:var(--accent)" />
+        style="flex:1;accent-color:var(--color-ink)" />
       <span class="task-val">${p.value}${unit}</span>
     </${TaskPane}>`;
 }

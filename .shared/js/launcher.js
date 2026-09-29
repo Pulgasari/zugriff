@@ -25,7 +25,7 @@ SearchPanel = await zugriff.component('SearchPanel');
 // ::: Page: Home
 
 if (route === 'home') {
-  await aufbau.boot({ css: { layout: 'landing', theme: 'zombie', themes: false } });   // themes.css comes with index.css
+  await aufbau.boot({ css: { layout: 'landing', reset: false, theme: 'zombie' } });   // aufbau.css comes with index.css
 
   const Menu = () => html`
     <nav>
@@ -49,7 +49,7 @@ if (route === 'home') {
 // ::: Page: Apps | Tools
 
 else {
-  await aufbau.boot({ css: { theme: 'zombie', themes: false } });
+  await aufbau.boot({ css: { reset: false, theme: 'zombie' } });
 
   // :::::: CONFIG + STATES
 

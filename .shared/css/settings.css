@@ -26,7 +26,7 @@
 }
 
 .settings-title {
-  color          : var(--accent);
+  color          : var(--color-ink);
   font-weight    : 600;
   letter-spacing : 0.05em;
 }
@@ -39,7 +39,7 @@
   flex-direction : column;
   gap            : 1rem;
   padding        : 1rem;
-  background     : color-mix(in oklch, var(--bg) 92%, black);
+  background     : color-mix(in oklch, var(--color-bg) 92%, black);
   border-bottom  : 1px solid var(--fg-25);
 
   > * {

@@ -20,12 +20,12 @@ h1 { font-size: 1.25rem; font-weight: 600; display: flex; align-items: center; g
 
 .time-field input {
   width: 4.5rem; padding: .3rem .45rem; border-radius: .35rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent);
-  background: color-mix(in srgb, var(--fg) 6%, transparent);
-  color: var(--fg); font-size: .85rem; font-variant-numeric: tabular-nums;
+  border: 1px solid color-mix(in srgb, var(--color-fg) 20%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 6%, transparent);
+  color: var(--color-fg); font-size: .85rem; font-variant-numeric: tabular-nums;
 }
 
-.time-field input:focus { outline: none; border-color: var(--accent); }
+.time-field input:focus { outline: none; border-color: var(--color-ink); }
 
 .time-fmt { opacity: .45; font-size: .78rem; font-variant-numeric: tabular-nums; }
 

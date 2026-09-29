@@ -1,7 +1,5 @@
-/* the palettes first: --palette, the presets and --bg, --fg, --accent */
-@import url('https://code.pulgasari.dev/aufbau/css/tokens.css');
-@import url('https://code.pulgasari.dev/aufbau/css/palettes.css');
-@import url('https://code.pulgasari.dev/aufbau/css/themes.css');
+/* aufbau first: layers, tokens, palettes, themes, reset */
+@import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
 
 @import url('./theme.css');
 @import url('./layout.css');

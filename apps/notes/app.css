@@ -2,10 +2,10 @@
 #app { flex-direction: row; }
 */
 
-.booting       { height: 100%; width: 100%; display: grid; place-items: center; color: var(--fg-50, var(--fg)); }
+.booting       { height: 100%; width: 100%; display: grid; place-items: center; color: var(--fg-50, var(--color-fg)); }
 .nav-close     { display: none; }
 .nav-open      { display: none; }
-.head-brand    { font-weight: 700; color: var(--fg); }
+.head-brand    { font-weight: 700; color: var(--color-fg); }
 .reader-scroll { flex: 1 1 auto; overflow-y: auto; }
 .reader-empty  { flex: 1 1 auto; display: flex; min-height: 0; }
 
@@ -62,7 +62,7 @@ aufbau-reader article {
     > ol { margin: 0.25em 0; }
   }
 
-  a       { text-decoration: none; color: var(--accent); }
+  a       { text-decoration: none; color: var(--color-ink); }
   a:hover { text-decoration: underline; }
 
   img { height: auto; border-radius: var(--radius); display: block; }
@@ -70,7 +70,7 @@ aufbau-reader article {
   hr { border: none; border-top: 1px solid var(--line); }
   blockquote {
     background    : var(--panel);
-    border-left   : 3px solid var(--accent); 
+    border-left   : 3px solid var(--color-ink); 
     border-radius : 0 var(--radius) var(--radius) 0;
     padding       : 0.2em 0 0.2em 1em;
   
@@ -112,11 +112,11 @@ aufbau-reader article {
   width: 14rem; flex: none; font-size: 0.82rem;
   border-left: 1px solid var(--line); padding-left: 1.25rem;
 }
-.toc-title      { font-weight: 700; color: var(--fg-50, var(--fg)); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.72rem; margin-bottom: 0.6rem; }
-.toc-item       { display: block; color: var(--fg-75, var(--fg)); text-decoration: none; padding: 0.2rem 0; line-height: 1.35; border-left: 2px solid transparent; }
-.toc-item:hover { color: var(--accent); }
+.toc-title      { font-weight: 700; color: var(--fg-50, var(--color-fg)); text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.72rem; margin-bottom: 0.6rem; }
+.toc-item       { display: block; color: var(--fg-75, var(--color-fg)); text-decoration: none; padding: 0.2rem 0; line-height: 1.35; border-left: 2px solid transparent; }
+.toc-item:hover { color: var(--color-ink); }
 .toc-item.lvl2  { padding-left: 0.75rem; }
-.toc-item.lvl3  { padding-left: 1.5rem; font-size: 0.95em; color: var(--fg-50, var(--fg)); }
+.toc-item.lvl3  { padding-left: 1.5rem; font-size: 0.95em; color: var(--fg-50, var(--color-fg)); }
 
 /* ── responsive: the sidebar becomes a drawer ─────────────────────────────── */
 

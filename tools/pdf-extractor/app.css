@@ -31,18 +31,18 @@
   border: 2px solid transparent;
   transition: border-color .15s;
   background: #fff;
-  box-shadow: 0 1px 4px color-mix(in srgb, var(--fg) 12%, transparent);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-fg) 12%, transparent);
 }
 
 .page-thumb.selected .thumb-canvas-wrap {
-  border-color: var(--accent);
+  border-color: var(--color-ink);
 }
 
 .thumb-canvas { width: 100%; display: block; }
 
 .thumb-check {
   position: absolute; top: .3rem; right: .3rem;
-  color: var(--accent); filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+  color: var(--color-ink); filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
   opacity: 0; transition: opacity .15s;
 }
 
@@ -57,8 +57,8 @@
 .export-panel {
   display: flex; flex-direction: column; gap: .75rem;
   padding: .9rem; border-radius: .6rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
-  background: color-mix(in srgb, var(--fg) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 3%, transparent);
 }
 
 /* narrower label than the shared .setting-row default */

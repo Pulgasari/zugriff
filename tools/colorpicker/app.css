@@ -5,12 +5,12 @@
 .color-header {
   display: flex; align-items: center; gap: .75rem;
   padding: .75rem; border-radius: .6rem;
-  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 5%, transparent);
 }
 
 .header-swatch {
   width: 2.5rem; height: 2.5rem; border-radius: .4rem; flex-shrink: 0;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 15%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-fg) 15%, transparent);
 }
 
 h1 { font-size: 1rem; font-weight: 600; flex: 1; display: flex; align-items: center; gap: .35rem; }
@@ -41,7 +41,7 @@ h1 { font-size: 1rem; font-weight: 600; flex: 1; display: flex; align-items: cen
 
 .slider-track {
   flex: 1; height: 10px; border-radius: 5px;
-  background: var(--gradient, color-mix(in srgb, var(--fg) 15%, transparent));
+  background: var(--gradient, color-mix(in srgb, var(--color-fg) 15%, transparent));
   position: relative;
 }
 
@@ -57,7 +57,7 @@ h1 { font-size: 1rem; font-weight: 600; flex: 1; display: flex; align-items: cen
 }
 
 /* style the native range for webkit */
-input[type=range] { accent-color: var(--accent); cursor: pointer; }
+input[type=range] { accent-color: var(--color-ink); cursor: pointer; }
 
 .slider-track { cursor: pointer; }
 
@@ -98,7 +98,7 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
 
 .copy-row {
   display: flex; align-items: center; gap: .5rem; padding: .35rem .5rem;
-  border-radius: .35rem; background: color-mix(in srgb, var(--fg) 5%, transparent);
+  border-radius: .35rem; background: color-mix(in srgb, var(--color-fg) 5%, transparent);
   font-size: .8rem;
 }
 
@@ -109,7 +109,7 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
 /* ── swatch ── */
 .swatch {
   border-radius: .35rem; flex-shrink: 0;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 12%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-fg) 12%, transparent);
   background-image: linear-gradient(45deg,#8882 25%,transparent 25%),
     linear-gradient(-45deg,#8882 25%,transparent 25%),
     linear-gradient(45deg,transparent 75%,#8882 75%),
@@ -131,11 +131,11 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
 
 .mix-result {
   display: flex; gap: .75rem; align-items: flex-start; padding: .75rem;
-  border-radius: .5rem; background: color-mix(in srgb, var(--fg) 4%, transparent);
+  border-radius: .5rem; background: color-mix(in srgb, var(--color-fg) 4%, transparent);
 }
 
 .swap-btn {
-  background: transparent; border: none; color: var(--fg);
+  background: transparent; border: none; color: var(--color-fg);
   cursor: pointer; opacity: .4; padding: .25rem;
   border-radius: .35rem; transition: opacity .15s; align-self: center;
 }
@@ -171,7 +171,7 @@ input[type=range] { accent-color: var(--accent); cursor: pointer; }
   resize: none;
   background: transparent;
   border: none;
-  color: var(--fg);
+  color: var(--color-fg);
   font-family: monospace;
   font-size: .75rem;
   line-height: 1.6;

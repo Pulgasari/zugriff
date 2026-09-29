@@ -22,7 +22,7 @@ html, body {
 
 #app-head {
   padding       : 8px 16px;
-  background    : color-mix(in oklch, var(--bg) 90%, black);
+  background    : color-mix(in oklch, var(--color-bg) 90%, black);
   border-bottom : 1px solid var(--fg-25);
   display       : flex;
   align-items   : center;
@@ -33,7 +33,7 @@ html, body {
 #app-head h1 {
   font-size      : 0.95rem;
   font-weight    : 600;
-  color          : var(--accent);
+  color          : var(--color-ink);
   letter-spacing : 0.05em;
 }
 
@@ -47,7 +47,7 @@ html, body {
 
 #app-foot {
   padding     : 6px 16px;
-  background  : color-mix(in oklch, var(--bg) 90%, black);
+  background  : color-mix(in oklch, var(--color-bg) 90%, black);
   border-top  : 1px solid var(--fg-25);
   font-size   : 0.75rem;
   color       : var(--fg-50);
@@ -85,5 +85,5 @@ html, body {
 
 #app-head .ghost-btn.active {
   opacity : 1;
-  color   : var(--accent);
+  color   : var(--color-ink);
 }

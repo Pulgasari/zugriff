@@ -1,6 +1,6 @@
 /* apps/code/app.css — the code editor's own look.
 
-   the reset, the theme tokens (--bg, --fg, --accent, --panel, --line, the
+   the reset, the theme tokens (--color-bg, --color-fg, --color-ink, --panel, --line, the
    derived --accent-25 / --fg-50 / --zebra …) and the #app frame come from
    ./../base.css + shared/css/theme.css. this sheet is only the editor's chrome;
    Monaco brings its own stylesheet (linked in index.html). */
@@ -9,7 +9,7 @@
 
 body {
   --hair  : var(--line);
-  --zebra : color-mix(in oklch, var(--bg), black 8%);
+  --zebra : color-mix(in oklch, var(--color-bg), black 8%);
 }
 
 /* a code app wants a monospace UI */
@@ -50,7 +50,7 @@ body {
   min-height     : 0;
   background     : var(--hair);
 
-  > *      { flex: 0 0 auto; background: var(--bg); padding: 0.5rem; }
+  > *      { flex: 0 0 auto; background: var(--color-bg); padding: 0.5rem; }
   #editor  { flex: 1 1 auto; min-height: 0; padding: 0; }
 }
 
@@ -61,7 +61,7 @@ body {
   gap            : 1px;
   background     : var(--hair);
 
-  > *        { background: var(--bg); padding: 0.5rem; }
+  > *        { background: var(--color-bg); padding: 0.5rem; }
   #keyboard  { flex: 0 0 auto; }
 }
 
@@ -85,7 +85,7 @@ body {
   }
 
   > * > *        { opacity: 0.5; cursor: pointer; }
-  > * > *.active { opacity: 1; color: var(--accent); }
+  > * > *.active { opacity: 1; color: var(--color-ink); }
 }
 
 /* ── file tabs ──────────────────────────────────────────────────────────── */
@@ -101,7 +101,7 @@ body {
   .filelist-empty {
     padding    : 0.5rem;
     opacity    : 0.5;
-    background  : var(--bg);
+    background  : var(--color-bg);
     white-space : nowrap;
   }
 
@@ -111,14 +111,14 @@ body {
     align-items    : center;
     gap            : 0.25rem;
     padding        : 0.35rem 0.5rem;
-    background     : var(--panel, var(--bg));
+    background     : var(--panel, var(--color-bg));
     cursor         : pointer;
     white-space    : nowrap;
 
-    &.active { background: var(--bg); color: var(--accent); }
+    &.active { background: var(--color-bg); color: var(--color-ink); }
 
     .tab-name  { font-size: 0.9em; }
-    .tab-dirty { color: var(--accent); }
+    .tab-dirty { color: var(--color-ink); }
     .tab-close {
       display     : inline-flex;
       padding     : 0;
@@ -149,7 +149,7 @@ body {
   .sb-indent,
   .sb-size,
   .sb-nowrap   { cursor: pointer; }
-  .sb-language { color: var(--accent); }
+  .sb-language { color: var(--color-ink); }
 }
 
 /* ── toolbar ────────────────────────────────────────────────────────────── */
@@ -162,7 +162,7 @@ body {
   font-size       : 20px;
 
   > * { cursor: pointer; opacity: 0.8; }
-  > *:hover { opacity: 1; color: var(--accent); }
+  > *:hover { opacity: 1; color: var(--color-ink); }
 }
 
 /* ── editor / Monaco ────────────────────────────────────────────────────── */
@@ -177,11 +177,11 @@ body {
 /* ── keyboard ───────────────────────────────────────────────────────────── */
 
 body {
-  --keyboard-btn-bg       : color-mix(in oklch, var(--bg), var(--fg) 12%);
-  --keyboard-btn-fg       : var(--fg);
+  --keyboard-btn-bg       : color-mix(in oklch, var(--color-bg), var(--color-fg) 12%);
+  --keyboard-btn-fg       : var(--color-fg);
   --keyboard-btn-radius   : 4px;
   --keyboard-btn-gap      : 0.25rem;
-  --keyboard-btn-hover-bg : var(--accent);
+  --keyboard-btn-hover-bg : var(--color-ink);
   --keyboard-btn-hover-fg : #fff;
 }
 
@@ -189,7 +189,7 @@ body {
   display        : flex;
   flex-direction : column;
   gap            : var(--keyboard-btn-gap);
-  background     : var(--bg);
+  background     : var(--color-bg);
 
   .row {
     display         : flex;
@@ -250,7 +250,7 @@ body {
     border-radius  : calc(var(--radius) + 4px);
     box-shadow     : 0 12px 40px rgb(0 0 0 / 0.45);
 
-    > * { background: var(--bg); padding: 1rem; }
+    > * { background: var(--color-bg); padding: 1rem; }
 
     .main { flex: 1 1 auto; overflow: auto; min-height: 0; }
   }
@@ -274,17 +274,17 @@ body {
   flex-flow : column nowrap;
   padding   : 0;
 
-  .commands-header { order: 2; padding: 1rem; position: sticky; bottom: 0; background: var(--bg); }
+  .commands-header { order: 2; padding: 1rem; position: sticky; bottom: 0; background: var(--color-bg); }
   .commands-body   { order: 1; padding: 1rem; gap: 1rem; display: flex; flex-flow: column nowrap; }
 }
 .commands-header input {
   width      : 100%;
   padding    : 0.5rem;
   background : none;
-  color      : var(--fg);
+  color      : var(--color-fg);
   border     : 2px solid var(--line);
 
-  &:focus { outline: none; border-color: var(--accent); color: var(--accent); }
+  &:focus { outline: none; border-color: var(--color-ink); color: var(--color-ink); }
 }
 .commands-list { list-style: none; padding: 0; margin: 0; }
 .commands-list li {
@@ -299,7 +299,7 @@ body {
   &:nth-child(2n+1) { background: var(--zebra); }
 
   strong { grid-area: name; text-align: left; }
-  small  { grid-area: key;  text-align: left; color: var(--accent); }
+  small  { grid-area: key;  text-align: left; color: var(--color-ink); }
   .fav-btn {
     grid-area    : icon;
     justify-self : end;
@@ -308,7 +308,7 @@ body {
     align-items  : center;
   }
 }
-.commands-body .none { color: var(--accent); text-align: center; }
+.commands-body .none { color: var(--color-ink); text-align: center; }
 
 /* ── form bits ──────────────────────────────────────────────────────────── */
 
@@ -325,7 +325,7 @@ select {
   gap       : 4px;
 
   button {
-    color         : var(--fg);
+    color         : var(--color-fg);
     padding       : 0.25rem 0.5rem;
     border        : 1px solid var(--line);
     border-radius : 4px;
@@ -334,7 +334,7 @@ select {
     cursor        : pointer;
   }
   button:hover  { opacity: 1; }
-  button.active { color: var(--accent); border-color: var(--accent); opacity: 1; }
+  button.active { color: var(--color-ink); border-color: var(--color-ink); opacity: 1; }
 }
 
 .toggle {
@@ -367,11 +367,11 @@ select {
     border        : 1px solid var(--line);
     border-radius : var(--radius);
     background    : var(--panel-2, transparent);
-    color         : var(--fg);
+    color         : var(--color-fg);
     cursor        : pointer;
     font          : inherit;
   }
-  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .btn-primary { background: var(--color-ink); border-color: var(--color-ink); color: #fff; font-weight: bold; }
   .btn-danger  { color: var(--c-null, #e06c75); }
 }
 .filebrowser-error {
@@ -425,7 +425,7 @@ select {
   padding       : 4px;
   display       : flex;
   flex-direction: column;
-  background    : var(--panel, var(--bg));
+  background    : var(--panel, var(--color-bg));
   border        : 1px solid var(--line);
   border-radius : var(--radius);
   box-shadow    : 0 8px 24px rgb(0 0 0 / 0.35);
@@ -438,7 +438,7 @@ select {
   border      : none;
   border-radius: 4px;
   background  : none;
-  color       : var(--fg);
+  color       : var(--color-fg);
   font        : inherit;
   text-align  : left;
   cursor      : pointer;
@@ -461,7 +461,7 @@ select {
   position        : fixed;
   inset           : 0;
   z-index         : 200;                 /* above the modals (100) */
-  background      : color-mix(in srgb, var(--bg) 60%, transparent);
+  background      : color-mix(in srgb, var(--color-bg) 60%, transparent);
   backdrop-filter : blur(4px);
   display         : flex;
   align-items     : center;
@@ -469,7 +469,7 @@ select {
   padding         : 1rem;
 }
 .prompt-dialog {
-  background     : var(--bg);
+  background     : var(--color-bg);
   border         : 1px solid var(--line);
   border-radius  : 0.7rem;
   padding        : 1rem;
@@ -487,26 +487,26 @@ select {
   padding       : 0.5rem 0.65rem;
   border-radius : 0.45rem;
   border        : 1px solid var(--line);
-  background    : color-mix(in srgb, var(--fg) 5%, transparent);
-  color         : var(--fg);
+  background    : color-mix(in srgb, var(--color-fg) 5%, transparent);
+  color         : var(--color-fg);
 }
-.prompt-input:focus { outline: none; border-color: var(--accent); }
+.prompt-input:focus { outline: none; border-color: var(--color-ink); }
 .prompt-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
 
 /* ── github ─────────────────────────────────────────────────────────────── */
 
 .gh-connect { display: flex; flex-direction: column; gap: 0.75rem; }
 .gh-hint    { font-size: 0.85em; line-height: 1.5; opacity: 0.8; }
-.gh-link    { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--accent); text-decoration: none; font-size: 0.85em; }
+.gh-link    { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--color-ink); text-decoration: none; font-size: 0.85em; }
 .gh-input {
   width         : 100%;
   padding       : 0.5rem;
   background    : none;
-  color         : var(--fg);
+  color         : var(--color-fg);
   border        : 2px solid var(--line);
   border-radius : var(--radius);
 }
-.gh-input:focus { outline: none; border-color: var(--accent); }
+.gh-input:focus { outline: none; border-color: var(--color-ink); }
 .gh-error {
   display     : flex;
   align-items : center;
@@ -521,7 +521,7 @@ select {
   padding       : 0.5rem 0.75rem;
   border        : none;
   border-radius : var(--radius);
-  background    : var(--accent);
+  background    : var(--color-ink);
   color         : #fff;
   font          : inherit;
   font-weight   : bold;
@@ -536,7 +536,7 @@ select {
   margin-bottom   : 0.75rem;
 }
 .gh-user    { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: bold; }
-.gh-textbtn { background: none; border: none; color: var(--accent); cursor: pointer; font: inherit; padding: 0.25rem; }
+.gh-textbtn { background: none; border: none; color: var(--color-ink); cursor: pointer; font: inherit; padding: 0.25rem; }
 .gh-busy    { font-size: 0.8em; opacity: 0.6; padding: 0.25rem 0; }
 
 .gh-repopick { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -591,7 +591,7 @@ select {
   border        : 1px solid var(--line);
   border-radius : var(--radius);
   background    : var(--panel-2, transparent);
-  color         : var(--fg);
+  color         : var(--color-fg);
   cursor        : pointer;
   font          : inherit;
 }
@@ -603,7 +603,7 @@ select {
   max-width  : 45%;
 }
 
-.sb-github { color: var(--accent); opacity: 0.85; }
+.sb-github { color: var(--color-ink); opacity: 0.85; }
 
 /* ── welcome ────────────────────────────────────────────────────────────── */
 

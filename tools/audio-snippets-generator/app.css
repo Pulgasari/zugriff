@@ -6,7 +6,7 @@
 .snippets { display: flex; flex-direction: column; gap: .75rem; }
 
 .snippet-pane {
-  border: 1px solid color-mix(in srgb, var(--fg) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-fg) 12%, transparent);
   border-radius: .6rem; overflow: hidden;
 }
 
@@ -15,7 +15,7 @@
 .pane-controls { display: flex; gap: .1rem; flex-shrink: 0; }
 
 /* waveform height + margins — the waveform itself is in shared/css/waveform.css */
-.waveform-wrap { height: 72px; margin-bottom: 1.5rem; background: color-mix(in srgb, var(--fg) 3%, transparent); }
+.waveform-wrap { height: 72px; margin-bottom: 1.5rem; background: color-mix(in srgb, var(--color-fg) 3%, transparent); }
 
 /* ── time row ── */
 .time-row {
@@ -35,7 +35,7 @@
 .preview-bar {
   display: flex; align-items: center; gap: .75rem;
   padding: .65rem .75rem; border-radius: .5rem;
-  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 5%, transparent);
 }
 
 .preview-info { opacity: .5; font-size: .82rem; font-variant-numeric: tabular-nums; }
