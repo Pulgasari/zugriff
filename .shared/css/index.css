@@ -1,10 +1,10 @@
-/* the themes first: --theme, the presets and --bg, --fg, --accent (see theme.css) */
+/* the palettes first: --palette, the presets and --bg, --fg, --accent */
 @import url('https://code.pulgasari.dev/aufbau/css/tokens.css');
+@import url('https://code.pulgasari.dev/aufbau/css/palettes.css');
 @import url('https://code.pulgasari.dev/aufbau/css/themes.css');
 
 @import url('./theme.css');
 @import url('./layout.css');
-/*@import url('./components.css');*/
 @import url('./settings.css');
 @import url('./apps.css');
 

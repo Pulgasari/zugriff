@@ -25,12 +25,10 @@
       } else {
         const basePath = '/' + route;
         document.documentElement.dataset.app   = route;
-        document.documentElement.dataset.theme = 'dracula';
         link('manifest', basePath + '/manifest.json');
         link('icon', basePath + '/app.svg', { type: 'image/svg+xml' });
         link('apple-touch-icon', basePath + '/app.svg');
         link('stylesheet', '/.shared/css/explorer.css');
-        link('stylesheet', '/.shared/css/apps.css');
         link('stylesheet', basePath + '/app.css');
       }
     })();

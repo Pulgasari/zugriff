@@ -42,11 +42,11 @@ const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 
 const labelOf = key => key[0].toUpperCase() + key.slice(1);
 
-// theme is the one field every app carries, the rest comes from the registry
+// palette is the one field every app carries, the rest comes from the registry
 // schema (font, dir …). an enum with `source: 'webfonts'` gets the catalog as values
-function sharedSpec (config, themes) {
+function sharedSpec (config, palettes) {
   const fonts = [['', 'default'], ...(webfonts?.fonts ?? []).map(font => [font.id, font.name])];
-  const spec  = { theme: { type: 'enum', look: 'combobox', values: themes, default: 'dracula', label: 'Theme' } };
+  const spec  = { palette: { type: 'enum', look: 'combobox', values: palettes, default: 'dracula', label: 'Palette' } };
 
   for (const [key, entry] of Object.entries(config.settings ?? {})) {
     const wf = entry.source === 'webfonts' ? { values: fonts } : {};
@@ -66,10 +66,10 @@ function Settings ({ fields = {}, onChange, values = {} }) {
     if (!app || !host.current) return;
     let closed = false;
 
-    // the theme names come from aufbau's themes.css, loaded once
-    gestalt.themes().then(themes => {
+    // the palette names come from aufbau's palettes.css, loaded once
+    gestalt.palettes().then(palettes => {
       if (closed) return;
-      const shared = sharedSpec(app.config, themes);
+      const shared = sharedSpec(app.config, palettes);
       const spec   = { ...shared, ...fields };
       const form   = gui.render(spec, {
         values   : { ...Object.fromEntries(Object.keys(shared).map(key => [key, app.state['$' + key]])), ...values },   // the leaf's value, not its signal
