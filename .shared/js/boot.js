@@ -56,19 +56,23 @@ function initDevTools (force = false) {
   } catch {} // storage may be blocked in incognito
 }
   
-// :::::: Task 2: Palette Boot (Synchronous - Prevents FOUC)
-// the palette leaf of the app's store (zugriff:<slug>:palette), set before the
-// first paint. palettes.css resolves every color from --palette, so the name is
-// all it takes
-function applyPalette ({ prefix }) {
+// :::::: Task 2: Gestalt Boot (Synchronous - Prevents FOUC)
+// the palette, density and geometry leaves of the app's store
+// (zugriff:<slug>:<leaf>), set before the first paint. aufbau's css resolves
+// everything from the tokens, so the names are all it takes
+const GESTALT_TOKENS = ['density', 'geometry', 'palette'];
+
+function applyGestalt ({ prefix }) {
   const slug = $root.dataset.app;
   if (!prefix || !slug) return;
-  try {
-    const palette = JSON.parse(localStorage.getItem(`${prefix}:${slug}:palette`));
-    if (typeof palette !== 'string' || !palette) return;
-    $root.style.setProperty('--palette', palette);
-    $root.dataset.palette = palette;
-  } catch {} // storage may be blocked, a stored value may be broken
+  for (const token of GESTALT_TOKENS) {
+    try {
+      const value = JSON.parse(localStorage.getItem(`${prefix}:${slug}:${token}`));
+      if (typeof value !== 'string' || !value) continue;
+      $root.style.setProperty(`--${token}`, value);
+      $root.dataset[token] = value;
+    } catch {} // storage may be blocked, a stored value may be broken
+  }
 }
 
   // :::::: Task 3: Import Map & Preloads Injection
@@ -132,8 +136,8 @@ function applyPalette ({ prefix }) {
       type  : ds.swType  ?? userConfig.swType  ?? 'module',  // 'module' | 'classic'
       scope : ds.swScope ?? userConfig.swScope ?? undefined,
     },
-    palette: {
-      prefix : ds.palettePrefix ?? userConfig.palettePrefix ?? 'zugriff',
+    gestalt: {
+      prefix : ds.gestaltPrefix ?? userConfig.gestaltPrefix ?? 'zugriff',
     },
     preload     : userConfig.preload || [],
     imports: Object.assign(getImportMap(), userConfig.imports || {})
@@ -142,7 +146,7 @@ function applyPalette ({ prefix }) {
 
   // Run tasks sequentially
   initDevTools();   // eruda only behind ?dev, remembered for the tab
-  applyPalette(config.palette);
+  applyGestalt(config.gestalt);
   injectImportMapAndPreloads(config.imports, config.preload, currentScript.src);
   registerServiceWorker(config.sw);
   initRuntime();

@@ -15,7 +15,7 @@
 //   <${SettingsModal} />
 //
 // an app adds its own fields as a spec, their changes go to `onChange`, the
-// shared ones (theme and the registry schema) keep writing into app.state:
+// shared ones (gestalt and the registry schema) keep writing into app.state:
 //
 //   <${Settings} fields=${{ proxy: { type: 'url', label: 'CORS proxy' } }}
 //                values=${{ proxy: proxy.value }}
@@ -42,11 +42,18 @@ const toggleSettings = () => settingsOpen.value = !settingsOpen.value;
 
 const labelOf = key => key[0].toUpperCase() + key.slice(1);
 
-// palette is the one field every app carries, the rest comes from the registry
-// schema (font, dir …). an enum with `source: 'webfonts'` gets the catalog as values
+// the gestalt fields every app carries: palette, skin, geometry, density. the
+// rest comes from the registry schema (font, dir …). an enum with
+// `source: 'webfonts'` gets the catalog as values, sorted by name across categories
 function sharedSpec (config, palettes) {
-  const fonts = [['', 'default'], ...(webfonts?.fonts ?? []).map(font => [font.id, font.name])];
-  const spec  = { palette: { type: 'enum', look: 'combobox', values: palettes, default: 'dracula', label: 'Palette' } };
+  const byName = (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+  const fonts  = [['', 'default'], ...[...(webfonts?.fonts ?? [])].sort(byName).map(font => [font.id, font.name])];
+  const spec   = {
+    palette  : { type: 'enum', look: 'combobox', values: palettes,           default: 'dracula',    label: 'Palette'  },
+    skin     : { type: 'enum', look: 'combobox', values: gestalt.skins,      default: 'monochrome', label: 'Skin'     },
+    geometry : { type: 'enum', look: 'combobox', values: gestalt.geometries, default: 'soft',       label: 'Geometry' },
+    density  : { type: 'enum', look: 'combobox', values: gestalt.densities,  default: 'normal',     label: 'Density'  },
+  };
 
   for (const [key, entry] of Object.entries(config.settings ?? {})) {
     const wf = entry.source === 'webfonts' ? { values: fonts } : {};
