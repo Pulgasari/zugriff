@@ -197,14 +197,14 @@ function RangeTaskPane ({ task, index, total, min, max, step = 1, unit = '' }) {
   return html`
     <${TaskPane} ...${{ task, index, total }}>
       <input type="range" min=${min} max=${max} step=${step} value=${p.value}
-             onInput=${e => bpUpdateTask(id, { value: +e.target.value })} style="flex:1;accent-color:var(--accent)" />
+             onInput=${e => bpUpdateTask(id, { value: +e.target.value })} style="flex:1;accent-color:var(--color-ink)" />
       <span class="im-task-val">${p.value}${unit}</span>
     </${TaskPane}>`;
 }
 
 const BlurTaskPane = props => { const { id, params: p } = props.task; return html`
   <${TaskPane} ...${props}>
-    <input type="range" min=1 max=20 value=${p.radius} onInput=${e => bpUpdateTask(id, { radius: +e.target.value })} style="flex:1;accent-color:var(--accent)" />
+    <input type="range" min=1 max=20 value=${p.radius} onInput=${e => bpUpdateTask(id, { radius: +e.target.value })} style="flex:1;accent-color:var(--color-ink)" />
     <span class="im-task-val">${p.radius}px</span>
   </${TaskPane}>`; };
 
@@ -253,7 +253,7 @@ const WatermarkTaskPane = props => { const { id, params: p } = props.task;
       <span class="im-task-label">Size</span>
       <input type="number" class="im-task-input sm" value=${p.size} min=8 max=200 onInput=${e => bpUpdateTask(id, { size: +e.target.value })} />
       <span class="im-task-label">Opacity</span>
-      <input type="range" min=0 max=1 step=0.05 value=${p.opacity} onInput=${e => bpUpdateTask(id, { opacity: +e.target.value })} style="width:80px;accent-color:var(--accent)" />
+      <input type="range" min=0 max=1 step=0.05 value=${p.opacity} onInput=${e => bpUpdateTask(id, { opacity: +e.target.value })} style="width:80px;accent-color:var(--color-ink)" />
       ${POS.map(([v, l]) => html`<button class=${'chip' + (p.pos === v ? ' active' : '')} onClick=${() => bpUpdateTask(id, { pos: v })} title=${l}>${v.toUpperCase()}</button>`)}
     </${TaskPane}>`; };
 
@@ -267,7 +267,7 @@ const FilterTaskPane = props => { const { id, params: p } = props.task;
       ${e?.amount && html`
         <span class="im-task-label">Amt</span>
         <input type="range" min=${e.amount.min} max=${e.amount.max} step=${e.amount.step ?? 0.05} value=${p.amount}
-               onInput=${ev => bpUpdateTask(id, { amount: +ev.target.value })} style="width:90px;accent-color:var(--accent)" />
+               onInput=${ev => bpUpdateTask(id, { amount: +ev.target.value })} style="width:90px;accent-color:var(--color-ink)" />
         <span class="im-task-val">${p.amount}</span>`}
     </${TaskPane}>`; };
 

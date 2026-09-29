@@ -23,9 +23,9 @@ function themeColors () {
   const cs = getComputedStyle(document.documentElement);
   const get = (name, fallback) => (cs.getPropertyValue(name).trim() || fallback);
   return {
-    bg     : get('--bg', '#282a36'),
-    fg     : get('--fg', '#f8f8f2'),
-    accent : get('--accent', '#bd93f9'),
+    bg     : get('--color-bg', '#282a36'),
+    fg     : get('--color-fg', '#f8f8f2'),
+    accent : get('--color-ink', '#bd93f9'),
   };
 }
 

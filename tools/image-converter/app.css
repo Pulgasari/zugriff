@@ -17,7 +17,7 @@
   padding       : 0.75rem;
   border-radius : 0.25rem;
   font-size     : 1.00rem;
-  background    : color-mix(in srgb, var(--bg) 95%, var(--fg));
+  background    : color-mix(in srgb, var(--color-bg) 95%, var(--color-fg));
   
   .thumb {
     aspect-ratio : 1 / 1;
@@ -31,9 +31,9 @@
 
 .file-item      .label { white-space: nowrap; }
 
-.file-item.done        { --accent: var(--success); background: color-mix(in oklch, var(--accent) 5%, transparent); }
+.file-item.done        { --color-ink: var(--success); background: color-mix(in oklch, var(--color-ink) 5%, transparent); }
 
-.file-item.done .label { color: var(--accent); }
+.file-item.done .label { color: var(--color-ink); }
 
 .file-item.error       { background: color-mix(in srgb, #f44 8%, transparent); }
 

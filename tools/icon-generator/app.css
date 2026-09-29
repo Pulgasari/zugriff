@@ -39,7 +39,7 @@
   font-size   : 0.85rem;
 }
 .option > span:first-child { min-width: 6rem; opacity: 0.55; }
-.option input[type=range]  { flex: 1; accent-color: var(--accent); }
+.option input[type=range]  { flex: 1; accent-color: var(--color-ink); }
 .option input[type=color]  {
   width         : 2.5rem;
   height        : 1.6rem;

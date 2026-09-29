@@ -21,7 +21,7 @@ body {
 the frame keeps clear of the system bars. 
 :root raises the specificity above an app's own #app rule, 
 and content-box clipping keeps an app's #app background (code paints var(--hair)) out of the inset, 
-where the page shows var(--bg) instead
+where the page shows var(--color-bg) instead
 */
 
 :root #app {
@@ -34,7 +34,7 @@ or move to: aufbau/css/surfaces.css */
 
 @container style(--palette: oled) {
   body {
-    --line: color-mix(in oklch, var(--fg) 15%, transparent);
+    --line: color-mix(in oklch, var(--color-fg) 15%, transparent);
   }
   #app {
     .view > header { border-bottom : 1px solid var(--line); }
@@ -44,10 +44,10 @@ or move to: aufbau/css/surfaces.css */
 }
 
 body {
-  --panel   : color-mix(in oklch, var(--bg) 90%, black);
-  --panel-2 : color-mix(in oklch, var(--bg) 80%, black);
-  --line    : color-mix(in oklch, var(--fg) 15%, transparent);
-  --hover   : color-mix(in oklch, var(--fg) 10%, transparent);
+  --panel   : color-mix(in oklch, var(--color-bg) 90%, black);
+  --panel-2 : color-mix(in oklch, var(--color-bg) 80%, black);
+  --line    : color-mix(in oklch, var(--color-fg) 15%, transparent);
+  --hover   : color-mix(in oklch, var(--color-fg) 10%, transparent);
   --radius  : 0.5rem;
 }
 
@@ -71,26 +71,26 @@ body {
   opacity    : 0.4;
 }
 
-a { color: var(--accent); }
+a { color: var(--color-ink); }
 
 ::selection { background: var(--accent-25); }
 
 /* ── derived tokens ─────────────────────────────────────────────────────── */
 
 body {
-  --zebra : color-mix(in oklch, var(--bg), black 5%);
+  --zebra : color-mix(in oklch, var(--color-bg), black 5%);
 
-  --accent-10 : hsl(from var(--accent) h s l / 0.10);
-  --accent-25 : hsl(from var(--accent) h s l / 0.25);
-  --accent-50 : hsl(from var(--accent) h s l / 0.50);
-  --accent-75 : hsl(from var(--accent) h s l / 0.75);
+  --accent-10 : hsl(from var(--color-ink) h s l / 0.10);
+  --accent-25 : hsl(from var(--color-ink) h s l / 0.25);
+  --accent-50 : hsl(from var(--color-ink) h s l / 0.50);
+  --accent-75 : hsl(from var(--color-ink) h s l / 0.75);
 
-  --fg-25 : hsl(from var(--fg) h s l / 0.25);
-  --fg-50 : hsl(from var(--fg) h s l / 0.50);
-  --fg-75 : hsl(from var(--fg) h s l / 0.75);
+  --fg-25 : hsl(from var(--color-fg) h s l / 0.25);
+  --fg-50 : hsl(from var(--color-fg) h s l / 0.50);
+  --fg-75 : hsl(from var(--color-fg) h s l / 0.75);
 
-  --shadow : 0 0 5px color-mix(in srgb, var(--bg) 90%, black);
+  --shadow : 0 0 5px color-mix(in srgb, var(--color-bg) 90%, black);
 
-  --button-primary-bg : var(--accent);
+  --button-primary-bg : var(--color-ink);
 }
 

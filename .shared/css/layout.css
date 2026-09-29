@@ -37,8 +37,8 @@
 @keyframes bg-change {
     0% { background-color: transparent; box-shadow: none; }
   100% {
-    background-color :          color-mix(in oklch, var(--bg) 90%, black);
-    box-shadow       : 0 0 10px color-mix(in oklch, var(--bg) 90%, black);
+    background-color :          color-mix(in oklch, var(--color-bg) 90%, black);
+    box-shadow       : 0 0 10px color-mix(in oklch, var(--color-bg) 90%, black);
   }
 }
 
@@ -69,7 +69,7 @@
 }
 
 #app-foot {
-  background : color-mix(in oklch, var(--bg) 90%, black);
+  background : color-mix(in oklch, var(--color-bg) 90%, black);
   font-size  : 10px;
   font-style : italic;
   opacity    : 0.50;
@@ -78,7 +78,7 @@
   flex       : 0 1 auto;
   align-self : flex-start;
 
-  strong { color: var(--accent); }
+  strong { color: var(--color-ink); }
 }
 
 #app-loading {

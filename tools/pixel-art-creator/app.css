@@ -4,15 +4,15 @@
 
 .preset-btn {
   background: transparent; cursor: pointer;
-  border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent);
-  color: var(--fg); padding: .2rem .45rem; border-radius: .3rem;
+  border: 1px solid color-mix(in srgb, var(--color-fg) 18%, transparent);
+  color: var(--color-fg); padding: .2rem .45rem; border-radius: .3rem;
   font-size: .75rem; font-weight: 600; font-variant-numeric: tabular-nums;
   opacity: .5; transition: opacity .12s, background .12s, border-color .12s;
 }
 
 .preset-btn:hover  { opacity: 1; }
 
-.preset-btn.active { opacity: 1; background: var(--accent); color: var(--bg); border-color: transparent; }
+.preset-btn.active { opacity: 1; background: var(--color-ink); color: var(--color-bg); border-color: transparent; }
 
 /* ── palette swatch (morphs to a circle when active) ── */
 .pal-swatch {
@@ -21,7 +21,7 @@
   width  : var(--size);
   height : var(--size);
   border-radius: .25rem; cursor: pointer;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 15%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-fg) 15%, transparent);
   transition: transform .1s, box-shadow .1s; position: relative;
 
   &:hover  { border-radius: 50%; }
@@ -39,7 +39,7 @@
   justify-content : flex-start;
   padding         : 0.5rem;
   border-radius   : 0.25rem;
-  border          : 1px solid color-mix(in srgb, var(--fg) 5%, transparent);
+  border          : 1px solid color-mix(in srgb, var(--color-fg) 5%, transparent);
   border          : 1px solid var(--pxl-active);
   width           : 100%;
   overflow        : auto;
@@ -80,7 +80,7 @@
 }
 
 [data-show-grid="true"] .pixel-cell {
-  --cc: color-mix(in srgb, var(--accent) 25%, transparent);
+  --cc: color-mix(in srgb, var(--color-ink) 25%, transparent);
   outline: 1px solid var(--cc);
   &:hover { background: var(--cc); }
 }
@@ -97,7 +97,7 @@
 .used-swatch {
   width: 1.4rem; height: 1.4rem; border-radius: .3rem; cursor: pointer;
   position: relative;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--fg) 15%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-fg) 15%, transparent);
   transition: transform .1s;
 }
 

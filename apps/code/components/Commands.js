@@ -39,7 +39,7 @@ export default function Commands () {
         <strong>${cmd.name || key}</strong>
         <small>${key}</small>
         <div class="fav-btn" onClick=${event => toggleFavorite(event, key)}>
-          <${Icon} name=${isFav ? 'bxs:heart' : 'bx:heart'} color=${isFav ? 'var(--accent, currentcolor)' : 'currentColor'} />
+          <${Icon} name=${isFav ? 'bxs:heart' : 'bx:heart'} color=${isFav ? 'var(--color-ink, currentcolor)' : 'currentColor'} />
         </div>
       </li>`;
   };

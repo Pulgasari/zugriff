@@ -5,8 +5,8 @@
 .panel {
   display: flex; flex-direction: column; gap: .85rem;
   padding: .9rem; border-radius: .6rem;
-  border: 1px solid color-mix(in srgb, var(--fg) 10%, transparent);
-  background: color-mix(in srgb, var(--fg) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 3%, transparent);
 }
 
 .settings-group { display: flex; flex-direction: column; gap: .65rem; }
@@ -26,7 +26,7 @@
 
 .entropy-bar {
   height: 5px; border-radius: 3px;
-  background: color-mix(in srgb, var(--fg) 12%, transparent); overflow: hidden;
+  background: color-mix(in srgb, var(--color-fg) 12%, transparent); overflow: hidden;
 }
 
 .entropy-fill { height: 100%; border-radius: 3px; transition: width .3s, background .3s; }
@@ -39,11 +39,11 @@
 .pw-row {
   display: flex; align-items: center; gap: .6rem;
   padding: .55rem .7rem; border-radius: .45rem;
-  background: color-mix(in srgb, var(--fg) 5%, transparent);
+  background: color-mix(in srgb, var(--color-fg) 5%, transparent);
   cursor: pointer; transition: background .12s;
 }
 
-.pw-row:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.pw-row:hover { background: color-mix(in srgb, var(--color-ink) 10%, transparent); }
 
 .pw-value {
   flex: 1; font-size: .85rem; letter-spacing: .03em;

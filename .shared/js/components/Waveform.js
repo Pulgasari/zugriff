@@ -21,8 +21,8 @@ function Waveform ({ peaks, start, end, duration, playPos }) {
 
     const ctx    = canvas.getContext('2d');
     const style  = getComputedStyle(document.documentElement);
-    const accent = style.getPropertyValue('--accent').trim() || '#3498db';
-    const fg     = style.getPropertyValue('--fg').trim()     || '#ffffff';
+    const accent = style.getPropertyValue('--color-ink').trim() || '#3498db';
+    const fg     = style.getPropertyValue('--color-fg').trim()     || '#ffffff';
     const sx     = (start / duration) * W;
     const ex     = (end   / duration) * W;
     const barW   = Math.max(1.5, W / peaks.length - 0.5);
