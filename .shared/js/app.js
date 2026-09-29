@@ -120,10 +120,13 @@ class ZugriffApp {
 
     const state = signalStore ({
       color    : { type: 'scalar', value: config.color },
+      density  : { type: String,   value: config.density  ?? 'normal' },
       dir      : { type: 'enum',   value: config.dir, values: ['ltr', 'rtl'] },
-      font     : { type: String,   value: config.font  ?? 'Manrope' },
+      font     : { type: String,   value: config.font     ?? 'Manrope' },
+      geometry : { type: String,   value: config.geometry ?? 'soft' },
       lang     : { type: 'scalar', value: config.lang },
-      palette  : { type: String,   value: config.palette ?? 'dracula' },
+      palette  : { type: String,   value: config.palette  ?? 'dracula' },
+      skin     : { type: String,   value: config.skin     ?? 'monochrome' },
       title    : { type: 'scalar', value: config.title ?? config.name ?? null },
       viewport : { type: 'scalar', value: config.viewport },
 
@@ -137,13 +140,17 @@ class ZugriffApp {
     });
 
     // pure side effects, persistence is the store's job. boot.js reads the stored
-    // palette before the first paint
+    // palette, density and geometry before the first paint. what they change is
+    // up to aufbau's gestalt, zugriff only hands the values on
     state.$onEffects({
-      dir     : value => { if ($root && value) $root.setAttribute('dir', value); },
-      font    : value => { if (value) webfonts.apply(value, { role: '--font' }); },
-      lang    : value => { if ($root && value) $root.lang = value; },
-      palette : value => applyPalette(value),
-      title   : value => { if ($doc && value) $doc.title = value; },
+      density  : value => { if (value) aufbau.gestalt.set({ density: value }); },
+      dir      : value => { if ($root && value) $root.setAttribute('dir', value); },
+      font     : value => { if (value) webfonts.apply(value, { role: '--font' }); },
+      geometry : value => { if (value) aufbau.gestalt.set({ geometry: value }); },
+      lang     : value => { if ($root && value) $root.lang = value; },
+      palette  : value => applyPalette(value),
+      skin     : value => { if (value) aufbau.gestalt.set({ skin: value }); },
+      title    : value => { if ($doc && value) $doc.title = value; },
     });
 
     return state;
@@ -188,7 +195,7 @@ class ZugriffApp {
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {
     // aufbau.css comes with index.css, the palette is the app's own
-    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, theme: false } });
+    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin, theme: false } });
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
