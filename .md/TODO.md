@@ -12,6 +12,9 @@
   - [ ] möglichkeit für sondercomments (zb "startet mit `todo:`) welche besonders hervorgehoben und/oder erfasst werden, zb um sie aufzulisten.oder hinzuspringen
   - [ ] evtl. md-syntax/-highlighting
 
+### features, wo ich nicht weiß, ob/wie das umzusetzen ginge:
+- [ ] collaborations-modus
+
 ## `apps/icons`
 - [ ] icons favorisieren
 - [ ] iconsets favorisieren
