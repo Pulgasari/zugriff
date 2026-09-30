@@ -2,9 +2,9 @@
 
 import Icon     from './Icon.js';
 
-function Button ({ children, className, class: klass, icon, onClick, label, text, disabled, title }) {
+function Button ({ children, className, class: klass, icon, onClick, label, text, disabled, title, 'aria-current': current }) {
   return html`
-    <button class=${className || klass} ...${{ disabled, onClick, title }}>
+    <button class=${className || klass} aria-current=${current} ...${{ disabled, onClick, title }}>
       ${icon && html`<${Icon} name=${icon} />`}
       ${children || label || text}
     </button>

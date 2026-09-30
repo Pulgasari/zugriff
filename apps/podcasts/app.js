@@ -93,12 +93,13 @@ app.effect(() => {
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
+// match: the detail views that keep their list's item active
 const dockItems = [
-  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'latest'    },
-  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'  },
-  { label: 'Later',    icon: 'bookmarks',             view: 'saved'     },
-  { label: 'Explore',  icon: 'mdi:compass-outline',   view: 'explore'   },
-  { label: 'Settings', icon: 'settings',              view: 'settings'  },
+  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'latest',   match: ['episode']         },
+  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts', match: ['podcast']         },
+  { label: 'Later',    icon: 'bookmarks',             view: 'saved'                                },
+  { label: 'Explore',  icon: 'mdi:compass-outline',   view: 'explore',  match: ['explore-podcast'] },
+  { label: 'Settings', icon: 'settings',              view: 'settings'                             },
 ];
 
 app.dialogs = {
@@ -132,7 +133,7 @@ function App () {
       <${Slot} map=${app.dialogs} name=${modal} load='dialog' />
     </main>
     <${PlayerPanel} />
-    <${Dock} items=${dockItems} />
+    <${Dock} items=${dockItems} current=${view} />
   </>`;
 }
 
