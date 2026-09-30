@@ -174,6 +174,7 @@ function applyGestalt ({ prefix }) {
       "@aufbau/devtools"        : `${pkg}/aufbau/devtools/index.js`,
       "@aufbau/devtools/"       : `${pkg}/aufbau/devtools/`,
       "@aufbau/elements"        : `${pkg}/aufbau/elements/index.js`,
+      "@aufbau/elements/htx"    : `${pkg}/aufbau/elements/adapters/htx.js`,
       "@aufbau/elements/"       : `${pkg}/aufbau/elements/`,
       "@aufbau/filters"         : `${pkg}/aufbau/filters/index.js`,
       "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
