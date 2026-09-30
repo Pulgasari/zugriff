@@ -43,6 +43,7 @@ app.state.$extend({
 
 const path     = signal([]);      // the folders below the root, by name
 const entries  = signal([]);      // the listing of path
+const loading  = signal(false);   // a listing is on its way, the old one is gone already
 const query    = signal('');      // the live filter
 const selected = signal(null);    // the entry a single click picked (double mode)
 const file     = signal(null);    // the entry in the preview
@@ -59,16 +60,22 @@ const opensOnTap = () => app.state.$open === 'single' || (app.state.$open === 'a
 const rootHandle = () => app.db.perm.value === 'granted' ? app.db.folder.value?.handle ?? null : null;
 
 // the listing follows the folder, its permission and the path by itself. the
-// last request wins, a slow folder answering late is dropped
+// old listing goes at once: its entries would still open against the new path
+// while a big folder loads. the last request wins, a late answer is dropped
 let request = 0;
 effect(() => {
   const root = rootHandle();
   const at   = path.value;
   const own  = ++request;
-  if (!root) { entries.value = []; return; }
+
+  entries.value = [];
+  loading.value = Boolean(root);
+  if (!root) return;
+
   fs.list(root, at)
-    .then(list => { if (own === request) entries.value = list; })
-    .catch(err => { if (own === request) { app.toast.error(err); entries.value = []; } });
+    .then (list => { if (own === request) entries.value = list; })
+    .catch(err  => { if (own === request) app.toast.error(err); })
+    .finally(()  => { if (own === request) loading.value = false; });
 });
 
 function goTo (next) {
@@ -206,7 +213,8 @@ function Library () {
 
   return html`
     <${Toolbar} />
-    ${list.length
+    ${loading.value ? html`<${Icon} name='loading' />`
+    : list.length
       ? html`<aufbau-index viewmode=${app.state.$viewmode} item-size='7rem'>${list.map(entry => html`<${Entry} key=${entry.name} entry=${entry} />`)}</aufbau-index>`
       : html`<p class='empty'>${query.value ? 'nothing matches the filter' : 'this folder is empty'}</p>`}
   `;
