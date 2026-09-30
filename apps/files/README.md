@@ -1,54 +1,41 @@
 # files
 
-A file explorer over a folder from your **own disk**. 
+A file manager over a folder from your **own disk**. You grant one folder with
+the File System Access API and it becomes the root. Nothing is uploaded and
+nothing is copied, only the directory handle is kept, so a returning visit just
+asks for permission again.
 
-**in web:**
+## views
 
-You grant one folder with.the [File System Access API](./../../shared/js/lib/fsaccess.js) and it becomes the root of the explorer — browse the tree, preview files, download them back out. Nothing is uploaded and nothing is copied; only the directory handle is persisted, and only so we can re-ask for it on the next visit.
+| view       | route        | what it is |
+|------------|--------------|------------|
+| `library`  | `#/`         | the folder: breadcrumb, filter, grid or list, folders open in place |
+| `preview`  | `#/preview`  | one file: type, size, an image inline, download. a sketch for now |
+| `settings` | `#/settings` | the shared settings (palette, skin, geometry, density, font), how entries open, the folder |
 
-**in the android app:**
-- global mode
-- scoped mode
+The views are `<app-view>`s in an `<app-root routing="hash">` (`@aufbau/components`),
+so the address is the state and back and forward work. The dock switches them.
 
-## what it does
+## opening entries
 
-- **grant a folder** — it becomes the root; the handle is remembered (in one
-  `@bunker/db` store) so a returning visit just re-asks for permission
-- browse the directory tree — double-click a folder to open it, breadcrumb or
-  `Backspace` to go back, list and grid views, a live filter
-- a details panel with inline previews — images render, small text files show
-  their contents — and **download** any file
-- **change** the granted folder or **close** it (which only forgets the handle)
+`Settings → Open with`:
 
-Browsing is read-only for now (the folder is picked with `mode:'read'`) — this
-is the “grant a folder as root” sketch; granting write is a later step.
+- `auto` (default): a tap on touch screens, a double click with a mouse
+- `a tap`: one click opens
+- `a double click`: one click selects, a double click or Enter opens
 
 ## how it's built
 
-The browsing surface itself is the shared
-[`FileExplorer`](./../../shared/js/components/FileExplorer.js) component. This
-app only builds a *backend* around the granted folder and hands it to the
-component; the same component, over `dirfs.js`'s `opfsBackend`, browses the
-private OPFS the cli uses. So the OPFS browser this app used to be now lives as
-a reusable component any app can embed.
-
 | file            | what it is |
 |-----------------|------------|
-| `app.js`        | the app chrome — sidebar + welcome/reconnect screens — around `<${FileExplorer}>`, mounted on `zugriff.app` |
-| `modules/db.js` | persists the one granted root handle (`@bunker/db`) + the permission dance |
-| `app.css`       | the app's own look — sidebar and hero screens only |
-| `manifest.json` | pwa manifest (generated from the registry) |
-| `app.svg`       | the app icon |
+| `app.js`        | the app: state, the three views, the dock |
+| `modules/db.js` | the one granted folder handle (`@bunker/db`) and the permission dance |
+| `app.css`       | the frame layout and the look of an entry, the rest is aufbau's |
 
-The explorer engine lives in `shared/`:
+Built from `app-root`, `app-view`, `div-x`, `div-y`, `input-search`
+(`@aufbau/components`) and `aufbau-index`, `aufbau-item`, `aufbau-crumbs`,
+`aufbau-picker` (`@aufbau/elements`). The listing follows the folder, its
+permission and the path by itself (`effect`).
 
-- [`shared/js/components/FileExplorer.js`](./../../shared/js/components/FileExplorer.js) — the UI
-- [`shared/css/explorer.css`](./../../shared/css/explorer.css) — its look (scoped under `.fx`)
-- [`shared/js/lib/dirfs.js`](./../../shared/js/lib/dirfs.js) — directory-tree ops over any `FileSystemDirectoryHandle` root, plus the ready-made `opfsBackend`
-
-## notes
-
-Folder permissions don't survive a plain reload in every browser, so the app
-nudges you to **install** it — an installed PWA keeps the grant (“allow on every
-visit”). Browsers without the File System Access API get a friendly
-“can't open folders here” screen instead of a broken page.
+The former explorer (`FileExplorer`, `explorer.css`) stays in `.shared` for the
+other apps that embed it.
