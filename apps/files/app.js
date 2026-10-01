@@ -619,7 +619,7 @@ function RemoteManager () {
       ${remoteError.value && html`<p class='error'>${remoteError.value}</p>`}
       <button class='action' type='submit' disabled=${remoteBusy.value}><${Icon} name=${remoteBusy.value ? 'loading' : 'lucide:plug'} /> connect</button>
     </form>
-    <p class='hint'>The server has to allow this app (cors). Nextcloud: the url ends in /remote.php/dav/files/${'<user>'}/, best with an app password. The password stays on this device.</p>
+    <p class='hint'>In a browser the server has to allow this app (cors), the android app needs nothing of the kind. Nextcloud: the url ends in /remote.php/dav/files/${'<user>'}/, best with an app password. The password stays on this device.</p>
   `;
 }
 

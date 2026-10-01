@@ -3,10 +3,10 @@
 FileSync speaks a subset of the **LocalSend v2** protocol, so it interoperates
 with existing LocalSend apps. In zugriff the sender is the files app on android
 (`FileSyncPlugin.java` and `LocalSend.java` here, the `sync` view of
-`apps/files`); the receiver is any LocalSend app, or the node desktop daemon of
-the original project (`pulgasari/wallpaperfx`, `apps/filesync/desktop`). This
-file is the invariant between them: change the wire shape there and here
-together.
+`apps/files`); the receiver is the official LocalSend app, which needs nothing
+from this side (the node desktop daemon of the original project,
+`pulgasari/wallpaperfx`, speaks the same subset). keep the sender within what
+LocalSend v2 defines.
 
 ## Roles (v0)
 

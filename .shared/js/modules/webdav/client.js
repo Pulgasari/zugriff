@@ -7,13 +7,16 @@
 //   const connection = { url: 'https://cloud.example/remote.php/dav/files/me/', username, password };
 //   await list(connection, 'photos');   // [{ isDir, lastModified, mime, name, path, size }]
 //
-// direct only: the browser talks to the server itself, so the server has to send
-// cors headers (allow this origin, the webdav methods and the Authorization,
-// Depth, Destination and Overwrite headers). a self-hosted nextcloud/owncloud with
-// cors on, `rclone serve webdav --cors`, or a proxy that adds the headers. the big
-// consumer clouds speak their own oauth apis instead.
+// the requests go through request() of modules/http.js. in the android app that
+// is native and knows no cors, any server works. in a browser it is fetch: the
+// server has to send cors headers (allow this origin, the webdav methods and the
+// Authorization, Depth, Destination and Overwrite headers), as a self-hosted
+// nextcloud/owncloud with cors on, `rclone serve webdav --cors` or a proxy that
+// adds them. the big consumer clouds speak their own oauth apis instead.
 //
 // a path is relative to the connection's url, '/'-joined, '' for its root.
+
+import { request as send } from '../http.js';
 
 // :::::: URLS :::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -46,8 +49,12 @@ export async function request (connection, path, { body, headers = {}, isDir = f
   if (!connection) throw new Error('No webdav connection.');
 
   let response;
-  try   { response = await fetch(urlFor(connection, path, isDir), { body, headers: { Authorization: authHeader(connection), ...headers }, method }); }
-  catch { throw new DavError(0, 'Connection failed, the server must allow cors (Access-Control-Allow-Origin) and the webdav methods for browser access.'); }
+  try   { response = await send(urlFor(connection, path, isDir), { body, headers: { Authorization: authHeader(connection), ...headers }, method }); }
+  catch (err) {
+    // natively there is no cors to blame, the message says what went wrong
+    if (globalThis.Capacitor?.isNativePlatform?.()) throw new DavError(0, `Connection failed: ${err?.message ?? err}`);
+    throw new DavError(0, 'Connection failed, the server must allow cors (Access-Control-Allow-Origin) and the webdav methods for browser access.');
+  }
 
   if (!response.ok) throw new DavError(response.status, MESSAGES[response.status] ?? `${response.status} ${response.statusText}`);
   return response;

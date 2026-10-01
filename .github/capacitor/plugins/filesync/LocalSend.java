@@ -81,6 +81,9 @@ public class LocalSend {
         String prepareUrl = base + API + "/prepare-upload";
         if (pin != null && !pin.isEmpty()) prepareUrl += "?pin=" + enc(pin);
         HttpURLConnection pc = open(prepareUrl, "POST", "application/json", fingerprint);
+        // the receiver may ask its user first (localsend does, unless quick save is on):
+        // the answer to prepare-upload can take as long as that tap
+        pc.setReadTimeout(5 * 60 * 1000);
         writeBytes(pc, prepare.toString().getBytes("UTF-8"));
         int pcode = pc.getResponseCode();
         String prespBody = readBody(pc);

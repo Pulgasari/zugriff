@@ -12,6 +12,15 @@
 //   const xml  = await getText(feedUrl, { accept: 'application/rss+xml', proxy });
 //   const data = await getJson(apiUrl, { signal });
 //
+// request() is for everything beyond a get: any method, headers and a body,
+// answered with a fetch Response. in the capacitor wrapper it goes through the
+// repo's own NativeHttp plugin (.github/capacitor/plugins/), which also carries
+// the methods android's http stack refuses (webdav: PROPFIND, MKCOL, MOVE,
+// COPY). in a browser it is fetch, cors and all, and there is no proxy for it:
+// a proxy would see credentials and bodies.
+//
+//   const response = await request(url, { body, headers: { Depth: '1' }, method: 'PROPFIND' });
+//
 // the capacitor bridge is reached through globalThis.Capacitor, never imported,
 // see modules/filesystem/platform.js
 
@@ -22,6 +31,21 @@ const PROXY = 'https://api.allorigins.win/raw?url={url}';
 // :::::: HELPERS
 
 const nativeHttp = () => globalThis.Capacitor?.isNativePlatform?.() ? globalThis.Capacitor.Plugins?.CapacitorHttp ?? null : null;
+const nativeRaw  = () => globalThis.Capacitor?.isNativePlatform?.() ? globalThis.Capacitor.Plugins?.NativeHttp ?? null : null;
+
+// the bridge carries strings only, bodies go as base64
+async function toBase64 (body) {
+  if (body == null) return null;
+  const bytes = new Uint8Array(body instanceof ArrayBuffer ? body : ArrayBuffer.isView(body) ? body.buffer : await new Blob([body]).arrayBuffer());
+  let binary = '';
+  for (let start = 0; start < bytes.length; start += 0x8000) binary += String.fromCharCode(...bytes.subarray(start, start + 0x8000));
+  return btoa(binary);
+}
+
+const fromBase64 = data => Uint8Array.from(atob(data ?? ''), char => char.charCodeAt(0));
+
+// a response without a body may not be given one, a fetch Response refuses it
+const EMPTY = new Set([101, 204, 205, 304]);
 
 // null without a template: the direct route is the only one then
 function viaProxy (proxy, url) {
@@ -71,6 +95,19 @@ async function get (url, { accept, as = 'text', proxy = PROXY, signal } = {}) {
 const getJson = (url, options = {}) => get(url, { accept: 'application/json', ...options, as: 'json' });
 const getText = (url, options = {}) => get(url, { ...options, as: 'text' });
 
+/** any method, any body, a fetch Response back: natively in the app, fetch in a browser */
+async function request (url, { body, headers = {}, method = 'GET', signal, timeout } = {}) {
+  const raw = nativeRaw();
+  if (!raw) return fetch(url, { body, headers, method, signal });
+
+  const answer = await raw.request({ body: await toBase64(body), headers, method, timeout, url });
+  return new Response(EMPTY.has(answer.status) ? null : fromBase64(answer.data), {
+    headers    : answer.headers,
+    status     : answer.status,
+    statusText : answer.statusText,
+  });
+}
+
 // :::::: EXPORT
 
-export { getJson, getText, PROXY, viaProxy };
+export { getJson, getText, PROXY, request, viaProxy };

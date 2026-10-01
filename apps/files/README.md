@@ -68,8 +68,9 @@ one, else copy and delete. Files are copied as streams.
 ## send (lan)
 
 The `sync` view (`#/sync`, in the menu as Send) sends files to a device on the
-local network over LocalSend v2: any LocalSend app receives them, or the node
-desktop daemon of the original filesync (`pulgasari/wallpaperfx`). It needs the
+local network over LocalSend v2: the official LocalSend app on the other side
+is all it takes (with quick save on, nobody has to tap accept for auto sync).
+It needs the
 android app: the network part is the native FileSync plugin
 (`.github/capacitor/plugins/filesync/`, protocol in its `PROTOCOL.md`), only
 the files app carries it (`build.plugins` in the registry).
@@ -101,8 +102,10 @@ WebDAV servers (Nextcloud and ownCloud included) are connected from the
 dashboard and open in a tab of their own (`modules/remotes.js`). A connection
 is a root handle like the granted folder (`.shared/js/modules/webdav/`), so
 browsing, preview, thumbnails, copy and move all work on it, and between it and
-the folder. The server has to allow cors for this app. The credentials stay on
-the device, in opfs. Drive, (S)FTP and LAN are tiles that say what each would
+the folder. In the android app the requests are native (`request()` of
+`.shared/js/modules/http.js`, the NativeHttp plugin), any server works; in a
+browser the server has to allow cors for this app. The credentials stay on the
+device, in opfs. Drive, (S)FTP and LAN are tiles that say what each would
 need.
 
 ## writing
