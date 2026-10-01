@@ -20,6 +20,13 @@
 //   const thumbs = createThumbCache({ proxy: () => corsProxy.value });
 //   const url = await thumbs.request(imageUrl);   // -> blob object-url or null
 //
+// a file the app already holds (a granted folder, an upload) skips the fetch:
+//
+//   const url = await thumbs.requestFile(`${path}:${file.size}:${file.lastModified}`, () => handle.getFile());
+//
+// the id is the cache key, so it should change with the file: size and
+// modification time in it make an edited image a new thumbnail.
+//
 // logging (@pulgasari/logger, scope 'thumbs'): a generated thumbnail and a
 // proxy fallback log at info, a failure at warn — both visible by default. cache
 // hits log at debug; run `setLogLevel('debug')` from @pulgasari/logger to see
@@ -171,6 +178,31 @@ export function createThumbCache ({
     return null;
   }
 
+  // ── downscale a blob into a webp ─────────────────────────────────────────
+  // returns { blob, w, h } on success, or { error } describing the failure.
+  async function downscale (source) {
+    let bitmap;
+    try   { bitmap = await createImageBitmap(source); } // decode once; bail if not an image
+    catch { return { error: 'decode' }; }
+
+    // downscale only — a small original is kept at its own size, never blown up
+    const scale = Math.min(1, width / (bitmap.width || width));
+    const w = Math.max(1, Math.round((bitmap.width  || 1) * scale));
+    const h = Math.max(1, Math.round((bitmap.height || 1) * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close?.();
+
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', quality));
+    if (!blob) return { error: 'encode' };
+    return { blob, w, h };
+  }
+
   // ── generate a downscaled webp blob from the original ──────────────────────
   // returns { blob, via, w, h } on success, or { error } describing the failure.
   async function generate (url) {
@@ -190,26 +222,8 @@ export function createThumbCache ({
     const got = await fetchBytes(url);
     if (!got) return { error: 'fetch' };
 
-    let bitmap;
-    try   { bitmap = await createImageBitmap(got.blob); } // decode once; bail if not an image
-    catch { return { error: 'decode' }; }
-
-    // downscale only — a small original is kept at its own size, never blown up
-    const scale = Math.min(1, width / (bitmap.width || width));
-    const w = Math.max(1, Math.round((bitmap.width  || 1) * scale));
-    const h = Math.max(1, Math.round((bitmap.height || 1) * scale));
-
-    const canvas = document.createElement('canvas');
-    canvas.width  = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(bitmap, 0, 0, w, h);
-    bitmap.close?.();
-
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', quality));
-    if (!blob) return { error: 'encode' };
-    return { blob, via: got.via, w, h };
+    const made = await downscale(got.blob);
+    return made.error ? made : { ...made, via: got.via };
   }
 
   // ── storage bookkeeping (soft lru by write time) ──────────────────────────
@@ -242,6 +256,39 @@ export function createThumbCache ({
     return u;
   }
 
+  // a cache hit from memory or opfs, else `make` once per key, stored on success
+  function cached (key, name, make) {
+    if (mem.has(key)) { log.debug('cache', 'mem', name); return Promise.resolve(mem.get(key)); }
+    if (inflight.has(key)) return inflight.get(key);
+
+    const job = (async () => {
+      const hit = await load(key);
+      if (hit) { log.debug('cache', 'opfs', name); return hit; }
+      try {
+        const res = await gate(make);
+        if (!res || res.error) {
+          log.warn('fail', res?.error || 'unknown', name);
+          return null;
+        }
+        await store(key, res.blob);
+        const u = URL.createObjectURL(res.blob);
+        mem.set(key, u);
+        const dims = res.w && res.h ? `${res.w}×${res.h}` : null;
+        log.info(!res.via || res.via === 'direct' ? 'made' : `made (via ${res.via})`,
+                 ...[dims, asKb(res.blob.size), name].filter(Boolean));
+        return u;
+      } catch (err) {
+        log.warn('fail', 'store', name, err?.message || err);
+        return null;
+      } finally {
+        inflight.delete(key);
+      }
+    })();
+
+    inflight.set(key, job);
+    return job;
+  }
+
   return {
     /** the cached object-url if it is already in memory, else null (sync) */
     peek (url) { return url ? (mem.get(keyOf(url)) || null) : null; },
@@ -253,36 +300,21 @@ export function createThumbCache ({
      */
     async request (url) {
       if (!url) return null;
-      const key = keyOf(url);
-      if (mem.has(key)) { log.debug('cache', 'mem', label(url)); return mem.get(key); }
-      if (inflight.has(key)) return inflight.get(key);
+      return cached(keyOf(url), label(url), () => generate(url));
+    },
 
-      const job = (async () => {
-        const cached = await load(key);
-        if (cached) { log.debug('cache', 'opfs', label(url)); return cached; }
-        try {
-          const res = await gate(() => generate(url));
-          if (!res || res.error) {
-            log.warn('fail', res?.error || 'unknown', label(url));
-            return null;
-          }
-          await store(key, res.blob);
-          const u = URL.createObjectURL(res.blob);
-          mem.set(key, u);
-          const dims = res.w && res.h ? `${res.w}×${res.h}` : null;
-          log.info(res.via === 'direct' ? 'made' : `made (via ${res.via})`,
-                   ...[dims, asKb(res.blob.size), label(url)].filter(Boolean));
-          return u;
-        } catch (err) {
-          log.warn('fail', 'store', label(url), err?.message || err);
-          return null;
-        } finally {
-          inflight.delete(key);
-        }
-      })();
+    /** the cached object-url for `id` if it is already in memory, else null (sync) */
+    peekFile (id) { return id ? (mem.get(keyOf(id)) || null) : null; },
 
-      inflight.set(key, job);
-      return job;
+    /**
+     * the thumbnail of a file the app already has: `getFile` returns the blob
+     * (a File, or a promise of one) and is only called on a miss. resolves to
+     * null for anything that does not decode as an image.
+     */
+    async requestFile (id, getFile) {
+      if (!id || !canResize) return null;
+      const name = id.replace(/(:\d+)+$/, '').split('/').pop();
+      return cached(keyOf(id), name, async () => downscale(await getFile()));
     },
 
     /** kick off generation for a batch of urls, ignoring the results */

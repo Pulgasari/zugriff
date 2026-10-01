@@ -164,6 +164,7 @@ export {
   settingsOpen,
 
   closeSettings,
+  sharedSpec,
   toggleSettings,
 };
 export default Settings;
