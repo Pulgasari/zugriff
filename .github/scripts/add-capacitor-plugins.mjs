@@ -5,34 +5,88 @@
 // `cap sync`; these live in .github/capacitor/plugins/ as plain java sources, so
 // they are copied in by hand and registered in MainActivity.
 //
-//   node .github/scripts/add-capacitor-plugins.mjs build/files
+//   APP_SLUG=files node .github/scripts/add-capacitor-plugins.mjs build/files
 //
-// every *.java there is one plugin class named after its file, placed by its own
-// `package` line. idempotent: a second run overwrites the sources and leaves
-// MainActivity alone.
+// two kinds:
+//   plugins/*.java          every app gets them (the saf folder access)
+//   plugins/<name>/         only the apps whose registry entry lists <name> in
+//                           build.plugins. a folder may hold helper classes next
+//                           to its plugin, and a manifest.json with what it adds to
+//                           AndroidManifest.xml: permissions, services, cleartext
+//
+// every java file is placed by its own `package` line. a class is registered
+// when it is annotated @CapacitorPlugin, the helpers are only copied.
+// idempotent: a second run overwrites the sources, adds nothing twice to the
+// manifest and leaves MainActivity alone.
 
 import { cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { registry } from './../../.shared/js/data/apps.js';
 
-const ROOT    = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const SOURCES = join(ROOT, '.github', 'capacitor', 'plugins');
-const javaDir = join(process.argv[2] || '.', 'android', 'app', 'src', 'main', 'java');
+const ROOT     = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+const SOURCES  = join(ROOT, '.github', 'capacitor', 'plugins');
+const project  = process.argv[2] || '.';
+const javaDir  = join(project, 'android', 'app', 'src', 'main', 'java');
+const manifest = join(project, 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
+
+const slug     = process.env.APP_SLUG;
+const optional = (slug && registry.get(slug)?.build?.plugins) || [];
 
 // :::::: COPY
 
-const plugins = [];
+const plugins   = [];
+const fragments = [];
 
-for (const file of (await readdir(SOURCES)).filter(name => name.endsWith('.java'))) {
-  const source = await readFile(join(SOURCES, file), 'utf8');
-  const pkg    = source.match(/^package\s+([\w.]+)\s*;/m)?.[1];
-  if (!pkg) throw new Error(`add-capacitor-plugins: ${file} has no package line`);
+async function copyJava (dir) {
+  for (const file of (await readdir(dir)).filter(name => name.endsWith('.java'))) {
+    const source = await readFile(join(dir, file), 'utf8');
+    const pkg    = source.match(/^package\s+([\w.]+)\s*;/m)?.[1];
+    if (!pkg) throw new Error(`add-capacitor-plugins: ${file} has no package line`);
 
-  const target = join(javaDir, ...pkg.split('.'));
-  await mkdir(target, { recursive: true });
-  await cp(join(SOURCES, file), join(target, file));
+    const target = join(javaDir, ...pkg.split('.'));
+    await mkdir(target, { recursive: true });
+    await cp(join(dir, file), join(target, file));
 
-  plugins.push(`${pkg}.${file.slice(0, -'.java'.length)}`);
+    if (/@CapacitorPlugin\b/.test(source)) plugins.push(`${pkg}.${file.slice(0, -'.java'.length)}`);
+  }
+}
+
+await copyJava(SOURCES);
+
+for (const name of optional) {
+  const dir = join(SOURCES, name);
+  if (!existsSync(dir)) throw new Error(`add-capacitor-plugins: ${slug} asks for "${name}", there is no ${dir}`);
+  await copyJava(dir);
+  if (existsSync(join(dir, 'manifest.json'))) fragments.push(JSON.parse(await readFile(join(dir, 'manifest.json'), 'utf8')));
+}
+
+// :::::: MANIFEST
+// string edits on the template's manifest: a permission before </manifest>, a
+// service before </application>, cleartext as an attribute of <application>
+
+if (fragments.length) {
+  let xml = await readFile(manifest, 'utf8');
+
+  for (const fragment of fragments) {
+    for (const permission of fragment.permissions ?? []) {
+      if (xml.includes(`"${permission}"`)) continue;
+      xml = xml.replace('</manifest>', `    <uses-permission android:name="${permission}" />\n</manifest>`);
+    }
+
+    for (const service of fragment.services ?? []) {
+      if (xml.includes(`"${service.name}"`)) continue;
+      const type = service.foregroundServiceType ? `\n            android:foregroundServiceType="${service.foregroundServiceType}"` : '';
+      xml = xml.replace(/\n([ \t]*)<\/application>/, (_, indent) => `\n        <service\n            android:name="${service.name}"\n            android:exported="false"${type} />\n${indent}</application>`);
+    }
+
+    if (fragment.cleartext && !xml.includes('usesCleartextTraffic')) {
+      xml = xml.replace('<application', '<application\n        android:usesCleartextTraffic="true"');
+    }
+  }
+
+  await writeFile(manifest, xml);
 }
 
 // :::::: REGISTER
@@ -78,4 +132,4 @@ ${plugins.map(name => `        registerPlugin(${name}.class);`).join('\n')}
 `);
 }
 
-console.log(`add-capacitor-plugins: ${plugins.join(', ')} -> ${activityPath}`);
+console.log(`add-capacitor-plugins: ${plugins.join(', ')} -> ${activityPath}${fragments.length ? `, manifest: ${optional.join(', ')}` : ''}`);
