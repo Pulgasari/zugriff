@@ -92,7 +92,7 @@ const config = {
 // live server.url the webview otherwise loads the real site straight away).
 const fallback = `<!doctype html>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>${config.appName}</title>
 <body style="margin:0;display:grid;place-items:center;min-height:100vh;font:16px system-ui;background:${app.color};color:#f8f8f2">
   <p style="opacity:.7">Offline — reconnect to open ${config.appName}.</p>

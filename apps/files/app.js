@@ -779,7 +779,7 @@ function Library () {
       <div class='listing'>
         ${loading.value ? html`<${Icon} name='loading' />`
         : list.length
-          ? html`<aufbau-index viewmode=${viewmode} item-size='8rem'>${list.map(entry => html`<${Entry} key=${entry.name} entry=${entry} />`)}</aufbau-index>`
+          ? html`<aufbau-index viewmode=${viewmode} item-size='128px' item-size-min='80px' item-size-max='320px'>${list.map(entry => html`<${Entry} key=${entry.name} entry=${entry} />`)}</aufbau-index>`
           : html`<p class='empty'>${filter.value ? 'nothing matches the filter' : 'this folder is empty'}</p>`}
       </div>
       <app-float anchor='bottom-end'>
