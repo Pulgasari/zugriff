@@ -62,7 +62,8 @@ app-view[active] {
   flex    : none;
   padding : 0.5rem 1rem;
 
-  > input-search, aufbau-input { display: block; inline-size: 100%; }
+  > input-search      { display: block; inline-size: 100%; }
+  > * > aufbau-input  { display: flex; inline-size: 100%; }
 }
 
 .tabs {
@@ -217,7 +218,8 @@ section > h2,
 }
 
 .tile {
-  background     : var(--sunken, var(--hover));
+  /* opaque: a pattern behind the app must not shine through */
+  background     : color-mix(in oklch, var(--color-bg), var(--color-fg) 6%);
   border-radius  : calc(var(--radius, 0.5rem) * 3);
   flex-direction : row-reverse;
   inline-size    : 100%;
@@ -228,8 +230,11 @@ section > h2,
 
   > aufbau-icon { flex: none; font-size: 1.5rem; }
 
-  &:hover:not(:disabled) { background: var(--hover); }
-  &:disabled { cursor: default; opacity: 0.5; }
+  &:hover:not(:disabled) { background: color-mix(in oklch, var(--color-bg), var(--color-fg) 10%); }
+
+  /* a shared button:disabled rule takes the background, this one keeps it */
+  &:disabled     { background: color-mix(in oklch, var(--color-bg), var(--color-fg) 6%); cursor: default; }
+  &:disabled > * { opacity: 0.5; }
 }
 
 .status {
@@ -242,14 +247,14 @@ section > h2,
 }
 
 /*//////////// PATTERNS ////////////*/
-/* the settings' patterns, set on the root as --*-pattern-image and -opacity
+/* the settings' patterns, set on the root as --pattern-*-image and -opacity
    (input-pattern's patternStyle). a mask over the text color, so they follow
    the theme */
 
-app-root[data-background-pattern] > app-area[name="main"] { isolation: isolate; }
+app-root[data-pattern-bg] > app-area[name="main"] { isolation: isolate; }
 
-app-root[data-background-pattern] > app-area[name="main"]::before,
-app-root[data-tile-pattern] .tile::before {
+app-root[data-pattern-bg] > app-area[name="main"]::before,
+app-root[data-pattern-tile] .tile::before {
   background-color : currentColor;
   content          : '';
   inset            : 0;
@@ -258,15 +263,19 @@ app-root[data-tile-pattern] .tile::before {
   z-index          : -1;
 }
 
-app-root[data-background-pattern] > app-area[name="main"]::before {
-  mask-image : var(--background-pattern-image);
-  opacity    : var(--background-pattern-opacity, 0.1);
+app-root[data-pattern-bg] > app-area[name="main"]::before {
+  mask-image : var(--pattern-bg-image);
+  opacity    : var(--pattern-bg-opacity, 0.1);
 }
 
-app-root[data-tile-pattern] .tile::before {
-  mask-image : var(--tile-pattern-image);
-  opacity    : var(--tile-pattern-opacity, 0.1);
+app-root[data-pattern-tile] .tile::before {
+  mask-image : var(--pattern-tile-image);
+  opacity    : var(--pattern-tile-opacity, 0.1);
 }
+
+/*//////////// CONTEXT ////////////*/
+
+app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
 
 /*//////////// PREVIEW ////////////*/
 

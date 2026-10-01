@@ -42,14 +42,14 @@ const { CATEGORIES, categoryOf } = app.scan;
 
 // the patterns are input-pattern values: 'dots 8%', '' for none
 app.state.$extend({
-  backgroundPattern : { type: String,   value: '' },
-  open              : { type: 'enum',   value: 'auto',   values: ['auto', 'double', 'single'] },
-  searchbar         : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
-  tab               : { type: Number,   value: 0 },
-  tabbar            : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
-  tabs              : { type: 'scalar', value: [{ path: [] }] },
-  tilePattern       : { type: String,   value: '' },
-  viewmode          : { type: 'enum',   value: 'list',   values: ['grid', 'list'] },
+  'pattern-bg'   : { type: String,   value: '' },
+  'pattern-tile' : { type: String,   value: '' },
+  open           : { type: 'enum',   value: 'auto',   values: ['auto', 'double', 'single'] },
+  searchbar      : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
+  tab            : { type: Number,   value: 0 },
+  tabbar         : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
+  tabs           : { type: 'scalar', value: [{ path: [] }] },
+  viewmode       : { type: 'enum',   value: 'list',   values: ['grid', 'list'] },
 });
 
 // one cache for the whole app, in opfs. the images of a folder, small
@@ -398,6 +398,7 @@ function Recent () {
 function Places () {
   return html`
     <section>
+      <h2>Folder</h2>
       <ul class='tiles'>
         <li>
           <button class='tile' type='button' onClick=${() => { goTo([]); show('library'); }}>
@@ -743,34 +744,43 @@ function Menu () {
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
 
 const FIELDS = {
-  open              : { type: 'enum', label: 'Open with',  look: 'segments', values: [['auto', 'auto'], ['single', 'a tap'], ['double', 'a double click']], default: 'auto' },
-  searchbar         : { type: 'enum', label: 'Search bar', look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
-  tabbar            : { type: 'enum', label: 'Tabs',       look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+  open           : { type: 'enum', label: 'Open with',  look: 'segments', values: [['auto', 'auto'], ['single', 'a tap'], ['double', 'a double click']], default: 'auto' },
+  searchbar      : { type: 'enum', label: 'Search bar', look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+  tabbar         : { type: 'enum', label: 'Tabs',       look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
 
   // no colors: a pattern takes the color of the text where it lies, only its opacity is chosen
-  backgroundPattern : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Background', default: '' },
-  tilePattern       : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Tiles',      default: '' },
+  'pattern-bg'   : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Background', default: '' },
+  'pattern-tile' : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Tiles',      default: '' },
+};
+
+// how the shared fields render here: the long lists step through their
+// entries as well, the direction is a switch of two
+const CONTROLS = {
+  density  : { attrs: { stepper: true } },
+  dir      : { look: 'segments' },
+  font     : { attrs: { stepper: true } },
+  geometry : { attrs: { stepper: true } },
+  palette  : { attrs: { stepper: true } },
+  skin     : { attrs: { stepper: true } },
 };
 
 // the patterns as custom properties on the root, app.css paints them. a late
 // answer for a value that changed in the meantime is dropped
-const PATTERNS = [
-  { key: 'backgroundPattern', name: 'background-pattern' },
-  { key: 'tilePattern',       name: 'tile-pattern'       },
-];
+// the setting's key names the custom properties too: --pattern-bg-image, --pattern-bg-opacity
+const PATTERNS = ['pattern-bg', 'pattern-tile'];
 
 function usePatterns (root) {
   useEffect(() => effect(() => {
     const element = root.current;
     if (!element) return;
 
-    for (const { key, name } of PATTERNS) {
-      const value = app.state['$' + key];
+    for (const name of PATTERNS) {
+      const value = app.state['$' + name];
       element.toggleAttribute(`data-${name}`, Boolean(value));
       if (!value) continue;
 
       patternStyle(value, { name }).then(style => {
-        if (!style || app.state['$' + key] !== value) return;
+        if (!style || app.state['$' + name] !== value) return;
         for (const [property, css] of Object.entries(style)) element.style.setProperty(property, css);
       });
     }
@@ -789,13 +799,22 @@ function Config () {
     gestalt.palettes().then(palettes => {
       if (closed) return;
       const spec = { ...sharedSpec(app.config, palettes), ...FIELDS };
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
+      element.controls = CONTROLS;
+      element.values   = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
+      element.spec     = spec;
     });
 
     const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
     element.addEventListener('config', onConfig);
-    return () => { closed = true; element.removeEventListener('config', onConfig); };
+
+    // the form follows the state while it is open, a change from elsewhere included
+    const keys   = Object.keys({ ...sharedSpec(app.config, []), ...FIELDS });
+    const follow = effect(() => {
+      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
+      if (element.spec && Object.keys(element.spec).length) element.values = values;
+    });
+
+    return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
   }, []);
 
   const folder = app.db.folder.value;
