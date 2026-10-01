@@ -59,10 +59,14 @@ app-view[active] {
 }
 
 .searchbar {
-  flex    : none;
-  padding : 0.5rem 1rem;
+  align-items : center;
+  display     : flex;
+  flex        : none;
+  gap         : 0.5rem;
+  padding     : 0.5rem 1rem;
 
-  > input-search      { display: block; inline-size: 100%; }
+  > input-search { flex: 1 1 auto; min-inline-size: 0; }
+
   > * > aufbau-input  { display: flex; inline-size: 100%; }
 }
 
@@ -246,6 +250,20 @@ section > h2,
   opacity           : 0.7;
 }
 
+.hint { font-size: 0.875rem; opacity: 0.7; }
+
+.link {
+  background      : none;
+  border          : 0;
+  color           : var(--color-ink);
+  cursor          : pointer;
+  font            : inherit;
+  padding         : 0;
+  text-decoration : underline;
+}
+
+.action[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
+
 /*//////////// PATTERNS ////////////*/
 /* the settings' patterns, set on the root as --pattern-*-image and -opacity
    (input-pattern's patternStyle). a mask over the text color, so they follow
@@ -271,6 +289,64 @@ app-root[data-pattern-bg] > app-area[name="main"]::before {
 app-root[data-pattern-tile] .tile::before {
   mask-image : var(--pattern-tile-image);
   opacity    : var(--pattern-tile-opacity, 0.1);
+}
+
+/*//////////// TASKS ////////////*/
+
+/* a square beside the search field, turning while a task runs */
+.tasks-button {
+  align-items     : center;
+  aspect-ratio    : 1;
+  background      : color-mix(in oklch, var(--color-bg), var(--color-fg) 6%);
+  block-size      : 2.75rem;
+  border          : 0;
+  border-radius   : var(--radius, 0.5rem);
+  color           : inherit;
+  cursor          : pointer;
+  display         : inline-flex;
+  flex            : none;
+  font-size       : 1.25rem;
+  justify-content : center;
+  position        : relative;
+
+  &.busy > aufbau-icon { animation: spin 1.2s linear infinite; }
+
+  > .badge {
+    background    : var(--color-ink);
+    border-radius : 999px;
+    color         : var(--color-bg);
+    font-size     : 0.65rem;
+    inset         : 0.15rem 0.15rem auto auto;
+    line-height   : 1;
+    padding       : 0.15rem 0.3rem;
+    position      : absolute;
+  }
+}
+
+@keyframes spin { to { rotate: 1turn; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tasks-button.busy > aufbau-icon { animation: none; }
+}
+
+.tasks {
+  display        : flex;
+  flex-direction : column;
+  gap            : 0.5rem;
+  margin-block   : 0.5rem 1rem;
+}
+
+.task {
+  align-items : center;
+  display     : flex;
+  gap         : 0.75rem;
+
+  > aufbau-icon { flex: none; font-size: 1.25rem; opacity: 0.7; }
+  > .text       { flex: 1 1 auto; }
+  > .text > progress { block-size: 0.25rem; inline-size: 100%; }
+
+  &.failed > .text > small    { color: var(--color-error, currentColor); opacity: 1; }
+  &.cancelled > .text > .name { text-decoration: line-through; }
 }
 
 /*//////////// CONTEXT ////////////*/

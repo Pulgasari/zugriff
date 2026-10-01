@@ -36,7 +36,9 @@ const app = zugriff.app;
 const fs  = zugriff.fs;
 
 app.db   = await app.module('db');
-app.scan = await app.module('scan');
+app.scan   = await app.module('scan');
+app.tasks  = await app.module('tasks');
+app.places = await app.module('places');
 
 const { CATEGORIES, categoryOf } = app.scan;
 
@@ -65,6 +67,7 @@ const category = signal(null);     // the category the dashboard lists, or null
 const selected = signal(null);     // the entry the context area is about
 const file     = signal(null);     // the entry in the preview
 const current  = signal('dashboard');
+const showTasks = signal(false);   // the context area shows the tasks
 
 const rootRef = { current: null };
 const show    = name => rootRef.current?.show(name);
@@ -146,10 +149,19 @@ effect(() => {
   const folder = app.db.folder.value;
   if (!root || !folder || scanned === folder) return;
   scanned = folder;
-  app.scan.restore(folder).then(() => app.scan.scan(root, folder)).catch(err => console.warn('[files] scan failed', err));
+  app.scan.restore(folder).then(() => indexFolder(root, folder));
 });
 
-const rescan = () => { const root = rootHandle(); if (root) app.scan.scan(root, app.db.folder.value); };
+// the walk as a task: its file count is the progress, cancelling stops it
+function indexFolder (root, folder) {
+  return app.tasks.run({ icon: 'lucide:scan-search', label: `Read ${folder.name}`, lane: 'index' }, ({ progress, signal }) => {
+    signal.addEventListener('abort', () => app.scan.stop());
+    const follow = effect(() => { const scanning = app.scan.scanning.value; if (scanning) progress(scanning.files, null); });
+    return app.scan.scan(root, folder).finally(follow);
+  }).catch(err => console.warn('[files] scan failed', err));
+}
+
+const rescan = () => { const root = rootHandle(); if (root) indexFolder(root, app.db.folder.value); };
 
 function open (entry, at = path.value) {
   if (entry.kind === 'directory') { goTo([...at, entry.name]); return show('library'); }
@@ -178,14 +190,17 @@ const visible = () => {
   return needle ? entries.value.filter(entry => entry.name.toLowerCase().includes(needle)) : entries.value;
 };
 
-const iconOf = entry =>
-    entry.kind === 'directory' ? 'lucide:folder'
+// a folder with a type shows the type's icon, `at` is the path the entry lies in
+const iconOf = (entry, at) =>
+    entry.kind === 'directory' ? (at && app.places.typeOf([...at, entry.name])?.icon) || 'lucide:folder'
   : CATEGORIES.find(item => item.id === categoryOf(entry))?.icon ?? 'lucide:file';
 
 const isImage = entry => entry.kind !== 'directory' && entry.type?.startsWith('image/');
 
 // :::::: WRITE ::::::::::::::::::::::::::::::::::::::::::::::::
-// the folder is granted read only. a write asks for more on the click that wants it
+// the folder is granted read only. a write asks for more on the click that wants
+// it, then runs as a task in the write lane: the app stays usable meanwhile, and
+// two writes never run into each other
 
 async function writable () {
   const root = rootHandle();
@@ -200,8 +215,7 @@ async function newFolder () {
   if (!name) return;
   const root = await writable();
   if (!root) return;
-  try   { await fs.mkdir(root, path.value, name); goTo([...path.value]); }
-  catch (err) { app.toast.error(err); }
+  write({ icon: 'lucide:folder-plus', label: `New folder ${name}` }, path.value, () => fs.mkdir(root, path.value, name));
 }
 
 async function renameEntry (entry) {
@@ -209,16 +223,27 @@ async function renameEntry (entry) {
   if (!name || name === entry.name) return;
   const root = await writable();
   if (!root) return;
-  try   { await fs.rename(root, entry.path ?? path.value, entry.name, name, entry.kind); selected.value = null; goTo([...path.value]); }
-  catch (err) { app.toast.error(err); }
+  const at = entry.path ?? path.value;
+  selected.value = null;
+  write({ icon: 'lucide:pencil', label: `Rename ${entry.name} to ${name}` }, at, () => fs.rename(root, at, entry.name, name, entry.kind));
 }
 
 async function deleteEntry (entry) {
   if (!confirm(`Delete “${entry.name}”? This removes it from your disk.`)) return;
   const root = await writable();
   if (!root) return;
-  try   { await fs.remove(root, entry.path ?? path.value, entry.name); selected.value = null; area('context')?.hide(); goTo([...path.value]); }
-  catch (err) { app.toast.error(err); }
+  const at = entry.path ?? path.value;
+  selected.value = null;
+  area('context')?.hide();
+  write({ icon: 'lucide:trash-2', label: `Delete ${entry.name}` }, at, () => fs.remove(root, at, entry.name));
+}
+
+// a write as a task. once it is done, the folder it changed is listed anew if it is still the one on screen
+function write (task, at, work) {
+  const same = () => at.join('/') === path.value.join('/');
+  app.tasks.run({ ...task, lane: 'write' }, work)
+    .then(() => { if (same()) goTo([...at]); })
+    .catch(err => app.toast.error(err));
 }
 
 async function download (entry) {
@@ -306,7 +331,7 @@ function Thumb ({ entry, at }) {
 
   return html`
     <span class='thumb' ref=${holder}>
-      ${url ? html`<img src=${url} alt='' loading='lazy' />` : html`<${Icon} name=${iconOf(entry)} />`}
+      ${url ? html`<img src=${url} alt='' loading='lazy' />` : html`<${Icon} name=${iconOf(entry, at)} />`}
     </span>
   `;
 }
@@ -325,6 +350,7 @@ function Search () {
   return html`
     <div class='searchbar'>
       <input-search placeholder=${`Search in ${folderName()}`} onsearch=${event => { query.value = event.detail.query; }}></input-search>
+      <${TasksButton} />
     </div>
   `;
 }
@@ -415,6 +441,61 @@ function Places () {
   `;
 }
 
+function Bookmarks () {
+  const list = app.places.bookmarks();
+  return html`
+    <section>
+      <h2>Bookmarks</h2>
+      ${list.length
+        ? html`
+          <ul class='tiles'>
+            ${list.map(bookmark => html`
+              <li key=${bookmark.path.join('/')}>
+                <button class='tile' type='button' onClick=${() => { goTo(bookmark.path); show('library'); }}>
+                  <${Icon} name=${app.places.typeOf(bookmark.path)?.icon ?? 'lucide:bookmark'} />
+                  <span class='text'>
+                    <span class='name'>${bookmark.name}</span>
+                    <small>/${bookmark.path.join('/')}</small>
+                  </span>
+                </button>
+              </li>
+            `)}
+          </ul>`
+        : html`<p class='hint'>Folders you bookmark show up here, from their details below.</p>`}
+    </section>
+  `;
+}
+
+// places outside the granted folder. none works yet, the tiles say what each needs
+const REMOTES = [
+  { icon: 'lucide:cloud',        label: 'WebDAV',       note: 'a client exists in the code app, it moves to .shared' },
+  { icon: 'lucide:cloud-cog',    label: 'Nextcloud',    note: 'through WebDAV, with an app password' },
+  { icon: 'lucide:hard-drive',   label: 'Google Drive', note: 'its own api, sign in with oauth' },
+  { icon: 'lucide:terminal',     label: '(S)FTP',       note: 'not from a browser, only in the android app' },
+  { icon: 'lucide:network',      label: 'LAN',          note: 'smb shares, only in the android app' },
+];
+
+function Remotes () {
+  return html`
+    <section>
+      <h2>Remote</h2>
+      <ul class='tiles'>
+        ${REMOTES.map(remote => html`
+          <li key=${remote.label}>
+            <button class='tile' type='button' disabled title=${remote.note}>
+              <${Icon} name=${remote.icon} />
+              <span class='text'>
+                <span class='name'>${remote.label}</span>
+                <small>soon · ${remote.note}</small>
+              </span>
+            </button>
+          </li>
+        `)}
+      </ul>
+    </section>
+  `;
+}
+
 function CategoryList () {
   const id    = category.value;
   const label = CATEGORIES.find(item => item.id === id)?.label ?? id;
@@ -478,7 +559,7 @@ function Dashboard () {
       ${!ready ? html`<${Welcome} />`
       : query.value.trim() ? html`<${Results} />`
       : category.value ? html`<${CategoryList} />`
-      : html`<${Recent} /><${Categories} /><${Places} />`}
+      : html`<${Recent} /><${Bookmarks} /><${Categories} /><${Places} /><${Remotes} />`}
     </div>
     ${!top && search}
   `;
@@ -529,6 +610,7 @@ function Filter () {
   return html`
     <div class='searchbar'>
       <input-search placeholder='Filter this folder' value=${filter.value} onsearch=${event => { filter.value = event.detail.query; }}></input-search>
+      <${TasksButton} />
     </div>
   `;
 }
@@ -645,8 +727,42 @@ function EntryContext ({ entry }) {
       <${Action} icon='lucide:arrow-up-right' label='open' onClick=${() => open(entry, at)} />
       ${entry.path && html`<${Action} icon='lucide:folder' label='show in folder' onClick=${() => showInFolder(entry)} />`}
       ${entry.kind === 'file' && html`<${Action} icon='lucide:download' label='download' onClick=${() => download(entry)} />`}
+      ${entry.kind === 'directory' && html`<${BookmarkAction} path=${[...at, entry.name]} name=${entry.name} />`}
       <${Action} icon='lucide:pencil' label='rename' onClick=${() => renameEntry(entry)} />
       <${Action} icon='lucide:trash-2' label='delete' onClick=${() => deleteEntry(entry)} />
+    </${Actions}>
+  `;
+}
+
+function BookmarkAction ({ path: at, name }) {
+  const marked = app.places.isBookmarked(at);
+  return html`<${Action} icon=${marked ? 'lucide:bookmark-minus' : 'lucide:bookmark-plus'} label=${marked ? 'remove bookmark' : 'bookmark'} onClick=${() => app.places.toggleBookmark(at, name)} />`;
+}
+
+// the type of the folder on screen: one of the known ones, none, or a new one
+function FolderType () {
+  const at        = path.value;
+  const current   = app.places.typeOf(at);
+  const suggested = !current && app.places.suggest(entries.value, categoryOf);
+
+  const create = () => {
+    const label = prompt('Name of the new folder type');
+    if (!label) return;
+    const icon = prompt('Its icon (an iconify id)', 'lucide:folder') || 'lucide:folder';
+    app.places.setType(at, app.places.addType({ icon, label }));
+  };
+
+  return html`
+    <h3>Type</h3>
+    ${suggested && html`<p class='hint'>Looks like ${suggested.label}. <button class='link' type='button' onClick=${() => app.places.setType(at, suggested.id)}>Make it one</button></p>`}
+    <${Actions}>
+      ${app.places.types().map(type => html`
+        <button class='action' type='button' key=${type.id} aria-pressed=${String(current?.id === type.id)}
+                onClick=${() => app.places.setType(at, current?.id === type.id ? null : type.id)}>
+          <${Icon} name=${type.icon} /> ${type.label}
+        </button>
+      `)}
+      <${Action} icon='lucide:plus' label='new type' onClick=${create} />
     </${Actions}>
   `;
 }
@@ -670,8 +786,10 @@ function FolderContext () {
     ]} />
     <${Actions}>
       <${Action} icon='lucide:folder-plus' label='new folder' onClick=${newFolder} />
+      ${path.value.length > 0 && html`<${BookmarkAction} path=${path.value} name=${path.value.at(-1)} />`}
       <${Action} icon='lucide:text-cursor-input' label='rename by pattern' disabled />
     </${Actions}>
+    ${path.value.length > 0 && html`<${FolderType} />`}
   `;
 }
 
@@ -696,6 +814,8 @@ function FileContext ({ entry }) {
 function Context () {
   const view = current.value;
 
+  if (showTasks.value) return html`<app-panel heading='Tasks'><${TaskList} /></app-panel>`;
+
   if (selected.value) return html`<app-panel heading=${selected.value.name}><${EntryContext} entry=${selected.value} /></app-panel>`;
   if (view === 'preview' && file.value) return html`<app-panel heading='Details'><${FileContext} entry=${file.value} /></app-panel>`;
   if (view === 'library' && rootHandle()) return html`<app-panel heading='This folder'><${FolderContext} /></app-panel>`;
@@ -705,6 +825,63 @@ function Context () {
       <${Status} />
       <${Actions}><${Action} icon='lucide:refresh-cw' label='read again' disabled=${!rootHandle() || Boolean(app.scan.scanning.value)} onClick=${rescan} /></${Actions}>
     </app-panel>
+  `;
+}
+
+// :::::: TASKS :::::::::::::::::::::::::::::::::::::::::::::::
+// what runs, what waits, what ran. the button sits beside the search field and
+// turns while a task runs, the list is in the context area
+
+function openTasks () {
+  selected.value  = null;
+  showTasks.value = true;
+  area('context')?.show();
+}
+
+function TasksButton () {
+  const busy  = app.tasks.busy.value;
+  const count = app.tasks.queue.value.length;
+  const label = count ? `${count} tasks` : 'tasks';
+
+  return html`
+    <button class=${busy ? 'tasks-button busy' : 'tasks-button'} type='button' aria-label=${label} title=${label} onClick=${openTasks}>
+      <${Icon} name=${busy ? 'lucide:loader' : 'lucide:list-checks'} />
+      ${count > 0 && html`<span class='badge'>${count}</span>`}
+    </button>
+  `;
+}
+
+const STATES = { cancelled: 'cancelled', done: 'done', failed: 'failed', queued: 'waiting', running: 'running' };
+
+function TaskRow ({ task }) {
+  const { done, total } = task.progress ?? {};
+  const open  = task.state === 'queued' || task.state === 'running';
+  const state = task.state === 'running' && done != null ? (total ? `${Math.round(done / total * 100)}%` : `${done}`) : STATES[task.state];
+
+  return html`
+    <li class=${`task ${task.state}`}>
+      <${Icon} name=${task.icon} />
+      <span class='text'>
+        <span class='name'>${task.label}</span>
+        <small>${task.error ?? [state, task.endedAt && fmt.date(task.endedAt)].filter(Boolean).join(' · ')}</small>
+        ${task.state === 'running' && total ? html`<progress max=${total} value=${done}></progress>` : null}
+      </span>
+      ${open && html`<${IconButton} icon='lucide:x' label=${`cancel ${task.label}`} onClick=${() => app.tasks.cancel(task.id)} />`}
+    </li>
+  `;
+}
+
+function TaskList () {
+  const queue   = app.tasks.queue.value;
+  const history = app.tasks.history.value;
+
+  return html`
+    ${queue.length
+      ? html`<ul class='tasks'>${queue.map(task => html`<${TaskRow} key=${task.id} task=${task} />`)}</ul>`
+      : html`<p class='empty'>nothing to do</p>`}
+    ${history.length > 0 && html`
+      <div-x class='section-head'><h3>History</h3><${IconButton} icon='lucide:trash' label='clear the history' onClick=${app.tasks.clearHistory} /></div-x>
+      <ul class='tasks'>${history.map(task => html`<${TaskRow} key=${task.id} task=${task} />`)}</ul>`}
   `;
 }
 
@@ -855,7 +1032,7 @@ function App () {
       </app-area>
       <app-area name='menu' dock='start'><${Menu} /></app-area>
       <app-area name='config' dock='end'><${Config} /></app-area>
-      <app-area name='context' dock='bottom' peek><${Context} /></app-area>
+      <app-area name='context' dock='bottom' peek ontoggle=${event => { if (!event.detail?.open) showTasks.value = false; }}><${Context} /></app-area>
     </app-root>
   `;
 }

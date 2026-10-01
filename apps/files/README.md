@@ -47,6 +47,29 @@ and stored as webp in opfs by the shared thumbnail cache (`.shared/js/thumbs.js`
 `requestFile`). The key holds path, size and modification time, so an edited
 image gets a new one. The cache is capped at 128 MB, the oldest go first.
 
+## tasks
+
+Work that takes a while runs as a task (`modules/tasks.js`), never in front of
+the user: reading the folder, every write. Tasks wait in lanes: the index and
+the writes run side by side, two writes one after another. The square beside
+the search field turns while one runs and shows the count; a tap lists what
+runs, what waits and what ran (the last 50, kept across visits). A waiting or
+running task can be cancelled.
+
+## folder types and bookmarks
+
+`modules/places.js`, per granted folder:
+
+- **types**: Audio, Documents, Images and Videos built in, more with a name and
+  an icon. A folder's details suggest one when most of its files are of a
+  kind. For now a type changes the folder's icon; a default view per type is
+  the next step.
+- **bookmarks**: a folder is bookmarked from its details and shows on the
+  dashboard.
+
+The dashboard also hints at remote places (WebDAV, Nextcloud, Drive, (S)FTP,
+LAN), each with what it would need. None works yet.
+
 ## writing
 
 The folder is granted read only. Renaming, deleting and a new folder ask for
@@ -58,5 +81,7 @@ write access on the click that wants it.
 |-------------------|------------|
 | `app.js`          | the app: state, tabs, the views, the areas |
 | `modules/db.js`   | the one granted folder handle (`@bunker/db`) and the permission dance |
+| `modules/places.js` | bookmarks and folder types |
 | `modules/scan.js` | the index of the whole folder |
+| `modules/tasks.js` | the task lanes and their history |
 | `app.css`         | the views' layout and the look of rows, tiles and cards |
