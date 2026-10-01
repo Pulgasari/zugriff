@@ -36,9 +36,10 @@ const app = zugriff.app;
 const fs  = zugriff.fs;
 
 app.db   = await app.module('db');
-app.scan   = await app.module('scan');
-app.tasks  = await app.module('tasks');
-app.places = await app.module('places');
+app.scan     = await app.module('scan');
+app.tasks    = await app.module('tasks');
+app.places   = await app.module('places');
+app.transfer = await app.module('transfer');
 
 const { CATEGORIES, categoryOf } = app.scan;
 
@@ -236,6 +237,26 @@ async function deleteEntry (entry) {
   selected.value = null;
   area('context')?.hide();
   write({ icon: 'lucide:trash-2', label: `Delete ${entry.name}` }, at, () => fs.remove(root, at, entry.name));
+}
+
+// what the clipboard holds goes into the folder on screen, as one task
+async function paste () {
+  const board = app.transfer.clipboard.value;
+  if (!board) return;
+  const root = await writable();
+  if (!root) return;
+
+  const target = [...path.value];
+  const count  = board.items.length;
+  const what   = count === 1 ? board.items[0].name : `${count} items`;
+  const verb   = board.mode === 'move' ? 'Move' : 'Copy';
+  if (board.mode === 'move') app.transfer.clear();
+
+  const done = () => { if (target.join('/') === path.value.join('/')) goTo([...target]); };
+  app.tasks.run({ icon: board.mode === 'move' ? 'lucide:scissors' : 'lucide:copy', label: `${verb} ${what} to /${target.join('/')}`, lane: 'write' },
+    ({ progress, signal }) => app.transfer.transfer(root, board.items, board.mode, target, { onProgress: progress, signal }))
+    .then(done)
+    .catch(err => { if (err?.name !== 'AbortError') app.toast.error(err); done(); });
 }
 
 // a write as a task. once it is done, the folder it changed is listed anew if it is still the one on screen
@@ -659,7 +680,26 @@ function Library () {
         <button class='fab' type='button' aria-label='new folder' title='new folder' onClick=${newFolder}><${Icon} name='lucide:folder-plus' /></button>
       </app-float>
     </div>
+    <${PasteBar} />
     ${bottom}
+  `;
+}
+
+// what waits on the clipboard, and the button that puts it here
+function PasteBar () {
+  const board = app.transfer.clipboard.value;
+  if (!board) return null;
+
+  const count = board.items.length;
+  const what  = count === 1 ? board.items[0].name : `${count} items`;
+
+  return html`
+    <div-x class='pastebar'>
+      <${Icon} name=${board.mode === 'move' ? 'lucide:scissors' : 'lucide:copy'} />
+      <span class='text'><span class='name'>${what}</span><small>${board.mode === 'move' ? 'to move' : 'to copy'}</small></span>
+      <button class='action' type='button' onClick=${paste}><${Icon} name='lucide:clipboard-paste' /> here</button>
+      <${IconButton} icon='lucide:x' label='empty the clipboard' onClick=${app.transfer.clear} />
+    </div-x>
   `;
 }
 
@@ -728,6 +768,8 @@ function EntryContext ({ entry }) {
       ${entry.path && html`<${Action} icon='lucide:folder' label='show in folder' onClick=${() => showInFolder(entry)} />`}
       ${entry.kind === 'file' && html`<${Action} icon='lucide:download' label='download' onClick=${() => download(entry)} />`}
       ${entry.kind === 'directory' && html`<${BookmarkAction} path=${[...at, entry.name]} name=${entry.name} />`}
+      <${Action} icon='lucide:copy' label='copy' onClick=${() => { app.transfer.pick('copy', entry, at); area('context')?.hide(); }} />
+      <${Action} icon='lucide:scissors' label='move' onClick=${() => { app.transfer.pick('move', entry, at); area('context')?.hide(); }} />
       <${Action} icon='lucide:pencil' label='rename' onClick=${() => renameEntry(entry)} />
       <${Action} icon='lucide:trash-2' label='delete' onClick=${() => deleteEntry(entry)} />
     </${Actions}>

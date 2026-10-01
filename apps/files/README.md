@@ -56,6 +56,15 @@ the search field turns while one runs and shows the count; a tap lists what
 runs, what waits and what ran (the last 50, kept across visits). A waiting or
 running task can be cancelled.
 
+## copy and move
+
+An entry's details put it on the clipboard, to copy or to move; more entries
+of the same kind join it. In the library a bar shows what waits, and pastes it
+into the folder on screen as one task with a file count as progress
+(`modules/transfer.js`). A taken name gets a number (`a (2).txt`), a folder
+cannot go into itself. A move uses the browser's own `move()` where it has
+one, else copy and delete. Files are copied as streams.
+
 ## folder types and bookmarks
 
 `modules/places.js`, per granted folder:
@@ -84,4 +93,5 @@ write access on the click that wants it.
 | `modules/places.js` | bookmarks and folder types |
 | `modules/scan.js` | the index of the whole folder |
 | `modules/tasks.js` | the task lanes and their history |
+| `modules/transfer.js` | the clipboard, copying and moving |
 | `app.css`         | the views' layout and the look of rows, tiles and cards |
