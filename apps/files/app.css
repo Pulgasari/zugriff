@@ -291,6 +291,27 @@ app-root[data-pattern-tile] .tile::before {
   opacity    : var(--pattern-tile-opacity, 0.1);
 }
 
+/*//////////// SYNC ////////////*/
+
+.address {
+  display        : flex;
+  flex-direction : column;
+  gap            : 0.5rem;
+  margin-block   : 0.75rem;
+}
+
+app-view[name="sync"] :is(input-text, input-password) {
+  display          : flex;
+  gap              : 0.5rem;
+  margin-block-end : 0.5rem;
+
+  > aufbau-input { flex: 1 1 auto; }
+}
+
+.action.primary { background: var(--color-ink); color: var(--color-bg); }
+
+.identity { opacity: 0.6; }
+
 /*//////////// REMOTE ////////////*/
 
 .remote-form {

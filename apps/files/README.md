@@ -65,6 +65,25 @@ into the folder on screen as one task with a file count as progress
 cannot go into itself. A move uses the browser's own `move()` where it has
 one, else copy and delete. Files are copied as streams.
 
+## send (lan)
+
+The `sync` view (`#/sync`, in the menu as Send) sends files to a device on the
+local network over LocalSend v2: any LocalSend app receives them, or the node
+desktop daemon of the original filesync (`pulgasari/wallpaperfx`). It needs the
+android app: the network part is the native FileSync plugin
+(`.github/capacitor/plugins/filesync/`, protocol in its `PROTOCOL.md`), only
+the files app carries it (`build.plugins` in the registry).
+
+- receivers are found by multicast, typed (`ip:port`, `filesync://…`) or picked
+  from those sent to before; https certificates are pinned by fingerprint where
+  it is known, a pin is asked for when the receiver wants one
+- files are picked, or sent from the library: a file's details have "send",
+  through the `content://` uri its android handle carries
+- a send is a task in the `send` lane, with bytes as progress; its history is
+  the task history
+- auto sync sends a folder in the background whenever new files show up on
+  wi-fi (optionally one ssid), subfolders included
+
 ## folder types and bookmarks
 
 `modules/places.js`, per granted folder:
@@ -100,6 +119,8 @@ write access on the click that wants it.
 | `modules/places.js` | bookmarks and folder types |
 | `modules/remotes.js` | the webdav connections |
 | `modules/scan.js` | the index of the whole folder |
+| `modules/sync.js` | lan sending through the FileSync plugin |
 | `modules/tasks.js` | the task lanes and their history |
 | `modules/transfer.js` | the clipboard, copying and moving |
+| `views/sync.js` | the send view |
 | `app.css`         | the views' layout and the look of rows, tiles and cards |

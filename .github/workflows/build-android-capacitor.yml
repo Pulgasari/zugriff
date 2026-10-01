@@ -201,7 +201,7 @@ jobs:
           APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-res.mjs "build/${{ matrix.app }}"
           # the repo's own native plugins (.github/capacitor/plugins/), copied in
           # and registered in MainActivity
-          node .github/scripts/add-capacitor-plugins.mjs "build/${{ matrix.app }}"
+          APP_SLUG="${{ matrix.app }}" node .github/scripts/add-capacitor-plugins.mjs "build/${{ matrix.app }}"
           # the template's aapt pattern drops dotted names, .shared/ has to go in
           node .github/scripts/allow-capacitor-assets.mjs "build/${{ matrix.app }}"
 

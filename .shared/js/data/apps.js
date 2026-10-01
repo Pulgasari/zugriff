@@ -74,7 +74,7 @@ const entries = [
     categories  : ['media'],
   },
   { // zugriff.dev/files/
-    build       : { android: ['capacitor', 'capacitor-live'] },
+    build       : { android: ['capacitor', 'capacitor-live'], plugins: ['filesync'] },
     categories  : ['files'],
     description : 'Grant a folder from your device and browse it — the folder is the root, nothing leaves your machine.',
     icon        : 'mdi:folder-outline',

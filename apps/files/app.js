@@ -27,6 +27,8 @@ import { sharedSpec }     from '/.shared/js/components/Settings.js';
 import fmt                from '/.shared/js/modules/fmt.js';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
+import SyncView, { sync } from './views/sync.js';
+
 // app-*, div-*, input-* and the rest of the components. the elements come with aufbau.boot()
 autoloader({ elements: false });
 
@@ -872,12 +874,20 @@ function EntryContext ({ entry }) {
       ${entry.path && html`<${Action} icon='lucide:folder' label='show in folder' onClick=${() => showInFolder(entry)} />`}
       ${entry.kind === 'file' && html`<${Action} icon='lucide:download' label='download' onClick=${() => download(entry)} />`}
       ${entry.kind === 'directory' && !(entry.source ?? sourceOf(entry)) && html`<${BookmarkAction} path=${[...at, entry.name]} name=${entry.name} />`}
+      ${entry.kind === 'file' && !(entry.source ?? sourceOf(entry)) && sync.available() && html`<${Action} icon='lucide:send' label='send' onClick=${() => sendEntry(entry, at)} />`}
       <${Action} icon='lucide:copy' label='copy' onClick=${() => { app.transfer.pick('copy', entry, at, rootOfSource(entry.source ?? sourceOf(entry))); area('context')?.hide(); }} />
       <${Action} icon='lucide:scissors' label='move' onClick=${() => { app.transfer.pick('move', entry, at, rootOfSource(entry.source ?? sourceOf(entry))); area('context')?.hide(); }} />
       <${Action} icon='lucide:pencil' label='rename' onClick=${() => renameEntry(entry)} />
       <${Action} icon='lucide:trash-2' label='delete' onClick=${() => deleteEntry(entry)} />
     </${Actions}>
   `;
+}
+
+// a file of the folder into the sync view's outbox, the view opens
+function sendEntry (entry, at) {
+  sync.addEntry(localRoot(), at, entry)
+    .then(() => { area('context')?.hide(); show('sync'); })
+    .catch(err => app.toast.error(err));
 }
 
 function BookmarkAction ({ path: at, name }) {
@@ -1037,6 +1047,7 @@ function TaskList () {
 const MENU = [
   { name: 'dashboard', label: 'Dashboard', icon: 'lucide:layout-dashboard' },
   { name: 'library',   label: 'Library',   icon: 'lucide:folder'           },
+  { name: 'sync',      label: 'Send',      icon: 'lucide:send'             },
 ];
 
 // the tools the app had before, coming back one by one
@@ -1161,6 +1172,14 @@ function Config () {
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::::
 
+// discovery runs while the sync view is on screen, it costs battery
+function onNavigate (event) {
+  current.value  = event.detail.to;
+  selected.value = null;
+  if (event.detail.to === 'sync') sync.start();
+  else if (event.detail.from === 'sync') sync.stop();
+}
+
 function App () {
   const root = useRef(null);
   usePatterns(root);
@@ -1171,11 +1190,12 @@ function App () {
   }, []);
 
   return html`
-    <app-root ref=${root} routing='hash' onnavigate=${event => { current.value = event.detail.to; selected.value = null; }}>
+    <app-root ref=${root} routing='hash' onnavigate=${onNavigate}>
       <app-area name='main'>
         <app-view name='dashboard' route='/' active><${Dashboard} /></app-view>
         <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
         <app-view name='preview' route='/preview' transition-on='glide'><${Preview} /></app-view>
+        <app-view name='sync' route='/sync' transition-on='glide'><${SyncView} Bar=${Bar} IconButton=${IconButton} Action=${Action} Actions=${Actions} /></app-view>
       </app-area>
       <app-area name='menu' dock='start'><${Menu} /></app-area>
       <app-area name='config' dock='end'><${Config} /></app-area>
