@@ -145,17 +145,16 @@ async function dirAt (root, path = []) {
 
 /** the entries in `path`, directories first then files, each sorted by name */
 async function list (root, path = []) {
-  const dir  = await dirAt(root, path);
-  const rows = [];
+  const dir     = await dirAt(root, path);
+  const handles = [];
+  for await (const [name, handle] of dir.entries()) handles.push([name, handle]);
 
-  for await (const [name, handle] of dir.entries()) {
-    if (handle.kind === 'directory') {
-      rows.push({ name, kind: 'directory' });
-    } else {
-      const file = await handle.getFile();
-      rows.push({ name, kind: 'file', size: file.size, lastModified: file.lastModified, type: file.type });
-    }
-  }
+  // the files are read side by side, one after the other took twice as long in a big folder
+  const rows = await Promise.all(handles.map(async ([name, handle]) => {
+    if (handle.kind === 'directory') return { name, kind: 'directory' };
+    const file = await handle.getFile();
+    return { name, kind: 'file', size: file.size, lastModified: file.lastModified, type: file.type };
+  }));
 
   return rows.sort((a, b) =>
     a.kind !== b.kind
