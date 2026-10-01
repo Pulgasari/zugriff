@@ -10,7 +10,7 @@ const defaults = {
   color       : '#282a36',     // theme_color / background_color for the manifest + <meta theme-color>
   dir         : 'ltr',
   display     : 'standalone',
-  viewport    : 'width=device-width, initial-scale=1, viewport-fit=cover',
+  viewport    : 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   aufbau      : { elements: { mode: 'auto' } },
 };
 
