@@ -76,8 +76,15 @@ one, else copy and delete. Files are copied as streams.
 - **bookmarks**: a folder is bookmarked from its details and shows on the
   dashboard.
 
-The dashboard also hints at remote places (WebDAV, Nextcloud, Drive, (S)FTP,
-LAN), each with what it would need. None works yet.
+## remote
+
+WebDAV servers (Nextcloud and ownCloud included) are connected from the
+dashboard and open in a tab of their own (`modules/remotes.js`). A connection
+is a root handle like the granted folder (`.shared/js/modules/webdav/`), so
+browsing, preview, thumbnails, copy and move all work on it, and between it and
+the folder. The server has to allow cors for this app. The credentials stay on
+the device, in opfs. Drive, (S)FTP and LAN are tiles that say what each would
+need.
 
 ## writing
 
@@ -91,6 +98,7 @@ write access on the click that wants it.
 | `app.js`          | the app: state, tabs, the views, the areas |
 | `modules/db.js`   | the one granted folder handle (`@bunker/db`) and the permission dance |
 | `modules/places.js` | bookmarks and folder types |
+| `modules/remotes.js` | the webdav connections |
 | `modules/scan.js` | the index of the whole folder |
 | `modules/tasks.js` | the task lanes and their history |
 | `modules/transfer.js` | the clipboard, copying and moving |

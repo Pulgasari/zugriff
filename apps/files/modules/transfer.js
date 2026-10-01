@@ -2,9 +2,13 @@
 // copying and moving inside the granted folder. a clipboard holds what was
 // picked (copy or cut), paste() runs it as one task into the folder on screen.
 //
-//   clipboard   null, or { mode: 'copy' | 'move', items: [{ kind, name, path }] }
-//   pick(mode, entry, path)   puts an entry on it, the same mode adds to it
+//   clipboard   null, or { mode: 'copy' | 'move', items: [{ kind, name, path, root }], pasted }
+//   pick(mode, entry, path, root)   puts an entry on it, the same mode adds to it
 //   transfer(root, items, mode, target, { onProgress, signal })
+//
+// every item keeps the root it came from, the target has its own: the granted
+// folder and a webdav server are both roots, so a copy between them is the same
+// copy. a move across roots is a copy and a delete.
 //
 // a name that is taken in the target gets a number: 'a.txt' -> 'a (2).txt'.
 // a folder cannot go into itself or below itself. a move uses the handle's own
@@ -22,12 +26,15 @@ const isInside = (inner, outer) => inner.length >= outer.length && samePath(inne
 
 // :::::: CLIPBOARD :::::::::::::::::::::::::::::::::::::::::::::
 
-export function pick (mode, entry, path) {
-  const item    = { kind: entry.kind, name: entry.name, path: entry.path ?? path };
+// once pasted, a copy stays on the clipboard to paste again, but the next pick starts anew
+export function pick (mode, entry, path, root) {
+  const item    = { kind: entry.kind, name: entry.name, path: entry.path ?? path, root };
   const current = clipboard.value;
-  const known   = current?.mode === mode ? current.items.filter(other => !(other.name === item.name && samePath(other.path, item.path))) : [];
+  const known   = current?.mode === mode && !current.pasted ? current.items.filter(other => !(other.name === item.name && samePath(other.path, item.path))) : [];
   clipboard.value = { items: [...known, item], mode };
 }
+
+export const pasted = () => { if (clipboard.value) clipboard.value = { ...clipboard.value, pasted: true }; };
 
 export const clear = () => { clipboard.value = null; };
 
@@ -97,13 +104,13 @@ const handleOf = async (root, item) => {
 
 export async function transfer (root, items, mode, target, { onProgress = () => {}, signal } = {}) {
   for (const item of items) {
-    if (item.kind === 'directory' && isInside(target, [...item.path, item.name])) {
+    if (item.root === root && item.kind === 'directory' && isInside(target, [...item.path, item.name])) {
       throw new Error(`“${item.name}” cannot go into itself`);
     }
   }
 
   const targetDir = await fs.dirAt(root, target);
-  const handles   = await Promise.all(items.map(item => handleOf(root, item)));
+  const handles   = await Promise.all(items.map(item => handleOf(item.root ?? root, item)));
   const total     = (await Promise.all(handles.map(countFiles))).reduce((sum, count) => sum + count, 0);
   let   done      = 0;
   const onFile    = () => onProgress(++done, total);
@@ -113,10 +120,10 @@ export async function transfer (root, items, mode, target, { onProgress = () => 
     if (signal?.aborted) throw new DOMException('transfer aborted', 'AbortError');
 
     const handle = handles[index];
-    const source = await fs.dirAt(root, item.path);
+    const source = await fs.dirAt(item.root ?? root, item.path);
 
     // a move within the same folder changes nothing
-    if (mode === 'move' && samePath(item.path, target)) { done += await countFiles(handle); onProgress(done, total); continue; }
+    if (mode === 'move' && (item.root ?? root) === root && samePath(item.path, target)) { done += await countFiles(handle); onProgress(done, total); continue; }
 
     const name = await freeName(targetDir, item.name, item.kind);
 

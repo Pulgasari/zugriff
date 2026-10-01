@@ -150,9 +150,11 @@ async function list (root, path = []) {
   for await (const [name, handle] of dir.entries()) handles.push([name, handle]);
 
   // the files are read side by side, one after the other took twice as long in a big folder
+  // peekFile() is the metadata without the content, for handles where reading a
+  // file means downloading it (webdav/handles.js)
   const rows = await Promise.all(handles.map(async ([name, handle]) => {
     if (handle.kind === 'directory') return { name, kind: 'directory' };
-    const file = await handle.getFile();
+    const file = handle.peekFile?.() ?? await handle.getFile();
     return { name, kind: 'file', size: file.size, lastModified: file.lastModified, type: file.type };
   }));
 

@@ -291,6 +291,19 @@ app-root[data-pattern-tile] .tile::before {
   opacity    : var(--pattern-tile-opacity, 0.1);
 }
 
+/*//////////// REMOTE ////////////*/
+
+.remote-form {
+  display        : flex;
+  flex-direction : column;
+  gap            : 0.5rem;
+  margin-block   : 0.5rem 1rem;
+
+  > .action { align-self: flex-start; }
+}
+
+.error { color: var(--color-error, currentColor); font-size: 0.875rem; }
+
 /*//////////// CLIPBOARD ////////////*/
 
 .pastebar {

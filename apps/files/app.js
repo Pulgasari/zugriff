@@ -40,6 +40,9 @@ app.scan     = await app.module('scan');
 app.tasks    = await app.module('tasks');
 app.places   = await app.module('places');
 app.transfer = await app.module('transfer');
+app.remotes  = await app.module('remotes');
+
+app.remotes.load().catch(err => console.warn('[files] remotes failed to load', err));
 
 const { CATEGORIES, categoryOf } = app.scan;
 
@@ -68,7 +71,7 @@ const category = signal(null);     // the category the dashboard lists, or null
 const selected = signal(null);     // the entry the context area is about
 const file     = signal(null);     // the entry in the preview
 const current  = signal('dashboard');
-const showTasks = signal(false);   // the context area shows the tasks
+const sheet    = signal(null);      // what the context area shows instead: 'tasks', 'remotes'
 
 const rootRef = { current: null };
 const show    = name => rootRef.current?.show(name);
@@ -79,9 +82,11 @@ const opensOnTap = () => app.state.$open === 'single' || (app.state.$open === 'a
 
 // :::::: TABS ::::::::::::::::::::::::::::::::::::::::::::::::
 
+// a tab is { path, source }: source null is the granted folder, else a remote's id
 const tabs      = () => app.state.$tabs?.length ? app.state.$tabs : [{ path: [] }];
 const tabIndex  = () => Math.min(Math.max(0, app.state.$tab), tabs().length - 1);
 const path      = computed(() => tabs()[tabIndex()].path);
+const source    = computed(() => tabs()[tabIndex()].source ?? null);
 const scrollTop = new Map;   // per tab, for the session
 
 function setTabs (next, index = tabIndex()) {
@@ -89,14 +94,15 @@ function setTabs (next, index = tabIndex()) {
   app.state.tab  = Math.min(Math.max(0, index), next.length - 1);
 }
 
-function goTo (next) {
-  setTabs(tabs().map((tab, index) => index === tabIndex() ? { ...tab, path: next } : tab));
+// `from` switches the tab to another source, undefined keeps its own
+function goTo (next, from) {
+  setTabs(tabs().map((tab, index) => index === tabIndex() ? { path: next, source: from === undefined ? tab.source ?? null : from } : tab));
   selected.value = null;
   filter.value   = '';
 }
 
-function openTab (at = path.value) {
-  const next = [...tabs(), { path: at }];
+function openTab (at = path.value, from = source.value) {
+  const next = [...tabs(), { path: at, source: from }];
   setTabs(next, next.length - 1);
   selected.value = null;
 }
@@ -117,8 +123,17 @@ const libraryScroller = () => document.querySelector('app-view[name="library"] .
 
 // :::::: FILES :::::::::::::::::::::::::::::::::::::::::::::::
 
-const rootHandle = () => app.db.perm.value === 'granted' ? app.db.folder.value?.handle ?? null : null;
-const folderName = () => app.db.folder.value?.name ?? 'folder';
+// the granted folder, and the root of a source: null for the folder, a remote's id
+const localRoot    = () => app.db.perm.value === 'granted' ? app.db.folder.value?.handle ?? null : null;
+const rootOfSource = from => from ? app.remotes.rootOf(from) : localRoot();
+const sourceName   = from => from ? app.remotes.byId(from)?.name ?? 'remote' : app.db.folder.value?.name ?? 'folder';
+
+// the root of the tab on screen
+const rootHandle = () => rootOfSource(source.value);
+const folderName = () => sourceName(source.value);
+
+// an entry of the index (it carries its path) is in the folder, one of a listing in the tab's source
+const sourceOf = entry => entry.path ? null : source.value;
 
 // the listing follows the folder, its permission and the path by itself. the
 // old listing goes at once: its entries would still open against the new path
@@ -146,7 +161,7 @@ effect(() => {
 // the index of the whole folder: the stored one at once, a fresh walk behind it
 let scanned = null;
 effect(() => {
-  const root   = rootHandle();
+  const root   = localRoot();
   const folder = app.db.folder.value;
   if (!root || !folder || scanned === folder) return;
   scanned = folder;
@@ -162,16 +177,16 @@ function indexFolder (root, folder) {
   }).catch(err => console.warn('[files] scan failed', err));
 }
 
-const rescan = () => { const root = rootHandle(); if (root) indexFolder(root, app.db.folder.value); };
+const rescan = () => { const root = localRoot(); if (root) indexFolder(root, app.db.folder.value); };
 
 function open (entry, at = path.value) {
   if (entry.kind === 'directory') { goTo([...at, entry.name]); return show('library'); }
-  file.value = { ...entry, kind: 'file', path: entry.path ?? at };
+  file.value = { ...entry, kind: 'file', path: entry.path ?? at, source: entry.source ?? sourceOf(entry) };
   show('preview');
 }
 
 function showInFolder (entry) {
-  goTo(entry.path ?? []);
+  goTo(entry.path ?? [], entry.source ?? sourceOf(entry));
   show('library');
 }
 
@@ -251,6 +266,7 @@ async function paste () {
   const what   = count === 1 ? board.items[0].name : `${count} items`;
   const verb   = board.mode === 'move' ? 'Move' : 'Copy';
   if (board.mode === 'move') app.transfer.clear();
+  else app.transfer.pasted();
 
   const done = () => { if (target.join('/') === path.value.join('/')) goTo([...target]); };
   app.tasks.run({ icon: board.mode === 'move' ? 'lucide:scissors' : 'lucide:copy', label: `${verb} ${what} to /${target.join('/')}`, lane: 'write' },
@@ -268,7 +284,7 @@ function write (task, at, work) {
 }
 
 async function download (entry) {
-  const blob = await fs.readFile(rootHandle(), entry.path ?? path.value, entry.name);
+  const blob = await fs.readFile(rootOfSource(entry.source ?? sourceOf(entry)), entry.path ?? path.value, entry.name);
   const link = Object.assign(document.createElement('a'), { download: entry.name, href: URL.createObjectURL(blob) });
   link.click();
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
@@ -330,9 +346,10 @@ function Hero ({ icon, title, children }) {
 }
 
 // the thumbnail of an image once it is on screen, the icon of its kind until then
-function Thumb ({ entry, at }) {
+// `from` is the entry's source, null for the granted folder
+function Thumb ({ entry, at, from = null }) {
   const holder = useRef(null);
-  const id     = isImage(entry) ? `${app.db.folder.value?.addedAt}/${at.join('/')}/${entry.name}:${entry.size}:${entry.lastModified}` : null;
+  const id     = isImage(entry) ? `${from ?? app.db.folder.value?.addedAt}/${at.join('/')}/${entry.name}:${entry.size}:${entry.lastModified}` : null;
   const [url, setUrl] = useState(() => thumbs.peekFile(id));
 
   useEffect(() => {
@@ -343,7 +360,7 @@ function Thumb ({ entry, at }) {
     const observer = new IntersectionObserver(([hit]) => {
       if (!hit.isIntersecting) return;
       observer.disconnect();
-      thumbs.requestFile(id, () => fs.readFile(rootHandle(), at, entry.name)).then(made => { if (alive && made) setUrl(made); });
+      thumbs.requestFile(id, () => fs.readFile(rootOfSource(from), at, entry.name)).then(made => { if (alive && made) setUrl(made); });
     }, { rootMargin: '200px' });
 
     observer.observe(holder.current);
@@ -352,7 +369,7 @@ function Thumb ({ entry, at }) {
 
   return html`
     <span class='thumb' ref=${holder}>
-      ${url ? html`<img src=${url} alt='' loading='lazy' />` : html`<${Icon} name=${iconOf(entry, at)} />`}
+      ${url ? html`<img src=${url} alt='' loading='lazy' />` : html`<${Icon} name=${iconOf(entry, from ? null : at)} />`}
     </span>
   `;
 }
@@ -487,21 +504,54 @@ function Bookmarks () {
   `;
 }
 
-// places outside the granted folder. none works yet, the tiles say what each needs
-const REMOTES = [
-  { icon: 'lucide:cloud',        label: 'WebDAV',       note: 'a client exists in the code app, it moves to .shared' },
-  { icon: 'lucide:cloud-cog',    label: 'Nextcloud',    note: 'through WebDAV, with an app password' },
-  { icon: 'lucide:hard-drive',   label: 'Google Drive', note: 'its own api, sign in with oauth' },
-  { icon: 'lucide:terminal',     label: '(S)FTP',       note: 'not from a browser, only in the android app' },
-  { icon: 'lucide:network',      label: 'LAN',          note: 'smb shares, only in the android app' },
+// places outside the granted folder. webdav works (nextcloud speaks it too), the
+// rest are tiles that say what each would need
+const PLANNED = [
+  { icon: 'lucide:hard-drive', label: 'Google Drive', note: 'its own api, sign in with oauth' },
+  { icon: 'lucide:terminal',   label: '(S)FTP',       note: 'not from a browser, only in the android app' },
+  { icon: 'lucide:network',    label: 'LAN',          note: 'smb shares, only in the android app' },
 ];
 
+// a remote opens in a tab of its own
+function openRemote (id) {
+  openTab([], id);
+  show('library');
+}
+
+function manageRemotes () {
+  selected.value = null;
+  sheet.value    = 'remotes';
+  area('context')?.show();
+}
+
 function Remotes () {
+  const connections = app.remotes.connections.value;
+
   return html`
     <section>
       <h2>Remote</h2>
       <ul class='tiles'>
-        ${REMOTES.map(remote => html`
+        ${connections.map(connection => html`
+          <li key=${connection.id}>
+            <button class='tile' type='button' onClick=${() => openRemote(connection.id)}>
+              <${Icon} name='lucide:cloud' />
+              <span class='text'>
+                <span class='name'>${connection.name}</span>
+                <small>${new URL(connection.url).host}</small>
+              </span>
+            </button>
+          </li>
+        `)}
+        <li>
+          <button class='tile' type='button' onClick=${manageRemotes}>
+            <${Icon} name='lucide:cloud-cog' />
+            <span class='text'>
+              <span class='name'>WebDAV, Nextcloud</span>
+              <small>${connections.length ? 'add or remove' : 'connect a server'}</small>
+            </span>
+          </button>
+        </li>
+        ${PLANNED.map(remote => html`
           <li key=${remote.label}>
             <button class='tile' type='button' disabled title=${remote.note}>
               <${Icon} name=${remote.icon} />
@@ -514,6 +564,60 @@ function Remotes () {
         `)}
       </ul>
     </section>
+  `;
+}
+
+// the connections, and a form for one more. adding tests it with a listing first
+const remoteError = signal(null);
+const remoteBusy  = signal(false);
+
+function RemoteManager () {
+  const form = useRef(null);
+
+  const add = async event => {
+    event.preventDefault();
+    const field = name => form.current.querySelector(`[name="${name}"]`)?.value ?? '';
+    remoteBusy.value  = true;
+    remoteError.value = null;
+    try {
+      const connection = await app.remotes.add({ name: field('name'), password: field('password'), url: field('url'), username: field('username') });
+      form.current.reset?.();
+      openRemote(connection.id);
+      area('context')?.hide();
+    }
+    catch (err) { remoteError.value = err.message ?? String(err); }
+    finally     { remoteBusy.value = false; }
+  };
+
+  const remove = connection => {
+    if (!confirm(`Forget “${connection.name}”? The files on the server stay.`)) return;
+    app.remotes.remove(connection.id);
+    // its tabs close with it, the last one falls back to the folder
+    const left = tabs().filter(tab => tab.source !== connection.id);
+    setTabs(left.length ? left : [{ path: [] }], 0);
+  };
+
+  return html`
+    ${app.remotes.connections.value.length > 0 && html`
+      <ul class='tasks'>
+        ${app.remotes.connections.value.map(connection => html`
+          <li class='task' key=${connection.id}>
+            <${Icon} name='lucide:cloud' />
+            <span class='text'><span class='name'>${connection.name}</span><small>${connection.url}</small></span>
+            <${IconButton} icon='lucide:trash-2' label=${`forget ${connection.name}`} onClick=${() => remove(connection)} />
+          </li>
+        `)}
+      </ul>`}
+    <h3>Connect</h3>
+    <form class='remote-form' ref=${form} onSubmit=${add}>
+      <aufbau-input name='url' type='url' placeholder='https://cloud.example/remote.php/dav/files/me/' required></aufbau-input>
+      <aufbau-input name='username' type='text' placeholder='username' autocomplete='username'></aufbau-input>
+      <aufbau-input name='password' type='password' placeholder='password or app password' autocomplete='current-password'></aufbau-input>
+      <aufbau-input name='name' type='text' placeholder='name (optional)'></aufbau-input>
+      ${remoteError.value && html`<p class='error'>${remoteError.value}</p>`}
+      <button class='action' type='submit' disabled=${remoteBusy.value}><${Icon} name=${remoteBusy.value ? 'loading' : 'lucide:plug'} /> connect</button>
+    </form>
+    <p class='hint'>The server has to allow this app (cors). Nextcloud: the url ends in /remote.php/dav/files/${'<user>'}/, best with an app password. The password stays on this device.</p>
   `;
 }
 
@@ -569,7 +673,7 @@ function Welcome () {
 }
 
 function Dashboard () {
-  const ready  = Boolean(rootHandle());
+  const ready  = Boolean(localRoot());
   const search = ready && html`<${Search} />`;
   const top    = app.state.$searchbar === 'top';
 
@@ -598,7 +702,7 @@ function Entry ({ entry }) {
                 onClick=${() => onEntryClick(entry)}
                 onDblClick=${() => open(entry)}
                 onKeyDown=${event => event.key === 'Enter' && !opensOnTap() && (event.preventDefault(), open(entry))}>
-          <${Thumb} entry=${entry} at=${path.value} />
+          <${Thumb} entry=${entry} at=${path.value} from=${source.value} />
           <span class='text'>
             <span class='name'>${entry.name}</span>
             <small>${entry.kind === 'file' ? `${fmt.date(entry.lastModified)} · ${fmt.bytes(entry.size)}` : 'folder'}</small>
@@ -612,7 +716,7 @@ function Entry ({ entry }) {
 
 function Tabs () {
   const list = tabs();
-  const name = tab => tab.path.at(-1) ?? folderName();
+  const name = tab => tab.path.at(-1) ?? sourceName(tab.source ?? null);
 
   return html`
     <div-x class='tabs' role='tablist' scrollable>
@@ -717,7 +821,7 @@ function Preview () {
     if (!entry || !isImage(entry)) return;
     let url = null;
     let cancelled = false;
-    fs.readFile(rootHandle(), entry.path, entry.name).then(blob => {
+    fs.readFile(rootOfSource(entry.source), entry.path, entry.name).then(blob => {
       if (cancelled || !image.current) return;
       url = URL.createObjectURL(blob);
       image.current.onload = () => { imageSize.value = { width: image.current.naturalWidth, height: image.current.naturalHeight }; };
@@ -767,9 +871,9 @@ function EntryContext ({ entry }) {
       <${Action} icon='lucide:arrow-up-right' label='open' onClick=${() => open(entry, at)} />
       ${entry.path && html`<${Action} icon='lucide:folder' label='show in folder' onClick=${() => showInFolder(entry)} />`}
       ${entry.kind === 'file' && html`<${Action} icon='lucide:download' label='download' onClick=${() => download(entry)} />`}
-      ${entry.kind === 'directory' && html`<${BookmarkAction} path=${[...at, entry.name]} name=${entry.name} />`}
-      <${Action} icon='lucide:copy' label='copy' onClick=${() => { app.transfer.pick('copy', entry, at); area('context')?.hide(); }} />
-      <${Action} icon='lucide:scissors' label='move' onClick=${() => { app.transfer.pick('move', entry, at); area('context')?.hide(); }} />
+      ${entry.kind === 'directory' && !(entry.source ?? sourceOf(entry)) && html`<${BookmarkAction} path=${[...at, entry.name]} name=${entry.name} />`}
+      <${Action} icon='lucide:copy' label='copy' onClick=${() => { app.transfer.pick('copy', entry, at, rootOfSource(entry.source ?? sourceOf(entry))); area('context')?.hide(); }} />
+      <${Action} icon='lucide:scissors' label='move' onClick=${() => { app.transfer.pick('move', entry, at, rootOfSource(entry.source ?? sourceOf(entry))); area('context')?.hide(); }} />
       <${Action} icon='lucide:pencil' label='rename' onClick=${() => renameEntry(entry)} />
       <${Action} icon='lucide:trash-2' label='delete' onClick=${() => deleteEntry(entry)} />
     </${Actions}>
@@ -828,10 +932,10 @@ function FolderContext () {
     ]} />
     <${Actions}>
       <${Action} icon='lucide:folder-plus' label='new folder' onClick=${newFolder} />
-      ${path.value.length > 0 && html`<${BookmarkAction} path=${path.value} name=${path.value.at(-1)} />`}
+      ${path.value.length > 0 && !source.value && html`<${BookmarkAction} path=${path.value} name=${path.value.at(-1)} />`}
       <${Action} icon='lucide:text-cursor-input' label='rename by pattern' disabled />
     </${Actions}>
-    ${path.value.length > 0 && html`<${FolderType} />`}
+    ${path.value.length > 0 && !source.value && html`<${FolderType} />`}
   `;
 }
 
@@ -856,7 +960,8 @@ function FileContext ({ entry }) {
 function Context () {
   const view = current.value;
 
-  if (showTasks.value) return html`<app-panel heading='Tasks'><${TaskList} /></app-panel>`;
+  if (sheet.value === 'tasks')   return html`<app-panel heading='Tasks'><${TaskList} /></app-panel>`;
+  if (sheet.value === 'remotes') return html`<app-panel heading='Remote'><${RemoteManager} /></app-panel>`;
 
   if (selected.value) return html`<app-panel heading=${selected.value.name}><${EntryContext} entry=${selected.value} /></app-panel>`;
   if (view === 'preview' && file.value) return html`<app-panel heading='Details'><${FileContext} entry=${file.value} /></app-panel>`;
@@ -865,7 +970,7 @@ function Context () {
   return html`
     <app-panel heading=${folderName()}>
       <${Status} />
-      <${Actions}><${Action} icon='lucide:refresh-cw' label='read again' disabled=${!rootHandle() || Boolean(app.scan.scanning.value)} onClick=${rescan} /></${Actions}>
+      <${Actions}><${Action} icon='lucide:refresh-cw' label='read again' disabled=${!localRoot() || Boolean(app.scan.scanning.value)} onClick=${rescan} /></${Actions}>
     </app-panel>
   `;
 }
@@ -876,7 +981,7 @@ function Context () {
 
 function openTasks () {
   selected.value  = null;
-  showTasks.value = true;
+  sheet.value    = 'tasks';
   area('context')?.show();
 }
 
@@ -1074,7 +1179,7 @@ function App () {
       </app-area>
       <app-area name='menu' dock='start'><${Menu} /></app-area>
       <app-area name='config' dock='end'><${Config} /></app-area>
-      <app-area name='context' dock='bottom' peek ontoggle=${event => { if (!event.detail?.open) showTasks.value = false; }}><${Context} /></app-area>
+      <app-area name='context' dock='bottom' peek ontoggle=${event => { if (!event.detail?.open) sheet.value = null; }}><${Context} /></app-area>
     </app-root>
   `;
 }
