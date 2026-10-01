@@ -18,6 +18,7 @@
 import { autoloader }               from '@aufbau/components';
 import { computed, effect, signal } from '@aufbau/signals';
 import { gestalt }                  from '@aufbau/api';
+import { patternStyle }             from '@aufbau/components/input/pattern.js';
 
 import { useEffect, useRef, useState } from 'preact/hooks';
 
@@ -39,13 +40,16 @@ app.scan = await app.module('scan');
 
 const { CATEGORIES, categoryOf } = app.scan;
 
+// the patterns are input-pattern values: 'dots 8%', '' for none
 app.state.$extend({
-  open      : { type: 'enum',   value: 'auto',   values: ['auto', 'double', 'single'] },
-  searchbar : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
-  tab       : { type: Number,   value: 0 },
-  tabbar    : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
-  tabs      : { type: 'scalar', value: [{ path: [] }] },
-  viewmode  : { type: 'enum',   value: 'list',   values: ['grid', 'list'] },
+  backgroundPattern : { type: String,   value: '' },
+  open              : { type: 'enum',   value: 'auto',   values: ['auto', 'double', 'single'] },
+  searchbar         : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
+  tab               : { type: Number,   value: 0 },
+  tabbar            : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
+  tabs              : { type: 'scalar', value: [{ path: [] }] },
+  tilePattern       : { type: String,   value: '' },
+  viewmode          : { type: 'enum',   value: 'list',   values: ['grid', 'list'] },
 });
 
 // one cache for the whole app, in opfs. the images of a folder, small
@@ -340,13 +344,19 @@ function FileRow ({ entry }) {
   `;
 }
 
+// by name, other always last
+const SORTED = [...CATEGORIES].sort((a, b) =>
+    a.id === 'other' ? 1
+  : b.id === 'other' ? -1
+  : a.label.localeCompare(b.label));
+
 function Categories () {
   const index = app.scan.index.value;
   return html`
     <section>
       <h2>Categories</h2>
       <ul class='tiles'>
-        ${CATEGORIES.map(({ id, label, icon }) => {
+        ${SORTED.map(({ id, label, icon }) => {
           const stats = index?.categories?.[id];
           return html`
             <li key=${id}>
@@ -388,7 +398,6 @@ function Recent () {
 function Places () {
   return html`
     <section>
-      <h2>Folder</h2>
       <ul class='tiles'>
         <li>
           <button class='tile' type='button' onClick=${() => { goTo([]); show('library'); }}>
@@ -734,10 +743,39 @@ function Menu () {
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
 
 const FIELDS = {
-  open      : { type: 'enum', label: 'Open with',  look: 'segments', values: [['auto', 'auto'], ['single', 'a tap'], ['double', 'a double click']], default: 'auto' },
-  searchbar : { type: 'enum', label: 'Search bar', look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
-  tabbar    : { type: 'enum', label: 'Tabs',       look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+  open              : { type: 'enum', label: 'Open with',  look: 'segments', values: [['auto', 'auto'], ['single', 'a tap'], ['double', 'a double click']], default: 'auto' },
+  searchbar         : { type: 'enum', label: 'Search bar', look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+  tabbar            : { type: 'enum', label: 'Tabs',       look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+
+  // no colors: a pattern takes the color of the text where it lies, only its opacity is chosen
+  backgroundPattern : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Background', default: '' },
+  tilePattern       : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Tiles',      default: '' },
 };
+
+// the patterns as custom properties on the root, app.css paints them. a late
+// answer for a value that changed in the meantime is dropped
+const PATTERNS = [
+  { key: 'backgroundPattern', name: 'background-pattern' },
+  { key: 'tilePattern',       name: 'tile-pattern'       },
+];
+
+function usePatterns (root) {
+  useEffect(() => effect(() => {
+    const element = root.current;
+    if (!element) return;
+
+    for (const { key, name } of PATTERNS) {
+      const value = app.state['$' + key];
+      element.toggleAttribute(`data-${name}`, Boolean(value));
+      if (!value) continue;
+
+      patternStyle(value, { name }).then(style => {
+        if (!style || app.state['$' + key] !== value) return;
+        for (const [property, css] of Object.entries(style)) element.style.setProperty(property, css);
+      });
+    }
+  }), []);
+}
 
 // the shared fields (palette, skin, …) and the app's own, all written into app.state
 function Config () {
@@ -782,6 +820,7 @@ function Config () {
 
 function App () {
   const root = useRef(null);
+  usePatterns(root);
 
   useEffect(() => {
     rootRef.current = root.current;

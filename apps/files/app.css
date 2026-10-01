@@ -115,12 +115,12 @@ aufbau-crumbs {
 .entry,
 .tile,
 .card {
-  align-items : center;
-  background  : none;
-  border      : 0;
-  color       : inherit;
-  cursor      : pointer;
-  display     : flex;
+  align-items     : center;
+  background      : none;
+  border          : 0;
+  color           : inherit;
+  cursor          : pointer;
+  display         : flex;
   font            : inherit;
   gap             : 1rem;
   justify-content : flex-start;
@@ -181,14 +181,17 @@ section + section { margin-block-start: 1.5rem; }
 
 section > h2,
 .section-head > h2 {
-  font-size        : 1rem;
+  font-size        : 0.75rem;
   font-weight      : 500;
+  letter-spacing   : 0.08em;
   margin-block-end : 0.75rem;
-  opacity          : 0.8;
+  opacity          : 0.55;
+  text-align       : center;
+  text-transform   : uppercase;
 }
 
 .section-head { align-items: center; gap: 0.25rem; }
-.section-head > h2 { margin: 0; }
+.section-head > h2 { flex: 1 1 auto; margin: 0; padding-inline-end: 2.5rem; }
 
 .cards {
   gap            : 0.75rem;
@@ -214,10 +217,14 @@ section > h2,
 }
 
 .tile {
-  background    : var(--sunken, var(--hover));
-  border-radius : calc(var(--radius, 0.5rem) * 3);
-  inline-size   : 100%;
-  padding       : 1.25rem;
+  background     : var(--sunken, var(--hover));
+  border-radius  : calc(var(--radius, 0.5rem) * 3);
+  flex-direction : row-reverse;
+  inline-size    : 100%;
+  isolation      : isolate;
+  overflow       : hidden;
+  padding        : 1.25rem;
+  position       : relative;
 
   > aufbau-icon { flex: none; font-size: 1.5rem; }
 
@@ -232,6 +239,33 @@ section > h2,
   gap               : 0.5rem;
   margin-block-start: 0.75rem;
   opacity           : 0.7;
+}
+
+/*//////////// PATTERNS ////////////*/
+/* the settings' patterns, set on the root as --*-pattern-image and -opacity
+   (input-pattern's patternStyle). a mask over the text color, so they follow
+   the theme */
+
+app-root[data-background-pattern] > app-area[name="main"] { isolation: isolate; }
+
+app-root[data-background-pattern] > app-area[name="main"]::before,
+app-root[data-tile-pattern] .tile::before {
+  background-color : currentColor;
+  content          : '';
+  inset            : 0;
+  pointer-events   : none;
+  position         : absolute;
+  z-index          : -1;
+}
+
+app-root[data-background-pattern] > app-area[name="main"]::before {
+  mask-image : var(--background-pattern-image);
+  opacity    : var(--background-pattern-opacity, 0.1);
+}
+
+app-root[data-tile-pattern] .tile::before {
+  mask-image : var(--tile-pattern-image);
+  opacity    : var(--tile-pattern-opacity, 0.1);
 }
 
 /*//////////// PREVIEW ////////////*/
