@@ -753,6 +753,17 @@ const FIELDS = {
   'pattern-tile' : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Tiles',      default: '' },
 };
 
+// how the shared fields render here: the long lists step through their
+// entries as well, the direction is a switch of two
+const CONTROLS = {
+  density  : { attrs: { stepper: true } },
+  dir      : { look: 'segments' },
+  font     : { attrs: { stepper: true } },
+  geometry : { attrs: { stepper: true } },
+  palette  : { attrs: { stepper: true } },
+  skin     : { attrs: { stepper: true } },
+};
+
 // the patterns as custom properties on the root, app.css paints them. a late
 // answer for a value that changed in the meantime is dropped
 // the setting's key names the custom properties too: --pattern-bg-image, --pattern-bg-opacity
@@ -788,8 +799,9 @@ function Config () {
     gestalt.palettes().then(palettes => {
       if (closed) return;
       const spec = { ...sharedSpec(app.config, palettes), ...FIELDS };
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
+      element.controls = CONTROLS;
+      element.values   = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
+      element.spec     = spec;
     });
 
     const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
