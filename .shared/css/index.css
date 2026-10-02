@@ -1,10 +1,12 @@
 /* aufbau first: layers, tokens, palettes, themes, reset */
 @import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
 
+/*
 @import url('./theme.css');
 @import url('./layout.css');
 @import url('./settings.css');
 @import url('./apps.css');
+*/
 
 /* CUSTOM PROPS */
 
