@@ -255,15 +255,16 @@ aufbau-item .title {
   align-items   : flex-start;
   display       : flex;
   font-size     : 0.75rem; 
-  gap           : 0.50rem;
-  padding       : 0.50rem;
+  gap           : --space(small);
+  padding       : --space(small);
   
    > .icon { color: var(--color-ink); flex: none; margin-top: 1px; }
   .body    { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
   .hint    { color: var(--fg-50, var(--color-fg)); }
   .hint b  { color: var(--fg-75, var(--color-fg)); font-weight: 600; }
   
-  button, aufbau-button, .btn { align-self: flex-start; }
+  button, aufbau-button, .btn { align-self: flex-start; }??
+  
 }
 
 /* MODAL */
@@ -275,7 +276,7 @@ aufbau-item .title {
 }
 
 .modal-backdrop {
-  background: var(--accent-a50);
+  --bg: --alpha(ink, -a50);
   padding: 1rem;
   display: grid;
   inset: 0;
@@ -404,7 +405,7 @@ aufbau-upload[look="dropzone"], .dropzone {
   width  : 100%;
 
   &::part(zone) {
-    border        : 2px dashed var(--fg-25);
+    border        : 2px dashed --alpha(fg, 0.25);
     border-radius : 0.75rem;
     padding       : 2.5rem;
     gap           : 0.6rem;
@@ -426,22 +427,25 @@ aufbau-upload[look="dropzone"], .dropzone {
   
 /* VIEW */
 
-.View header {
-  background-color: var(--bg-d-2);
-  display: flex; justify-content: space-between;
-  gap: 0.5rem; padding: 0.75rem;
-  position: sticky; top: 0;
+.view, .View {
+  header {
+    background-color: var(--bg-d-2);
+    display: flex; justify-content: space-between;
+    gap: 0.5rem; padding: 0.75rem;
+    position: sticky; top: 0;
+  }
+  
+  header        { text-transform: uppercase; }
+  header button { text-transform: uppercase; }
 }
-
-.View header        { text-transform: uppercase; }
-.View header button { text-transform: uppercase; }
-
+  
 /* OTHER STUFF */
 
 .art img { border-radius: 0.25rem; }
 
-.View > header button {
-  border: 2px solid color-mix(in oklch, currentcolor, transparent 75%);
+.view > header button {
+  border: 2px solid --color(cc);
+  /* --rad: circle; */
   border-radius: 50%;
   font-size: 1rem;
   padding: 0.25rem;
@@ -452,24 +456,22 @@ aufbau-upload[look="dropzone"], .dropzone {
 .videoplayer {
   position: relative;
   
-  .stage {
-    z-index: 1;
-  }
+  .stage { z-index: 1; }
 
   .controls {
     background: var(--color-bg);
     display: flex; flex-flow: column;
     z-index: 2;
 
-    > * { display: flex; flex-flow: row; gap: 1rem; }
+    > * { display: flex; flex-flow: row; --gap: small; }
   }
 }
 
-/* */
-
+/*
 .col { display: flex; flex-direction: column; }
 .row { display: flex; flex-direction: row; }
-
+*/
+  
 /*
 contain: layout;
 contain: paint;
