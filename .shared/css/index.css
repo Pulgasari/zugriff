@@ -10,6 +10,20 @@
 
 /* CUSTOM PROPS */
 
+html, body { height: 100%; }
+
+body {
+  overflow            : hidden;
+  overscroll-behavior : none;
+}
+
+#app {
+  display   : flex;
+  flex-flow : column;
+  height    : 100dvh;
+  overflow  : hidden;
+}
+
 /* TYPO */
 :root {
   --font      : "Manrope";
