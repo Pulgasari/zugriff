@@ -131,7 +131,7 @@ aufbau-button, button, .btn, .button {
   --bg: --darker(bg, 10%);
   text-transform: uppercase;
 
-  > *       { --bg: darker(bg, 20%); border: none; border-radius: 0; }
+  > *       { --bg: --darker(bg, 20%); border: none; border-radius: 0; }
   button    { text-transform: uppercase; }
   > .active { box-shadow: inset 0 2px --color(ink); color: --color(ink); }
 }
@@ -139,70 +139,19 @@ aufbau-button, button, .btn, .button {
 /* EMPTY */
 
 .empty {
+  --fg  : --muted(fg, 50%);
+  --gap : small;
+  --pad : huge;
+  
   align-items : center;
-  color       : var(--fg-50, var(--color-fg));
   display     : flex; 
   flex-flow   : column;
-  gap         : 0.5rem;
   margin      : auto;
-  padding     : 4rem 1rem;
   text-align  : center;
   
   .icon  { opacity: 0.5; }
-  .title { font-size: 1rem; font-weight: 600; color: var(--color-fg); }
-  .hint  { max-width: 26rem; font-size: 1rem; }
-  .btn   { margin-top: 0.75rem; }
-}
-
-/* INDEX */
-
-aufbau-index[viewmode="list"] { 
-  gap: 0;
-  
-  > *:nth-child(odd) { background-color: #0001; }
-  > * {
-    display : grid;
-    gap     : 0.75rem;
-    grid-template-columns : 100px auto;
-    grid-template-rows    : 1fr;
-    /* grid: 1fr 1fr / 1fr 2fr; */
-    > *             { grid-column: 2; }
-    > *:first-child { grid-column: 1; grid-row: span 4; }
-  }
-}
-
-.art, .artwork {
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
-
-aufbau-item {
-  .art, .artwork {
-    /* --gestalt-flow: grid center center; */
-    
-    display         : grid;
-    align-items     : center;
-    justify-content : center;
-  
-    aufbau-icon {
-      font-size: 2rem;
-      opacity: 0.25;
-    }
-  }
-  .meta {
-    opacity: 0.5;
-  }
-  .title {
-    font-size   : 1.25rem;
-    font-weight : bold;
-    line-height : 1.25;
-  }
-}
-
-/*.art, .not-a-button,*/
-.meta > button,
-aufbau-item .title {
-  display: contents!important;
+  .title { font-weight: 600; color: var(--color-fg); }
+  .hint  { max-width: 26rem; }
 }
 
 /* INSTALL-TIP */
@@ -211,12 +160,11 @@ aufbau-item .title {
   background    : color-mix(in oklch, var(--color-ink) 10%, var(--panel));
   border        : 1px solid var(--line);
   border-radius : var(--radius);
-  color         : var(--fg-75, var(--color-fg)); 
   align-items   : flex-start;
   display       : flex;
   font-size     : 0.75rem; 
-  gap           : --space(small);
-  padding       : --space(small);
+  --gap  : small;
+  --pad  : small;
   
    > .icon { color: var(--color-ink); flex: none; margin-top: 1px; }
   .body    { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
