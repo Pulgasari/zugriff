@@ -1,21 +1,7 @@
-/* aufbau first: layers, tokens, palettes, themes, reset */
 @import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
 
-/*
-@import url('./theme.css');
-@import url('./layout.css');
-@import url('./settings.css');
-@import url('./apps.css');
-*/
-
-/* CUSTOM PROPS */
-
 html, body { height: 100%; }
-
-body {
-  overflow            : hidden;
-  overscroll-behavior : none;
-}
+body { overflow: hidden; overscroll-behavior: none; }
 
 #app {
   display   : flex;
@@ -24,7 +10,44 @@ body {
   overflow  : hidden;
 }
 
+/* ── tokens ─────────────────────────────────────────────────────── */
+
+body {
+  --hover   :  --alpha(fg, 90%);
+  --line    :  --alpha(fg, 85%);
+  --panel   : --darker(bg, 10%);
+  --panel-2 : --darker(bg, 20%);
+  --zebra   : --darker(bg, 10%);
+  /* --radius  : 0.5rem; */
+}
+
+/* ── mobile / android  ─────────────────────────────────────────────────────── */
+
+/*
+safe-area insets. non-zero where the page runs edge-to-edge:
+the capacitor wrappers (android 15+ enforces it, viewport-fit=cover opts in) and notched screens.      
+body's background covers the canvas behind the system bars, #app keeps clear
+*/
+
+body {
+  --safe-top    : env(safe-area-inset-top,    0px);
+  --safe-right  : env(safe-area-inset-right,  0px);
+  --safe-bottom : env(safe-area-inset-bottom, 0px);
+  --safe-left   : env(safe-area-inset-left,   0px);
+}
+
+:root #app {
+  background-clip : content-box;
+  padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+}
+
+
+/* CUSTOM PROPS */
+
+
 /* TYPO */
+
+/*
 :root {
   --font      : "Manrope";
   --font-code : "JetBrains Mono", monospace;
@@ -32,18 +55,24 @@ body {
 }
 *          { font-family : var(--font); }
 html, body { font-size   : var(--font-size); }
-
-
-/*
-::view-transition-old(root) { animation: page-out 180ms ease both; }
-::view-transition-new(root) { animation: page-in  350ms cubic-bezier(.22, 1, .36, 1) both; }      
-
-@keyframes page-out {
-  to { filter: blur(3px); opacity: 0; transform: translateY(-6px); }
-}
-
-@keyframes page-in {
-  from { filter: blur(3px); opacity: 0; transform: translateY(8px); }
-  to   { filter: blur(0);   opacity: 1; transform: translateY(0);   }
-}
 */
+
+/* move to: aufbau/css/mobile.css */
+
+/* ::selection { background: var(--accent-25); } */
+
+/* ── oled fix (temp) ─────────────────────────────────────────────────────── */
+
+/* move to: zugriff/apps/podcasts/app.css
+or move to: aufbau/css/surfaces.css */
+
+@container style(--palette: oled) {
+  body {
+    --line: color-mix(in oklch, var(--color-fg) 15%, transparent);
+  }
+  #app {
+    .view > header { border-bottom : 1px solid var(--line); }
+    #app-dock      { border-top    : 1px solid var(--line); }
+    aufbau-item    { border-bottom : 1px solid var(--line); }
+  }
+}
