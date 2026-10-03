@@ -27,7 +27,7 @@ function Item ({ episode }) {
   });
   
   return html`
-    <aufbau-item 
+    <data-item 
       class:done=${state.done}
       class:playing=${app.player.episode?.id === episode.id}
       ref=${ref}
@@ -64,7 +64,7 @@ function Item ({ episode }) {
           title : 'open episode page',
         }
       ]}/>
-    </aufbau-item>
+    </data-item>
   `;
 }
 

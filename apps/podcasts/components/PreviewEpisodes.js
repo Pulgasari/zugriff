@@ -21,7 +21,7 @@ function Item ({ episode }) {
   const teaser = plain(episode.description).slice(0, TEASER);
 
   return html`
-    <aufbau-item>
+    <data-item>
       <${Artwork} src=${episode.image} />
 
       <div class='meta'>
@@ -34,7 +34,7 @@ function Item ({ episode }) {
       ${teaser && html`<p class='teaser'>${teaser}</p>`}
 
       ${episode.link && html`<${Link} href=${episode.link} icon='mdi:open-in-new' label='Episode page' />`}
-    </aufbau-item>
+    </data-item>
   `;
 }
 

@@ -87,7 +87,7 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
   writes are ignored), `proxy` / `imgResizer` are text. Persisted as one blob under
   `zugriff:podcasts:settings`. Its own store rather than an `app.state` subtree because
   `typedSignal` persistence is whole-store and `app.state` must stay ephemeral.
-- `app.go(name, id)` — navigate. For toasts call `app.toast(…)` directly (see `.shared/js/modules/toast.js`).
+- `app.go(name, id)` — navigate: the `<app-view>` of that name in the `<app-root>` of app.js. the lists have a hash route, the detail views keep their id outside the address. For toasts call `app.toast(…)` directly (see `.shared/js/modules/toast.js`).
 - `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …); `app.hotKeys` is the declarative combo→spec map that binds keys to them (`space` = play/pause, `arrow-left`/`arrow-right` = skip, `escape` = close). See `.shared/js/modules/{actions,hotkeys}.js`.
 
 Views/panels/components reach all of this through `const app = zugriff.app` (+
@@ -117,7 +117,7 @@ destructuring the stable module refs); shared components load from
   `any` is ours, not theirs — it stands for leaving `attribute` out. A parameter the
   api rejects comes back as HTTP 200 with no results, so that is turned into an error
   rather than read as "nothing found". The storefront list is
-  `/.shared/json/countries.json`, which `<aufbau-picker src=…>` loads by itself.
+  `/.shared/json/countries.json`, which `<input-value src=…>` loads by itself.
 - **`views/ExploreView.js`** — the same library seen from outside, kept in the view
   since nothing else needs it (ExplorePodcastView imports the shared pieces from
   there): the directory search, a feed read but not stored (`preview`, cached per url for the session) and
@@ -132,8 +132,8 @@ destructuring the stable module refs); shared components load from
   the first read lands, and remembers the last rows per key so navigating back
   draws immediately and refreshes behind the list.
 
-The grid/list podcasts view is laid out by `<aufbau-index viewmode="grid|list">`
-with each podcast in an `<aufbau-item>`.
+The grid/list podcasts view is laid out by `<data-index viewmode="grid|list">`
+with each podcast in a `<data-item>`.
 
 ---
 
