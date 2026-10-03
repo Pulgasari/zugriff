@@ -58,51 +58,37 @@ data-item { gap: 0.5rem; padding: 0.75rem; }
   padding     : 0.5rem;
   
   > span { flex: 1 1 auto; }
-  .icon  { color: var(--color-ink); }
+  .icon  { --fg: --color(ink); }
 }
 
 /* BU'TON */
 
+
 aufbau-button, button, .btn, .button {
+  --gap : tiny;
+  --pad : small;
+  --rad : --radius();
+  
   background    : var(--panel-2);
   border        : 1px solid var(--line);
-  border-radius : var(--radius-control, var(--radius));
-  color         : var(--color-fg);
   font          : inherit;
-  font-size     : 0.85rem;
-  gap           : 0.25rem;
-  padding       : 0.25rem 0.50rem;
   transition    : opacity 0.25s;
+  /* display: inline-flex; align-items: center; justify-content: center; */
   
   &:hover:not(:disabled) { opacity: 1.00; border-color: var(--accent-50); }
   &:disabled             { opacity: 0.25; cursor: not-allowed; }
 
-  &.danger  { color: var(--c-null, #e06c75); }
-  &.danger:hover:not(:disabled) { background: color-mix(in oklch, var(--c-null, #e06c75) 15%, transparent); }      
-  &.primary   { background: var(--color-ink); border-color: var(--color-ink); font-weight: 600; }      
-  &.secondary { background: var(--button-primary-bg); color: var(--color-bg); }
-  &.ghost     { background: transparent; border: none; color: var(--color-fg); opacity: 0.50; }
-  
-  &.small     { font-size: 0.75rem; padding: 0.25rem 0.50rem; }
-  &.big       { font-size: 1.50rem; padding: 0.50rem 1.00rem; }
-
-  /* kinda like' display: contents;' */
-  &.naked { background-color: unset; color: unset; } 
+  &.small { font-size: 0.75rem; --pad:  small; }
+  &.big   { font-size: 1.50rem; --pad: normal; }
+  &.ghost { --bg: transparent; --fg: --muted(fg, 50%); border: 0; }
+/* &.naked { --bg: unset; --fg: unset; } kinda like' display: contents;' */
+  .active { --fg: --color(ink); }
 }
 
-.icon-btn,
-.act-btn {
-  background    : transparent;
-  border        : none;
-  color         : var(--color-fg);
-  cursor        : pointer;
-  padding       : 0.1rem 0.2rem;
-  border-radius : 0.25rem;
-  display       : flex;
-  align-items   : center;
-  opacity       : 0.5;
-  transition    : opacity 0.1s;
-
+.ibtn, .icon-btn, .act-btn { 
+  --bg: transparent; 
+  --fg: var(--color-fg);
+  
   &:hover { opacity: 1; }
 }
 
@@ -111,31 +97,6 @@ aufbau-button, button, .btn, .button {
   align-items : center;
   gap         : 0.25rem;
 }
-
-.ibtn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 2rem; height: 2rem; border: none; border-radius: var(--radius);
-  background: transparent; color: var(--fg-75, var(--color-fg)); cursor: pointer;
-  transition: background 0.12s, color 0.12s;
-}
-.ibtn:hover:not(:disabled) { background: var(--hover); color: var(--color-fg); }
-.ibtn:disabled { opacity: 0.4; cursor: default; }
-.ibtn.active { color: var(--color-ink); background: var(--accent-25); }
-
-/* ── button modifiers ───────────────────────────────────────────────────── */
-/* base `button, .btn` is defined at the top of this file — these are the
-   modifiers the apps kept redefining locally. */
-
-.btn.sm        { padding: 0.25rem 0.60rem; font-size: 0.78rem; }
-.btn.full      { width: 100%; justify-content: center; }
-.btn.icon-only { padding: 0.50rem 0.65rem; }
-.btn.danger    { background: color-mix(in srgb, #f44 12%, transparent); color: #f66; }
-
-/* icon-btn variants — base `.icon-btn, .act-btn` is defined above */
-.icon-btn.remove:hover { color: #f66; opacity: 1; }
-.icon-btn:disabled     { opacity: 0.15; cursor: not-allowed; }
-a.icon-btn             { text-decoration: none; }
-a.icon-btn:hover       { color: var(--color-ink); opacity: 1; }
 
 /* CHIP */
 
@@ -148,7 +109,7 @@ a.icon-btn:hover       { color: var(--color-ink); opacity: 1; }
   background    : transparent;
   color         : var(--color-fg);
 
-  &:hover  { color: var(--color-ink); }
+  &:hover  { --fg: --color(ink); }
   
   &.active {
     background   : var(--color-ink);
@@ -166,83 +127,31 @@ a.icon-btn:hover       { color: var(--color-ink); opacity: 1; }
 
 /* DOCK */
 
-#app-dock, .dock, .Dock { 
-  background-color: var(--bg-d-1);
+#app-dock, .dock, .Dock {
+  --bg: --darker(bg, 10%);
   text-transform: uppercase;
 
-  > *    { background-color: var(--bg-d-2); border: none; border-radius: 0; }
-  button { text-transform: uppercase; }
-
-  > .active { box-shadow: inset 0 2px var(--color-ink); color: var(--color-ink); }
+  > *       { --bg: --darker(bg, 20%); border: none; border-radius: 0; }
+  button    { text-transform: uppercase; }
+  > .active { box-shadow: inset 0 2px --color(ink); color: --color(ink); }
 }
 
 /* EMPTY */
 
 .empty {
+  --fg  : --muted(fg, 50%);
+  --gap : small;
+  --pad : huge;
+  
   align-items : center;
-  color       : var(--fg-50, var(--color-fg));
   display     : flex; 
   flex-flow   : column;
-  gap         : 0.5rem;
   margin      : auto;
-  padding     : 4rem 1rem;
   text-align  : center;
   
   .icon  { opacity: 0.5; }
-  .title { font-size: 1rem; font-weight: 600; color: var(--color-fg); }
-  .hint  { max-width: 26rem; font-size: 1rem; }
-  .btn   { margin-top: 0.75rem; }
-}
-
-/* INDEX */
-
-data-index[viewmode="list"] { 
-  gap: 0;
-  
-  > *:nth-child(odd) { background-color: #0001; }
-  > * {
-    display : grid;
-    gap     : 0.75rem;
-    grid-template-columns : 100px auto;
-    grid-template-rows    : 1fr;
-    /* grid: 1fr 1fr / 1fr 2fr; */
-    > *             { grid-column: 2; }
-    > *:first-child { grid-column: 1; grid-row: span 4; }
-  }
-}
-
-.art, .artwork {
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-}
-
-data-item {
-  .art, .artwork {
-    /* --gestalt-flow: grid center center; */
-    
-    display         : grid;
-    align-items     : center;
-    justify-content : center;
-  
-    svg-icon {
-      font-size: 2rem;
-      opacity: 0.25;
-    }
-  }
-  .meta {
-    opacity: 0.5;
-  }
-  .title {
-    font-size   : 1.25rem;
-    font-weight : bold;
-    line-height : 1.25;
-  }
-}
-
-/*.art, .not-a-button,*/
-.meta > button,
-data-item .title {
-  display: contents!important;
+  .title { font-weight: 600; color: var(--color-fg); }
+  .hint  { max-width: 26rem; }
 }
 
 /* INSTALL-TIP */
@@ -251,19 +160,19 @@ data-item .title {
   background    : color-mix(in oklch, var(--color-ink) 10%, var(--panel));
   border        : 1px solid var(--line);
   border-radius : var(--radius);
-  color         : var(--fg-75, var(--color-fg)); 
   align-items   : flex-start;
   display       : flex;
   font-size     : 0.75rem; 
-  gap           : 0.50rem;
-  padding       : 0.50rem;
+  --gap  : small;
+  --pad  : small;
   
    > .icon { color: var(--color-ink); flex: none; margin-top: 1px; }
   .body    { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
   .hint    { color: var(--fg-50, var(--color-fg)); }
   .hint b  { color: var(--fg-75, var(--color-fg)); font-weight: 600; }
   
-  button, aufbau-button, .btn { align-self: flex-start; }
+  button, aufbau-button, .btn { align-self: flex-start; }??
+  
 }
 
 /* MODAL */
@@ -275,7 +184,7 @@ data-item .title {
 }
 
 .modal-backdrop {
-  background: var(--accent-a50);
+  --bg: --alpha(ink, -a50);
   padding: 1rem;
   display: grid;
   inset: 0;
@@ -351,7 +260,7 @@ input  { padding: 0.5rem; width: 100%; }
 
 .side-foot {
   flex: none;
-  padding: 0.5rem;
+  --pad: small;
   border-top: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 0.5rem;
 
@@ -363,7 +272,7 @@ input  { padding: 0.5rem; width: 100%; }
 .tree {
   flex: 1 1 auto; 
   overflow-y: auto; 
-  padding: 0.5rem;
+  --pad: small;
 }
 
 /* a granted folder block */
@@ -379,23 +288,20 @@ input  { padding: 0.5rem; width: 100%; }
 
 /* the tree itself — rendered by <data-tree> / <data-node>. the row lives
    in the item's shadow root, reachable as ::part(row|icon|label) */
-data-node { --tree-indent: 0.85rem; }
+data-node {
+  --tree-indent: 0.85rem;
 
-data-node::part(row) {
-  font-size : 0.85rem;
-  gap       : 0.25rem;
-  padding   : 0.25rem;
+  &::part(row)       { --gap: tiny; --pad: tiny; /*font-size : 0.85rem;*/ }
+  &::part(row):hover { color: var(--color-fg); background: var(--hover); }
+
+  &[selected]::part(row) {
+    color       : var(--color-fg);
+    background  : var(--accent-25);
+    font-weight : 600;
+  }
+
+  &[selected]::part(icon) { --fg: --color(ink); }
 }
-
-data-node::part(row):hover { color: var(--color-fg); background: var(--hover); }
-
-data-node[selected]::part(row) {
-  color       : var(--color-fg);
-  background  : var(--accent-25);
-  font-weight : 600;
-}
-
-data-node[selected]::part(icon) { color: var(--color-ink); }
 
  /* ── dropzone (<input-file look='dropzone'>) ───── */
 
@@ -404,7 +310,7 @@ input-file[look="dropzone"], .dropzone {
   width  : 100%;
 
   &::part(zone) {
-    border        : 2px dashed var(--fg-25);
+    border        : 2px dashed --alpha(fg, 0.25);
     border-radius : 0.75rem;
     padding       : 2.5rem;
     gap           : 0.6rem;
@@ -426,22 +332,25 @@ input-file[look="dropzone"], .dropzone {
   
 /* VIEW */
 
-.View header {
-  background-color: var(--bg-d-2);
-  display: flex; justify-content: space-between;
-  gap: 0.5rem; padding: 0.75rem;
-  position: sticky; top: 0;
+.view, .View {
+  header {
+    background-color: var(--bg-d-2);
+    display: flex; justify-content: space-between;
+    gap: 0.5rem; padding: 0.75rem;
+    position: sticky; top: 0;
+  }
+  
+  header        { text-transform: uppercase; }
+  header button { text-transform: uppercase; }
 }
-
-.View header        { text-transform: uppercase; }
-.View header button { text-transform: uppercase; }
-
+  
 /* OTHER STUFF */
 
 .art img { border-radius: 0.25rem; }
 
-.View > header button {
-  border: 2px solid color-mix(in oklch, currentcolor, transparent 75%);
+.view > header button {
+  border: 2px solid --color(cc);
+  /* --rad: circle; */
   border-radius: 50%;
   font-size: 1rem;
   padding: 0.25rem;
@@ -452,24 +361,22 @@ input-file[look="dropzone"], .dropzone {
 .videoplayer {
   position: relative;
   
-  .stage {
-    z-index: 1;
-  }
+  .stage { z-index: 1; }
 
   .controls {
     background: var(--color-bg);
     display: flex; flex-flow: column;
     z-index: 2;
 
-    > * { display: flex; flex-flow: row; gap: 1rem; }
+    > * { display: flex; flex-flow: row; --gap: small; }
   }
 }
 
-/* */
-
+/*
 .col { display: flex; flex-direction: column; }
 .row { display: flex; flex-direction: row; }
-
+*/
+  
 /*
 contain: layout;
 contain: paint;

@@ -23,6 +23,58 @@ BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
   }
 }
 
+
+
+
+aufbau-index[viewmode="list"] { 
+  gap: 0;
+  
+  > *:nth-child(odd) { background-color: #0001; }
+  > * {
+    display : grid;
+    gap     : 0.75rem;
+    grid-template-columns : 100px auto;
+    grid-template-rows    : 1fr;
+    /* grid: 1fr 1fr / 1fr 2fr; */
+    > *             { grid-column: 2; }
+    > *:first-child { grid-column: 1; grid-row: span 4; }
+  }
+}
+
+.art, .artwork {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+aufbau-item {
+  .art, .artwork {
+    /* --gestalt-flow: grid center center; */
+    
+    display         : grid;
+    align-items     : center;
+    justify-content : center;
+  
+    aufbau-icon {
+      font-size: 2rem;
+      opacity: 0.25;
+    }
+  }
+  .meta {
+    opacity: 0.5;
+  }
+  .title {
+    font-size   : 1.25rem;
+    font-weight : bold;
+    line-height : 1.25;
+  }
+}
+
+/*.art, .not-a-button,*/
+.meta > button,
+aufbau-item .title {
+  display: contents!important;
+}
+
 aufbau-item {
   contain-intrinsic-height : auto 170px;
   content-visibility       : auto;
