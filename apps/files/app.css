@@ -11,7 +11,21 @@
 @container(--shadows: auto) {} /* = skin */
 @container(--shadows: off)  {}
 
+/* theoretically nothing to do here */
+@container(--scheme: auto)  {}
+@container(--scheme: dark)  {}
+@container(--scheme: light) {}
 
+/*
+:::::::::::: SPACING ::::::::::::::::::::::::::::::::::::::::::::::::::
+- ich benutze ausser in sehr seltenen fällen gar kein 'margin` mehr
+  sondern mache ansonsten alles über 'gap' und 'padding'
+- aber auch hier denk ich da eher in 'layout/flow only' (ohne abstände) 
+  während das spacing sich dann automatisch aus hierarchie und kontext ergibt
+- und das setz ich dann tendenziell eher gesammelt
+- und mit dem neuen approach will ich ja sowieso nich mehr als 5 sizes verwenden
+  und sogar explizit als: tiny, small, normal, large, huge
+*/
 
 app-root {
   flex           : 1 1 auto;
