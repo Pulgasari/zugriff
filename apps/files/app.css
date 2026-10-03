@@ -1,5 +1,18 @@
 /* apps/files/app.css */
 
+@container(--a11y-reduced-motion: false) {}
+@container(--a11y-high-contrast: false) {}
+
+@container(--geometry: sharp)  {}
+@container(--geometry: soft)   {}
+@container(--geometry: round)  {}
+@container(--geometry: pilled) {}
+
+@container(--shadows: auto) {} /* = skin */
+@container(--shadows: off)  {}
+
+
+
 app-root {
   flex           : 1 1 auto;
   min-block-size : 0;
