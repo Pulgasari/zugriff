@@ -1,6 +1,6 @@
 // .shared/js/modules/toast.js
-// one toast system for every app, a thin layer over <aufbau-toast>. input
-// handling (strings, errors, { error: … } level keys) lives in AufbauToast,
+// one toast system for every app, a thin layer over <pop-toast>. input
+// handling (strings, errors, { error: … } level keys) lives in PopToast,
 // this only adds the zugriff defaults. also bound to the runtime as zugriff.toast.
 //
 //   toast('Saved');
@@ -9,12 +9,12 @@
 //   toast.error('Could not save');
 //   toast({ heading: 'Done', message: 'All files exported', duration: 6000 });
 
-import AufbauToast, { toToastOptions } from '@aufbau/elements/AufbauToast.js';
+import PopToast, { toToastOptions } from '@aufbau/elements/webcomponents/pop-toast.js';
 
 const DEFAULTS = { duration: 3000 };
 
 // defaults first, so anything the caller passes (inside the input or as options) wins
-const toast = (input, options) => AufbauToast.notify({ ...DEFAULTS, ...toToastOptions(input, options) });
+const toast = (input, options) => PopToast.notify({ ...DEFAULTS, ...toToastOptions(input, options) });
 
 const level = type => (input, options) => toast(input, { ...options, type });
 

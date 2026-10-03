@@ -73,6 +73,6 @@ or move to: aufbau/css/surfaces.css */
   #app {
     .view > header { border-bottom : 1px solid var(--line); }
     #app-dock      { border-top    : 1px solid var(--line); }
-    aufbau-item    { border-bottom : 1px solid var(--line); }
+    data-item      { border-bottom : 1px solid var(--line); }
   }
 }

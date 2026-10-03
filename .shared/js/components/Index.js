@@ -15,7 +15,7 @@ function Index ({
   ...rest
 }) {
   return html`
-    <aufbau-index
+    <data-index
       class=${klass}
       gap=${gap}
       item-shape=${itemShape}
@@ -25,7 +25,7 @@ function Index ({
       item-size-min=${itemSizeMin}
       viewmode=${viewmode}
       ...${rest}
-    >${children}</aufbau-index>
+    >${children}</data-index>
   `;
 }
 

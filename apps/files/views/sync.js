@@ -68,10 +68,10 @@ function Receiver ({ IconButton }) {
       <div class='address'>
         <input-text placeholder='address, ip:port or filesync://…' value=${address.value}
                     oninput=${event => { address.value = event.target.value ?? ''; chosen.value = null; }}></input-text>
-        <aufbau-picker look='segments' value=${current?.protocol ?? protocol.value}
+        <input-value look='segments' value=${current?.protocol ?? protocol.value}
                        onchange=${event => { protocol.value = event.target.value; if (chosen.value) chosen.value = { ...chosen.value, protocol: event.target.value }; }}>
-          ${sync.PROTOCOLS.map(name => html`<aufbau-option value=${name}>${name}</aufbau-option>`)}
-        </aufbau-picker>
+          ${sync.PROTOCOLS.map(name => html`<input-option value=${name}>${name}</input-option>`)}
+        </input-value>
         <input-password placeholder='pin, if the receiver wants one' value=${pin.value} oninput=${event => { pin.value = event.target.value ?? ''; }}></input-password>
       </div>
     </section>

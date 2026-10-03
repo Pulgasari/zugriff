@@ -103,7 +103,7 @@ self.addEventListener('fetch', event => {
   else if (isVendor(url))     { store = vendor; ttl = 0; }
   else if (isDev(url))        { store = dev;    ttl = 0; }
   else if (isIcon(url))       { store = icon;   ttl = ICON_TTL;
-                                // an <aufbau-icon> mask-image is fetched cors; a background-image
+                                // an <svg-icon> mask-image is fetched cors; a background-image
                                 // one (flags) no-cors → opaque, which cannot be stored or masked.
                                 // force cors so iconify answers with its access-control-allow-origin
                                 // and both modes get one readable, cacheable, cors-clean body.

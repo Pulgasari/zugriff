@@ -15,10 +15,9 @@
 
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::
 
-import { autoloader }               from '@aufbau/components';
 import { computed, effect, signal } from '@aufbau/signals';
 import { gestalt }                  from '@aufbau/api';
-import { patternStyle }             from '@aufbau/components/input/pattern.js';
+import { patternStyle }             from '@aufbau/elements/webcomponents/input/types/pattern.js';
 
 import { useEffect, useRef, useState } from 'preact/hooks';
 
@@ -29,8 +28,7 @@ import { createThumbCache } from '/.shared/js/thumbs.js';
 
 import SyncView, { sync } from './views/sync.js';
 
-// app-*, div-*, input-* and the rest of the components. the elements come with aufbau.boot()
-autoloader({ elements: false });
+// app-*, div-*, input-* and the rest come with aufbau.boot(), its autoloader defines them
 
 // :::::: HANDLE ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -612,10 +610,10 @@ function RemoteManager () {
       </ul>`}
     <h3>Connect</h3>
     <form class='remote-form' ref=${form} onSubmit=${add}>
-      <aufbau-input name='url' type='url' placeholder='https://cloud.example/remote.php/dav/files/me/' required></aufbau-input>
-      <aufbau-input name='username' type='text' placeholder='username' autocomplete='username'></aufbau-input>
-      <aufbau-input name='password' type='password' placeholder='password or app password' autocomplete='current-password'></aufbau-input>
-      <aufbau-input name='name' type='text' placeholder='name (optional)'></aufbau-input>
+      <input-url      name='url'      placeholder='https://cloud.example/remote.php/dav/files/me/' required></input-url>
+      <input-text     name='username' placeholder='username' autocomplete='username'></input-text>
+      <input-password name='password' placeholder='password or app password' autocomplete='current-password'></input-password>
+      <input-text     name='name'     placeholder='name (optional)'></input-text>
       ${remoteError.value && html`<p class='error'>${remoteError.value}</p>`}
       <button class='action' type='submit' disabled=${remoteBusy.value}><${Icon} name=${remoteBusy.value ? 'loading' : 'lucide:plug'} /> connect</button>
     </form>
@@ -697,7 +695,7 @@ function Dashboard () {
 function Entry ({ entry }) {
   const isSelected = selected.value?.name === entry.name && !selected.value?.path;
   return html`
-    <aufbau-item>
+    <data-item>
       <div class=${isSelected ? 'row selected' : 'row'}>
         <button class='entry' type='button'
                 aria-pressed=${isSelected ? 'true' : null}
@@ -712,7 +710,7 @@ function Entry ({ entry }) {
         </button>
         <${IconButton} icon='lucide:ellipsis-vertical' label='more' onClick=${() => about(entry)} />
       </div>
-    </aufbau-item>
+    </data-item>
   `;
 }
 
@@ -749,11 +747,11 @@ function Crumbs () {
   useEffect(() => {
     const element = crumbs.current;
     const onCrumb = event => goTo(event.detail.path.split('/').filter(Boolean));
-    element?.addEventListener('aufbau-crumbs', onCrumb);
-    return () => element?.removeEventListener('aufbau-crumbs', onCrumb);
+    element?.addEventListener('nav-crumbs', onCrumb);
+    return () => element?.removeEventListener('nav-crumbs', onCrumb);
   }, []);
 
-  return html`<aufbau-crumbs ref=${crumbs} root=${folderName()} path=${'/' + path.value.join('/')}></aufbau-crumbs>`;
+  return html`<nav-crumbs ref=${crumbs} root=${folderName()} path=${'/' + path.value.join('/')}></nav-crumbs>`;
 }
 
 function Library () {
@@ -779,7 +777,7 @@ function Library () {
       <div class='listing'>
         ${loading.value ? html`<${Icon} name='loading' />`
         : list.length
-          ? html`<aufbau-index viewmode=${viewmode} item-size='128px' item-size-min='80px' item-size-max='320px'>${list.map(entry => html`<${Entry} key=${entry.name} entry=${entry} />`)}</aufbau-index>`
+          ? html`<data-index viewmode=${viewmode} item-size='128px' item-size-min='80px' item-size-max='320px'>${list.map(entry => html`<${Entry} key=${entry.name} entry=${entry} />`)}</data-index>`
           : html`<p class='empty'>${filter.value ? 'nothing matches the filter' : 'this folder is empty'}</p>`}
       </div>
       <app-float anchor='bottom-end'>

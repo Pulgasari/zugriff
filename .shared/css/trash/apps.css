@@ -26,7 +26,7 @@ code, kbd { font-family: var(--mono); }
 
 /* spacings */
 
-aufbau-item { gap: 0.5rem; padding: 0.75rem; }
+data-item { gap: 0.5rem; padding: 0.75rem; }
 
 #app-main { flex: 1; overflow-y: auto; }
 .Dock     { flex-shrink: 0; }
@@ -37,7 +37,7 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .Dock     { gap: 0.125rem; }
 .Dock > * { gap: 0.5rem; padding: 0.75rem; }
 
-.Dock aufbau-icon { font-size: 2rem; }
+.Dock svg-icon { font-size: 2rem; }
 
 /* BASIC LAYOUT */
 
@@ -286,9 +286,9 @@ input  { padding: 0.5rem; width: 100%; }
   .reconnect .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 }
 
-/* the tree itself — rendered by <aufbau-tree> / <aufbau-tree-item>. the row lives
+/* the tree itself — rendered by <data-tree> / <data-node>. the row lives
    in the item's shadow root, reachable as ::part(row|icon|label) */
-aufbau-tree-item {
+data-node {
   --tree-indent: 0.85rem;
 
   &::part(row)       { --gap: tiny; --pad: tiny; /*font-size : 0.85rem;*/ }
@@ -303,9 +303,9 @@ aufbau-tree-item {
   &[selected]::part(icon) { --fg: --color(ink); }
 }
 
- /* ── dropzone (<aufbau-upload look='dropzone'>) ───── */
+ /* ── dropzone (<input-file look='dropzone'>) ───── */
 
-aufbau-upload[look="dropzone"], .dropzone {
+input-file[look="dropzone"], .dropzone {
   display: block;
   width  : 100%;
 

@@ -11,12 +11,12 @@ const length = value =>
 
 function Icon ({ name, size, color, className, class: klass, onClick, title, style }) {
   return html`
-    <aufbau-icon
+    <svg-icon
       class=${['icon', className, klass].filter(Boolean).join(' ')}
       icon=${resolveIcon(name)}
       size=${length(size)}
       ...${{ color, onClick, style, title }}
-    ></aufbau-icon>`;
+    ></svg-icon>`;
 }
 
 export { icons, resolveIcon } from './../data/icons.js';
