@@ -241,6 +241,7 @@ function applyGestalt ({ prefix }) {
       "@pulgasari/obj"              : `${pkg}/js-packages/obj/index.js`,
       "@pulgasari/obj/CanonicalMap" : `${pkg}/js-packages/obj/CanonicalMap.js`,
       "@pulgasari/random"           : `${pkg}/js-packages/random/index.js`,
+      "@pulgasari/shift"            : `${pkg}/js-packages/shift/index.js`,
       "@pulgasari/str"              : `${jsr}/@pulgasari/str`,
       "@pulgasari/timing"           : `${pkg}/js-packages/timing/index.js`,
       "@pulgasari/url"              : `${pkg}/js-packages/url/index.js`,
