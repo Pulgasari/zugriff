@@ -1,4 +1,4 @@
-# todo
+# todo :: apps
 
 ## `apps/code`
 - [ ] geteilter editor-panel um mehrere files nebeneinander einzusehen/bearbeiten
@@ -40,6 +40,8 @@
 
 ---
 
+# todo :: builds
+
 ## builds for android
 - [x] variante 1: bubblewrap
 - [x] variante 2: capacitor via webview wrapper um `https://zugriff.dev/<app>/`
@@ -56,3 +58,9 @@
 - variante 2: `dev.zugriff.<app>.live`   | `AppName (live)`
 - variante 3: `dev.zugriff.<app>.bundle` | `AppName (bundle)`
 - variante 4: `dev.zugriff.<app>`        | `AppName`
+
+---
+
+# todo :: concepts
+- `apps/collector`
+- `apps/downloader` konzepterstellung für ne downloader-app. quasi ne art jDownloader (light) in modern. evtl auf basis von opfs. nicht community-driven, dafür fokus auf erstellen eigener plugins.
