@@ -34,5 +34,5 @@ zugriff/
       patterns/                 whole apps from a handful of options
       data/                     icons — short names for the iconify ids
       lib/                      data-converters, signals, thumbs, ffmpeg, theme
-  cli/                          the wasm micro terminal
+  apps/cli/                     the wasm micro terminal
 ```
