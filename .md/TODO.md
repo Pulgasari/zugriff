@@ -40,7 +40,22 @@
 
 ---
 
-## capacitor builds for android
+## builds for android
+- [x] variante 1: bubblewrap
+- [x] variante 2: capacitor via webview wrapper um `https://zugriff.dev/<app>/`
+- [x] variante 3: capacitor + komplettes bundle
+- [ ] variante 4: capacitor + OTA / live update
+
+### anmerkungen
+- variante 1 und 2 sind mir nicht genug für android-versionen der zugriff-apps
+- variante 3 erscheint mir wiederum too much
+- variante 4 wäre vermutlich das beste aus "both worlds"
+
+### name + id der builds
+- variante 1: `dev.zugriff.<app>.bw`     | `AppName (BW)`
+- variante 2: `dev.zugriff.<app>.live`   | `AppName (live)`
+- variante 3: `dev.zugriff.<app>.bundle` | `AppName (bundle)`
+- variante 4: `dev.zugriff.<app>`        | `AppName`
 
 - [x] aktuell sind die spaces ober- und unterhalb des app-screens bei den android-capacitor-apps schwarz anstatt bg-farbe des themes zu haben. wenn ich mich recht erinnere, sollte das gerade durch capacitor fixbar sein?
 - [x] die android-apps haben alle das default-capacitor-icon, sollten aber eigtl. alle ihr eigenes haben
