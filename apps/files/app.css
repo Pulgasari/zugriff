@@ -25,6 +25,13 @@
 - und das setz ich dann tendenziell eher gesammelt
 - und mit dem neuen approach will ich ja sowieso nich mehr als 5 sizes verwenden
   und sogar explizit als: tiny, small, normal, large, huge
+
+--- bei aufbau/css
+div {   gap: --space(small);  padding: --space(huge); } // robust
+div { --gap: small; --pad: huge;  } // hübscher, aber bissl magisch, robust machbar?    
+
+--- bei aufbau/ass
+div ( gap: small; padding: small; } // perfekte form, aber braucht js oder build-step     
 */
 
 app-root {
