@@ -41,6 +41,8 @@ body {
   overflow       : hidden;
 }
 
+app-root { flex: 1 1 auto; min-height: 0; }
+
 #workspace {
   flex           : 1 1 auto;
   display        : flex;
@@ -224,48 +226,6 @@ body {
   &:disabled { cursor: not-allowed; opacity: 0.25; }
 }
 .keyboard-spacer { flex: 1 0 0; }
-
-/* ── modals ─────────────────────────────────────────────────────────────── */
-
-.modal {
-  position    : absolute;
-  inset       : 0;
-  z-index     : 100;
-  display     : grid;
-  place-items : center;
-  padding     : 2rem;
-  overflow    : hidden;
-  background  : var(--accent-50, rgb(0 0 0 / 0.6));
-  backdrop-filter: blur(2px);
-
-  .inner {
-    display        : flex;
-    flex-direction : column;
-    gap            : 1px;
-    width          : 100%;
-    max-width      : 720px;
-    height         : 100%;
-    overflow       : hidden;
-    background     : var(--hair);
-    border-radius  : calc(var(--radius) + 4px);
-    box-shadow     : 0 12px 40px rgb(0 0 0 / 0.45);
-
-    > * { background: var(--color-bg); padding: 1rem; }
-
-    .main { flex: 1 1 auto; overflow: auto; min-height: 0; }
-  }
-
-  .aside {
-    display         : flex;
-    align-items     : center;
-    justify-content : space-between;
-    font-size       : 20px;
-    font-weight     : bold;
-
-    .modal-close { cursor: pointer; opacity: 0.7; }
-    .modal-close:hover { opacity: 1; }
-  }
-}
 
 /* ── commands palette ───────────────────────────────────────────────────── */
 
