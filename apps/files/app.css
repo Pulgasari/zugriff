@@ -27,7 +27,7 @@
   und sogar explizit als: tiny, small, normal, large, huge
 
 --- bei aufbau/css
-div {   gap: --space(small);  padding: --space(huge); } // robust
+div { gap: --space(small); padding: --space(huge); } // robust
 div { --gap: small; --pad: huge;  } // hübscher, aber bissl magisch, robust machbar?    
 
 --- bei aufbau/ass
