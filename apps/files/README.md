@@ -7,7 +7,7 @@ asks for permission again.
 
 ## frame
 
-An `<app-root>` with four `<app-area>`s (`@aufbau/components`):
+An `<app-root>` with four `<app-area>`s (`@aufbau/elements`):
 
 | area      | dock   | what it holds |
 |-----------|--------|---------------|

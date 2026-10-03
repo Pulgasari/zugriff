@@ -1,9 +1,9 @@
 // components/Waveform.js
-// stays a canvas of its own rather than wrapping <aufbau-waveform>. that element
+// stays a canvas of its own rather than wrapping <media-wave>. that element
 // now takes precomputed `peaks` too (so the shared decode gap is closed), but it
 // paints DOM bars for a single progress value — this view needs a selection
 // range and a playhead drawn over the bars, which is a canvas overlay job. so
-// the split is the rendering model, not the data: reach for <aufbau-waveform>
+// the split is the rendering model, not the data: reach for <media-wave>
 // for a plain progress waveform, this for the trim/seek editors.
 
 import { html, useRef, useEffect } from './../vendors.js';

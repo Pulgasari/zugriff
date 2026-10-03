@@ -26,7 +26,7 @@ code, kbd { font-family: var(--mono); }
 
 /* spacings */
 
-aufbau-item { gap: 0.5rem; padding: 0.75rem; }
+data-item { gap: 0.5rem; padding: 0.75rem; }
 
 #app-main { flex: 1; overflow-y: auto; }
 .Dock     { flex-shrink: 0; }
@@ -37,7 +37,7 @@ aufbau-item { gap: 0.5rem; padding: 0.75rem; }
 .Dock     { gap: 0.125rem; }
 .Dock > * { gap: 0.5rem; padding: 0.75rem; }
 
-.Dock aufbau-icon { font-size: 2rem; }
+.Dock svg-icon { font-size: 2rem; }
 
 /* BASIC LAYOUT */
 
@@ -196,7 +196,7 @@ a.icon-btn:hover       { color: var(--color-ink); opacity: 1; }
 
 /* INDEX */
 
-aufbau-index[viewmode="list"] { 
+data-index[viewmode="list"] { 
   gap: 0;
   
   > *:nth-child(odd) { background-color: #0001; }
@@ -216,7 +216,7 @@ aufbau-index[viewmode="list"] {
   object-fit: cover;
 }
 
-aufbau-item {
+data-item {
   .art, .artwork {
     /* --gestalt-flow: grid center center; */
     
@@ -224,7 +224,7 @@ aufbau-item {
     align-items     : center;
     justify-content : center;
   
-    aufbau-icon {
+    svg-icon {
       font-size: 2rem;
       opacity: 0.25;
     }
@@ -241,7 +241,7 @@ aufbau-item {
 
 /*.art, .not-a-button,*/
 .meta > button,
-aufbau-item .title {
+data-item .title {
   display: contents!important;
 }
 
@@ -377,29 +377,29 @@ input  { padding: 0.5rem; width: 100%; }
   .reconnect .row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 }
 
-/* the tree itself — rendered by <aufbau-tree> / <aufbau-tree-item>. the row lives
+/* the tree itself — rendered by <data-tree> / <data-node>. the row lives
    in the item's shadow root, reachable as ::part(row|icon|label) */
-aufbau-tree-item { --tree-indent: 0.85rem; }
+data-node { --tree-indent: 0.85rem; }
 
-aufbau-tree-item::part(row) {
+data-node::part(row) {
   font-size : 0.85rem;
   gap       : 0.25rem;
   padding   : 0.25rem;
 }
 
-aufbau-tree-item::part(row):hover { color: var(--color-fg); background: var(--hover); }
+data-node::part(row):hover { color: var(--color-fg); background: var(--hover); }
 
-aufbau-tree-item[selected]::part(row) {
+data-node[selected]::part(row) {
   color       : var(--color-fg);
   background  : var(--accent-25);
   font-weight : 600;
 }
 
-aufbau-tree-item[selected]::part(icon) { color: var(--color-ink); }
+data-node[selected]::part(icon) { color: var(--color-ink); }
 
- /* ── dropzone (<aufbau-upload look='dropzone'>) ───── */
+ /* ── dropzone (<input-file look='dropzone'>) ───── */
 
-aufbau-upload[look="dropzone"], .dropzone {
+input-file[look="dropzone"], .dropzone {
   display: block;
   width  : 100%;
 

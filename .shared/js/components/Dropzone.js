@@ -1,5 +1,5 @@
 // components/Dropzone.js
-// wraps <aufbau-upload look='dropzone'>. the element handles the drag/drop and
+// wraps <input-file look='dropzone'>. the element handles the drag/drop and
 // the file dialog, we translate its files into the entry shape the apps expect
 // and hand them to a signal. the element's own file list stays empty — every
 // app renders its own.
@@ -46,19 +46,19 @@ function Dropzone ({
       el.clear?.();
     };
 
-    el.addEventListener('aufbau-upload', handler);
-    return () => el.removeEventListener('aufbau-upload', handler);
+    el.addEventListener('input-file', handler);
+    return () => el.removeEventListener('input-file', handler);
   }, [signal, onFiles]);
 
   return html`
-    <aufbau-upload
+    <input-file
       ref=${ref}
       class='dropzone'
       look='dropzone'
       accept=${accept}
       multiple=${multiple}
       text=${text ?? `drop ${what} here or click to browse`}
-    ></aufbau-upload>`;
+    ></input-file>`;
 }
 
 export       { Dropzone, toEntry };

@@ -1,6 +1,6 @@
 // components/Tree.js
 
-// a preact wrapper around <aufbau-tree>. the element is autoloaded lazily, so a
+// a preact wrapper around <data-tree>. the element is autoloaded lazily, so a
 // plain `nodes=${data}` from a vdom lib would be stringified into an attribute
 // before the element upgrades — this sets the `nodes` property imperatively once
 // the element is defined, and forwards its select/toggle events as callbacks.
@@ -20,9 +20,9 @@ function Tree ({ nodes, onSelect, onToggle, class: klass }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (customElements.get('aufbau-tree')) { el.nodes = nodes; return; }
+    if (customElements.get('data-tree')) { el.nodes = nodes; return; }
     let alive = true;
-    customElements.whenDefined('aufbau-tree').then(() => {
+    customElements.whenDefined('data-tree').then(() => {
       if (alive && ref.current) ref.current.nodes = nodes;
     });
     return () => { alive = false; };
@@ -33,15 +33,15 @@ function Tree ({ nodes, onSelect, onToggle, class: klass }) {
     if (!el) return;
     const select = e => onSelect?.(e);
     const toggle = e => onToggle?.(e);
-    el.addEventListener('aufbau-tree-select', select);
-    el.addEventListener('aufbau-tree-toggle', toggle);
+    el.addEventListener('data-tree-select', select);
+    el.addEventListener('data-tree-toggle', toggle);
     return () => {
-      el.removeEventListener('aufbau-tree-select', select);
-      el.removeEventListener('aufbau-tree-toggle', toggle);
+      el.removeEventListener('data-tree-select', select);
+      el.removeEventListener('data-tree-toggle', toggle);
     };
   }, [onSelect, onToggle]);
 
-  return html`<aufbau-tree ref=${ref} class=${klass}></aufbau-tree>`;
+  return html`<data-tree ref=${ref} class=${klass}></data-tree>`;
 }
 
 export       { Tree };

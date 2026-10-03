@@ -4,7 +4,7 @@
 // it are the app's choice:
 //
 //   SettingsView  — a view of its own, e.g. a route
-//   SettingsModal — a modal dialog on <aufbau-modal>
+//   SettingsModal — a modal dialog on <pop-modal>
 //   SettingsPanel — a panel that drops in below the app's header
 //
 // modal and panel follow `settingsOpen` unless `open` and `onClose` are given,
@@ -118,15 +118,15 @@ function SettingsModal ({ open = settingsOpen.value, onClose = closeSettings, ..
   useEffect(() => {
     const element = modal.current;
     const closed  = event => { if (!event.detail?.open) onClose(); };
-    element?.addEventListener('aufbau-modal', closed);
-    return () => element?.removeEventListener('aufbau-modal', closed);
+    element?.addEventListener('pop-modal', closed);
+    return () => element?.removeEventListener('pop-modal', closed);
   }, [onClose]);
 
   // the form is built on opening, so it shows the values of that moment
   return html`
-    <aufbau-modal ref=${modal} class="settings-modal" heading="Settings" open=${open}>
+    <pop-modal ref=${modal} class="settings-modal" heading="Settings" open=${open}>
       ${open && html`<${Settings} ...${props} />`}
-    </aufbau-modal>
+    </pop-modal>
   `;
 }
 

@@ -54,9 +54,9 @@ export default ({ dev = false, out, packages = 'build/_pkg', slug }) => ({
     source : packages,
   },
 
-  // the svgs of the icons found in the staged files, provided to <aufbau-icon>
+  // the svgs of the icons found in the staged files, provided to <svg-icon>
   icons : {
-    element : '@aufbau/elements/AufbauIcon.js',
+    element : '@aufbau/elements/webcomponents/svg-icon.js',
     path    : '/_icons',
   },
 

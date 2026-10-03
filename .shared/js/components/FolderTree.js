@@ -56,7 +56,7 @@ function FolderTree ({
 
   const q = filter.trim().toLowerCase();
 
-  // scanned folder tree -> <aufbau-tree> node list. a filter query forces every
+  // scanned folder tree -> <data-tree> node list. a filter query forces every
   // matching branch open so the hits are visible without hand-expanding.
   const toNodes = (dir, sourceId, forceOpen) =>
     (dir.children ?? []).map(child => child.kind === 'file'

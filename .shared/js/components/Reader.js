@@ -2,7 +2,7 @@
 
 function Reader ({ format, id, text, transform, onClick, ...rest }) {
   return html`
-    <aufbau-reader 
+    <output-md
       format=${format}
       id=${id}
       raw=${text}
@@ -10,7 +10,7 @@ function Reader ({ format, id, text, transform, onClick, ...rest }) {
       onClick=${onClick}
       ...${rest}
       >
-    </aufbau-reader>
+    </output-md>
   `;
 }
 

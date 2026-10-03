@@ -20,10 +20,10 @@ const normalize = opt => {
 
 function Option ({ icon, label, title, value }) {
   return html`
-    <aufbau-option
+    <input-option
       key=${value}
       ...${{ icon, label, title, value }}
-    ></aufbau-option>
+    ></input-option>
   `;
 }
 
@@ -42,13 +42,13 @@ function Picker ({ options, signal, onChange, searchable, value, ...rest }) {
   };
 
   return html`
-    <aufbau-picker
+    <input-value
       searchable=${searchable || undefined}
       onChange=${change}
       ...${{ value, ...rest }}
     >
       ${options.map(normalize).map(Option)}
-    </aufbau-picker>
+    </input-value>
   `;
 }
 
