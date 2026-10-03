@@ -20,8 +20,8 @@ export default function PlayerPanel () {
   const time    = app.player.time;
 
   const cycleRate = () => {
-    const i = RATES.indexOf(player.rate);
-    player.setRate(RATES[(i + 1) % RATES.length] ?? 1);
+    const i = RATES.indexOf(app.player.rate);
+    app.player.setRate(RATES[(i + 1) % RATES.length] ?? 1);
   };
 
   return html`
@@ -56,7 +56,7 @@ export default function PlayerPanel () {
       </div>
 
       <div class="scrub">
-        <span class="time">${fmtDuration(t)}</span>
+        <span class="time">${fmtDuration(time)}</span>
         <input class="range"
           type="range" 
           min="0"
@@ -73,7 +73,7 @@ export default function PlayerPanel () {
           class="rate"
           title="Playback speed"
           onClick=${cycleRate}>
-          ${player.rate}×
+          ${app.player.rate}×
         </button>
         
         <${IconButton} 

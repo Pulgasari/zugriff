@@ -177,7 +177,7 @@ function PodcastItem ({ entry, isRemembered, isSubscribed }) {
     .join(' · ');
 
   return html`
-    <aufbau-item class:subscribed=${isSubscribed}>
+    <data-item class:subscribed=${isSubscribed}>
       <${Artwork} aria-label='open podcast' onClick=${() => open(entry.url)} src=${entry.image} />
       <div class='meta'>${meta}</div>
       <${Button} class='title' label=${entry.title} onClick=${() => open(entry.url)} />
@@ -185,7 +185,7 @@ function PodcastItem ({ entry, isRemembered, isSubscribed }) {
         rememberAction (entry, isRemembered),
         subscribeAction(entry, isSubscribed),
       ]} />
-    </aufbau-item>
+    </data-item>
   `;
 }
 
@@ -194,7 +194,7 @@ function EpisodeItem ({ entry, isRemembered, isSubscribed }) {
   const teaser  = plain(entry.description).slice(0, TEASER);
 
   return html`
-    <aufbau-item class:subscribed=${isSubscribed}>
+    <data-item class:subscribed=${isSubscribed}>
       <${Artwork} aria-label='open podcast' onClick=${() => open(entry.url)} src=${entry.image} />
       <div class='meta'>
         <${DateLabel} value=${entry.date} />
@@ -208,7 +208,7 @@ function EpisodeItem ({ entry, isRemembered, isSubscribed }) {
         // an empty href would render a link that goes nowhere
         entry.link && { icon: 'mdi:open-in-new', href: entry.link, title: 'open the episode in the store' },
       ].filter(Boolean)} />
-    </aufbau-item>
+    </data-item>
   `;
 }
 

@@ -3,6 +3,16 @@ NOTE FOR CLAUDE: YOU ARE NOT ALLOWED TO EDIT THIS
 BUT YOU ARE ALLOWED TO PUT CSS CODE SUGGESTIONS HERE INSIDE COMMENTS
 */
 
+/*
+SUGGESTION — the tags of @aufbau/elements 2: the selectors below still name the old ones.
+  aufbau-index -> data-index, aufbau-item -> data-item, aufbau-icon -> svg-icon,
+  aufbau-input -> input-search (the search panel)
+the frame is <app-root> > <app-area name="main"> (views, .player, #app-dock) + <app-area name="config">.
+.view is still the root of every view, inside its <app-view>.
+the root fills #app as in files/app.css:
+  app-root { flex: 1 1 auto; min-block-size: 0; }
+*/
+
 .view {
   display   : flex;
   flex-flow : column;

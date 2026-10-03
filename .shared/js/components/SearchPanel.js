@@ -10,13 +10,13 @@ function SearchPanel ({ placeholder, signal, appStateId: id = 'search' }) {
 
   if (signal !== undefined) {
     clear   = ()      => signal.value = '';
-    onInput = (event) => signal.value = event.detail.value;
+    onInput = (event) => signal.value = event.currentTarget.value ?? '';
     value   = signal.value;
   }
 
   else {
     clear   = ()      => app.state[id] = '';
-    onInput = (event) => app.state[id] = event.detail.value;
+    onInput = (event) => app.state[id] = event.currentTarget.value ?? '';
     value   = app.state['$' + id];   // the leaf's value; the bare name is its signal
   }
   
