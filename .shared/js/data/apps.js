@@ -44,6 +44,15 @@ const entries = [
     description : 'Grant your music folders and browse the library by song, album and artist — ID3 tags and cover art read on device.',
     categories  : ['media'],
   },
+  { // zugriff.dev/cli/
+    type        : 'app',
+    slug        : 'cli',
+    name        : 'CLI',
+    short_name  : 'CLI',
+    icon        : 'mdi:console',
+    description : 'A terminal in the browser: files in the origin private file system, wasm tools run in a worker.',
+    categories  : ['code', 'files'],
+  },
   { // zugriff.dev/code/
     build       : { android: ['capacitor', 'capacitor-live'] },
     categories  : ['code', 'files'],

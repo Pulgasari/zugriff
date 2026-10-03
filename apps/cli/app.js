@@ -1,147 +1,178 @@
 // cli/app.js
+// a terminal over the origin's opfs. the commands that need real work go to a
+// worker, the rest run here.
 
 // :::::: IMPORTS :::::::::::::::::::::::::::::::::::::::::::
 
-// ::: vendors
-import { FitAddon } from '@xterm/addon-fit';
-import { Terminal } from '@xterm/xterm';
+import * as fit   from '@xterm/addon-fit';
+import * as xterm from '@xterm/xterm';
 
-// ::: local: app
+import { gestalt }           from '@aufbau/api';
+import { signal }            from '@aufbau/signals';
+import { useEffect, useRef } from 'preact/hooks';
+
+import { sharedSpec } from '/.shared/js/components/Settings.js';
+import { vfs }        from '/.shared/js/modules/opfs.js';
+
 import { terminalOptions } from './app.config.js';
 
-// ::: local: shared
-import zugriff                           from '/.shared/js/runtime.js';
-import Nav                               from '/.shared/js/components/Nav.js';
-import { SettingsButton, SettingsPanel } from '/.shared/js/components/Settings.js';
-import { vfs }                           from '/.shared/js/modules/opfs.js';
-import { html, signal, useEffect, useRef } from '/.shared/js/vendors.js';
+// esm.sh hands these umd builds out with named exports, a vendored copy as one default object
+const { FitAddon } = fit.FitAddon   ? fit   : fit.default;
+const { Terminal } = xterm.Terminal ? xterm : xterm.default;
 
-// :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
+// :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
 const app = zugriff.app;
 
-// Signal tracking loaded WASM tools
+const VERSION = 'v0.2.0';
+
+// the commands the prompt knows, the wasm tools join with `init`
 const loadedCommands = signal(new Set(['help', 'init', 'clear', 'ls', 'upload', 'download', 'rm']));
 
-function TerminalView() {
+const rootRef = { current: null };
+const area    = name => rootRef.current?.area(name);
+
+// :::::: TERMINAL ::::::::::::::::::::::::::::::::::::::::::
+
+function TerminalView () {
   const terminalRef = useRef(null);
 
   useEffect(() => {
     if (!terminalRef.current) return;
 
-    const term = new Terminal (terminalOptions());
-
+    const term     = new Terminal(terminalOptions());
     const fitAddon = new FitAddon();
     term.loadAddon(fitAddon);
     term.open(terminalRef.current);
     fitAddon.fit();
 
-    // Spawn background Web Worker
-    const worker = new Worker('worker.js', { type: 'module' });
+    // the worker sits next to this module, not next to the page
+    const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
 
-    // Handle incoming messages from the execution worker
-    worker.onmessage = (e) => {
-      const { type, text } = e.data;
-      /*
-      switch (type) {
-        case 'STDOUT' : term.writeln(`\x1b[36m${text}\x1b[0m`); break;
-        case 'STDERR' : term.writeln(`\x1b[31m${text}\x1b[0m`); break;
-        case 'EXIT'   : writePrompt();
-      }
-      */
-      if (type === 'STDOUT') {
-        term.writeln(`\x1b[36m${text}\x1b[0m`);
-      } else if (type === 'STDERR') {
-        term.writeln(`\x1b[31m${text}\x1b[0m`);
-      } else if (type === 'EXIT') {
-        writePrompt();
-      }
-    };
-
-    const handleResize = () => fitAddon.fit();
-    window.addEventListener('resize', handleResize);
-
+    const prompt = 'zugriff> ';
     let currentLine = '';
     let isExecuting = false;
-    const prompt = 'zugriff> ';
 
     const writePrompt = () => {
       isExecuting = false;
       term.write(`\r\n\x1b[32m${prompt}\x1b[0m`);
     };
 
-    term.writeln('\x1b[1;34m=== zugriff v0.2.0 ===\x1b[0m');
+    worker.onmessage = event => {
+      const { type, text } = event.data;
+      if (type === 'STDOUT') term.writeln(`\x1b[36m${text}\x1b[0m`);
+      if (type === 'STDERR') term.writeln(`\x1b[31m${text}\x1b[0m`);
+      if (type === 'EXIT')   writePrompt();
+    };
+
+    // the area resizes with the window and when a dock opens beside it
+    const observer = new ResizeObserver(() => fitAddon.fit());
+    observer.observe(terminalRef.current);
+
+    term.writeln(`\x1b[1;34m=== zugriff ${VERSION} ===\x1b[0m`);
     term.writeln('Client-side WASM micro-terminal. Type "help" to list available commands.');
     term.write(`\x1b[32m${prompt}\x1b[0m`);
 
-    // Intercept keyboard commands
-    term.onData(async (data) => {
+    term.onData(async data => {
       if (isExecuting) return;
-
       const charCode = data.charCodeAt(0);
 
-      if (charCode === 13) { // Enter
+      if (charCode === 13) {   // enter
         term.write('\r\n');
         const input = currentLine.trim();
         currentLine = '';
-        
-        if (input) {
-          isExecuting = true;
-          await handleCommand(input, term, worker, writePrompt);
-        } else {
-          writePrompt();
-        }
-      } else if (charCode === 127) { // Backspace
-        if (currentLine.length > 0) {
-          currentLine = currentLine.slice(0, -1);
-          term.write('\b \b');
-        }
-      } else if (charCode >= 32) { // Printable characters
+        if (!input) return writePrompt();
+        isExecuting = true;
+        await handleCommand(input, term, worker, writePrompt);
+      }
+      else if (charCode === 127) {   // backspace
+        if (!currentLine.length) return;
+        currentLine = currentLine.slice(0, -1);
+        term.write('\b \b');
+      }
+      else if (charCode >= 32) {
         currentLine += data;
         term.write(data);
       }
     });
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
       worker.terminate();
       term.dispose();
     };
   }, []);
 
+  return html`<div class="terminal-container" ref=${terminalRef}></div>`;
+}
+
+// :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
+
+// the shared fields (palette, skin, …), written into app.state
+function Config () {
+  const host = useRef(null);
+
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    let closed = false;
+
+    gestalt.palettes().then(palettes => {
+      if (closed) return;
+      const spec = sharedSpec(app.config, palettes);
+      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
+      element.spec   = spec;
+    });
+
+    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
+    element.addEventListener('config', onConfig);
+
+    return () => { closed = true; element.removeEventListener('config', onConfig); };
+  }, []);
+
   return html`
-    <div class="terminal-container" ref=${terminalRef}></div>
+    <app-panel heading='Settings'>
+      <app-config ref=${host}></app-config>
+    </app-panel>
   `;
 }
 
-// Application Layout Shell
-function App() {
-  const activeCount = loadedCommands.value.size;
+// :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
+
+function App () {
+  const root = useRef(null);
+
+  useEffect(() => { rootRef.current = root.current; }, []);
 
   return html`
-    <header id="app-head">
-      <div id="app-logo">
-        <h1>zugriff</h1>
-        <span class="version">v0.2.0</span>
-      </div>
-      <div class="actions">
-        <${Nav} here='cli' base='./../' />
-        <${SettingsButton} />
-      </div>
-    </header>
+    <app-root ref=${root} routing='none'>
+      <app-area name='main'>
+        <header id="app-head">
+          <div id="app-logo">
+            <h1>zugriff</h1>
+            <span class="version">${VERSION}</span>
+          </div>
+          <button class="ghost-btn" title="Settings" onClick=${() => area('config')?.toggle()}>
+            <svg-icon icon="settings"></svg-icon>
+          </button>
+        </header>
 
-    <${SettingsPanel} />
-    
-    <main id="app-main">
-      <${TerminalView} />
-    </main>
-    
-    <footer id="app-foot">
-      <span>Engine: OPFS + WebWorker</span>
-      <span>Loaded Tools: ${activeCount}</span>
-    </footer>
+        <main id="app-main">
+          <${TerminalView} />
+        </main>
+
+        <footer id="app-foot">
+          <span>Engine: OPFS + WebWorker</span>
+          <span>Loaded Tools: ${loadedCommands.value.size}</span>
+        </footer>
+      </app-area>
+
+      <app-area name='config' dock='end'><${Config} /></app-area>
+    </app-root>
   `;
 }
+
+// :::::: COMMANDS ::::::::::::::::::::::::::::::::::::::::::
 
 // Dispatch commands to built-in handlers or Web Worker
 async function handleCommand(rawInput, term, worker, finishCallback) {
@@ -277,5 +308,6 @@ async function triggerFileDownload(filename, term) {
   }
 }
 
-// Mount Root
+// :::::: BOOT ::::::::::::::::::::::::::::::::::::::::::::::
+
 app.init({ App });
