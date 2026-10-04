@@ -11,27 +11,27 @@
 //   add(fields)   tests the connection with a listing, then keeps it
 //   rootOf(id)    the root handle, one per connection
 
-import { createOpfs } from '@bunker/opfs';
-import { signal }     from '@aufbau/signals';
+import createOPFS from '@bunker/opfs';
+import { signal } From '@aufbau/signals';
 
 import { test }    from '/.shared/js/modules/webdav/client.js';
 import { davRoot } from '/.shared/js/modules/webdav/handles.js';
 
 const STORE = 'remotes';
-const store = createOpfs({ directory: 'zugriff/files' });
+const store = createOPFS ({ directory: 'zugriff/files' });
 const roots = new Map;
 
-export const connections = signal([]);
+const connections = signal([]);
 
-export async function load () {
+async function load () {
   connections.value = await store.get(STORE).catch(() => null) ?? [];
 }
 
 const persist = () => store.set(STORE, connections.value);
 
-export const byId = id => connections.value.find(connection => connection.id === id) ?? null;
+const byId = id => connections.value.find(connection => connection.id === id) ?? null;
 
-export async function add ({ name, password = '', url, username = '' }) {
+async function add ({ name, password = '', url, username = '' }) {
   const trimmed = String(url ?? '').trim();
   if (!/^https?:\/\//i.test(trimmed)) throw new Error('The url has to start with http:// or https://');
 
@@ -49,15 +49,19 @@ export async function add ({ name, password = '', url, username = '' }) {
   return connection;
 }
 
-export async function remove (id) {
+async function remove (id) {
   connections.value = connections.value.filter(connection => connection.id !== id);
   roots.delete(id);
   await persist();
 }
 
-export function rootOf (id) {
+function rootOf (id) {
   const connection = byId(id);
   if (!connection) return null;
   if (!roots.has(id)) roots.set(id, davRoot(connection));
   return roots.get(id);
 }
+
+// :::::: EXPORT
+
+export { add, byId, connections, load, remove, rootOf };
