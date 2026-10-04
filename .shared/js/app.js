@@ -7,24 +7,33 @@ import { effect, signal, signalStore } from '@aufbau/signals';
 import webfonts                        from '@aufbau/webfonts';
 import { createDB }                    from '@bunker/db';
 
-import { createActions } from './modules/actions.js';
-import { createHotkeys } from './modules/hotkeys.js';
-import { toast }         from './modules/toast.js';
-import { syncBars }      from './modules/bars.js';
+import { registry }           from './data/apps.js';
+import { createActions }      from './modules/actions.js';
+import { createHotkeys }      from './modules/hotkeys.js';
+import { toast }              from './modules/toast.js';
+import { syncBars }           from './modules/bars.js';
 import { reveal, transition } from './transitions.js';
-
-import { registry } from './data/apps.js';
-
-import { html, render } from './vendors.js';
+import { html, render }       from './vendors.js';
 
 // :::::: HELPERS
 
 const pick = mod => mod?.default ?? mod;
 
+const splitBy    = (sep) => (str) => str.split(sep);
+const segmentsOf = (str) => splitBy('/');
+const popOf      = (arr) => arr.pop();
+
 // the plural of a loader: loads all names at once, resolves to { name: export }.
 // a path keeps its last segment as the key: 'folder/Name' -> Name, '@aufbau/filters' -> filters
 const many = load => (...names) => Promise.all(names.map(name => load(name)))
   .then(loaded => Object.fromEntries(names.map((name, index) => [name.split('/').pop(), loaded[index]])));
+/*
+const _many = load => (...names) => Promise.all(names.map(load)).then(
+  loaded => Object.fromEntries(
+    names.map((name, index) => [name.split('/').pop(), loaded[index]])
+  )
+);
+*/
 
 // :::::: PWA
 
