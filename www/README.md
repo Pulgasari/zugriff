@@ -3,7 +3,7 @@
 - podcasts [web-bundle](https://app.zugriff.dev/podcasts/)
 
 the bundled web part of the apps built as `capacitor`, one folder per app,
-written by `.github/workflows/ota-publish.yml` (`commit_www`). the same files go
+written by [`.github/workflows/ota-publish.yml`](/.github/workflows/ota-publish.yml) (`commit_www`). the same files go
 into the over-the-air zip of the release `ota-<slug>` and, staged the same way,
 into the apk.
 
