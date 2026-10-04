@@ -2,6 +2,9 @@
 
 ## `apps/code`
 
+- [ ] commands-system an moderne html-commands-api koppeln (?)
+- [ ] plugin-system
+
 #### panel: editor
 - [ ] geteilter editor-panel um mehrere files nebeneinander einzusehen/bearbeiten
 
@@ -20,6 +23,8 @@
   - [ ] option für: `opacity` 0.25 bis 1.00 in 0.5 steps
   - [ ] möglichkeit für sondercomments (zb "startet mit `todo:`) welche besonders hervorgehoben und/oder erfasst werden, zb um sie aufzulisten.oder hinzuspringen
   - [ ] evtl. md-syntax/-highlighting
+
+#### panel: transformer
 
 ### features, wo ich nicht weiß, ob/wie das umzusetzen ginge:
 - [ ] collaborations-modus
