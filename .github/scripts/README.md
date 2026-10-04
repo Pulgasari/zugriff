@@ -33,7 +33,7 @@ gesetzt (der `app`-Dispatch-Input), wird auf genau diesen Slug eingegrenzt.
 Das Capacitor-Gegenstück zu `gen-twa-manifest.mjs`: schreibt für **eine** App
 ein `capacitor.config.json` — deterministisch und ohne interaktives `cap init`.
 Standardmäßig liefert Capacitor das von `stage-capacitor-www.mjs` gestagete
-`www/` aus. Mit `LIVE=1` wird die App wie die TWA um ihre **Live-URL** gewickelt
+`www/` aus. Mit `VARIANT=capacitor-live` wird die App wie die TWA um ihre **Live-URL** gewickelt
 (`server.url = https://zugriff.dev/<slug>/`, dazu ein `www/index.html` als
 Offline-Fallback, weil Capacitor ein nicht-leeres `webDir` verlangt); Capacitor
 injiziert seine native Bridge trotzdem in die Remote-Seite, sodass native Plugins
@@ -147,31 +147,60 @@ lesen es und liefern die jeweilige Build-Matrix (`get-capacitor-apps.js` mit
 
 ### Namen, IDs, Dateien
 
-`android.js` hält die Regeln. Nur der gebündelte Capacitor-Build ist die App
-selbst, jede andere Variante trägt ein Kürzel in Name, ID und Datei, so lassen
-sich alle nebeneinander installieren:
+`android.js` hält die Regeln. Nur `capacitor` ist die App selbst, jede andere
+Variante trägt ein Kürzel in Name, ID und Datei, so lassen sich alle nebeneinander
+installieren:
 
-| Variante          | Name              | ID                          | Datei                            |
-|-------------------|-------------------|-----------------------------|----------------------------------|
-| `capacitor`       | `Podcasts`        | `dev.zugriff.podcasts`      | `podcasts-202612011212.apk`      |
-| `capacitor` + dev | `Podcasts (dev)`  | `dev.zugriff.podcasts.dev`  | `podcasts-202612011212-dev.apk`  |
-| `capacitor-live`  | `Podcasts (live)` | `dev.zugriff.podcasts.live` | `podcasts-202612011212-live.apk` |
-| `bubblewrap`      | `Podcasts (bw)`   | `dev.zugriff.podcasts.bw`   | `podcasts-202612011212-bw.apk`   |
+| Variante           | Name                | ID                            | Datei                               |
+|--------------------|---------------------|-------------------------------|-------------------------------------|
+| `bubblewrap`       | `Podcasts (BW)`     | `dev.zugriff.podcasts.bw`     | `podcasts-202612011212-bw.apk`      |
+| `capacitor-live`   | `Podcasts (live)`   | `dev.zugriff.podcasts.live`   | `podcasts-202612011212-live.apk`    |
+| `capacitor-bundle` | `Podcasts (bundle)` | `dev.zugriff.podcasts.bundle` | `podcasts-202612011212-bundle.apk`  |
+| `capacitor`        | `Podcasts`          | `dev.zugriff.podcasts`        | `podcasts-202612011212.apk`         |
+| `capacitor` + dev  | `Podcasts (dev)`    | `dev.zugriff.podcasts.dev`    | `podcasts-202612011212-dev.apk`     |
 
 Der Stempel ist die Minute, in der der Lauf startet (Berliner Zeit), für alle
 Builds eines Laufs derselbe. Dazu jeweils die `.aab`.
 
-| Wert             | Workflow                           | App im APK |
-|------------------|------------------------------------|------------|
-| `bubblewrap`     | `build-android-bubblewrap.yml`     | TWA um die Live-URL |
-| `capacitor-live` | `build-android-capacitor-live.yml` | WebView auf die Live-URL (`server.url`) |
-| `capacitor`      | `build-android-capacitor.yml`      | die Dateien selbst, aus `www/` |
+| Wert               | Workflow                             | App im APK |
+|--------------------|--------------------------------------|------------|
+| `bubblewrap`       | `build-android-bubblewrap.yml`       | TWA um die Live-URL |
+| `capacitor-live`   | `build-android-capacitor-live.yml`   | WebView auf die Live-URL (`server.url`) |
+| `capacitor-bundle` | `build-android-capacitor-bundle.yml` | die Dateien selbst, aus `www/` |
+| `capacitor`        | `build-android-capacitor.yml`        | die Dateien selbst, aus `www/`, dazu Updates over the air |
+
+### Over the air: `capacitor`
+
+`capacitor` ist `capacitor-bundle` plus `@capgo/capacitor-updater` im manuellen
+Modus (`autoUpdate: false`, in `capacitor.config.json` von
+`gen-capacitor-config.mjs`). Das APK startet mit seinem eigenen Bundle, neuere
+holt die App sich selbst:
+
+1. `ota-publish.yml` (manuell, optional eine App) stagt das `www/` wie der
+   APK-Build, packt es als `<slug>-<version>.zip` und legt es mit einem
+   `ota.json` (`{ slug, version, url }`) ins Release `ota-<slug>` (Prerelease, nie
+   „latest"). Mit `commit_www` landet dasselbe `www/` als `www/<slug>/` im Repo
+   (`www/README.md`).
+2. Jedes gestagte `www/` trägt sein eigenes `ota.json`: `{ slug, version,
+   manifest }`, die Version ist der Stempel des Laufs, `manifest` die URL des
+   `ota.json` im Release.
+3. `.shared/js/modules/ota.js` bestätigt beim Start das laufende Bundle
+   (`notifyAppReady`, sonst rollt das Plugin nach 10 s zurück), liest beide
+   `ota.json` (das entfernte nativ über `CapacitorHttp`, ohne CORS) und lädt ein
+   neueres Zip herunter. Es wird beim nächsten Start aktiv (`next`).
+4. Ein neues APK verwirft die geladenen Bundles (`resetWhenUpdate`) und startet
+   wieder mit seinem eigenen.
+
+Der dev-Build bekommt keine Updates, ein Update würde sein Devtools-Bundle ersetzen.
+Im Web, in `capacitor-live` und `capacitor-bundle` fehlt das Plugin, `ota.js` tut
+dort nichts.
 
 ---
 
 ## Capacitor-Build: `.github/workflows/build-android-capacitor.yml`
 
-Verpackt die Apps mit `build.android: 'capacitor'` als Android-Apps (**APK +
+Verpackt die Apps mit `build.android: 'capacitor'` (und über die Wrapper-Workflows
+`capacitor-bundle` und `capacitor-live`) als Android-Apps (**APK +
 AAB**) — ein Matrix-Job pro App. Die Dateien der App liegen im APK:
 `stage-capacitor-www.mjs` stellt vor dem Scaffolding das `www/` zusammen,
 `capacitor.config.json` hat kein `server.url`.
@@ -205,7 +234,7 @@ jsdelivr, unpkg, Icons, APIs). Die Step-Summary jedes Laufs listet es.
 
 ## Capacitor-Live-Build: `.github/workflows/build-android-capacitor-live.yml`
 
-Ruft `build-android-capacitor.yml` mit `live: true` auf, für die Apps mit
+Ruft `build-android-capacitor.yml` mit `variant: capacitor-live` auf, für die Apps mit
 `build.android: 'capacitor-live'`: kein `www/`-Staging, stattdessen zeigt
 `server.url` auf die Live-URL. Gleiche Toolchain, gleiches Signing, gleiche
 Plugins.

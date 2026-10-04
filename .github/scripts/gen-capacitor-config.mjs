@@ -5,10 +5,14 @@
 // Bubblewrap side, and what makes the Android build runnable in CI (see
 // .github/workflows/build-android-capacitor.yml).
 //
-// by default (build.android: 'capacitor') capacitor serves the webDir that
-// stage-capacitor-www.mjs staged, the app's files ship inside the apk.
+// VARIANT is the build (android.js):
 //
-// with LIVE=1 (build.android: 'capacitor-live') the app is wrapped around its
+//   capacitor         the staged www/ inside the apk, plus @capgo/capacitor-updater
+//                     in manual mode: .shared/js/modules/ota.js pulls newer bundles
+//   capacitor-bundle  the staged www/ inside the apk, nothing more
+//   capacitor-live    the live url, see below
+//
+// with capacitor-live the app is wrapped around its
 // *live* deployment URL like the TWA: Capacitor's server.url points the webview
 // at https://zugriff.dev/<slug>/, and Capacitor still injects its native bridge
 // into that remote page, so native plugins (the repo's Saf plugin for folder
@@ -29,12 +33,14 @@
 //   APP_URL         full app url (default `${SITE_BASE}/${slug}/` — the public
 //                   route; vercel rewrites /<slug>/ to /apps/<slug>/, so the
 //                   /apps/ path is internal only and 404s if requested directly)
-//   LIVE            1 for a live build (build.android: 'capacitor-live')
-//   DEVTOOLS        1 for the -dev build: `.dev` on the appId, `(dev)` in the name
+//   VARIANT         capacitor (default), capacitor-bundle or capacitor-live
+//   DEVTOOLS        1 for the -dev build: `.dev` on the appId, `(dev)` in the name,
+//                   no updater (an update would replace its devtools bundle)
 //   APP_ID_PREFIX   reverse-dns prefix for the appId (default dev.zugriff)
 //
 // names and ids by variant come from android.js: Podcasts dev.zugriff.podcasts,
-// Podcasts (dev) ….podcasts.dev, Podcasts (live) ….podcasts.live
+// Podcasts (dev) ….podcasts.dev, Podcasts (bundle) ….podcasts.bundle,
+// Podcasts (live) ….podcasts.live
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -50,11 +56,10 @@ if (!app || app.type !== 'app') { console.error(`gen-capacitor-config: no app "$
 const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
 const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');
 const outDir   = process.argv[2] || '.';
-const live     = process.env.LIVE === '1';
+const variant  = process.env.VARIANT || 'capacitor';
+const live     = variant === 'capacitor-live';
 const dev      = process.env.DEVTOOLS === '1';
-
-// the variant, for its id and name (android.js)
-const variant = live ? 'capacitor-live' : 'capacitor';
+const updates  = variant === 'capacitor' && !dev;
 
 // relative luminance: DARK means light bar icons, for a dark app color
 const isLight = (color) => {
@@ -85,6 +90,16 @@ const config = {
       initialViewportFitValueHint : 'cover',
       style                       : isLight(app.color) ? 'LIGHT' : 'DARK',
     },
+    // manual mode: the app decides when to look and what to take (ota.js). a
+    // bundle that does not confirm itself within appReadyTimeout is rolled back,
+    // a new apk drops the downloaded bundles and starts from its own
+    ...(updates && {
+      CapacitorUpdater : {
+        appReadyTimeout : 10000,
+        autoUpdate      : false,
+        resetWhenUpdate : true,
+      },
+    }),
   },
 };
 
@@ -103,4 +118,4 @@ await writeFile(join(outDir, 'capacitor.config.json'), JSON.stringify(config, nu
 if (live) await writeFile(join(outDir, 'www', 'index.html'), fallback);
 
 console.log(`gen-capacitor-config: wrote ${join(outDir, 'capacitor.config.json')}`);
-console.log(`  appId ${config.appId}  ·  ${live ? `url ${config.server.url}` : 'staged www/'}`);
+console.log(`  appId ${config.appId}  ·  ${live ? `url ${config.server.url}` : 'staged www/'}${updates ? '  ·  updates over the air' : ''}`);

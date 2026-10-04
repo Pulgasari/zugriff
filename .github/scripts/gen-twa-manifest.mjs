@@ -23,7 +23,7 @@
 //   APP_ID_PREFIX   reverse-dns prefix for the packageId
 //                   (default dev.zugriff — reverse-dns of zugriff.dev; the
 //                    packageId is `${APP_ID_PREFIX}.${slug}.bw`, e.g.
-//                    dev.zugriff.notes.bw, and the name `Notes (bw)`, see
+//                    dev.zugriff.notes.bw, and the name `Notes (BW)`, see
 //                    android.js. /.well-known/assetlinks.json lists these ids)
 
 import { TwaManifest } from '@bubblewrap/core';
@@ -40,7 +40,7 @@ const keystore    = process.env.KEYSTORE_PATH || 'android.keystore';
 const alias       = process.env.KEY_ALIAS || 'android';
 
 const twa = await TwaManifest.fromWebManifest(manifestUrl);
-// id and name of the bubblewrap variant, Podcasts (bw), see android.js
+// id and name of the bubblewrap variant, Podcasts (BW), see android.js
 twa.packageId    = idOf(registry.get(slug), 'bubblewrap');
 twa.name         = nameOf(registry.get(slug), 'bubblewrap');
 twa.launcherName = twa.name;

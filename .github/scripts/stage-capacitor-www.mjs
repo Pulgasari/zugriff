@@ -16,14 +16,21 @@
 //   APP_SLUG    (required)  the app's registry slug
 //   DEVTOOLS    1 for the -dev build, with @aufbau/devtools and opened on ?dev
 //   PKG_SOURCE  where the package repos are, or get cloned to (default build/_pkg)
+//   OTA_VERSION the version of this bundle (default: this minute, yyyymmddhhmm)
+//   OTA_MANIFEST the url of the newest bundle's ota.json, for the build `capacitor`
+//
+// next to the app it writes www/ota.json, { slug, version, manifest }: the version
+// the bundle tells about itself, and where .shared/js/modules/ota.js looks for a
+// newer one
 
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { appendFile } from 'node:fs/promises';
+import { appendFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { registry } from './../../.shared/js/data/apps.js';
 import config from './../../bundler.config.js';
+import { stampOf } from './android.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -44,6 +51,9 @@ if (!existsSync(join(bundler, 'node_modules'))) execFileSync('npm', ['install', 
 const { bundle } = await import(pathToFileURL(join(bundler, 'index.js')));
 const dev = process.env.DEVTOOLS === '1';
 const { summary } = await bundle({ ...config({ dev, out: resolve(outDir, 'www'), packages, slug }), root: ROOT });
+
+const ota = { slug, version: process.env.OTA_VERSION || stampOf(), ...(process.env.OTA_MANIFEST && { manifest: process.env.OTA_MANIFEST }) };
+await writeFile(resolve(outDir, 'www', 'ota.json'), JSON.stringify(ota, null, 2) + '\n');
 
 const text = `### www: ${slug}${dev ? '-dev' : ''}\n\n${summary}\n`;
 console.log('\n' + text);

@@ -1,0 +1,171 @@
+name: Publish over-the-air bundles
+
+# the web part of the android build `capacitor` (variant 4, .github/scripts/android.js),
+# published for the installed apps to pick up. per app:
+#
+#   1. stage www/ like the apk build does (stage-capacitor-www.mjs), with
+#      www/ota.json naming this bundle's version and where newer ones are
+#   2. zip it and put it into the release ota-<slug> (a prerelease, never "latest"):
+#        <slug>-<version>.zip   the bundle
+#        ota.json               { slug, version, url }, the newest one
+#      ota.json goes up last, so it never names a zip that is not there yet, and
+#      the older zips are removed after it
+#   3. with `commit_www`: the same www/ into the repo as www/<slug>/, to look at,
+#      diff and serve as a comparison with the live version (www/README.md)
+#
+# the installed app (.shared/js/modules/ota.js) reads its own ota.json, fetches
+# the release's ota.json, downloads a newer zip through @capgo/capacitor-updater
+# and takes it on the next start. a bundle that does not come up is rolled back
+# by the plugin, a new apk starts from its own bundle again.
+#
+# manual for now. to publish on every change, add a push trigger on main for
+# apps/**, .shared/**, index.html and bundler.config.js.
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'single app slug (empty = every app built as capacitor)'
+        required: false
+        default: ''
+      commit_www:
+        description: 'also commit the bundle as www/<slug>/'
+        type: boolean
+        required: false
+        default: true
+
+permissions:
+  contents: write   # releases, and the www/ commit
+
+concurrency:
+  group: ota-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # the apps built as capacitor, and one version for the whole run
+  discover-apps:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.parse.outputs.apps }}
+      stamp: ${{ steps.parse.outputs.stamp }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Extract the capacitor apps
+        id: parse
+        env:
+          APP_FILTER: ${{ inputs.app }}
+        run: |
+          node --input-type=module -e "
+            import fs from 'node:fs';
+            import { slugsFor, stampOf } from './.github/scripts/android.js';
+            const only  = process.env.APP_FILTER?.trim();
+            const apps  = slugsFor('capacitor', only);
+            const stamp = stampOf();
+            if (only && !apps.length) { console.error('\"' + only + '\" is not built as capacitor'); process.exit(1); }
+            console.log('apps', apps, 'version', stamp);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT, 'apps=' + JSON.stringify(apps) + '\nstamp=' + stamp + '\n');
+          "
+
+  publish:
+    needs: discover-apps
+    if: ${{ needs.discover-apps.outputs.apps != '[]' && needs.discover-apps.outputs.apps != '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJson(needs.discover-apps.outputs.apps) }}
+    env:
+      APP: ${{ matrix.app }}
+      VERSION: ${{ needs.discover-apps.outputs.stamp }}
+      TAG: ota-${{ matrix.app }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Stage www/ for ${{ matrix.app }}
+        run: |
+          APP_SLUG="$APP" \
+          OTA_VERSION="$VERSION" \
+          OTA_MANIFEST="https://github.com/${{ github.repository }}/releases/download/${TAG}/ota.json" \
+          PKG_SOURCE=build/_pkg \
+          node .github/scripts/stage-capacitor-www.mjs "build/${APP}"
+
+      - name: Zip the bundle
+        run: |
+          # index.html at the root of the zip. `.` takes the dotted .shared/ along
+          cd "build/${APP}/www"
+          zip -qr "../../${APP}-${VERSION}.zip" .
+          cd -
+          ls -l "build/${APP}-${VERSION}.zip"
+
+      - name: Publish to the release ${{ env.TAG }}
+        run: |
+          ZIP="${APP}-${VERSION}.zip"
+          URL="https://github.com/${{ github.repository }}/releases/download/${TAG}/${ZIP}"
+          printf '{\n  "slug": "%s",\n  "version": "%s",\n  "url": "%s"\n}\n' "$APP" "$VERSION" "$URL" > build/ota.json
+
+          gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" \
+            --prerelease --latest=false \
+            --title "ota: ${APP}" \
+            --notes "over-the-air bundles of ${APP}, see .github/workflows/ota-publish.yml"
+
+          # the zip first, the manifest that names it after
+          gh release upload "$TAG" "build/${ZIP}" --clobber
+          gh release upload "$TAG" build/ota.json --clobber
+
+          # the zips before this one
+          gh release view "$TAG" --json assets --jq '.assets[].name' \
+            | grep -E '\.zip$' | grep -vx "$ZIP" \
+            | while read -r OLD; do gh release delete-asset "$TAG" "$OLD" --yes; done
+
+          echo "### ota: ${APP} ${VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "${URL}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep www/ for the commit
+        if: ${{ inputs.commit_www }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: www-${{ matrix.app }}
+          path: build/${{ matrix.app }}/www
+          include-hidden-files: true
+          retention-days: 1
+
+  # one commit for every app of the run, so the matrix jobs do not race each other
+  commit-www:
+    needs: [discover-apps, publish]
+    if: ${{ inputs.commit_www && always() && needs.publish.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: www-*
+          path: build/www
+
+      - name: Commit www/<slug>/
+        run: |
+          for DIR in build/www/www-*; do
+            [ -d "$DIR" ] || continue
+            APP="${DIR##*/www-}"
+            rm -rf "www/${APP}"
+            mkdir -p www
+            cp -r "$DIR" "www/${APP}"
+          done
+
+          git add www
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898732+github-actions[bot]@users.noreply.github.com"
+          git commit -m "www: the ota bundles of ${{ needs.discover-apps.outputs.stamp }}"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

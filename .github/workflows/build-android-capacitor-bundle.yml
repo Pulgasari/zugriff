@@ -1,0 +1,27 @@
+name: Build Android (Capacitor | Bundle) Packages
+
+# the apps whose registry entry sets build.android == 'capacitor-bundle' in
+# .shared/js/data/apps.js: the app's files inside the apk, staged like the
+# capacitor build but without over-the-air updates. it runs
+# build-android-capacitor.yml as capacitor-bundle: same toolchain, signing and
+# plugins. the app is Podcasts (bundle), dev.zugriff.podcasts.bundle, the files
+# podcasts-202612011212-bundle.apk/.aab, see .github/scripts/android.js.
+
+on:
+  workflow_dispatch:        # manual only — packaging never runs on a commit
+    inputs:
+      app:
+        description: 'single app slug to build (empty = all capacitor-bundle apps)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-android-capacitor.yml
+    with:
+      app: ${{ inputs.app }}
+      variant: capacitor-bundle
+    secrets: inherit

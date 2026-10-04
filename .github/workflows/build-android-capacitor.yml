@@ -1,12 +1,18 @@
 name: Build Android (Capacitor) Packages
 
-# Packages the apps whose registry entry lists build.android 'capacitor' in
+# Packages the apps whose registry entry lists the variant in build.android in
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
 # An app can list several android variants (see .github/scripts/android.js):
 #
-#   bubblewrap      build-android-bubblewrap.yml      a TWA around the live url
-#   capacitor-live  build-android-capacitor-live.yml  a webview on the live url
-#   capacitor       this workflow                     the files inside the apk
+#   bubblewrap        build-android-bubblewrap.yml        a TWA around the live url
+#   capacitor-live    build-android-capacitor-live.yml    a webview on the live url
+#   capacitor-bundle  build-android-capacitor-bundle.yml  the files inside the apk
+#   capacitor         this workflow                       the files inside the apk,
+#                                                         updated over the air
+#
+# capacitor carries @capgo/capacitor-updater in manual mode: the apk starts with
+# its own bundle, .shared/js/modules/ota.js looks for a newer one in the release
+# ota-<slug> that ota-publish.yml fills, and takes it on the next start.
 #
 # Why both exist: a TWA is just Chrome, so an app wrapped that way is stuck with
 # the browser File System Access API — and on Android that API re-confirms every
@@ -31,9 +37,10 @@ name: Build Android (Capacitor) Packages
 # Names, ids and files per variant (.github/scripts/android.js), all installable
 # side by side, each file its own unzipped artifact:
 #
-#   Podcasts         dev.zugriff.podcasts        podcasts-202612011212.apk
-#   Podcasts (dev)   dev.zugriff.podcasts.dev    podcasts-202612011212-dev.apk
-#   Podcasts (live)  dev.zugriff.podcasts.live   podcasts-202612011212-live.apk
+#   Podcasts           dev.zugriff.podcasts          podcasts-202612011212.apk
+#   Podcasts (dev)     dev.zugriff.podcasts.dev      podcasts-202612011212-dev.apk
+#   Podcasts (bundle)  dev.zugriff.podcasts.bundle   podcasts-202612011212-bundle.apk
+#   Podcasts (live)    dev.zugriff.podcasts.live     podcasts-202612011212-live.apk
 #
 # The app's files ship inside the apk: stage-capacitor-www.mjs stages the app,
 # .shared and the first-party packages into www/ with @aufbau/bundler (config:
@@ -41,7 +48,7 @@ name: Build Android (Capacitor) Packages
 # from npm, capacitor serves them from https://localhost/. the step summary of
 # each run lists what still goes over the network.
 #
-# build-android-capacitor-live.yml runs this workflow with `live`: then each app
+# build-android-capacitor-live.yml runs this workflow as capacitor-live: then each app
 # is wrapped around its LIVE deployment URL (server.url =
 # https://zugriff.dev/<slug>/) like the TWA, and nothing is staged. Capacitor
 # still injects its bridge into that remote page, so the plugins work.
@@ -67,23 +74,23 @@ on:
         description: 'single app slug to build (empty = all capacitor apps)'
         required: false
         default: ''
-  workflow_call:            # build-android-capacitor-live.yml
+  workflow_call:            # build-android-capacitor-bundle.yml, build-android-capacitor-live.yml
     inputs:
       app:
         type: string
         required: false
         default: ''
-      live:
-        description: 'wrap the deployment url instead of shipping the files'
-        type: boolean
+      variant:
+        description: 'capacitor, capacitor-bundle or capacitor-live'
+        type: string
         required: false
-        default: false
+        default: capacitor
 
 permissions:
   contents: read
 
 concurrency:
-  group: build-${{ inputs.live && 'android-capacitor-live' || 'android-capacitor' }}-${{ github.ref }}
+  group: build-android-${{ inputs.variant || 'capacitor' }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -101,7 +108,7 @@ jobs:
         id: parse
         env:
           APP_FILTER: ${{ inputs.app }}
-          BUILDER: ${{ inputs.live && 'capacitor-live' || 'capacitor' }}
+          BUILDER: ${{ inputs.variant || 'capacitor' }}
         run: node .github/scripts/get-capacitor-apps.js
 
   # Job 2 — one parallel build per app slug
@@ -111,14 +118,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # { app, dev, file }: dev is '' or '-dev', the second build with devtools
-      # that bundler.config.js asks for (`devtools`), bundled builds only. file
-      # is the apk/aab name, podcasts-202612011212-dev (android.js)
+      # { app, dev, file, stamp }: dev is '' or '-dev', the second build with
+      # devtools that bundler.config.js asks for (`devtools`), capacitor only. file
+      # is the apk/aab name, podcasts-202612011212-dev (android.js), stamp the
+      # version of the bundle inside
       matrix:
         include: ${{ fromJson(needs.discover-apps.outputs.apps) }}
     env:
       DEVTOOLS: ${{ matrix.dev && '1' || '' }}
-      LIVE: ${{ inputs.live && '1' || '' }}
+      VARIANT: ${{ inputs.variant || 'capacitor' }}
+      # capacitor without devtools updates itself over the air (ota.js)
+      UPDATES: ${{ (inputs.variant || 'capacitor') == 'capacitor' && !matrix.dev && '1' || '' }}
       SITE_BASE: https://zugriff.dev   # the app's live origin (baked into server.url)
       BUILD_TOOLS: '36.0.0'
       KEYSTORE_PATH: ${{ github.workspace }}/android.keystore
@@ -166,19 +176,23 @@ jobs:
           fi
 
       - name: Stage www/ for ${{ matrix.app }}
-        if: ${{ env.LIVE != '1' }}
+        if: ${{ env.VARIANT != 'capacitor-live' }}
         run: |
           # the app, .shared and the first-party package repos (cloned into
           # build/_pkg), the package origin rewritten to the local copy. what
-          # still reaches the network lands in the step summary
-          APP_SLUG="${{ matrix.app }}" PKG_SOURCE=build/_pkg node .github/scripts/stage-capacitor-www.mjs "build/${{ matrix.app }}"
+          # still reaches the network lands in the step summary. www/ota.json
+          # names the bundle's version and, for updates, where newer ones are
+          if [ "$UPDATES" = "1" ]; then
+            export OTA_MANIFEST="https://github.com/${{ github.repository }}/releases/download/ota-${{ matrix.app }}/ota.json"
+          fi
+          APP_SLUG="${{ matrix.app }}" OTA_VERSION="${{ matrix.stamp }}" PKG_SOURCE=build/_pkg node .github/scripts/stage-capacitor-www.mjs "build/${{ matrix.app }}"
 
       - name: Scaffold the Capacitor project for ${{ matrix.app }}
         run: |
           DIR="build/${{ matrix.app }}"
           mkdir -p "$DIR"
-          # capacitor.config.json (the staged www/, or with LIVE server.url -> app
-          # plus a www/ offline fallback)
+          # capacitor.config.json (the staged www/, or for capacitor-live
+          # server.url -> app plus a www/ offline fallback, VARIANT from env)
           APP_SLUG="${{ matrix.app }}" node .github/scripts/gen-capacitor-config.mjs "$DIR"
 
           cd "$DIR"
@@ -188,6 +202,10 @@ jobs:
           # repo's own Saf plugin, added in the next step
           npm install --no-audit --no-fund \
             @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8
+          # the over-the-air updates, found by cap sync like any npm plugin
+          if [ "$UPDATES" = "1" ]; then
+            npm install --no-audit --no-fund @capgo/capacitor-updater@8
+          fi
 
           npx cap add android
           npx cap sync android

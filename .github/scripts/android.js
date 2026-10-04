@@ -5,22 +5,29 @@
 //   build: { android: 'capacitor' }
 //   build: { android: ['capacitor', 'capacitor-live'] }
 //
-// names, ids and files carry the variant, all but capacitor's bundled build,
-// which is the app itself. dev is the -dev build with devtools (capacitor only),
-// so the variants of an app install side by side:
+//   variant           what                                         name                id                          file
+//   bubblewrap        a twa around the live url                    Podcasts (BW)       dev.zugriff.podcasts.bw     podcasts-202612011212-bw.apk
+//   capacitor-live    a webview on the live url                    Podcasts (live)     dev.zugriff.podcasts.live   podcasts-202612011212-live.apk
+//   capacitor-bundle  the files inside the apk                     Podcasts (bundle)   dev.zugriff.podcasts.bundle podcasts-202612011212-bundle.apk
+//   capacitor         the files inside the apk, updated over the   Podcasts            dev.zugriff.podcasts        podcasts-202612011212.apk
+//                     air (@capgo/capacitor-updater)
+//   capacitor + dev   the same with @aufbau/devtools, no updates   Podcasts (dev)      dev.zugriff.podcasts.dev    podcasts-202612011212-dev.apk
 //
-//   variant          name              id                        file
-//   capacitor        Podcasts          dev.zugriff.podcasts      podcasts-202612011212.apk
-//   capacitor + dev  Podcasts (dev)    dev.zugriff.podcasts.dev  podcasts-202612011212-dev.apk
-//   capacitor-live   Podcasts (live)   dev.zugriff.podcasts.live podcasts-202612011212-live.apk
-//   bubblewrap       Podcasts (bw)     dev.zugriff.podcasts.bw   podcasts-202612011212-bw.apk
-//
-// the stamp is the build's minute, yyyymmddhhmm in berlin time (stampOf).
+// capacitor is the app itself, every other variant carries its mark in name, id
+// and file, so all of them install side by side. the stamp is the build's
+// minute, yyyymmddhhmm in berlin time (stampOf).
 
 import { registry } from './../../.shared/js/data/apps.js';
 
-const SUFFIXES = { bubblewrap: 'bw', capacitor: '', 'capacitor-live': 'live' };
-const VARIANTS = Object.keys(SUFFIXES);
+// the mark of a variant in the id and file, and in the name
+const MARKS = {
+  bubblewrap         : { id: 'bw',     name: 'BW'     },
+  capacitor          : { id: '',       name: ''       },
+  'capacitor-bundle' : { id: 'bundle', name: 'bundle' },
+  'capacitor-live'   : { id: 'live',   name: 'live'   },
+};
+const DEV      = { id: 'dev', name: 'dev' };
+const VARIANTS = Object.keys(MARKS);
 
 // a valid android package segment: only [a-zA-Z0-9_], never leading with a digit
 const segmentOf = text => text.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').replace(/^(\d)/, 'a$1');
@@ -32,11 +39,14 @@ function check (app, variant) {
   if (!variantsOf(app).includes(variant)) throw new Error(`"${app.slug}" is not built as ${variant}`);
 }
 
-// '', 'dev', 'live' or 'bw'
-function suffixOf (variant, dev = false) {
+// the mark of a build: { id, name }, both empty for the app itself
+function markOf (variant, dev = false) {
   if (dev && variant !== 'capacitor') throw new Error(`a dev build is capacitor only, not ${variant}`);
-  return dev ? 'dev' : SUFFIXES[variant];
+  return dev ? DEV : MARKS[variant];
 }
+
+// '', 'dev', 'live', 'bundle' or 'bw'
+const suffixOf = (variant, dev = false) => markOf(variant, dev).id;
 
 function idOf (app, variant, { dev = false, prefix = process.env.APP_ID_PREFIX || 'dev.zugriff' } = {}) {
   check(app, variant);
@@ -46,9 +56,9 @@ function idOf (app, variant, { dev = false, prefix = process.env.APP_ID_PREFIX |
 
 function nameOf (app, variant, { dev = false } = {}) {
   check(app, variant);
-  const suffix = suffixOf(variant, dev);
-  const name   = app.short_name || app.name || app.slug;
-  return suffix ? `${name} (${suffix})` : name;
+  const mark = markOf(variant, dev).name;
+  const name = app.short_name || app.name || app.slug;
+  return mark ? `${name} (${mark})` : name;
 }
 
 // the apk/aab file name without extension
