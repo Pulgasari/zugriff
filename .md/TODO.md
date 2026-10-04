@@ -37,6 +37,8 @@
   - [ ] search-input (autofokusiert)
   - [ ] iconsets 
 
+–--
+
 ## `apps/podcasts`
 - [x] neuen View "explore" erstellen
   - [x] zunächst ist er im prinzip ähnlich zum 'add podcasts'-dialog, zumindest in dem sinne, dass man ne suche hat, und podcasts gelistet werden. aber bei klick auf podcasts, sieht man mehr infos, dessen episoden usw.
