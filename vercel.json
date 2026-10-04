@@ -6,6 +6,11 @@
   "trailingSlash": true,
   "rewrites": [
     {
+      "has"         : [{ "type": "host", "value": "app.zugriff.dev" }],
+      "source"      : "/:appname([a-z0-9-]+)/",
+      "destination" : "/index.html"
+    },
+    {
       "source"      : "/(apps|tools)/",
       "destination" : "/index.html"
     },
