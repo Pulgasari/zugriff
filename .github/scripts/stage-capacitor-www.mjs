@@ -23,14 +23,21 @@
 // the bundle tells about itself, and where .shared/js/modules/ota.js looks for a
 // newer one
 
-import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { appendFile, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+// :::::: IMPORT
+
+// ::: NODE.JS
+import { execFileSync }                 from 'node:child_process';
+import { existsSync }                   from 'node:fs';
+import { appendFile, writeFile }        from 'node:fs/promises';
+import { dirname, join, resolve }       from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+// ::: ZUGRIFF
 import { registry } from './../../.shared/js/data/apps.js';
-import config from './../../bundler.config.js';
-import { stampOf } from './android.js';
+import config       from './../../bundler.config.js';
+import { stampOf }  from './android.js';
+
+// ::::::
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -38,10 +45,16 @@ const slug = process.env.APP_SLUG;
 if (!slug) { console.error('stage-capacitor-www: APP_SLUG is required'); process.exit(1); }
 if (!registry.get(slug)) { console.error(`stage-capacitor-www: no app "${slug}" in the registry`); process.exit(1); }
 
+/*
+const paths = {};
+paths.out    = process.argv[2]        || join('build', slug);
+paths.pkg    = process.env.PKG_SOURCE || join('build', '_pkg');
+paths.aufbau = join(ROOT, paths.pkg, 'aufbau');
+*/
+
 const outDir   = process.argv[2] || join('build', slug);
 const packages = process.env.PKG_SOURCE || join('build', '_pkg');
-
-const aufbau = join(ROOT, packages, 'aufbau');
+const aufbau   = join(ROOT, packages, 'aufbau');
 if (!existsSync(aufbau)) execFileSync('git', ['clone', '--quiet', '--depth', '1', 'https://github.com/Pulgasari/aufbau.git', aufbau], { stdio: 'inherit' });
 
 // the bundler's own dependencies (esbuild for the vendor step)
