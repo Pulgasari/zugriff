@@ -1,8 +1,17 @@
 # todo :: apps
 
 ## `apps/code`
+
+#### panel: editor
 - [ ] geteilter editor-panel um mehrere files nebeneinander einzusehen/bearbeiten
+
+#### panel: file-list
 - [ ] files in der fileList sticky machen können
+
+#### panel; github
+- [ ] prüfen, ob/inwiefern die integration von gh actions/workflows möglich wäre, sodass man diese quasi von der app aus ausführen kann. und insb. diese besser zu handhaben wären als auf github.com, wo man sich zu tode kreuz und quer klicken muss
+
+#### panel: settings
 - [ ] editor-settings je filetype/ext setzbar
 - [ ] sonderbehandlung im editor für kommentare
   - [ ] option für: `font`
