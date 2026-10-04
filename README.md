@@ -2,7 +2,11 @@
 
 # zugriff
 
-client-side mini-PWAs. static files only — no build step, no bundler, no node or deno. ESM in the browser, served straight off GitHub Pages.
+cross-platform apps focused on browser and android.
+
+build with: **aufbau** | **capacitor** | **htx** | **preact**
+
+---
 
 - [zugriff.dev](https://zugriff.dev)
 - [cli](https://zugriff.dev/cli/)
