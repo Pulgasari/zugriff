@@ -4,7 +4,7 @@
 
 cross-platform apps focused on browser and android.
 
-build with: **aufbau** | **capacitor** | **htx** | **preact**
+build with: **aufbau** + **capacitor** + **htx** + **preact**
 
 ---
 
