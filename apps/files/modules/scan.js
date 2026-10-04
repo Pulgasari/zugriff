@@ -15,8 +15,8 @@
 // entry:    { name, path: ['a', 'b'], size, lastModified, type }
 // scanning: null, or { files } while a walk runs
 
-import { createOpfs } from '@bunker/opfs';
-import { signal }     from '@aufbau/signals';
+import createOpfs from '@bunker/opfs';
+import { signal } from '@aufbau/signals';
 
 // :::::: CATEGORIES ::::::::::::::::::::::::::::::::::::::::::::
 
