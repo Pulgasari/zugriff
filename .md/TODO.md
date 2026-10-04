@@ -64,3 +64,17 @@
 # todo :: concepts
 - `apps/collector`
 - `apps/downloader` konzepterstellung für ne downloader-app. quasi ne art jDownloader (light) in modern. evtl auf basis von opfs. nicht community-driven, dafür fokus auf erstellen eigener plugins.
+
+---
+
+# notes :: capacitor plugins
+
+- capacitor updater
+  - docs: https://capgo.app/plugins/capacitor-updater/
+  - repo: https://github.com/Cap-go/capacitor-updater/
+- capacitor social login
+  - docs: https://capgo.app/plugins/capacitor-social-login/
+  - repo: https://github.com/Cap-go/capacitor-social-login/
+- capacitor native biometric
+  - docs: https://capgo.app/plugins/capacitor-native-biometric/
+  - repo: https://github.com/Cap-go/capacitor-native-biometric/
