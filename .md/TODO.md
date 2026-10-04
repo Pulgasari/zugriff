@@ -125,6 +125,10 @@ Aber wie gesagt: Nur mögliche Zusatzaufgabe, kein Stress.
   - https://capgo.app/plugins/capacitor-zip/
   - https://github.com/Cap-go/capacitor-zip/
 
+| in benutzung | ausprobiert | docs        |
+|--------------|-------------|-------------|
+| -[ ]         | - [ ]       | device info |
+
 https://capgo.app/plugins/capacitor-device-info/
 https://capgo.app/plugins/capacitor-file-compressor/
 https://capgo.app/plugins/capacitor-intent-launcher/
