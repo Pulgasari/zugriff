@@ -52,8 +52,9 @@
 - variante 1 und 2 sind mir nicht genug für android-versionen der zugriff-apps
 - variante 3 erscheint mir wiederum too much
 - variante 4 wäre vermutlich das beste aus "both worlds"
+- nutzen für variante 4 will ich `@capgo/capacitor-updater` weil meine recherche ergab, dass dies hier vom repo aus funtionieren müsste
 
-### name + id der builds
+### name + id der builds wären dann fortan:
 - variante 1: `dev.zugriff.<app>.bw`     | `AppName (BW)`
 - variante 2: `dev.zugriff.<app>.live`   | `AppName (live)`
 - variante 3: `dev.zugriff.<app>.bundle` | `AppName (bundle)`
@@ -81,6 +82,9 @@
 - file
   - https://capgo.app/plugins/capacitor-file/
   - https://github.com/Cap-go/capacitor-file/
+- file picker
+  - https://capgo.app/plugins/capacitor-file-picker/
+  - https://github.com/Cap-go/capacitor-file-picker/
 - capacitor native biometric
   - docs: https://capgo.app/plugins/capacitor-native-biometric/
   - repo: https://github.com/Cap-go/capacitor-native-biometric/
@@ -93,3 +97,10 @@
 - zip
   - https://capgo.app/plugins/capacitor-zip/
   - https://github.com/Cap-go/capacitor-zip/
+
+https://capgo.app/plugins/capacitor-device-info/
+https://capgo.app/plugins/capacitor-file-compressor/
+https://capgo.app/plugins/capacitor-intent-launcher/
+https://capgo.app/plugins/capacitor-live-reload/
+https://capgo.app/plugins/capacitor-video-thumbnails/
+https://capgo.app/plugins/capacitor-widget-kit/
