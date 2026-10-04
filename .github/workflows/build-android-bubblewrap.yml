@@ -4,8 +4,11 @@ name: Build Android (Bubblewrap | Live) Packages
 # .shared/js/data/apps.js into Android apps (APK + AAB), one matrix job per app.
 # Each app is wrapped as a Trusted Web Activity pointing at its live deployment
 # with Bubblewrap — Google's official TWA tool, the same engine PWABuilder uses
-# under the hood. the siblings are build-android-capacitor-live.yml and
-# build-android-capacitor.yml.
+# under the hood.
+#
+# the siblings are: 
+# - build-android-capacitor-live.yml
+# - build-android-capacitor.yml
 #
 # ── SIGNING ──────────────────────────────────────────────────────────
 # With the repo secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD /
@@ -15,8 +18,10 @@ name: Build Android (Bubblewrap | Live) Packages
 # per-run keystore: good only for "does it build / install to test", not stable
 # (the SHA-256 changes every run, so assetlinks can't be pinned to it).
 #
-# To go stable: create one keystore (or share one across apps), add the four
-# secrets, then read the value the "Print signing SHA-256" step logs into the
+# To go stable:
+# - create one keystore (or share one across apps), 
+# - add the four secrets, 
+# - then read the value the "Print signing SHA-256" step logs into the
 # single /.well-known/assetlinks.json (repo root) under each dev.zugriff.<slug>.bw
 # package. Exact commands: .github/scripts/README.md.
 #
