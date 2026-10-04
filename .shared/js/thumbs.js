@@ -33,8 +33,8 @@
 // them. a host that blocks the direct fetch is remembered so the browser's
 // unsuppressable CORS error is not logged again for it.
 
-import { createOpfs } from '@bunker/opfs';
-import { Logger }     from '@pulgasari/logger';
+import createOpfs from '@bunker/opfs';
+import { Logger } from '@pulgasari/logger';
 
 // inside the capacitor wrapper. its bridge is injected into the remote page, the
 // npm packages are never bundled, see modules/filesystem/platform.js
