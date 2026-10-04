@@ -12,7 +12,7 @@
 //   rootOf(id)    the root handle, one per connection
 
 import createOPFS from '@bunker/opfs';
-import { signal } From '@aufbau/signals';
+import { signal } from '@aufbau/signals';
 
 import { test }    from '/.shared/js/modules/webdav/client.js';
 import { davRoot } from '/.shared/js/modules/webdav/handles.js';
