@@ -72,9 +72,24 @@
 - capacitor updater
   - docs: https://capgo.app/plugins/capacitor-updater/
   - repo: https://github.com/Cap-go/capacitor-updater/
+- data storage (sqlite)
+  - https://capgo.app/plugins/capacitor-data-storage-sqlite/
+  - https://github.com/Cap-go/capacitor-data-storage-sqlite/
 - capacitor social login
   - docs: https://capgo.app/plugins/capacitor-social-login/
   - repo: https://github.com/Cap-go/capacitor-social-login/
+- file
+  - https://capgo.app/plugins/capacitor-file/
+  - https://github.com/Cap-go/capacitor-file/
 - capacitor native biometric
   - docs: https://capgo.app/plugins/capacitor-native-biometric/
   - repo: https://github.com/Cap-go/capacitor-native-biometric/
+- capacitor shake
+  - docs: https://capgo.app/plugins/capacitor-shake/
+  - repo: https://github.com/Cap-go/capacitor-shake/
+- capacitor persistent account
+  - docs: https://capgo.app/plugins/capacitor-persistent-account/
+  - repo: https://github.com/Cap-go/capacitor-persistent-account/
+- zip
+  - https://capgo.app/plugins/capacitor-zip/
+  - https://github.com/Cap-go/capacitor-zip/
