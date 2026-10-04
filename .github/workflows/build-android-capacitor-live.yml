@@ -3,7 +3,7 @@ name: Build Android (Capacitor | Live) Packages
 # the apps whose registry entry sets build.android == 'capacitor-live' in
 # .shared/js/data/apps.js: a capacitor webview on the app's live deployment url
 # (server.url = https://zugriff.dev/<slug>/), nothing of the app inside the apk.
-# it runs build-android-capacitor.yml with `live`: same toolchain, signing and
+# it runs build-android-capacitor.yml as capacitor-live: same toolchain, signing and
 # plugins. the app is Podcasts (live), dev.zugriff.podcasts.live, the files
 # podcasts-202612011212-live.apk/.aab, see .github/scripts/android.js.
 
@@ -23,5 +23,5 @@ jobs:
     uses: ./.github/workflows/build-android-capacitor.yml
     with:
       app: ${{ inputs.app }}
-      live: true
+      variant: capacitor-live
     secrets: inherit

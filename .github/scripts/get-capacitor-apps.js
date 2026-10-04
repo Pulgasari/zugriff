@@ -2,9 +2,11 @@
 //
 // sibling of get-bubblewrap-apps.js: emits the matrix build-android-capacitor.yml
 // packages, one { app, dev, file } per build of the apps built as BUILDER
-// ('capacitor' by default, or 'capacitor-live'), see android.js. with `devtools`
-// set in bundler.config.js a bundled app is built a second time with dev: '-dev'.
-// file is the apk/aab name, one stamp for the whole run.
+// ('capacitor' by default, 'capacitor-bundle' or 'capacitor-live'), see android.js.
+// with `devtools` set in bundler.config.js a capacitor app is built a second time
+// with dev: '-dev'.
+// file is the apk/aab name, stamp the run's minute: the version of the bundle
+// inside, the same for every build of the run.
 
 import fs from 'node:fs';
 import { devtools } from './../../bundler.config.js';
@@ -17,7 +19,7 @@ const builder = process.env.BUILDER || 'capacitor';
 const stamp   = stampOf();
 
 const builds = slugsFor(builder, only).flatMap(app => [false, ...(builder === 'capacitor' && devtools ? [true] : [])]
-  .map(dev => ({ app, dev: dev ? '-dev' : '', file: fileOf(app, builder, stamp, { dev }) })));
+  .map(dev => ({ app, dev: dev ? '-dev' : '', file: fileOf(app, builder, stamp, { dev }), stamp })));
 
 // an app asked for by name that is not built as BUILDER fails the run, it would
 // skip the build and pass green

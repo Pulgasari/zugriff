@@ -211,6 +211,9 @@ class ZugriffApp {
 
     if (App) render(html`<${App} />`, $target);
     await reveal($target);   // frame, dock and first view appear together
+
+    // android build `capacitor`: confirm this bundle, fetch a newer one for the next start
+    if (globalThis.Capacitor?.Plugins?.CapacitorUpdater) import('./modules/ota.js').then(({ ota }) => ota());
     return this;
   };
 
