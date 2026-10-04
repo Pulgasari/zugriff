@@ -54,11 +54,19 @@
 - variante 4 wäre vermutlich das beste aus "both worlds"
 - nutzen für variante 4 will ich `@capgo/capacitor-updater` weil meine recherche ergab, dass dies hier vom repo aus funtionieren müsste
 
-### name + id der builds wären dann fortan:
+### fortan gilt: name + id der builds
 - variante 1: `dev.zugriff.<app>.bw`     | `AppName (BW)`
 - variante 2: `dev.zugriff.<app>.live`   | `AppName (live)`
 - variante 3: `dev.zugriff.<app>.bundle` | `AppName (bundle)`
 - variante 4: `dev.zugriff.<app>`        | `AppName`
+
+### fortan gilt: angabe der buildtypes in `/.shared/js/data/apps.js"
+- variante 1: `bubblewrap`
+- variante 2: `capacitor-live`
+- variante 3: `capacitor-bundle`
+- variante 4: `capacitor`
+
+(die angaben dort können also aktuell so bleiben wie se schon sind.)
 
 ---
 
