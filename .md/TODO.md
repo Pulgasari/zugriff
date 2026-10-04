@@ -68,6 +68,14 @@
 
 (die angaben dort können also aktuell so bleiben wie se schon sind.)
 
+### evtl. zusatzaufgabe:
+
+Wäre es möglich, dass von der neuen Variante der Web-Teil hker im Repo unter `/www/<appname>/` landet? 
+
+Falls ja würde ich quasi mal nebenher antesten wollen inwiefern man das für die Web-Version nutzen könnte bzw. ob die positivenAuswirkungen auf die Performance überdeutlich wären – oder schlichtweg als direkter anschaulicher Vergleich zur und Orientierungsmaßstab für die Web-/Live-Version.
+
+Aber wie gesagt: Nur mögliche Zusatzaufgabe, kein Stress.
+
 ---
 
 # todo :: concepts
