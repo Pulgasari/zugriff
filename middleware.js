@@ -1,59 +1,51 @@
-import { NextResponse } from 'next/server';
+// No dependencies or imports required! Uses native Web Standard APIs.
 
-// Vercel Edge Middleware for zero-FOUC state injection with structured logging
-export async function middleware(request) {
+// Helper to parse cookie values from the raw Cookie header
+function getCookie(cookieHeader, name) {
+  if (!cookieHeader) return null;
+  const match = cookieHeader.match(new RegExp(`(?:^|; )` + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + `=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+export default async function middleware(request) {
   const startTime = performance.now();
   const url = new URL(request.url);
 
   // 1. Filter: Only process HTML page requests
   const accept = request.headers.get('accept') || '';
   if (!accept.includes('text/html')) {
-    return NextResponse.next();
+    return fetch(request);
   }
 
-  // 2. Read cookies directly from HTTP request headers
-  const themeCookie = request.cookies.get('theme')?.value;
-  const compactCookie = request.cookies.get('compact')?.value;
+  // 2. Read raw Cookie header from incoming request
+  const cookieHeader = request.headers.get('cookie');
+  const theme = getCookie(cookieHeader, 'theme') || '#111827';
+  const compact = getCookie(cookieHeader, 'compact') || 'false';
 
-  const theme = themeCookie || '#111827';
-  const compact = compactCookie || 'false';
+  console.log(`[Edge Middleware] Request: ${url.pathname}${url.search}`);
+  console.log(`[Edge Middleware] Parsed cookies -> theme: "${theme}", compact: "${compact}"`);
 
-  // Log incoming request details
-  console.log(`[Edge Middleware] Incoming HTML Request: ${url.pathname}${url.search}`);
-  console.log(`[Edge Middleware] Extracted Cookies -> theme: "${themeCookie ?? 'NONE (fallback applied)'}", compact: "${compactCookie ?? 'NONE (fallback applied)'}"`);
-
-  // 3. Fetch original static HTML from origin / storage
+  // 3. Fetch static HTML file from origin
   const response = await fetch(request);
-  
+
   const contentType = response.headers.get('content-type') || '';
   if (!contentType.includes('text/html')) {
-    console.log(`[Edge Middleware] Bypassing modification (content-type: ${contentType})`);
     return response;
   }
 
   let html = await response.text();
 
-  // 4. Inject attributes into root <html> tag in-flight
+  // 4. Inject styles and dataset attributes into <html...> tag
   const rootAttributes = `style="--theme: ${theme};" data-compact="${compact}"`;
   const htmlInjected = html.replace('<html', `<html ${rootAttributes}`);
 
-  const wasInjected = html !== htmlInjected;
   const duration = (performance.now() - startTime).toFixed(2);
+  console.log(`[Edge Middleware] State injected successfully in ${duration}ms`);
 
-  // Log injection outcome and execution time
-  if (wasInjected) {
-    console.log(`[Edge Middleware] Successfully injected state into <html> in ${duration}ms`);
-  } else {
-    console.warn(`[Edge Middleware] Failed to inject state: <html...> tag not found (${duration}ms)`);
-  }
-
-  // 5. Construct response headers
+  // 5. Construct response with new headers
   const newHeaders = new Headers(response.headers);
   newHeaders.set('content-type', 'text/html; charset=utf-8');
-  
-  // Expose execution timing to browser DevTools (Network Tab -> Timing)
   newHeaders.set('Server-Timing', `edge-fouc;desc="Edge State Injection";dur=${duration}`);
-  newHeaders.set('X-Edge-FOUC-Injected', wasInjected ? 'true' : 'false');
 
   return new Response(htmlInjected, {
     status: response.status,
@@ -61,7 +53,7 @@ export async function middleware(request) {
   });
 }
 
-// Matcher configuration to bypass static assets
+// Optimization: Bypass middleware for static assets
 export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js)$).*)',
