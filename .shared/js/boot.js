@@ -248,12 +248,15 @@ function applyGestalt ({ prefix }) {
       //"@pulgasari/htx"       : `${pkg}/js-packages/htx/index.js`,
       //"@pulgasari/htx/"      : `${pkg}/js-packages/htx/`,
 
-      "@htx/htx"    : `${pkg}/htx/packages/htx/index.js`,
-      "@htx/js"     : `${pkg}/htx/packages/js/index.js`,
-      "@htx/preact" : `${pkg}/htx/packages/preact/index.js`,
+      "@htx/compiler" : `${pkg}/htx/packages/compiler/index.js`,
+      "@htx/elements" : `${pkg}/htx/packages/elements/index.js`,
+      "@htx/htx"      : `${pkg}/htx/packages/htx/index.js`,
+      "@htx/js"       : `${pkg}/htx/packages/js/index.js`,
+      "@htx/preact"   : `${pkg}/htx/packages/preact/index.js`,
 
       // ::: preact + htm — one instance only; dependents pin PREACT via
       // ?external= / ?deps= so esm.sh never ships a second copy
+      "acorn"              : "https://esm.sh/acorn@8", // parser of @htx/compiler
       "htm"                : "https://esm.sh/htm@3.1.1",
       "htm/preact"         : `https://esm.sh/htm@3.1.1/preact?deps=preact@${PREACT}`,
       "preact"             : `https://esm.sh/preact@${PREACT}`,
