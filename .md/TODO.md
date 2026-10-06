@@ -62,7 +62,7 @@
 - [x] variante 1: bubblewrap
 - [x] variante 2: capacitor via webview wrapper um `https://zugriff.dev/<app>/`
 - [x] variante 3: capacitor + komplettes bundle
-- [ ] variante 4: capacitor + OTA / live update
+- [x] variante 4: capacitor + OTA / live update
 
 ### anmerkungen
 - variante 1 und 2 sind mir nicht genug für android-versionen der zugriff-apps
