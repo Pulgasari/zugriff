@@ -156,7 +156,7 @@ function IconGrid ({ names }) {
   useEffect(() => {
     let handle;
     import('@aufbau/gestures')
-      .then(g => { if (ref.current) handle = g.compose(ref.current, { onAdjust: v => itemSize.value = Math.round(v), value: itemSize.value, min: 56, max: 200 }); })
+      .then(g => { if (ref.current) handle = g.adjustable(ref.current, { onChange: v => itemSize.value = Math.round(v), value: itemSize.value, minimum: 56, maximum: 200 }); })
       .catch(() => {});
     return () => handle?.destroy();
   }, []);
