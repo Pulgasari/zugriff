@@ -97,6 +97,7 @@ Aber wie gesagt: Nur mögliche Zusatzaufgabe, kein Stress.
 # todo :: concepts
 - `apps/collector`
 - `apps/downloader` konzepterstellung für ne downloader-app. quasi ne art jDownloader (light) in modern. evtl auf basis von opfs. nicht community-driven, dafür fokus auf erstellen eigener plugins.
+- `apps/todo`
 
 ---
 
