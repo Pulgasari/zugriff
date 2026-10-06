@@ -215,16 +215,16 @@ function ViewMode () {
   useEffect(() => { resetView(); }, [current.value]);   // reset zoom/pan when the shown image changes
 
   const gestureRef = useGesture({
-    onDoubleClick : () => { if (current.value) setZoom(zoom.value > 1 ? 1 : 2.5); },
-    onPanStart    : () => { panStart.current = { ...pan.value }; },
-    onPan         : p => {
+    onDoubleTap  : () => { if (current.value) setZoom(zoom.value > 1 ? 1 : 2.5); },
+    onPanStart   : () => { panStart.current = { ...pan.value }; },
+    onPanMove    : g => {
       if (zoom.value <= 1) return;
-      pan.value = { x: panStart.current.x + p.deltaX, y: panStart.current.y + p.deltaY };
+      pan.value = { x: panStart.current.x + g.delta.x, y: panStart.current.y + g.delta.y };
       clampPan();
     },
-    onPinchStart  : () => { pinchStart.current = zoom.value; },
-    onPinch       : p => { if (current.value) setZoom(pinchStart.current * p.scale); },
-    onWheel       : w => { if (current.value) setZoom(zoom.value * (w.deltaY < 0 ? 1.15 : 1 / 1.15)); },
+    onPinchStart : () => { pinchStart.current = zoom.value; },
+    onPinchMove  : g => { if (current.value) setZoom(pinchStart.current * g.scale); },
+    onWheelMove  : g => { if (current.value) setZoom(zoom.value * (g.movement.y < 0 ? 1.15 : 1 / 1.15)); },
   });
 
   const setStage = useRef(null);
