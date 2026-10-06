@@ -103,6 +103,20 @@ const applyPalette = async palette => {
   syncBars(bg); // the native bars, inside the capacitor wrapper only
 };
 
+// :::::: GESTALT COOKIE
+
+// palette, density and geometry go into a cookie as well, scoped to the app's
+// path, so middleware.js can write them into the html at the edge. boot.js sets
+// the same from localStorage, the cookie only moves the first paint earlier
+const GESTALT = ['density', 'geometry', 'palette'];
+
+function writeGestaltCookie (slug, values) {
+  if (!$doc || !slug) return;
+  const value = new URLSearchParams(GESTALT.filter(token => values[token]).map(token => [token, values[token]])).toString();
+  try   { $doc.cookie = `zugriff-gestalt=${encodeURIComponent(value)}; path=/${slug}/; max-age=31536000; samesite=lax`; }
+  catch {} // a sandboxed document has no cookies, the edge then just knows nothing
+}
+
 // :::::: APP
 
 class ZugriffApp {
@@ -151,13 +165,16 @@ class ZugriffApp {
     // pure side effects, persistence is the store's job. boot.js reads the stored
     // palette, density and geometry before the first paint. what they change is
     // up to aufbau's gestalt, zugriff only hands the values on
+    const gestalt = {};
+    const remember = (token, value) => { gestalt[token] = value; writeGestaltCookie(this.slug, gestalt); };
+
     state.$onEffects({
-      density  : value => { if (value) aufbau.gestalt.set({ density: value }); },
+      density  : value => { remember('density', value); if (value) aufbau.gestalt.set({ density: value }); },
       dir      : value => { if ($root && value) $root.setAttribute('dir', value); },
       font     : value => { if (value) webfonts.apply(value, { role: '--font' }); },
-      geometry : value => { if (value) aufbau.gestalt.set({ geometry: value }); },
+      geometry : value => { remember('geometry', value); if (value) aufbau.gestalt.set({ geometry: value }); },
       lang     : value => { if ($root && value) $root.lang = value; },
-      palette  : value => applyPalette(value),
+      palette  : value => { remember('palette', value); applyPalette(value); },
       skin     : value => { if (value) aufbau.gestalt.set({ skin: value }); },
       title    : value => { if ($doc && value) $doc.title = value; },
     });

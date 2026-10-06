@@ -59,7 +59,9 @@ function initDevTools (force = false) {
 // :::::: Task 2: Gestalt Boot (Synchronous - Prevents FOUC)
 // the palette, density and geometry leaves of the app's store
 // (zugriff:<slug>:<leaf>), set before the first paint. aufbau's css resolves
-// everything from the tokens, so the names are all it takes
+// everything from the tokens, so the names are all it takes. on zugriff.dev
+// middleware.js may have written them into the html already, from the cookie
+// app.js keeps; localStorage stays the truth, so they are set here regardless
 const GESTALT_TOKENS = ['density', 'geometry', 'palette'];
 
 function applyGestalt ({ prefix }) {
