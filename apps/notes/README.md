@@ -5,7 +5,8 @@ web: <https://zugriff.dev/notes/>
 A Markdown notebook that reads a folder straight off your disk. You grant one
 or more folders with the browser's **File System Access API**; each folder is
 walked recursively and its **folder structure becomes the outline** in the
-sidebar. Selecting a `.md` file renders it in place.
+menu (a sidebar where there is room, a drawer on phones). Selecting a `.md`
+file opens it in the note view.
 
 Nothing is uploaded or copied. The only thing kept in the database is the
 directory *handle* — a permission token — so the app can re-open the same
@@ -38,7 +39,7 @@ folder next time instead of asking you to pick it again.
 | file            | what it is |
 |-----------------|------------|
 | `index.html`    | static shell — links `../base.css`, `app.css` and the importmap |
-| `app.js`        | the app: tree sidebar + Markdown reader, mounted via `boot({ shell:false })` |
+| `app.js`        | the app: an `app-root` with start/note views, the tree in a `menu` area, settings in a `config` area |
 | `library.js`    | the granted directory handles (folder-library data layer), bound to `app.lib` |
 | `app.css`       | the app's own look |
 | `app.config.js` | registry entry + aufbau runtime options |
