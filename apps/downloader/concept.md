@@ -1,6 +1,6 @@
 # concept: downloader
 
-an idea, not a plan. nothing here is built yet. `tools/downloader` (fetch one
+the plan the app was built from. what is in it and what is open: README.md. `tools/downloader` (fetch one
 url, save it) is the seed, this is what it could grow into.
 
 a jdownloader light: paste or share links, they become packages, a queue

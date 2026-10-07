@@ -1,6 +1,6 @@
 # concept: todo
 
-an idea, not a plan. nothing here is built yet.
+the plan the app was built from. what is in it and what is open: README.md.
 
 tasks for one person, offline, fast to add and fast to tick. no accounts, the
 data lives on the device, sync comes through what zugriff already has.

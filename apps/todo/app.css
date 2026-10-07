@@ -39,7 +39,7 @@ app-area[name="menu"] { --area-size: min(85vw, 18rem); }
 
   > button:not(.nav-link) { opacity: 0; }
   &:hover > button, &:focus-within > button { opacity: 1; }
-  &[aria-current="page"] .nav-link { background: var(--accent-25, var(--hover)); }
+  &[aria-current="page"] .nav-link { background: color-mix(in srgb, currentColor 12%, transparent); }
 }
 
 .nav-link {
@@ -58,7 +58,7 @@ app-area[name="menu"] { --area-size: min(85vw, 18rem); }
   padding         : 0.45rem 0.75rem;
   text-align      : start;
 
-  &:hover { background: var(--hover); }
+  &:hover { background: color-mix(in srgb, currentColor 6%, transparent); }
   > span:first-of-type { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 
@@ -152,7 +152,7 @@ app-area[name="menu"] { --area-size: min(85vw, 18rem); }
 
 .add-field {
   align-items   : center;
-  background    : var(--sunken, var(--hover));
+  background    : color-mix(in srgb, currentColor 6%, transparent);
   border-radius : var(--radius, 0.5rem);
   display       : flex;
   gap           : 0.5rem;
@@ -201,7 +201,7 @@ app-area[name="menu"] { --area-size: min(85vw, 18rem); }
   outline       : none;
   touch-action  : pan-y;
 
-  &[aria-current="true"], &:focus-visible { background: var(--hover); }
+  &[aria-current="true"], &:focus-visible { background: color-mix(in srgb, currentColor 10%, var(--color-bg)); }
   &[data-done] .title { opacity: 0.5; text-decoration: line-through; }
 
   &[data-priority="1"] .check { color: #8be9fd; }

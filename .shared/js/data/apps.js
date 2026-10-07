@@ -63,6 +63,19 @@ const entries = [
     slug        : 'code',
     type        : 'app',
   },
+  { // zugriff.dev/downloader/
+    build       : { android: ['capacitor', 'capacitor-live'] },
+    type        : 'app',
+    slug        : 'downloader',
+    name        : 'Downloader',
+    icon        : 'lucide:download-cloud',
+    description : 'Paste or share links, they become packages: a queue fetches them resumably and puts the files where they belong.',
+    categories  : ['files', 'network'],
+    manifest    : {
+      launch_handler : { client_mode: ['focus-existing', 'auto'] },
+      share_target   : { action: './', method: 'GET', params: { text: 'text', title: 'title', url: 'url' } },
+    },
+  },
   { // zugriff.dev/ebooks/
     build       : { android: ['capacitor', 'capacitor-live'] },
     type        : 'app',
@@ -178,6 +191,15 @@ const entries = [
     description : 'Keep, tag and search your prompts — stored on this device.',
     categories  : ['tool'],
   },
+  { // zugriff.dev/todo/
+    build       : { android: ['capacitor', 'capacitor-live'] },
+    type        : 'app',
+    slug        : 'todo',
+    name        : 'Todo',
+    icon        : 'lucide:list-checks',
+    description : 'Tasks for one person, offline: typed in one line, ticked with a swipe, synced through a folder or webdav.',
+    categories  : ['productivity'],
+  },
   { // zugriff.dev/videos/
     build       : { android: ['capacitor', 'capacitor-live'] },
     type        : 'app',
@@ -282,14 +304,6 @@ const entries = [
     icon        : 'mdi:table-search',
     description : 'Browse CSV as a searchable tree.',
     categories  : ['inspector'],
-  },
-  {
-    type        : 'tool',
-    slug        : 'downloader',
-    name        : 'Downloader',
-    icon        : 'material-symbols:download',
-    description : 'Fetch a file by URL and save it locally.',
-    categories  : ['tool'],
   },
   {
     type        : 'tool',
