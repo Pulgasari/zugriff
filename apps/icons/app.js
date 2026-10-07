@@ -13,15 +13,13 @@ import { useEffect, useRef } from 'preact/hooks';
 import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
-ActionMenu     = await zugriff.component('ActionMenu'),
-Button         = await zugriff.component('Button'),
-Dock           = await zugriff.component('Dock'),
-Empty          = await zugriff.component('Empty'),
-Icon           = await zugriff.component('Icon'),
-IconButton     = await zugriff.component('IconButton'),
-Loading        = await zugriff.component('Loading'),
-SettingsButton = await zugriff.component('Settings', 'SettingsButton'),
-SettingsModal  = await zugriff.component('Settings', 'SettingsModal');
+Button     = await zugriff.component('Button'),
+Config     = await zugriff.component('Config'),
+Dock       = await zugriff.component('Dock'),
+Empty      = await zugriff.component('Empty'),
+Icon       = await zugriff.component('Icon'),
+IconButton = await zugriff.component('IconButton'),
+Loading    = await zugriff.component('Loading');
 
 // ::: the app handle
 const app = zugriff.app;
@@ -29,23 +27,48 @@ app.api = await app.module('iconify');
 app.db  = await app.module('db');
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
-// ui navigation on app.state (deep signal, no `.value`). the api results (collections /
-// set / search) stay as plain signals — a set is thousands of names, better not deep-wrapped.
+// the view on screen is #app's business (app-view, the hash), the rest is on app.state
+// (deep signal, no `.value`). the api results (collections / set / search) stay plain
+// signals — a set is thousands of names, better not deep-wrapped.
 
-app.state.route     = { name: 'home', id: null };   // home | sets | set | search | favorites
 app.state.$extend({
-  nav       : { type: 'scalar', value: false },   // mobile drawer
-  detail    : { type: 'scalar', value: null },    // selected icon name | null
-  setFilter : { type: 'scalar', value: '' },      // filter on the sets list
-  query     : { type: 'scalar', value: '' },      // search box
+  detail    : { type: 'scalar', value: null                },   // the icon in the context area | null
+  prefix    : { type: 'scalar', value: null, persist: true },   // the set of the 'set' view
+  setFilter : { type: 'scalar', value: '',   persist: true },   // filter on the sets list
+  query     : { type: 'scalar', value: '',   persist: true },   // search box
 });
 
+const current     = signal('home');   // the view on screen, for the dock
 const collections = signal(null);   // [{ prefix, name, total, … }] | null
 const setData     = signal(null);   // { prefix, title, total, icons } for route 'set'
 const setLoading  = signal(false);
 const results     = signal([]);
 const searching   = signal(false);
 const itemSize    = typedSignal({ value: 88, key: 'icons:item-size' }); // persisted grid zoom
+
+// :::::: FRAME :::::::::::::::::::::::::::::::::::::::::::::
+// #app is the <app-root>: the views in the main area, the icon in the context area
+
+const area = app.area;
+const show = app.show;
+
+app.go = name => show(name);
+
+function onNavigate (event) {
+  current.value = event.detail.to;
+}
+
+app.root.addEventListener('navigate', onNavigate);
+
+function inspect (name) {
+  app.state.detail = name;
+  area('context')?.show();
+}
+
+function closeDetail () {
+  area('context')?.hide();
+  app.state.detail = null;
+}
 
 // :::::: DATA :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -55,13 +78,19 @@ async function ensureCollections () {
   catch { collections.value = []; app.toast({ error: 'Could not reach the Iconify API' }); }
 }
 
-async function openSet (prefix) {
-  app.go('set', prefix);
+async function loadSet (prefix) {
+  if (!prefix || setData.value?.prefix === prefix) return;
   setData.value = null;
   setLoading.value = true;
-  try     { setData.value = await api.collection(prefix); }
+  try     { setData.value = await app.api.collection(prefix); }
   catch   { app.toast({ error: 'Could not load that set' }); }
   finally { setLoading.value = false; }
+}
+
+function openSet (prefix) {
+  app.state.prefix = prefix;
+  loadSet(prefix);
+  show('set');
 }
 
 let searchTimer = null;
@@ -79,10 +108,10 @@ function onSearch (value) {
 }
 
 // :::::: ACTIONS + HOTKEYS ::::::::::::::::::::::::::::::::::
-// escape backs out of the open sheet, then the mobile drawer
+// escape closes the icon in the context area
 
-app.actions = { 'dismiss': () => { if (app.state.$detail) app.state.detail = null; else app.state.nav = false; } };
-app.hotKeys = { 'escape': { action: 'dismiss', global: true } };
+app.actions = { 'dismiss': closeDetail };
+app.hotkeys = { 'escape': { action: 'dismiss', global: true, when: () => !!app.state.$detail } };
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -137,7 +166,7 @@ const IconGlyph = ({ name }) => html`<iconify-icon icon=${name}></iconify-icon>`
 function IconCell ({ name }) {
   const fav = app.db.favs.value.has(name);
   return html`
-    <button class="cell" onClick=${() => app.state.detail = name} title=${name}>
+    <button class="cell" onClick=${() => inspect(name)} title=${name}>
       <span class="glyph"><${IconGlyph} name=${name} /></span>
       <span class="cname">${name.split(':')[1]}</span>
       <${Button}
@@ -182,8 +211,8 @@ function HomeView () {
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <${Button} icon='images' label='browse sets' onClick=${() => { ensureCollections(); app.go('sets'); }} />
-          <${Button} icon='search' label='search'      onClick=${() => app.go('search')} />
+          <${Button} icon='images' label='browse sets' onClick=${() => show('sets')}   />
+          <${Button} icon='search' label='search'      onClick=${() => show('search')} />
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -217,7 +246,9 @@ function SetsView () {
 }
 
 function SetView () {
+  useEffect(() => { loadSet(app.state.$prefix); }, []);
   const d = setData.value;
+  if (!app.state.$prefix) return html`<${Empty} icon='images' hint='Pick a set.' />`;
   if (setLoading.value || !d) return html`<${Loading}/>`;
   return html`
     <div class="setview">
@@ -233,6 +264,8 @@ function SetView () {
 }
 
 function SearchView () {
+  // the query survives a reload, the results do not
+  useEffect(() => { if (app.state.$query.trim() && !results.value.length) onSearch(app.state.$query); }, []);
   return html`
     <div class="searchview">
       ${searching.value ? html`<${Loading}/>`
@@ -243,31 +276,11 @@ function SearchView () {
 }
 
 function FavoritesView () {
-  const names = [...db.favs.value];
+  const names = [...app.db.favs.value];
   return names.length
     ? html`<${IconGrid} names=${names} />`
     : html`<${Empty} icon='heart' hint='No favourites yet — tap the heart on any icon.' />`;
 }
-
-function Content () {
-  switch (app.state.$route.name) {
-    case 'sets':      return html`<${SetsView} />`;
-    case 'set':       return html`<${SetView} />`;
-    case 'search':    return html`<${SearchView} />`;
-    case 'favorites': return html`<${FavoritesView} />`;
-    default:          return html`<${HomeView} />`;
-  }
-}
-
-/*
-app.views = {
-  home   : 'HomeView',
-  favs   : 'FavoritesView',
-  search : 'SearchView',
-  set    : 'SetView',
-  sets   : 'SetsView',
-};
-*/
 
 // ── top bar ──────────────────────────────────────────────────────────────
 
@@ -281,33 +294,31 @@ function SizeControl () {
   `;
 }
 
-function TopBar () {
-  const r = app.state.$route;
-  const grid = r.name === 'set' || r.name === 'search' || r.name === 'favorites';
+// each view carries its own, `name` is the view's
+function TopBar ({ name }) {
+  const grid = name === 'set' || name === 'search' || name === 'favs';
   return html`
     <header class="topbar">
-      <${IconButton} aria-label="Menu" icon='menu' onClick=${() => app.state.nav = true} />
-      ${r.name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go('sets')} />`}
+      ${name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => show('sets')} />`}
 
-      ${r.name === 'search'
+      ${name === 'search'
         ? html`<div class="searchbox big">
             <${Icon} name='search' />
-            <input type="search" placeholder="Search all of Iconify…" autofocus value=${app.state.$query} onInput=${e => onSearch(e.target.value)} />
+            <input type="search" placeholder="Search all of Iconify…" value=${app.state.$query} onInput=${e => onSearch(e.target.value)} />
           </div>`
-        : r.name === 'sets'
+        : name === 'sets'
         ? html`<div class="searchbox">
             <${Icon} name='search' />
             <input type="search" placeholder="Filter sets…" value=${app.state.$setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
-        : html`<h1>${r.name === 'favorites' ? 'Favourites' : 'Icons'}</h1>`}
+        : html`<h1>${name === 'favs' ? 'Favourites' : name === 'set' ? 'Sets' : 'Icons'}</h1>`}
 
       <span class="spacer"></span>
       ${grid && html`<${SizeControl} />`}
-      <${SettingsButton} /><${SettingsModal} />
     </header>`;
 }
 
-// ── detail sheet ─────────────────────────────────────────────────────────
+// ── detail, the content of the context area ──────────────────────────────
 
 function Detail () {
   const name = app.state.$detail;
@@ -315,12 +326,10 @@ function Detail () {
   const [prefix, icon] = name.split(':');
   const fav = app.db.favs.value.has(name);
   return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.detail = null; }}>
-      <div class="sheet" role="dialog" aria-modal="true">
-        <button class="sheet-x" aria-label="Close" onClick=${() => app.state.detail = null}><${Icon} name="mdi:close" /></button>
+    <app-panel heading=${icon}>
+      <div class="detail">
         <div class="sheet-preview"><iconify-icon icon=${name}></iconify-icon></div>
-        <div class="sheet-name">${icon}</div>
-        <div class="sheet-set"><button class="linkish" onClick=${() => { app.state.detail = null; openSet(prefix); }}>${prefix}</button></div>
+        <div class="sheet-set"><button class="linkish" onClick=${() => { closeDetail(); openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
           <${Button} icon='copy'     label='copy name' onClick=${() => copy        (name)} />
           <${Button} icon='svg'      label='copy svg'  onClick=${() => copySvg     (name)} />
@@ -332,30 +341,50 @@ function Detail () {
           />
         </div>
       </div>
-    </div>`;
+    </app-panel>`;
 }
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
-const dockItems = [
-  { icon: 'mdi:home', label: 'home',   view: 'home'   },
-  { icon: 'search',   label: 'search', view: 'search' },
-  { icon: 'images',   label: 'sets',   view: 'sets'   },
-  { icon: 'heart',    label: 'favs',   view: 'favs'   },
+const VIEWS = [
+  { name: 'home',   route: '/',       View: HomeView      },
+  { name: 'sets',   route: '/sets',   View: SetsView      },
+  { name: 'set',    route: '/set',    View: SetView       },
+  { name: 'search', route: '/search', View: SearchView    },
+  { name: 'favs',   route: '/favs',   View: FavoritesView },
 ];
 
+const dockItems = [
+  { icon: 'mdi:home', label: 'home',     view: 'home'                                },
+  { icon: 'search',   label: 'search',   view: 'search'                              },
+  { icon: 'images',   label: 'sets',     view: 'sets', match: ['set']                },
+  { icon: 'heart',    label: 'favs',     view: 'favs'                                },
+  { icon: 'settings', label: 'settings', onClick: () => area('config')?.toggle()     },
+];
+
+// the areas of #app, the root
 function App () {
   useEffect(() => {
     app.db.loadFavs().catch(() => {});
     ensureCollections(); // warms the catalogue for home stats + sets
+    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
+      current.value = app.root.view?.getAttribute('name') ?? 'home';
+    });
   }, []);
 
-  return html`<>
-    <main id='app-main'>
-      <${Content}/>
-    </main>
-    <${Dock} items=${dockItems} />
-  </>`;
+  return html`
+    <app-area name='main'>
+      ${VIEWS.map(({ name, route, View }) => html`
+        <app-view key=${name} name=${name} route=${route} active=${name === 'home' || undefined}>
+          <${TopBar} name=${name} />
+          <${View} />
+        </app-view>
+      `)}
+      <${Dock} items=${dockItems} current=${current.value} />
+    </app-area>
+    <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) app.state.detail = null; }}><${Detail} /></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
+  `;
 }
 
 // :::::: BOOT

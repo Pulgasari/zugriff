@@ -12,6 +12,32 @@ body { overflow: hidden; overscroll-behavior: none; }
   &:not(:has(> app-area)) { display: flex; flex-flow: column; }
 }
 
+/* ── the dock, the Dock component: a row of icon and label ──────────────── */
+
+#app-dock {
+  border-top : 1px solid var(--line);
+  display    : flex;
+  flex       : none;
+
+  > button {
+    align-items    : center;
+    background     : none;
+    border         : 0;
+    color          : inherit;
+    display        : flex;
+    flex           : 1 1 0;
+    flex-direction : column;
+    font           : inherit;
+    font-size      : 0.7rem;
+    gap            : --space(tiny);
+    opacity        : 0.7;
+    padding        : --space(small);
+
+    &.active { opacity: 1; }
+    svg-icon { font-size: 1.3rem; }
+  }
+}
+
 /* ── tokens ─────────────────────────────────────────────────────── */
 
 body {
