@@ -7,22 +7,19 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 */
-/* ── layout ── */
-#app-main {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  height: 100%;
-}
+/* ── frame ──
+   #app is the <app-root>: the list in <app-area name="menu"> at the start, a
+   sidebar where there is room, a drawer where not. the prompt in the main area */
+
+app-area[name="menu"] { --area-size: min(85vw, 280px); }
+
+app-view[name="prompt"] { block-size: 100%; display: flex; flex-direction: column; }
 
 /* ── sidebar ── */
 .sidebar {
   display: flex; flex-direction: column; gap: .65rem;
   padding: 1rem .75rem;
-  border-right: 1px solid color-mix(in srgb, var(--color-fg) 10%, transparent);
-  overflow: hidden; min-height: 0;
+  overflow: hidden; min-height: 0; height: 100%;
 }
 
 .sidebar-top { flex-shrink: 0; }
@@ -207,27 +204,11 @@
 
 .empty-hint { font-size: .8rem; opacity: .35; padding: .35rem 0; }
 
-/* ── mobile ── */
+/* ── narrow: the list is a drawer, the prompt has a way back to it ── */
 .mobile-only { display: none; }
 
-@media (max-width: 640px) {
-  body { overflow: hidden; }
-
-  #app-main {
-    grid-template-columns : 1fr;
-    grid-template-rows    : 1fr;
-  }
-
-  /* show sidebar by default */
-  #app-main .sidebar        { display: flex; }
-  #app-main > :nth-child(2) { display: none; }
-
-  /* when detail active — swap visibility */
-  #app-main.mobile-detail .sidebar { display: none; }
-  #app-main.mobile-detail > :nth-child(2) { display: flex; }
-
-  .mobile-only { display: flex; }
-
+#app:has(> app-area[name="menu"]:state(overlay)) {
+  .mobile-only               { display: flex; }
   .detail-view, .detail-edit { padding: .85rem; }
 }
 

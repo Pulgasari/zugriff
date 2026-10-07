@@ -16,7 +16,7 @@ function TagManager ({ show, onClose }) {
 
   const add = () => {
     if (!name.trim()) return;
-    app.db.saveTag({ id: app.db.uid(), name: name.trim(), color });
+    app.lib.saveTag({ id: app.lib.uid(), name: name.trim(), color });
     setName('');
   };
 
@@ -28,12 +28,12 @@ function TagManager ({ show, onClose }) {
       </header>
       
       <div class="tag-manager-list">
-        ${app.db.tags.value.map(t => html`
+        ${app.lib.tags.value.map(t => html`
           <div class="tag-manager-row">
             <span class="tag-badge" style=${{ '--tag-color': t.color }}>${t.name}</span>
             <${IconButton} icon='trash' onClick=${() => app.removeTag(t.id)} />
           </div>`)}
-        ${app.db.tags.value.length === 0 && html`<span class="empty-hint">No tags yet</span>`}
+        ${app.lib.tags.value.length === 0 && html`<span class="empty-hint">No tags yet</span>`}
       </div>
       
       <div class="tag-manager-add">

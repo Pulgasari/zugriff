@@ -56,7 +56,7 @@ export default function Detail () {
           <button class="icon-btn remove" title="Delete" onClick=${() => { if (confirm('Delete this prompt?')) app.removePrompt(prompt.id); }}>
             <${Icon} name="mdi:trash-can-outline" />
           </button>
-          <button class="icon-btn mobile-only" onClick=${() => app.state.mobilePane = 'list'}>
+          <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
             <${Icon} name="mdi:arrow-left" />
           </button>
         </div>
@@ -80,7 +80,7 @@ export default function Detail () {
   const save = () => {
     const now = Date.now();
     app.savePrompt({
-      id:        prompt?.id ?? app.db.uid(),
+      id:        prompt?.id ?? app.lib.uid(),
       title:     title.trim(),
       content,
       tags:      selTags,
@@ -98,14 +98,14 @@ export default function Detail () {
         <input class="edit-title-input" type="text" placeholder="Prompt title…"
           value=${title} onInput=${e => setTitle(e.target.value)} />
         <div class="detail-header-actions">
-          <button class="icon-btn mobile-only" onClick=${() => app.state.mobilePane = 'list'}>
+          <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
             <${Icon} name="mdi:arrow-left" />
           </button>
         </div>
       </div>
 
       <div class="edit-tag-picker">
-        ${app.db.tags.value.map(t => html`
+        ${app.lib.tags.value.map(t => html`
           <button
             class=${'tag-toggle' + (selTags.includes(t.id) ? ' active' : '')}
             style=${{ '--tag-color': t.color }}
@@ -113,7 +113,7 @@ export default function Detail () {
             <${Icon} name=${selTags.includes(t.id) ? 'mdi:check' : 'mdi:tag-outline'} />
             ${t.name}
           </button>`)}
-        ${app.db.tags.value.length === 0 && html`<span class="empty-hint">No tags — create some in the sidebar</span>`}
+        ${app.lib.tags.value.length === 0 && html`<span class="empty-hint">No tags — create some in the sidebar</span>`}
       </div>
 
       <textarea class="edit-content" placeholder="Prompt content…"

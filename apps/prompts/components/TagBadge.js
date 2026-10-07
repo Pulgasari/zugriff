@@ -7,7 +7,7 @@ import IconButton from '/.shared/js/components/IconButton.js';
 const app = zugriff.app;
 
 function TagBadge ({ tagId, removable, onRemove }) {
-  const tag = zugriff.app.db.tags.value.find(t => t.id === tagId);
+  const tag = zugriff.app.lib.tags.value.find(t => t.id === tagId);
   //const tag = zugriff.app.lib.tags.findByCriteria({ id: tagId });
   if (!tag) return null;
 
