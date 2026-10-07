@@ -16,6 +16,18 @@
 @container(--scheme: dark)  {}
 @container(--scheme: light) {}
 
+/* nach aufbau standard css */
+
+.thumb {
+  align-items     : center;
+  display         : flex;
+  aspect-ratio    : 1;
+  justify-content : center;
+  overflow        : hidden;
+
+  > img { block-size: 100%; inline-size: 100%; object-fit: cover; }
+}
+
 /*
 :::::::::::: SPACING ::::::::::::::::::::::::::::::::::::::::::::::::::
 - ich benutze ausser in sehr seltenen fällen gar kein 'margin` mehr
@@ -34,17 +46,15 @@ div { --gap: small; --pad: huge;  } // hübscher, aber bissl magisch, robust mac
 div ( gap: small; padding: small; } // perfekte form, aber braucht js oder build-step     
 */
 
-app-root {
-  flex           : 1 1 auto;
-  min-block-size : 0;
-}
+app-root         { flex: 1 1 auto; min-block-size: 0; }
+app-view         { flex-direction: column; overflow: hidden; }
+app-view[active] { display: flex; }
+app-panel h3     { font-size: 1rem; font-weight: 500; }
 
-/* a view is a column: bars at its ends, the middle scrolls */
-app-view[active] {
-  display        : flex;
-  flex-direction : column;
-  overflow       : hidden;
-}
+
+nav-crumbs       { flex: none; padding: 0 1rem 0.5rem; }
+
+.rows { display: flex; flex-direction: column; }
 
 .scroll,
 .listing {
@@ -54,14 +64,12 @@ app-view[active] {
   padding        : 0 1rem 1rem;
 }
 
+*:disabled { cursor: default; opacity: 0.5; }
+
+
 /*//////////// HEADINGS ////////////*/
    
-h2 {
-  /* letter-spacing: 0.08em; */
-  opacity          : 0.55;
-  text-align       : center;
-  text-transform   : uppercase;
-}
+h2 { opacity: 0.55; text-align: center; text-transform: uppercase; }
 
 /*//////////// BARS ////////////*/
 
@@ -140,19 +148,12 @@ h2 {
   }
 }
 
-nav-crumbs {
-  flex    : none;
-  padding : 0 1rem 0.5rem;
-}
 
 /*//////////// ROWS ////////////*/
 
 /* a row: the thumbnail tile, name and details, the menu button at the end */
 .row {
-  align-items : center;
-  display     : flex;
-  gap         : 0.25rem;
-
+  align-items: center; display: flex; gap: 0.25rem;
   &.selected { background: var(--hover); border-radius: var(--radius, 0.5rem); }
 }
 
@@ -171,11 +172,7 @@ nav-crumbs {
   text-align      : start;
 }
 
-.entry {
-  flex            : 1 1 0;
-  min-inline-size : 0;
-  padding         : 0.5rem 0;
-}
+.entry { flex: 1 1 0; min-inline-size: 0; padding: 0.5rem 0; }
 
 .text {
   display         : flex;
@@ -188,54 +185,34 @@ nav-crumbs {
 }
 
 .thumb {
-  align-items     : center;
-  background      : var(--sunken, var(--hover));
-  border-radius   : calc(var(--radius, 0.5rem) * 2);
-  display         : flex;
-  flex            : none;
-  font-size       : 1.5rem;
-  inline-size     : 3.5rem;
-  aspect-ratio    : 1;
-  justify-content : center;
-  overflow        : hidden;
-
-  > img { block-size: 100%; inline-size: 100%; object-fit: cover; }
+  background    : var(--sunken, var(--hover));
+  border-radius : var(--radius);
+  flex          : none;
+  font-size     : 1.5rem;
+  inline-size   : 3.5rem;
 }
 
-.rows {
-  display        : flex;
-  flex-direction : column;
-}
 
-/* the shared list layout (artwork beside text, stripes, apps.css) is not ours: the row is the whole item */
+
 data-index[viewmode] > data-item:nth-child(n) { background: none; display: block; padding: 0; }
 
-/* in the grid the thumbnail grows, the name goes below it */
 data-index[viewmode="grid"] {
   .row   { flex-direction: column; position: relative; }
-  .entry { flex-direction: column; gap: 0.35rem; inline-size: 100%; }
-  .thumb { font-size: 2.5rem; inline-size: 100%; }
-  .text  { align-items: center; inline-size: 100%; text-align: center; > * { max-inline-size: 100%; } }
+  .entry { flex-direction: column; gap: 0.35rem; }
+  .thumb { font-size: 2.5rem; }
+  .text  { align-items: center; text-align: center; }
   .row > .icon-button { inset: 0.25rem 0.25rem auto auto; position: absolute; }
+
+  .entry, .thumb, .text { inline-size: 100%; }
+  .text  > *        { max-inline-size: 100%; }
 }
 
 /*//////////// DASHBOARD ////////////*/
 
-section + section { margin-block-start: 1.5rem; }
-
-section > h2,
-.section-head > h2 {
-  font-size        : 0.75rem;
-  margin-block-end : 0.75rem;
-}
-
 .section-head      { align-items: center; gap: 0.25rem; }
-.section-head > h2 { flex: 1 1 auto; margin: 0; padding-inline-end: 2.5rem; }
+.section-head > h2 { flex: 1 1 auto; }
 
-.cards {
-  gap            : 0.75rem;
-  padding-bottom : 0.25rem;
-}
+.cards { gap: 0.75rem; }
 
 .card {
   align-items     : stretch;
@@ -258,7 +235,7 @@ section > h2,
 .tile {
   /* opaque: a pattern behind the app must not shine through */
   background     : color-mix(in oklch, var(--color-bg), var(--color-fg) 6%);
-  border-radius  : calc(var(--radius, 0.5rem) * 3);
+  border-radius  : var(--radius);
   flex-direction : row-reverse;
   inline-size    : 100%;
   isolation      : isolate;
@@ -280,11 +257,10 @@ section > h2,
   display           : flex;
   font-size         : 0.875rem;
   gap               : 0.5rem;
-  margin-block-start: 0.75rem;
   opacity           : 0.7;
 }
 
-.hint { font-size: 0.875rem; opacity: 0.7; }
+.hint { opacity: 0.7; }
 
 .link {
   background      : none;
@@ -297,33 +273,6 @@ section > h2,
 }
 
 .action[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
-
-/*//////////// PATTERNS ////////////*/
-/* the settings' patterns, set on the root as --pattern-*-image and -opacity
-   (input-pattern's patternStyle). a mask over the text color, so they follow
-   the theme */
-
-app-root[data-pattern-bg] > app-area[name="main"] { isolation: isolate; }
-
-app-root[data-pattern-bg] > app-area[name="main"]::before,
-app-root[data-pattern-tile] .tile::before {
-  background-color : currentColor;
-  content          : '';
-  inset            : 0;
-  pointer-events   : none;
-  position         : absolute;
-  z-index          : -1;
-}
-
-app-root[data-pattern-bg] > app-area[name="main"]::before {
-  mask-image : var(--pattern-bg-image);
-  opacity    : var(--pattern-bg-opacity, 0.1);
-}
-
-app-root[data-pattern-tile] .tile::before {
-  mask-image : var(--pattern-tile-image);
-  opacity    : var(--pattern-tile-opacity, 0.1);
-}
 
 /*//////////// SYNC ////////////*/
 
@@ -340,8 +289,8 @@ app-view[name="sync"] :is(input-text, input-password) {
   margin-block-end : 0.5rem;
 }
 
-.action.primary { background: var(--color-ink); color: var(--color-bg); }
-
+.action.primary { background: var(--color-ink); color: var(--color-bg); } /* .action.primary { --bg: ink; --fg: bg; } */
+  
 .identity { opacity: 0.6; }
 
 /*//////////// REMOTE ////////////*/
@@ -379,7 +328,6 @@ app-view[name="sync"] :is(input-text, input-password) {
   background      : color-mix(in oklch, var(--color-bg), var(--color-fg) 6%);
   block-size      : 2.75rem;
   border          : 0;
-  border-radius   : var(--radius, 0.5rem);
   color           : inherit;
   cursor          : pointer;
   display         : inline-flex;
@@ -420,11 +368,11 @@ app-view[name="sync"] :is(input-text, input-password) {
   display     : flex;
   gap         : 0.75rem;
 
-  > svg-icon { flex: none; font-size: 1.25rem; opacity: 0.7; }
-  > .text       { flex: 1 1 auto; }
+  > svg-icon         { flex: none; font-size: 1.25rem; opacity: 0.7; }
+  > .text            { flex: 1 1 auto; }
   > .text > progress { block-size: 0.25rem; inline-size: 100%; }
 
-  &.failed > .text > small    { color: var(--color-error, currentColor); opacity: 1; }
+  &.failed    > .text > small { --fg: error; opacity: 1; }
   &.cancelled > .text > .name { text-decoration: line-through; }
 }
 
@@ -442,7 +390,7 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
   min-block-size  : 0;
   padding         : 1rem;
 
-  > img        { max-block-size: 100%; max-inline-size: 100%; object-fit: contain; }
+  > img      { max-block-size: 100%; max-inline-size: 100%; object-fit: contain; }
   > svg-icon { font-size: 6rem; opacity: 0.6; }
 }
 
@@ -510,10 +458,7 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
   > dd { overflow-wrap: anywhere; }
 }
 
-.actions {
-  flex-wrap : wrap;
-  gap       : 0.5rem;
-}
+.actions { flex-wrap: wrap; gap: 0.5rem; }
 
 .action {
   align-items   : center;
@@ -528,12 +473,10 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
   padding       : 0.5rem 1rem;
 
   &:hover:not(:disabled) { background: var(--hover); }
-  &:disabled { cursor: default; opacity: 0.5; }
 }
 
-app-panel h3 { font-size: 1rem; font-weight: 500; margin-block: 1.5rem 0.5rem; }
 
-.folder { align-items: center; display: flex; gap: 0.5rem; margin-block-end: 0.75rem; }
+.folder { align-items: center; display: flex; gap: 0.5rem; }
 
 .hero {
   align-items : center;
@@ -542,7 +485,7 @@ app-panel h3 { font-size: 1rem; font-weight: 500; margin-block: 1.5rem 0.5rem; }
   text-align  : center;
 
   > svg-icon { font-size: 4rem; }
-  > p           { text-align: center; }
+  > p        { text-align: center; }
 }
 
 .empty { opacity: 0.6; padding: 2rem 0; text-align: center; }
