@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'preact/hooks';
 
 import Empty      from '/.shared/js/components/Empty.js';
-import Icon       from '/.shared/js/components/Icon.js';
 
 import TocPanel from './../components/TocPanel.js';
 import { createEpubReader, createPdfReader } from './../modules/reader.js';
@@ -121,21 +120,21 @@ function ReaderView ({ bookKey }) {
             onPick=${target => { if (ui.kind === 'pdf') eng?.gotoDest(target); else eng?.gotoHref(target); readerUi.value = { ...readerUi.value, tocOpen: false }; }} />`}
 
         ${!ui.ready && !ui.error && html`
-          <div class="reader-loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`}
+          <div class="reader-loading"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon></div>`}
         ${ui.error && html`
           <div class="reader-error"><${Empty} icon="mdi:book-alert-outline" title="Couldn’t open this book" hint=${ui.error} /></div>`}
 
         ${ui.kind === 'epub' && ui.ready && !ui.error && html`
-          <button class="page-edge left"  aria-label="Previous" onClick=${() => eng?.prev()}><${Icon} name="mdi:chevron-left" /></button>
-          <button class="page-edge right" aria-label="Next"     onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-right" /></button>`}
+          <button class="page-edge left"  aria-label="Previous" onClick=${() => eng?.prev()}><svg-icon icon="mdi:chevron-left"></svg-icon></button>
+          <button class="page-edge right" aria-label="Next"     onClick=${() => eng?.next()}><svg-icon icon="mdi:chevron-right"></svg-icon></button>`}
       </div>
 
       <footer class="reader-foot">
         ${ui.kind === 'pdf' && ui.pages
           ? html`
-            <button class="ibtn" aria-label="Previous page" onClick=${() => eng?.prev()}><${Icon} name="mdi:chevron-up" /></button>
+            <button class="ibtn" aria-label="Previous page" onClick=${() => eng?.prev()}><svg-icon icon="mdi:chevron-up"></svg-icon></button>
             <span class="foot-label">Page ${ui.page ?? 1} / ${ui.pages}</span>
-            <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><${Icon} name="mdi:chevron-down" /></button>`
+            <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><svg-icon icon="mdi:chevron-down"></svg-icon></button>`
           : html`<span class="foot-label">${ui.percent != null ? Math.round((ui.percent || 0) * 100) + '%' : ''}</span>`}
         <aufbau-progress class="foot-bar" value=${Math.round((ui.percent || 0) * 100)}></aufbau-progress>
       </footer>

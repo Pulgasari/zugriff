@@ -10,12 +10,11 @@
 */
 
 import { html } from './../vendors.js';
-import Icon from './Icon.js';
 
 function Empty ({ icon, title, hint, action, children }) {
   return html`
     <div class="empty">
-      ${icon  && html`<${Icon} name=${icon} />`}
+      ${icon  && html`<svg-icon icon=${icon}></svg-icon>`}
       ${title && html`<p class="empty-title">${title}</p>`}
       ${hint  && html`<p class="empty-hint">${hint}</p>`}
       ${action}

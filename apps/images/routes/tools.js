@@ -2,7 +2,6 @@
 // shared pieces for the file-list tool routes (convert + batch).
 
 import { useRef, useState } from 'preact/hooks';
-import { Icon } from '/.shared/js/components/index.js';
 import { isImageFile } from '../modules/state.js';
 
 const uid = () => (crypto.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2)));
@@ -24,7 +23,7 @@ function ImgDrop ({ onFiles, label }) {
          onDragLeave=${e => { if (e.target === e.currentTarget) setOver(false); }}
          onDrop=${onDrop}
          onClick=${() => inputRef.current?.click()}>
-      <${Icon} name="mdi:image-plus" />
+      <svg-icon icon="mdi:image-plus"></svg-icon>
       <p>${label || 'Drop images here, or click to choose'}</p>
       <input ref=${inputRef} type="file" accept="image/*" multiple hidden
              onChange=${e => { onFiles(e.target.files); e.target.value = ''; }} />
@@ -50,13 +49,13 @@ function ToolFileItem ({ entry, onRemove }) {
   return html`
     <div class=${'im-fileitem ' + entry.status}>
       <div class="im-fi-thumb"><img src=${entry.previewUrl} alt=${entry.file.name} /></div>
-      <${Icon} name=${icon} class=${busyRow ? 'spin' : ''} />
+      <svg-icon icon=${icon} class=${busyRow ? 'spin' : ''}></svg-icon>
       <span class="im-fi-name">${entry.file.name}</span>
       ${label && html`<span class="im-fi-label">${label}</span>`}
       ${entry.status === 'done' && html`
-        <a class="tbtn" href=${entry.blobUrl} download=${entry.outName} title="Download"><${Icon} name="mdi:download" /></a>`}
+        <a class="tbtn" href=${entry.blobUrl} download=${entry.outName} title="Download"><svg-icon icon="mdi:download"></svg-icon></a>`}
       ${!busyRow && html`
-        <button class="tbtn" title="Remove" onClick=${() => onRemove(entry.id)}><${Icon} name="mdi:close" /></button>`}
+        <button class="tbtn" title="Remove" onClick=${() => onRemove(entry.id)}><svg-icon icon="mdi:close"></svg-icon></button>`}
     </div>`;
 }
 export { uid, dropEntries, ImgDrop, ToolFileItem };

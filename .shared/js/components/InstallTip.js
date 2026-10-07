@@ -3,7 +3,6 @@
 // <${InstallTip} message="Install to keep your book folders connected." />
 
 import { html } from './../vendors.js';
-import Icon     from './Icon.js';
 
 const DEFAULT_MESSAGE = 'Install the app so your folders stay connected between visits — no reconnecting.';
 
@@ -12,7 +11,7 @@ function InstallTip ({ message = DEFAULT_MESSAGE }) {
 
   return html`
     <div class='install-tip'>
-      <${Icon} name='info' />
+      <svg-icon icon='info'></svg-icon>
       <span class='text'>${message}</span>
       ${zugriff.app.canInstall
         ? html`<btn-push onClick=${zugriff.app.promptInstall} icon='download' label='Install app' />`      

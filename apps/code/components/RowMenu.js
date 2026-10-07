@@ -3,7 +3,6 @@
 // { label, icon, onClick, danger } (falsy entries are skipped).
 
 import { html, useState } from './../vendors.js';
-import Icon from '/.shared/js/components/Icon.js';
 
 export default function RowMenu ({ items }) {
   const [open, setOpen] = useState(false);
@@ -15,14 +14,14 @@ export default function RowMenu ({ items }) {
   return html`
     <span class="rowmenu">
       <button class="rowmenu-btn" title="Actions" onClick=${e => { e.stopPropagation(); setOpen(o => !o); }}>
-        <${Icon} name="mdi:dots-horizontal" />
+        <svg-icon icon="mdi:dots-horizontal"></svg-icon>
       </button>
       ${open && html`
         <div class="rowmenu-scrim" onClick=${e => { e.stopPropagation(); setOpen(false); }}></div>
         <div class="rowmenu-pop" onClick=${e => e.stopPropagation()}>
           ${list.map(it => html`
             <button class=${'rowmenu-item' + (it.danger ? ' danger' : '')} onClick=${run(it.onClick)}>
-              ${it.icon && html`<${Icon} name=${it.icon} />`}<span>${it.label}</span>
+              ${it.icon && html`<svg-icon icon=${it.icon}></svg-icon>`}<span>${it.label}</span>
             </button>`)}
         </div>`}
     </span>`;

@@ -3,7 +3,6 @@
 // not an NLE. rotate/flip/crop already exist on the player as live transforms; the
 // editor will bake them plus a trim into an exported clip. wired up later.
 
-import { Icon } from '/.shared/js/components/index.js';
 import { src }  from '/.shared/js/media/videoplayer.js';
 
 const PLANNED = [
@@ -19,11 +18,11 @@ function EditRoute () {
   return html`
     <div class="vid-edit">
       <div class="vid-edit-hint">
-        <${Icon} name="mdi:movie-edit-outline" />
+        <svg-icon icon="mdi:movie-edit-outline"></svg-icon>
         <h2>Quick edits</h2>
         <p>${src.value ? 'Editing tools are on the way.' : 'Open a clip in the player first.'}</p>
         <ul class="vid-edit-planned">
-          ${PLANNED.map(t => html`<li key=${t.label}><${Icon} name=${t.icon} /> ${t.label}</li>`)}
+          ${PLANNED.map(t => html`<li key=${t.label}><svg-icon icon=${t.icon}></svg-icon> ${t.label}</li>`)}
         </ul>
       </div>
     </div>`;

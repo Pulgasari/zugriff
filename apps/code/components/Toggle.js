@@ -1,7 +1,6 @@
 // apps/code/components/Toggle.js
 
 import { html } from './../vendors.js';
-import Icon from '/.shared/js/components/Icon.js';
 
 export default function Toggle ({ value = false, onChange, label, size = '32' }) {
   const opacity = value ? '100%' : '50%';
@@ -10,7 +9,7 @@ export default function Toggle ({ value = false, onChange, label, size = '32' })
 
   return html`
     <div class="toggle" style=${{ opacity }} onClick=${onClick}>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon}></svg-icon>
       ${label && html`<span>${label}</span>`}
     </div>
   `;

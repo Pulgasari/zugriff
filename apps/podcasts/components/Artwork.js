@@ -2,7 +2,6 @@
 
 import { useSignal } from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
-import Icon from '/.shared/js/components/Icon.js';
 
 const app = zugriff.app;
 
@@ -40,7 +39,7 @@ function Artwork ({ src, size = 48, className = '', onClick }) {
 
   const pic = showImg
     ? html`<img loading='lazy' src=${url} onError=${onError} />`
-    : html`<${Icon} name='mdi:podcast' />`;
+    : html`<svg-icon icon='mdi:podcast'></svg-icon>`;
 
   return onClick
     ? html`<button class=${classes} onClick=${onClick}>${pic}</button>`

@@ -18,7 +18,6 @@ Brand       = await zugriff.component('Brand'),
 Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
 FolderTree  = await zugriff.component('FolderTree'),
-Icon        = await zugriff.component('Icon'),
 InstallTip  = await zugriff.component('InstallTip'),
 Reader      = await zugriff.component('Reader'),
 SearchPanel = await zugriff.component('SearchPanel');
@@ -184,7 +183,7 @@ function NoteText ({ note }) {
   }, [note.sourceId, note.node.path, note.node.handle]);
 
   return (text == null)
-  ? html`<div class='booting'><${Icon} name='loading' /></div>`
+  ? html`<div class='booting'><svg-icon icon='loading'></svg-icon></div>`
   : html`<>
     <${Reader} id='notes-reader' format='markdown' text=${text} />
     <nav-toc target='#notes-reader' selector='h1, h2, h3'></nav-toc>
@@ -226,7 +225,7 @@ function App () {
     });
   }, [app.lib.ready.value]);
 
-  if (!app.lib.ready.value) return html`<div class='booting'><${Icon} name='loading' /></div>`;
+  if (!app.lib.ready.value) return html`<div class='booting'><svg-icon icon='loading'></svg-icon></div>`;
 
   return html`
     <app-area name='main'>

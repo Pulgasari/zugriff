@@ -6,7 +6,7 @@ import UPNG from 'upng-js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon, Picker } from '/.shared/js/components/index.js';
+import { Picker } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('pixel-art-creator');
@@ -299,7 +299,7 @@ function MirrorToggle() {
         title=${'Mirror: ' + cur.label + ' (hold to pick)'}
         onClick=${() => { mirror.value = MIRROR_MODES[(idx+1) % MIRROR_MODES.length].id; }}
         onMouseDown=${onDown} onMouseUp=${onUp} onMouseLeave=${onUp}>
-        <${Icon} name=${cur.icon} />
+        <svg-icon icon=${cur.icon}></svg-icon>
       </button>
       ${open && html`
         <>
@@ -308,7 +308,7 @@ function MirrorToggle() {
             ${MIRROR_MODES.map(m => html`
               <button class=${'mirror-opt' + (mirror.value === m.id ? ' active' : '')}
                 onClick=${() => { mirror.value = m.id; setOpen(false); }}>
-                <${Icon} name=${m.icon} /><span>${m.label}</span>
+                <svg-icon icon=${m.icon}></svg-icon><span>${m.label}</span>
               </button>
             `)}
           </div>
@@ -331,7 +331,7 @@ function Palette() {
       <label class="pal-add" title="Add color">
         <input type="color" style="opacity:0;position:absolute;width:0;height:0"
           onInput=${e => addColor(e.target.value)} />
-        <${Icon} name="mdi:plus" />
+        <svg-icon icon="mdi:plus"></svg-icon>
       </label>
     </div>`;
 }
@@ -382,34 +382,34 @@ function Toolbar () {
       <div class="divider" />
       
       <div class="tool-group">
-        <button class="tool-btn" title="Undo (Ctrl+Z)" onClick=${undo}><${Icon} name="mdi:undo" /></button>
-        <button class="tool-btn" title="Redo (Ctrl+Y)" onClick=${redo}><${Icon} name="mdi:redo" /></button>
+        <button class="tool-btn" title="Undo (Ctrl+Z)" onClick=${undo}><svg-icon icon="mdi:undo"></svg-icon></button>
+        <button class="tool-btn" title="Redo (Ctrl+Y)" onClick=${redo}><svg-icon icon="mdi:redo"></svg-icon></button>
       </div>
       <div class="divider" />
       <div class="tool-group">
-        <button class="tool-btn" title="Clear"         onClick=${clearGrid}><${Icon}    name="mdi:trash-can-outline" /></button>
-        <button class="tool-btn" title="Fill all"      onClick=${fillAll}><${Icon}      name="mdi:palette" /></button>
-        <button class="tool-btn" title="Invert colors" onClick=${invertColors}><${Icon} name="mdi:invert-colors" /></button>
+        <button class="tool-btn" title="Clear"         onClick=${clearGrid}><svg-icon    icon="mdi:trash-can-outline"></svg-icon></button>
+        <button class="tool-btn" title="Fill all"      onClick=${fillAll}><svg-icon      icon="mdi:palette"></svg-icon></button>
+        <button class="tool-btn" title="Invert colors" onClick=${invertColors}><svg-icon icon="mdi:invert-colors"></svg-icon></button>
       </div>
       <div class="divider" />
       
-      <button class="btn primary"   onClick=${downloadSVG}><${Icon} name="mdi:download" /> SVG</button>
-      <button class="btn secondary" onClick=${downloadPNG}><${Icon} name="mdi:image"    /> PNG</button>
-      <button class="btn secondary" onClick=${downloadUPNG}><${Icon} name="mdi:image-compress" /> PNG opt</button>
-      <button class="btn secondary" onClick=${exportJSON}><${Icon} name="mdi:code-json" /> JSON</button>
+      <button class="btn primary"   onClick=${downloadSVG}><svg-icon icon="mdi:download"></svg-icon> SVG</button>
+      <button class="btn secondary" onClick=${downloadPNG}><svg-icon icon="mdi:image"></svg-icon> PNG</button>
+      <button class="btn secondary" onClick=${downloadUPNG}><svg-icon icon="mdi:image-compress"></svg-icon> PNG opt</button>
+      <button class="btn secondary" onClick=${exportJSON}><svg-icon icon="mdi:code-json"></svg-icon> JSON</button>
       
       <label class="btn secondary" title="Import JSON">
         <input type="file" accept=".json" style="display:none"
           onChange=${e => { importJSON(e.target.files[0]); e.target.value=''; }} />
-        <${Icon} name="mdi:upload" /> Import
+        <svg-icon icon="mdi:upload"></svg-icon> Import
       </label>
       
       <div class="divider" />
       
       <div class="tool-group">
-        <button class="tool-btn" title="Toggle BG"   onClick=${toggleShowBg}><${Icon} name="tabler:background" /></button>
-        <button class="tool-btn" title="Toggle Gap"  onClick=${toggleShowGap}><${Icon} name="boxicons:between-vertical-end" /></button>
-        <button class="tool-btn" title="Toggle Grid" onClick=${toggleShowGrid}><${Icon} name="cil:grid" /></button>
+        <button class="tool-btn" title="Toggle BG"   onClick=${toggleShowBg}><svg-icon icon="tabler:background"></svg-icon></button>
+        <button class="tool-btn" title="Toggle Gap"  onClick=${toggleShowGap}><svg-icon icon="boxicons:between-vertical-end"></svg-icon></button>
+        <button class="tool-btn" title="Toggle Grid" onClick=${toggleShowGrid}><svg-icon icon="cil:grid"></svg-icon></button>
       </div>
       
       <div class='group'>

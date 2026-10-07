@@ -2,7 +2,6 @@
 // batch route (ex image-batch-processor): a pipeline of tasks over many images.
 
 import { signal, typedSignal } from '@aufbau/signals';
-import { Icon }   from '/.shared/js/components/index.js';
 import * as fx    from '../modules/filters.js';
 import { dropEntries, ImgDrop, ToolFileItem } from './tools.js';
 
@@ -181,11 +180,11 @@ function TaskPane ({ task, index, total, children }) {
   return html`
     <div class="im-task">
       <header>
-        <span class="im-task-title"><${Icon} name=${icon} /> ${label}</span>
+        <span class="im-task-title"><svg-icon icon=${icon}></svg-icon> ${label}</span>
         <span class="im-task-actions">
-          <button class="tbtn" onClick=${() => bpMoveTask(id, -1)} disabled=${index === 0}><${Icon} name="mdi:chevron-up" /></button>
-          <button class="tbtn" onClick=${() => bpMoveTask(id, 1)} disabled=${index === total - 1}><${Icon} name="mdi:chevron-down" /></button>
-          <button class="tbtn" onClick=${() => bpRemoveTask(id)}><${Icon} name="mdi:close" /></button>
+          <button class="tbtn" onClick=${() => bpMoveTask(id, -1)} disabled=${index === 0}><svg-icon icon="mdi:chevron-up"></svg-icon></button>
+          <button class="tbtn" onClick=${() => bpMoveTask(id, 1)} disabled=${index === total - 1}><svg-icon icon="mdi:chevron-down"></svg-icon></button>
+          <button class="tbtn" onClick=${() => bpRemoveTask(id)}><svg-icon icon="mdi:close"></svg-icon></button>
         </span>
       </header>
       <main>${children}</main>
@@ -219,8 +218,8 @@ const ConvertTaskPane = props => { const { id, params: p } = props.task; return 
 
 const FlipTaskPane = props => { const { id, params: p } = props.task; return html`
   <${TaskPane} ...${props}>
-    <button class=${'chip' + (p.axis === 'h' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'h' })}><${Icon} name="mdi:flip-horizontal" /> Horizontal</button>
-    <button class=${'chip' + (p.axis === 'v' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'v' })}><${Icon} name="mdi:flip-vertical" /> Vertical</button>
+    <button class=${'chip' + (p.axis === 'h' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'h' })}><svg-icon icon="mdi:flip-horizontal"></svg-icon> Horizontal</button>
+    <button class=${'chip' + (p.axis === 'v' ? ' active' : '')} onClick=${() => bpUpdateTask(id, { axis: 'v' })}><svg-icon icon="mdi:flip-vertical"></svg-icon> Vertical</button>
   </${TaskPane}>`; };
 
 const GrayscaleTaskPane = props => html`<${TaskPane} ...${props}><span class="im-task-hint">No options</span></${TaskPane}>`;
@@ -283,7 +282,7 @@ function TaskAdder () {
       <span class="im-adder-label">Add task</span>
       <div class="im-adder-chips">
         ${Object.entries(BP_TASK_TYPES).map(([type, def]) => html`
-          <button class="chip" onClick=${() => bpAddTask(type)}><${Icon} name=${def.icon} /> ${def.label}</button>`)}
+          <button class="chip" onClick=${() => bpAddTask(type)}><svg-icon icon=${def.icon}></svg-icon> ${def.label}</button>`)}
       </div>
     </div>`;
 }
@@ -317,10 +316,10 @@ function BatchMode () {
       ${(list.length > 0 && taskList.length > 0) && html`
         <div class="im-tool-actions">
           <button class="btn primary" onClick=${bpRunAll} disabled=${busy || pendingCnt === 0}>
-            <${Icon} name=${busy ? 'mdi:loading' : 'mdi:play'} class=${busy ? 'spin' : ''} />
+            <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:play'} class=${busy ? 'spin' : ''}></svg-icon>
             ${busy ? 'Processing…' : 'Run on ' + pendingCnt + ' image' + (pendingCnt > 1 ? 's' : '')}</button>
           ${hasDone && html`<button class="btn" onClick=${bpDownloadAll}>
-            <${Icon} name="mdi:download-multiple" /> Download all</button>`}
+            <svg-icon icon="mdi:download-multiple"></svg-icon> Download all</button>`}
         </div>`}
     </div>`;
 }

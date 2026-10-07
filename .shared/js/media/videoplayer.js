@@ -8,7 +8,6 @@
 
 import { computed, signal }        from '@aufbau/signals';
 import { html, useEffect, useRef } from './../vendors.js';
-import { Icon } from '/.shared/js/components/Icon.js';
 
 // :::::: STATE
 
@@ -171,7 +170,7 @@ function Ctrl ({ icon, label, onClick, active = false, big = false, disabled = f
       aria-label=${label}
       disabled=${disabled}
       onClick=${onClick}>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon}></svg-icon>
     </button>`;
 }
 
@@ -282,7 +281,7 @@ function Stage () {
 
       ${!src.value && html`
         <button class="empty" onClick=${pick}>
-          <${Icon} name="mdi:movie-open-outline" />
+          <svg-icon icon="mdi:movie-open-outline"></svg-icon>
           <span>Open a video</span>
           <small>It stays on your device.</small>
         </button>`}

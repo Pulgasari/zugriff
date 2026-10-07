@@ -4,7 +4,6 @@
 import { html, useEffect } from './../vendors.js';
 import { signal }          from '@aufbau/signals';
 import Modal    from './Modal.js';
-import Icon     from '/.shared/js/components/Icon.js';
 import TreeNode from './TreeNode.js';
 
 // picks via the runtime fs layer (browser picker or native SAF seam)
@@ -134,42 +133,42 @@ export default function FileBrowser () {
       <div class="filebrowser-header">
         <button class="btn-secondary btn-danger" onClick=${clearWorkspace}>Reset workspace</button>
         <button class="btn-primary" onClick=${openDirectory}>
-          <${Icon} name="material-symbols:folder-open" />
+          <svg-icon icon="material-symbols:folder-open"></svg-icon>
           Grant a folder
         </button>
         ${status === 'needs-restore' && savedHandle && html`
           <button class="btn-secondary btn-accent" onClick=${restoreDirectory}>
-            <${Icon} name="material-symbols:folder-open" />
+            <svg-icon icon="material-symbols:folder-open"></svg-icon>
             Open “${savedHandle.name}”
           </button>`}
       </div>
 
       ${errorMsg && html`
         <div class="filebrowser-error">
-          <${Icon} name="material-symbols:error-outline" />
+          <svg-icon icon="material-symbols:error-outline"></svg-icon>
           ${errorMsg}
         </div>`}
 
       <div class="filebrowser-body">
         ${status === 'init' && html`
           <div class="none">
-            <${Icon} name="material-symbols:hourglass-empty" /><br/>
+            <svg-icon icon="material-symbols:hourglass-empty"></svg-icon><br/>
             Loading saved session…
           </div>`}
         ${status === 'needs-restore' && html`
           <div class="none">
-            <${Icon} name="material-symbols:lock-outline" /><br/>
+            <svg-icon icon="material-symbols:lock-outline"></svg-icon><br/>
             Reconnect <strong>${savedHandle?.name}</strong> to continue.
           </div>`}
         ${status === 'ready' && html`
           <div class="tree-rootbar">
-            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><${Icon} name="material-symbols:note-add-outline" /></button>
-            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><${Icon} name="material-symbols:create-new-folder-outline" /></button>
-            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><${Icon} name="paste" /></button>`}
+            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><svg-icon icon="material-symbols:note-add-outline"></svg-icon></button>
+            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><svg-icon icon="material-symbols:create-new-folder-outline"></svg-icon></button>
+            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><svg-icon icon="paste"></svg-icon></button>`}
           </div>`}
         ${(status === 'ready' || status === 'idle') && html`
           ${files.length === 0
-            ? html`<div class="none"><${Icon} name="material-symbols:info" /><br/>No folder loaded.</div>`
+            ? html`<div class="none"><svg-icon icon="material-symbols:info"></svg-icon><br/>No folder loaded.</div>`
             : html`<ul class="tree-root">
                 ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} parent=${app.workspaces.dir} depth=${0} />`)}
               </ul>`}

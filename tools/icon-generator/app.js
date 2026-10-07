@@ -8,7 +8,7 @@ import { html, signal, computed } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Dropzone, Icon } from '/.shared/js/components/index.js';
+import { Dropzone } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('icon-generator');
@@ -179,7 +179,7 @@ function Results () {
             <span>${iconName(result.size)}</span>
             <button class="icon-btn" title="Download"
                     onClick=${() => save(result.url, iconName(result.size))}>
-              <${Icon} name="mdi:download" />
+              <svg-icon icon="mdi:download"></svg-icon>
             </button>
           </figcaption>
         </figure>`)}
@@ -195,7 +195,7 @@ function App () {
 
       ${errMsg.value && html`
         <div class="err-block">
-          <${Icon} name="mdi:alert-circle-outline" /> ${errMsg.value}
+          <svg-icon icon="mdi:alert-circle-outline"></svg-icon> ${errMsg.value}
         </div>`}
 
       ${hasSource.value && html`

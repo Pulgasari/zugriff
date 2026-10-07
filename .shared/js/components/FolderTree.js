@@ -4,7 +4,6 @@
 
 import { typedSignal } from '@aufbau/signals';
 
-import Icon    from './Icon.js';
 import Loading from './Loading.js';
 import Tree    from './Tree.js';
 
@@ -132,7 +131,7 @@ function FolderTree ({
     return html`
       <div class='src' key=${source.id}>
         <div class='head'>
-          <${Icon} name='folder' />
+          <svg-icon icon='folder'></svg-icon>
           <span class='name' title=${source.name}>${source.name}</span>
           <btn-icon icon='refresh' label='refresh' onClick=${refresh} disabled=${disabled} />
           <btn-icon icon='close'   label='close'   onClick=${remove} />

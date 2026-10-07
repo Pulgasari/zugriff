@@ -1,7 +1,6 @@
 // podcasts :: panels/PlayerPanel.js
 // the docked player bar — artwork/meta, transport, scrubber and speed/done/close.
 
-import Icon            from '/.shared/js/components/Icon.js';
 import Art             from './../components/Artwork.js';
 import { useTable }    from './../modules/hooks.js';
 import { fmtDuration } from './../modules/methods.js';

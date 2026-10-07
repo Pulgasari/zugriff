@@ -6,7 +6,7 @@ import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb,
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon, Picker } from '/.shared/js/components/index.js';
+import { Picker } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('colorpicker');
@@ -72,7 +72,7 @@ function CopyRow({ label, value }) {
       <span class="copy-label">${label}</span>
       <code class="copy-value">${value}</code>
       <button class="ghost-btn" onClick=${doCopy}>
-        <${Icon} name=${copied ? 'mdi:check' : 'mdi:content-copy'} />
+        <svg-icon icon=${copied ? 'mdi:check' : 'mdi:content-copy'}></svg-icon>
       </button>
     </div>`;
 }
@@ -251,7 +251,7 @@ function MixTab() {
       <div class="mix-row">
         <${ColorInput} value=${a} onChange=${setA} />
         <button class="swap-btn" onClick=${() => { setA(b); setB(a); }} title="Swap">
-          <${Icon} name="mdi:swap-horizontal" />
+          <svg-icon icon="mdi:swap-horizontal"></svg-icon>
         </button>
         <${ColorInput} value=${b} onChange=${setB} />
       </div>
@@ -300,7 +300,7 @@ function ShadesTab() {
           <span class="copy-label">css</span>
           <textarea class="vars-textarea" readonly style=${{ '--lines': steps }}>${cssVars}</textarea>
           <button class="ghost-btn" onClick=${() => navigator.clipboard.writeText(cssVars)}>
-            <${Icon} name="mdi:content-copy" />
+            <svg-icon icon="mdi:content-copy"></svg-icon>
           </button>
         </div>
       </div>

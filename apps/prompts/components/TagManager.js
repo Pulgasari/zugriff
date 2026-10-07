@@ -1,7 +1,6 @@
 // prompts :: components/TagManager.js
 // the inline tag editor in the sidebar: list existing tags, delete them, add a new one.
 
-import Icon       from '/.shared/js/components/Icon.js';
 
 import { useState } from 'preact/hooks';
 

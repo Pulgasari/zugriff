@@ -3,7 +3,6 @@
 // the list pane: new-prompt button, search, tag filter + manager, sort, and the filtered
 // prompt list. reads ui state off app.state, the library off app.lib.
 
-import Icon        from '/.shared/js/components/Icon.js';
 import Picker      from '/.shared/js/components/Picker.js';
 
 import TagManager          from './../components/TagManager.js';
@@ -29,17 +28,17 @@ export default function Sidebar () {
 
       <div class="sidebar-top">
         <button class="btn primary full" onClick=${() => app.newPrompt()}>
-          <${Icon} name="mdi:plus" /> New Prompt
+          <svg-icon icon="mdi:plus"></svg-icon> New Prompt
         </button>
       </div>
 
       <div class="search-row">
-        <${Icon} name="mdi:magnify" class="search-icon" />
+        <svg-icon icon="mdi:magnify" class="search-icon"></svg-icon>
         <input class="search-input" type="text" placeholder="Search…"
           value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
         ${app.state.$search && html`
           <button class="icon-btn" onClick=${() => app.state.search = ''}>
-            <${Icon} name="mdi:close" />
+            <svg-icon icon="mdi:close"></svg-icon>
           </button>`}
       </div>
 
@@ -47,7 +46,7 @@ export default function Sidebar () {
         <div class="tag-filter-header">
           <span class="section-label">Tags</span>
           <button class="icon-btn" title="Manage tags" onClick=${() => setShowTags(s => !s)}>
-            <${Icon} name="mdi:tag-edit-outline" />
+            <svg-icon icon="mdi:tag-edit-outline"></svg-icon>
           </button>
         </div>
         <${TagManager} show=${showTags} onClose=${() => setShowTags(false)} />

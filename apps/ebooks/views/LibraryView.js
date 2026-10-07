@@ -1,7 +1,6 @@
 // ebooks :: views/LibraryView.js
 
 import Empty       from '/.shared/js/components/Empty.js';
-import Icon        from '/.shared/js/components/Icon.js';
 import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
@@ -46,7 +45,7 @@ function LibraryView () {
   const pending = app.db.pending.value;
 
   const tools = html`
-    ${pending > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${pending} left</span>`}
+    ${pending > 0 && html`<span class="scan-note"><svg-icon icon="loading"></svg-icon> ${pending} left</span>`}
     <btn-icon icon='refresh'    label='Rescan folders' onClick=${() => app.db.rescanAll()} />
     <btn-icon icon='folder-add' label='Add folder'     onClick=${app.addFolder} />
     <btn-icon icon='settings'   label='Settings'       onClick=${app.toggleConfig} />

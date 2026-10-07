@@ -1,7 +1,6 @@
 // components/Nav.js
 
 import { html } from './../vendors.js';
-import Icon from './Icon.js';
 
 function Nav ({ here }) {
   const links = [
@@ -19,7 +18,7 @@ function Nav ({ here }) {
           href=${link.href}
           aria-current=${here === link.id ? 'page' : null}
         >
-          <${Icon} name=${link.icon} /> ${link.label}
+          <svg-icon icon=${link.icon}></svg-icon> ${link.label}
         </a>`)}
     </nav>`;
 }

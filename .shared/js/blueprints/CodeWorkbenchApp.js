@@ -13,7 +13,6 @@ import { debounce, html, effect, signal } from './../vendors.js';
 
 import CodeInputPane  from './../components/CodeInputPane.js';
 import CodeOutputPane from './../components/CodeOutputPane.js';
-import Icon           from './../components/Icon.js';
 
 // muss aufs neue @aufbau/signals umgestellt werden
 import { typedSignal } from '@aufbau/signals';
@@ -140,7 +139,7 @@ function CodeWorkbenchApp ({
 
           ${!live.value && html`
             <button class="btn primary" onClick=${doExecute} disabled=${busy || !input.value}>
-              <${Icon} name=${busy ? 'mdi:loading' : 'mdi:lightning-bolt'} className=${busy ? 'spin' : ''} />
+              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:lightning-bolt'} class=${busy ? 'spin' : ''}></svg-icon>
               ${busy ? 'Running…' : actionLabel}
             </button>`}
 

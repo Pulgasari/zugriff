@@ -11,7 +11,7 @@ import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
 // ::: shared
 import { Config }      from '/.shared/js/components/Config.js';
-import { Icon, Image } from '/.shared/js/components/index.js';
+import { Image } from '/.shared/js/components/index.js';
 import { PROXY }       from '/.shared/js/modules/http.js';
 
 // ::: app modules
@@ -141,7 +141,7 @@ function NavItem ({ name, icon, label, count }) {
   const active = current.value === name;
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)} title=${label}>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon}></svg-icon>
       <span class="nav-label">${label}</span>
       ${count > 0 && html`<span class="nav-count">${count}</span>`}
     </button>`;
@@ -156,16 +156,16 @@ function FeedItem ({ feed: f }) {
     <div class=${'feed-row' + (active ? ' active' : '')}>
       <button class="feed-open" onClick=${() => app.go('feed', f.id)} title=${f.title}>
         <span class="feed-ic">
-          ${spin ? html`<${Icon} name="loading" />`
+          ${spin ? html`<svg-icon icon="loading"></svg-icon>`
                  : f.image ? html`<img src=${f.image} alt="" loading="lazy" onError=${e => e.target.style.display = 'none'} />`
-                           : html`<${Icon} name=${f.kind === 'youtube' ? 'youtube' : 'rss'} />`}
+                           : html`<svg-icon icon=${f.kind === 'youtube' ? 'youtube' : 'rss'}></svg-icon>`}
         </span>
         <span class="feed-name">${f.title}</span>
-        ${f.error ? html`<${Icon} name="alert" className="feed-err" />`
+        ${f.error ? html`<svg-icon icon="alert" class="feed-err"></svg-icon>`
                   : unread > 0 && html`<span class="nav-count">${unread}</span>`}
       </button>
       <button class="feed-x" title="Unfollow" onClick=${() => removeFeed(f)}>
-        <${Icon} name="close" /></button>
+        <svg-icon icon="close"></svg-icon></button>
     </div>`;
 }
 
@@ -174,11 +174,11 @@ function Sidebar () {
   return html`
     <div class="sidebar">
       <div class="brand">
-        <${Icon} name="rss"/> <span>Feeds</span>
+        <svg-icon icon="rss"></svg-icon> <span>Feeds</span>
       </div>
 
       <button class="add-btn" onClick=${addFeed}>
-        <${Icon} name="plus" /> Add feed</button>
+        <svg-icon icon="plus"></svg-icon> Add feed</button>
 
       <div class="nav-scroll">
         <div class="nav-group">
@@ -197,7 +197,7 @@ function Sidebar () {
 
         ${tubes.length > 0 && html`
           <div class="nav-group">
-            <div class="nav-title"><${Icon} name="youtube" /> YouTube</div>
+            <div class="nav-title"><svg-icon icon="youtube"></svg-icon> YouTube</div>
             ${tubes.map(f => html`<${FeedItem} key=${f.id} feed=${f} />`)}
           </div>`}
 
@@ -206,9 +206,9 @@ function Sidebar () {
 
       <div class="side-foot">
         <button class="foot-btn" onClick=${() => refreshView()} disabled=${!!app.state.$busy || !db.feeds.value.length}>
-          <${Icon} name="refresh" /> Refresh</button>
+          <svg-icon icon="refresh"></svg-icon> Refresh</button>
         <button class="foot-btn" onClick=${() => { closeMenu(); area('config')?.toggle(); }}>
-          <${Icon} name="settings" /> Settings</button>
+          <svg-icon icon="settings"></svg-icon> Settings</button>
       </div>
     </div>`;
 }
@@ -246,7 +246,7 @@ function VideoCard ({ item }) {
       <div class="vid-thumb">
         ${item.image
           ? html`<${Image} src=${item.image} />`
-          : html`<div class="vid-noimg"><${Icon} name="youtube" /></div>`}
+          : html`<div class="vid-noimg"><svg-icon icon="youtube"></svg-icon></div>`}
         ${unread && html`<span class="vid-new">new</span>`}
       </div>
       <div class="vid-title">${item.title}</div>
@@ -261,10 +261,10 @@ function Body ({ name }) {
     const hasFeeds = db.feeds.value.length > 0;
     return html`
       <div class="empty">
-        <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} />
+        <svg-icon icon=${hasFeeds ? 'mdi:check-all' : 'rss'}></svg-icon>
         <p>${hasFeeds ? 'Nothing here yet — try Refresh.' : 'Follow a feed to see the latest here.'}</p>
         ${!hasFeeds && html`<button class="cta" onClick=${addFeed}>
-          <${Icon} name="plus" /> Add your first feed</button>`}
+          <svg-icon icon="plus"></svg-icon> Add your first feed</button>`}
       </div>`;
   }
 
@@ -279,18 +279,18 @@ function Header ({ name }) {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}>
-        <${Icon} name="menu" /></button>
-      <${Icon} name=${v.icon} className="topbar-ic" />
+        <svg-icon icon="menu"></svg-icon></button>
+      <svg-icon icon=${v.icon} class="topbar-ic"></svg-icon>
       <h1 class="topbar-title" title=${v.title}>${v.title}</h1>
       ${v.feed?.link && html`<a class="ibtn" href=${v.feed.link} target="_blank" rel="noopener noreferrer" title="Open site">
-        <${Icon} name="mdi:open-in-new" /></a>`}
+        <svg-icon icon="mdi:open-in-new"></svg-icon></a>`}
       <span class="topbar-spacer"></span>
-      ${app.state.$busy && html`<span class="topbar-busy"><${Icon} name="loading" /> ${app.state.$busy}</span>`}
+      ${app.state.$busy && html`<span class="topbar-busy"><svg-icon icon="loading"></svg-icon> ${app.state.$busy}</span>`}
       ${v.list.length > 0 && html`
         <button class="ibtn" title="Mark all read" onClick=${() => markAllRead(name)}>
-          <${Icon} name="mdi:check-all" /></button>`}
+          <svg-icon icon="mdi:check-all"></svg-icon></button>`}
       <button class="ibtn" title="Refresh" onClick=${() => refreshView(name)} disabled=${!!app.state.$busy}>
-        <${Icon} name="refresh" /></button>
+        <svg-icon icon="refresh"></svg-icon></button>
     </header>`;
 }
 
@@ -337,7 +337,7 @@ function App () {
     });
   }, [db.ready.value]);
 
-  if (!db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+  if (!db.ready.value) return html`<div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon></div>`;
 
   return html`
     <app-area name='main'>

@@ -19,8 +19,7 @@ import { editCurrent }  from './routes/edit.js';
 // ::: shared components
 const
 Brand      = await zugriff.component('Brand'),
-Config     = await zugriff.component('Config'),
-Icon       = await zugriff.component('Icon');
+Config     = await zugriff.component('Config');
 
 // ::: the app handle — the data layer hangs off it as app.lib
 const app = zugriff.app;
@@ -63,7 +62,7 @@ function ModeBar () {
           <button class=${'im-mode' + (current.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => m.id === 'edit' ? editCurrent() : app.setRoute(m.id)}
                   title=${m.label}>
-            <${Icon} name=${m.icon} /> <span>${m.label}</span>
+            <svg-icon icon=${m.icon}></svg-icon> <span>${m.label}</span>
           </button>`)}
       </nav>
       <div class="im-modebar-actions"><btn-icon icon='settings' label='Settings' onClick=${() => app.area('config')?.toggle()} /></div>

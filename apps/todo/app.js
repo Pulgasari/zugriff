@@ -26,7 +26,6 @@ const // shared components
 Brand       = await zugriff.component('Brand'),
 Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
-Icon        = await zugriff.component('Icon'),
 InstallTip  = await zugriff.component('InstallTip'),
 SearchPanel = await zugriff.component('SearchPanel');
 
@@ -196,7 +195,7 @@ function NavItem ({ icon, label, count, active, onClick, children }) {
   return html`
     <div class='nav-item' aria-current=${active ? 'page' : null}>
       <button type='button' class='nav-link' onClick=${onClick}>
-        <${Icon} name=${icon} /><span>${label}</span>${count ? html`<span class='count'>${count}</span>` : ''}
+        <svg-icon icon=${icon}></svg-icon><span>${label}</span>${count ? html`<span class='count'>${count}</span>` : ''}
       </button>
       ${children}
     </div>

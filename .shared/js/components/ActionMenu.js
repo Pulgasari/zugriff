@@ -7,7 +7,6 @@
 
 import { isValidElement } from 'preact';
 
-import Icon   from './Icon.js';
 import Link   from './Link.js';
 
 const isFn = sth => typeof sth === 'function';

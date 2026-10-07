@@ -23,7 +23,6 @@
 
 // :::::: IMPORTS
 
-import Icon from './Icon.js';
 import View from './View.js';
 
 import { gestalt } from '@aufbau/api';
@@ -106,7 +105,7 @@ function SettingsButton () {
       onClick=${toggleSettings}
       title="Settings"
       aria-expanded=${settingsOpen.value}>
-      <${Icon} name="settings" />
+      <svg-icon icon="settings"></svg-icon>
     </button>
   `;
 }
@@ -137,7 +136,7 @@ function SettingsPanel ({ open = settingsOpen.value, onClose = closeSettings, ..
     <div id="app-settings" class="settings-panel" role="dialog" aria-label="Settings">
       <header>
         <span class="settings-title">Settings</span>
-        <button class="ghost-btn" aria-label="Close" onClick=${onClose}><${Icon} name="close" /></button>
+        <button class="ghost-btn" aria-label="Close" onClick=${onClose}><svg-icon icon="close"></svg-icon></button>
       </header>
       <${Settings} ...${props} />
     </div>

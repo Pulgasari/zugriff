@@ -7,7 +7,7 @@ import { fetchFile } from '@ffmpeg/util';
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
 import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
-import { Dropzone, Icon } from '/.shared/js/components/index.js';
+import { Dropzone } from '/.shared/js/components/index.js';
 import { WaveformWithHandles } from '/.shared/js/components/index.js';
 
 const { boot } = defineTool('audio-cutter');
@@ -159,16 +159,16 @@ function App() {
       ${!file ? html`<${Dropzone} accept='audio/*' multiple=${false} what='an audio file' onFiles=${entries => loadFile(entries[0].file)} />` : html`
 
         <div class="file-bar">
-          <${Icon} name="mdi:music-note-outline" />
+          <svg-icon icon="mdi:music-note-outline"></svg-icon>
           <span class="fname">${file.name}</span>
           <span class="dur">${fmt(dur)}</span>
           <button class="icon-btn remove" onClick=${reset} title="Remove">
-            <${Icon} name="mdi:close" />
+            <svg-icon icon="mdi:close"></svg-icon>
           </button>
         </div>
 
         ${st === 'loading' && html`
-          <div class="info-row"><${Icon} name="mdi:loading" className="spin" /> Decoding…</div>`}
+          <div class="info-row"><svg-icon icon="mdi:loading" class="spin"></svg-icon> Decoding…</div>`}
 
         ${peaks.value && html`
           <${WaveformWithHandles} 
@@ -188,7 +188,7 @@ function App() {
                 onInput=${e => startSig.value = Math.max(0, Math.min(+e.target.value, endSig.value-.1))} />
               <span class="time-fmt">${fmt(startSig.value)}</span>
             </div>
-            <div class="sel-dur"><${Icon} name="mdi:scissors-cutting" />${fmt(endSig.value - startSig.value)}</div>
+            <div class="sel-dur"><svg-icon icon="mdi:scissors-cutting"></svg-icon>${fmt(endSig.value - startSig.value)}</div>
             <div class="time-field">
               <label>End</label>
               <input type="number" step="0.1" min=${(startSig.value+.1).toFixed(1)} max=${dur.toFixed(1)}
@@ -200,20 +200,20 @@ function App() {
 
           <div class="actions">
             <button class="btn icon-only" onClick=${togglePlay} title=${playing.value ? 'Pause' : 'Preview'}>
-              <${Icon} name=${playing.value ? 'mdi:pause' : 'mdi:play'} />
+              <svg-icon icon=${playing.value ? 'mdi:pause' : 'mdi:play'}></svg-icon>
             </button>
             <button class="btn primary" onClick=${doConvert} disabled=${busy}>
-              <${Icon} name=${busy ? 'mdi:loading' : 'mdi:content-cut'} className=${busy ? 'spin' : ''} />
+              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:content-cut'} class=${busy ? 'spin' : ''}></svg-icon>
               ${ffLoading.value ? 'Loading ffmpeg…' : st === 'converting' ? 'Cutting…' : 'Cut & export'}
             </button>
             ${st === 'done' && blobUrl.value && html`
               <a class="btn secondary" href=${blobUrl.value} download=${outName.value}>
-                <${Icon} name="mdi:download" /> Download
+                <svg-icon icon="mdi:download"></svg-icon> Download
               </a>`}
           </div>
 
           ${st === 'error' && html`
-            <div class="err-row"><${Icon} name="mdi:alert-circle-outline" /> ${errMsg.value}</div>`}
+            <div class="err-row"><svg-icon icon="mdi:alert-circle-outline"></svg-icon> ${errMsg.value}</div>`}
         `}
       `}
     </div>`;

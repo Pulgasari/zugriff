@@ -1,6 +1,5 @@
 // components/Brand.js
 
-import Icon from './Icon.js';
 
 function Brand ({ app, icon, name, ...rest }) {
   icon ??= app?.config?.icon ?? '';
@@ -8,7 +7,7 @@ function Brand ({ app, icon, name, ...rest }) {
   
   return html`
     <div id='app-brand' ...${rest}>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon}></svg-icon>
       <span>${name}</span>
     </div>
   `;

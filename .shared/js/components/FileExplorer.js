@@ -32,7 +32,6 @@ import { html, useEffect, useRef }  from './../vendors.js';
 import { computed, signal        }  from './../vendors.js';
 import { typedSignal }              from '@aufbau/signals';
 
-import Icon        from './Icon.js';
 
 // tree ops over the backend's root handle come from the runtime fs layer
 const dirfs = zugriff.fs;
@@ -293,7 +292,7 @@ function ToolButton ({ icon, label, onClick, disabled, active }) {
       disabled=${disabled}
       title=${label}
       aria-label=${label}>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon}></svg-icon>
     </button>`;
 }
 
@@ -303,7 +302,7 @@ function Breadcrumb () {
   return html`
     <nav class="crumbs" aria-label="path">
       <button class="crumb root" onClick=${() => goTo(0)} title=${label}>
-        <${Icon} name="mdi:home-outline" /> ${label}
+        <svg-icon icon="mdi:home-outline"></svg-icon> ${label}
       </button>
       ${segs.map((name, i) => html`
         <span class="sep" key=${'s' + i}>/</span>
@@ -324,7 +323,7 @@ function Row ({ entry }) {
       onDblClick=${() => open(entry)}
       onContextMenu=${e => { e.preventDefault(); menu.value = { x: e.clientX, y: e.clientY, entry }; }}
       onKeyDown=${e => { if (e.key === 'Enter') open(entry); }}>
-      <span class=${'ic ' + entry.kind}><${Icon} name=${iconFor(entry)} /></span>
+      <span class=${'ic ' + entry.kind}><svg-icon icon=${iconFor(entry)}></svg-icon></span>
       <span class="nm">${entry.name}</span>
       <span class="sz">${entry.kind === 'file' ? fmtSize(entry.size) : '—'}</span>
       <span class="dt">${entry.kind === 'file' ? fmtDate(entry.lastModified) : 'folder'}</span>
@@ -341,7 +340,7 @@ function Cell ({ entry }) {
       onDblClick=${() => open(entry)}
       onContextMenu=${e => { e.preventDefault(); menu.value = { x: e.clientX, y: e.clientY, entry }; }}
       onKeyDown=${e => { if (e.key === 'Enter') open(entry); }}>
-      <span class=${'ic ' + entry.kind}><${Icon} name=${iconFor(entry)} /></span>
+      <span class=${'ic ' + entry.kind}><svg-icon icon=${iconFor(entry)}></svg-icon></span>
       <span class="nm">${entry.name}</span>
     </div>`;
 }
@@ -350,11 +349,11 @@ function Listing () {
   const rows = visible.value;
 
   if (loading.value && !rows.length) return html`<div class="hint">loading…</div>`;
-  if (error.value)  return html`<div class="hint err"><${Icon} name="mdi:alert-outline" /> ${error.value}</div>`;
+  if (error.value)  return html`<div class="hint err"><svg-icon icon="mdi:alert-outline"></svg-icon> ${error.value}</div>`;
 
   if (!rows.length) return html`
     <div class="empty">
-      <${Icon} name=${filter.value ? 'mdi:file-search-outline' : 'mdi:folder-open-outline'} />
+      <svg-icon icon=${filter.value ? 'mdi:file-search-outline' : 'mdi:folder-open-outline'}></svg-icon>
       <p>${filter.value ? `nothing matches “${filter.value}”` : 'this folder is empty'}</p>
       ${!filter.value && writable.value && html`<p class="sub">drop files here, or use the buttons above</p>`}
     </div>`;
@@ -378,10 +377,10 @@ function Details () {
   return html`
     <aside class="details">
       <div class="d-head">
-        <span class=${'ic ' + d.kind}><${Icon} name=${iconFor(d)} /></span>
+        <span class=${'ic ' + d.kind}><svg-icon icon=${iconFor(d)}></svg-icon></span>
         <span class="d-name" title=${d.name}>${d.name}</span>
         <button class="tbtn" onClick=${clearSelection} title="Close" aria-label="Close details">
-          <${Icon} name="mdi:close" />
+          <svg-icon icon="mdi:close"></svg-icon>
         </button>
       </div>
 
@@ -391,7 +390,7 @@ function Details () {
         ${d.previewError && html`<div class="hint err">${d.previewError}</div>`}
         ${!d.url && d.text == null && !d.previewError && html`
           <div class="no-preview">
-            <${Icon} name=${d.kind === 'directory' ? 'mdi:folder-open-outline' : 'mdi:file-hidden'} />
+            <svg-icon icon=${d.kind === 'directory' ? 'mdi:folder-open-outline' : 'mdi:file-hidden'}></svg-icon>
             <span>${d.kind === 'directory' ? 'open to browse' : 'no preview'}</span>
           </div>`}
       </div>
@@ -404,11 +403,11 @@ function Details () {
 
       <div class="d-actions">
         ${d.kind === 'directory'
-          ? html`<button class="btn" onClick=${() => open(d)}><${Icon} name="mdi:folder-open-outline" /> Open</button>`
-          : html`<button class="btn" onClick=${() => download(d)}><${Icon} name="download" /> Download</button>`}
+          ? html`<button class="btn" onClick=${() => open(d)}><svg-icon icon="mdi:folder-open-outline"></svg-icon> Open</button>`
+          : html`<button class="btn" onClick=${() => download(d)}><svg-icon icon="download"></svg-icon> Download</button>`}
         ${writable.value && html`
-          <button class="btn ghost" onClick=${() => askRename(d)}><${Icon} name="rename" /> Rename</button>
-          <button class="btn danger" onClick=${() => askDelete(d)}><${Icon} name="delete" /> Delete</button>`}
+          <button class="btn ghost" onClick=${() => askRename(d)}><svg-icon icon="rename"></svg-icon> Rename</button>
+          <button class="btn danger" onClick=${() => askDelete(d)}><svg-icon icon="delete"></svg-icon> Delete</button>`}
       </div>
     </aside>`;
 }
@@ -419,7 +418,7 @@ function ContextMenu () {
   const e = m.entry;
   const item = (icon, label, fn) => html`
     <button onClick=${() => { menu.value = null; fn(); }}>
-      <${Icon} name=${icon} /> ${label}
+      <svg-icon icon=${icon}></svg-icon> ${label}
     </button>
   `;
 
@@ -478,7 +477,7 @@ function StorageMeter () {
   return html`
     <div class="meter" title=${`${fmtSize(usage)} of ${fmtSize(quota)} used`}>
       <div class="meter-label">
-        <${Icon} name="mdi:database-outline" /> storage
+        <svg-icon icon="mdi:database-outline"></svg-icon> storage
       </div>
       <div class="meter-bar"><div class="meter-fill" style=${`width:${pct}%`}></div></div>
       <div class="meter-text">${fmtSize(usage)}${quota ? ` / ${fmtSize(quota)}` : ''}</div>
@@ -492,7 +491,7 @@ function Toolbar ({ onUpload }) {
       <${Breadcrumb} />
       <div class="spacer"></div>
       <div class="search">
-        <${Icon} name="mdi:magnify" />
+        <svg-icon icon="mdi:magnify"></svg-icon>
         <input
           type="search"
           placeholder="Filter…"
@@ -526,7 +525,7 @@ function StatusBar () {
     <footer class="statusbar">
       <span>${dirs} folder${dirs === 1 ? '' : 's'}, ${files} file${files === 1 ? '' : 's'}</span>
       ${sel && html`<span class="sel">·  ${sel}</span>`}
-      ${busy.value && html`<span class="working"><${Icon} name="svg-spinners:bars-scale-middle" /> working…</span>`}
+      ${busy.value && html`<span class="working"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon> working…</span>`}
       <span class="spacer"></span>
       <${StorageMeter} />
     </footer>`;
@@ -595,7 +594,7 @@ function FileExplorer ({ backend: be }) {
             <${Listing} />
           </div>
           <${Details} />
-          ${writable.value && html`<div class="drop-hint"><${Icon} name="mdi:tray-arrow-down" /> <span>Drop to upload</span></div>`}
+          ${writable.value && html`<div class="drop-hint"><svg-icon icon="mdi:tray-arrow-down"></svg-icon> <span>Drop to upload</span></div>`}
         </div>
         <${StatusBar} />
       </section>
@@ -613,7 +612,7 @@ function Unsupported ({ backend: be }) {
   return html`
     <div class="fx">
       <div class="unsupported">
-        <${Icon} name="mdi:database-alert-outline" />
+        <svg-icon icon="mdi:database-alert-outline"></svg-icon>
         <h1>Not available here</h1>
         <p>
           This browser can't reach ${be?.label || 'this storage'}. 

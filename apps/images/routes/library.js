@@ -3,7 +3,7 @@
 
 import { signal, computed }            from '@aufbau/signals';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { Icon, InstallTip }            from '/.shared/js/components/index.js';
+import { InstallTip }            from '/.shared/js/components/index.js';
 import { setFiles }                    from '../modules/state.js';
 
 const app = zugriff.app;
@@ -70,7 +70,7 @@ function Thumb ({ pic }) {
     <button ref=${ref} class="im-thumb" title=${pic.path} onClick=${() => openInView(pic)}>
       ${url
         ? html`<img src=${url} alt=${pic.name} loading="lazy" />`
-        : html`<div class="im-thumb-ph"><${Icon} name="mdi:image-outline" /></div>`}
+        : html`<div class="im-thumb-ph"><svg-icon icon="mdi:image-outline"></svg-icon></div>`}
       <span class="im-thumb-name">${pic.name}</span>
     </button>`;
 }
@@ -80,7 +80,7 @@ function ReconnectBar () {
   if (!stale.length) return null;
   return html`
     <div class="im-reconnect">
-      <${Icon} name="mdi:folder-alert-outline" />
+      <svg-icon icon="mdi:folder-alert-outline"></svg-icon>
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(s => html`
         <div class="im-reconnect-item" key=${s.id}>
@@ -88,10 +88,10 @@ function ReconnectBar () {
           <button class="btn small primary" onClick=${() => app.lib.reconnect(s.id).then(res => {
             if (!res.granted) libMsg.value = `Reconnect failed — ${res.error ? (res.error.name || 'error') : 'browser said “' + res.state + '”'}. Try “Choose folder”.`;
           })}>
-            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
+            <svg-icon icon="mdi:folder-key-outline"></svg-icon> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works"
                   onClick=${() => app.lib.repick(s.id).then(ok => { if (!ok) libMsg.value = `Could not open ${s.name}`; })}>
-            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
+            <svg-icon icon="mdi:folder-search-outline"></svg-icon> Choose folder</button>
         </div>`)}
     </div>`;
 }
@@ -112,7 +112,7 @@ function LibraryMode () {
   useEffect(() => { app.lib.ensureLoaded(); }, []);
 
   if (!app.lib.ready.value) {
-    return html`<div class="im-lib"><div class="im-booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
+    return html`<div class="im-lib"><div class="im-booting"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon></div></div>`;
   }
 
   const pics       = visiblePics.value;
@@ -122,21 +122,21 @@ function LibraryMode () {
   return html`
     <div class="im-lib">
       <header class="im-lib-head">
-        ${scanning && html`<span class="im-scan-note"><${Icon} name="svg-spinners:bars-scale-middle" /> scanning…</span>`}
+        ${scanning && html`<span class="im-scan-note"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon> scanning…</span>`}
         <div class="im-lib-search">
-          <${Icon} name="mdi:magnify" />
+          <svg-icon icon="mdi:magnify"></svg-icon>
           <input type="search" placeholder="Search images…" value=${libSearch.value}
                  onInput=${e => libSearch.value = e.target.value} />
           ${libSearch.value && html`<button class="iv-btn" aria-label="Clear" onClick=${() => libSearch.value = ''}>
-            <${Icon} name="mdi:close" /></button>`}
+            <svg-icon icon="mdi:close"></svg-icon></button>`}
         </div>
-        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => app.lib.rescanAll()}><${Icon} name="mdi:refresh" /></button>`}
+        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => app.lib.rescanAll()}><svg-icon icon="mdi:refresh"></svg-icon></button>`}
         <button class="btn primary" onClick=${addFolderAction}>
-          <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
+          <svg-icon icon="mdi:folder-plus-outline"></svg-icon> Add folder</button>
       </header>
 
-      ${libMsg.value && html`<div class="im-lib-msg"><${Icon} name="mdi:alert-outline" /> ${libMsg.value}
-        <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><${Icon} name="mdi:close" /></button></div>`}
+      ${libMsg.value && html`<div class="im-lib-msg"><svg-icon icon="mdi:alert-outline"></svg-icon> ${libMsg.value}
+        <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><svg-icon icon="mdi:close"></svg-icon></button></div>`}
 
       <${ReconnectBar} />
       <${InstallTip} show=${app.lib.sources.value.length > 0}
@@ -146,11 +146,11 @@ function LibraryMode () {
       ${!hasFolders
         ? html`
           <div class="im-lib-empty">
-            <${Icon} name="mdi:folder-multiple-image" />
+            <svg-icon icon="mdi:folder-multiple-image"></svg-icon>
             <p class="im-empty-title">Browse an image folder</p>
             <p class="im-empty-hint">Grant a folder off your device and browse it as a gallery — open any image into the viewer or editor. Nothing is uploaded; only the folder permission is remembered.</p>
             <button class="btn primary" onClick=${addFolderAction}>
-              <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>
+              <svg-icon icon="mdi:folder-plus-outline"></svg-icon> Add a folder</button>
           </div>`
         : pics.length
           ? html`<div class="im-scroll"><aufbau-index class="im-grid" viewmode="grid" item-size="140px" gap="0.6rem">
@@ -158,7 +158,7 @@ function LibraryMode () {
             </aufbau-index></div>`
           : html`
             <div class="im-lib-empty">
-              <${Icon} name=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'} />
+              <svg-icon icon=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'}></svg-icon>
               <p class="im-empty-title">${libSearch.value ? 'Nothing matches your search' : 'No images here yet'}</p>
               ${!libSearch.value && html`<p class="im-empty-hint">Scanning may still be running, or this folder has no images.</p>`}
             </div>`}

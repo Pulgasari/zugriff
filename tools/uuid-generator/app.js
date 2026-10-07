@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { CopyIcon, Icon, Picker, Slider } from '/.shared/js/components/index.js';
+import { CopyIcon, Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('uuid-generator');
@@ -70,11 +70,11 @@ function App() {
           value=${count.value} onChange=${v => count.value = v} />
         <div class="actions">
           <button class="btn primary" onClick=${generate}>
-            <${Icon} name="mdi:refresh" /> Generate
+            <svg-icon icon="mdi:refresh"></svg-icon> Generate
           </button>
           ${list.length > 0 && html`
             <button class="btn secondary" onClick=${copyAll}>
-              <${Icon} name=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'} />
+              <svg-icon icon=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'}></svg-icon>
               ${copied.value === '__all__' ? 'Copied!' : 'Copy all'}
             </button>`}
         </div>
@@ -84,7 +84,7 @@ function App() {
         ${list.map(uuid => html`
           <div class="uuid-row" onClick=${() => copyOne(uuid)} title="Click to copy">
             <code class="uuid">${uuid}</code>
-            <${Icon} name=${copied.value === uuid ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon" />
+            <svg-icon icon=${copied.value === uuid ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon"></svg-icon>
           </div>`)}
         ${list.map(uuid => html`
           <div class="uuid-row">

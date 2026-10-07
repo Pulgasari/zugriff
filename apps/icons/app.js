@@ -3,7 +3,7 @@
 // an Iconify browser: every set, every icon, search, favourites. 
 // the grid renders through the <iconify-icon> webcomponent 
 // so a page of hundreds of icons is a couple of batched requests;
-// the app's own chrome uses the shared aufbau-icon <Icon>. 
+// the app's own chrome uses <svg-icon>.
 // data comes from api.iconify.design (modules/iconify.js),
 // favourites from @bunker/db (modules/db.js).
 
@@ -16,7 +16,6 @@ const // ::: shared components
 Config     = await zugriff.component('Config'),
 Dock       = await zugriff.component('Dock'),
 Empty      = await zugriff.component('Empty'),
-Icon       = await zugriff.component('Icon'),
 Loading    = await zugriff.component('Loading');
 
 // ::: the app handle
@@ -205,7 +204,7 @@ function HomeView () {
   return html`
     <div class="home">
       <div class="hero">
-        <${Icon} name="mdi:emoticon-outline" />
+        <svg-icon icon="mdi:emoticon-outline"></svg-icon>
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
@@ -285,9 +284,9 @@ function FavoritesView () {
 function SizeControl () {
   return html`
     <div class="size">
-      <${Icon} name='zoom-out' />
+      <svg-icon icon='zoom-out'></svg-icon>
       <input type="range" min="56" max="200" step="1" value=${itemSize.value} onInput=${e => itemSize.value = +e.target.value} />
-      <${Icon} name='zoom-in' />
+      <svg-icon icon='zoom-in'></svg-icon>
     </div>
   `;
 }
@@ -301,12 +300,12 @@ function TopBar ({ name }) {
 
       ${name === 'search'
         ? html`<div class="searchbox big">
-            <${Icon} name='search' />
+            <svg-icon icon='search'></svg-icon>
             <input type="search" placeholder="Search all of Iconify…" value=${app.state.$query} onInput=${e => onSearch(e.target.value)} />
           </div>`
         : name === 'sets'
         ? html`<div class="searchbox">
-            <${Icon} name='search' />
+            <svg-icon icon='search'></svg-icon>
             <input type="search" placeholder="Filter sets…" value=${app.state.$setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
         : html`<h1>${name === 'favs' ? 'Favourites' : name === 'set' ? 'Sets' : 'Icons'}</h1>`}

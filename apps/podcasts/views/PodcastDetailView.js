@@ -4,7 +4,6 @@
 
 import Empty        from '/.shared/js/components/Empty.js';
 import GoBackButton from '/.shared/js/components/GoBackButton.js';
-import Icon         from '/.shared/js/components/Icon.js';
 import Link         from '/.shared/js/components/Link.js';
 import Picker       from '/.shared/js/components/Picker.js';
 import SearchPanel  from '/.shared/js/components/SearchPanel.js';

@@ -4,7 +4,6 @@
 
 import { useSignal }     from '@aufbau/signals';
 import { useRef }        from 'preact/hooks';
-import Icon   from '/.shared/js/components/Icon.js';
 import Modal  from '/.shared/js/components/Modal.js';
 import Picker from '/.shared/js/components/Picker.js';
 import { PROXY }         from '/.shared/js/modules/http.js';
@@ -97,8 +96,8 @@ export default function SettingsPanel () {
           <span class="field-label">Subscriptions</span>
           <span class="field-hint">Back up your subscriptions and listening progress as JSON, or restore from a file.</span>
           <span class="field-row">
-            <button onClick=${doExport}><${Icon} name="download" /> Export JSON</button>
-            <button onClick=${() => fileRef.current?.click()}><${Icon} name="mdi:upload" /> Import JSON</button>
+            <button onClick=${doExport}><svg-icon icon="download"></svg-icon> Export JSON</button>
+            <button onClick=${() => fileRef.current?.click()}><svg-icon icon="mdi:upload"></svg-icon> Import JSON</button>
             <input ref=${fileRef} type="file" accept="application/json,.json" hidden
                    onChange=${e => { doImport(e.target.files[0]); e.target.value = ''; }} />
           </span>

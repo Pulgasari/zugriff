@@ -4,12 +4,11 @@
 // <${Loading}>${anything}<//>          spinner + arbitrary content
 
 import { html } from './../vendors.js';
-import Icon     from './Icon.js';
 
 function Loading ({ text, children, class: klass }) {
   return html`
     <div class=${klass ? 'loading ' + klass : 'loading'}>
-      <${Icon} name='loading' />
+      <svg-icon icon='loading'></svg-icon>
       ${children ?? (text && html`<span>${text}</span>`)}
     </div>
   `;

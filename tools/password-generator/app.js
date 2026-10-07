@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon, Picker, Slider } from '/.shared/js/components/index.js';
+import { Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('password-generator');
@@ -217,7 +217,7 @@ function PasswordRow({ pw }) {
   return html`
     <div class="pw-row" onClick=${() => copyOne(pw)} title="Click to copy">
       <code class="pw-value">${pw}</code>
-      <${Icon} name=${isCopied ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon" />
+      <svg-icon icon=${isCopied ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon"></svg-icon>
     </div>`;
 }
 
@@ -250,11 +250,11 @@ function App() {
 
         <div class="actions">
           <button class="btn primary" onClick=${generate}>
-            <${Icon} name="mdi:refresh" /> Generate
+            <svg-icon icon="mdi:refresh"></svg-icon> Generate
           </button>
           ${list.length > 1 && html`
             <button class="btn secondary" onClick=${copyAll}>
-              <${Icon} name=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'} />
+              <svg-icon icon=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'}></svg-icon>
               ${copied.value === '__all__' ? 'Copied!' : 'Copy all'}
             </button>`}
         </div>
