@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'preact/hooks';
 
 import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
-import IconButton from '/.shared/js/components/IconButton.js';
 
 import TocPanel from './../components/TocPanel.js';
 import { createEpubReader, createPdfReader } from './../modules/reader.js';
@@ -94,7 +93,7 @@ function ReaderView ({ bookKey }) {
   return html`
     <div class="reader">
       <header class="reader-bar">
-        <${IconButton} icon="arrow-left" label="Back" title="Back to library" onClick=${closeReader} />
+        <btn-icon icon="arrow-left" label="Back" title="Back to library" onClick=${closeReader} />
         <div class="reader-id">
           <span class="reader-title">${book?.title ?? 'Book'}</span>
           ${book?.author && html`<span class="reader-author">${book.author}</span>`}
@@ -102,15 +101,15 @@ function ReaderView ({ bookKey }) {
 
         <div class="reader-controls">
           ${ui.kind === 'pdf' && html`
-            <${IconButton} icon="mdi:minus" label="Zoom out" onClick=${() => eng?.zoomOut()} />
-            <${IconButton} icon="mdi:plus"  label="Zoom in"  onClick=${() => eng?.zoomIn()} />`}
+            <btn-icon icon="mdi:minus" label="Zoom out" onClick=${() => eng?.zoomOut()} />
+            <btn-icon icon="mdi:plus"  label="Zoom in"  onClick=${() => eng?.zoomIn()} />`}
           ${ui.kind === 'epub' && html`
-            <${IconButton} icon="mdi:format-font-size-decrease" label="Smaller text" disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontDown(); readerFont.value = eng.fontSize; }} />
-            <${IconButton} icon="mdi:format-font-size-increase" label="Larger text"  disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontUp();   readerFont.value = eng.fontSize; }} />
-            <${IconButton} icon=${ui.flow === 'scrolled' ? 'mdi:book-open-page-variant-outline' : 'mdi:page-layout-body'}
+            <btn-icon icon="mdi:format-font-size-decrease" label="Smaller text" disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontDown(); readerFont.value = eng.fontSize; }} />
+            <btn-icon icon="mdi:format-font-size-increase" label="Larger text"  disabled=${!eng} onClick=${() => { if (!eng) return; eng.fontUp();   readerFont.value = eng.fontSize; }} />
+            <btn-icon icon=${ui.flow === 'scrolled' ? 'mdi:book-open-page-variant-outline' : 'mdi:page-layout-body'}
               label=${ui.flow === 'scrolled' ? 'Paginated' : 'Scrolled'} disabled=${!eng}
               onClick=${async () => { if (!eng) return; const f = ui.flow === 'scrolled' ? 'paginated' : 'scrolled'; readerFlow.value = f; await eng.setFlow(f); readerUi.value = { ...readerUi.value, flow: f }; }} />`}
-          <${IconButton} icon="mdi:table-of-contents" label="Contents" active=${ui.tocOpen} onClick=${toggleToc} />
+          <btn-icon icon="mdi:table-of-contents" label="Contents" aria-pressed=${ui.tocOpen} onClick=${toggleToc} />
         </div>
       </header>
 

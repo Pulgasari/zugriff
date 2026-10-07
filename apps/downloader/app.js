@@ -20,10 +20,8 @@ import { usePlugins }        from './modules/plugins.js';
 const { area, current, show } = frame;
 
 const // shared components
-Button     = await zugriff.component('Button'),
 Dock       = await zugriff.component('Dock'),
-Empty      = await zugriff.component('Empty'),
-IconButton = await zugriff.component('IconButton');
+Empty      = await zugriff.component('Empty');
 
 // :::::: APP
 
@@ -116,7 +114,7 @@ function Header ({ title, children }) {
     <header>
       <h2>${title}</h2>
       ${children}
-      <${IconButton} icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
+      <btn-icon icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
     </header>
   `;
 }
@@ -129,12 +127,12 @@ function Queue () {
     <div class='view'>
       <${Header} title='Queue'>
         ${running > 0 && html`<span class='status'>${running} running · ${zugriff.fmt.bytes(speed)}/s</span>`}
-        ${engine.active.value.length > 0 && html`<${IconButton} icon='lucide:pause' title='pause all' onClick=${app.actions['pause-all']} />`}
+        ${engine.active.value.length > 0 && html`<btn-icon icon='lucide:pause' title='pause all' onClick=${app.actions['pause-all']} />`}
       <//>
       <main class='list'>
         ${groups.length
           ? groups.map(({ pack, rows }) => html`<${PackageCard} key=${pack?.id ?? 'none'} pack=${pack} rows=${rows} />`)
-          : html`<${Empty} icon='lucide:download-cloud' title='Nothing in the queue' hint='paste links anywhere, or add them in the grabber' action=${html`<${Button} icon='lucide:link' label='add links' onClick=${() => show('grab')} />`} />`}
+          : html`<${Empty} icon='lucide:download-cloud' title='Nothing in the queue' hint='paste links anywhere, or add them in the grabber' action=${html`<btn-tap icon='lucide:link' label='add links' onClick=${() => show('grab')} />`} />`}
       </main>
     </div>
   `;

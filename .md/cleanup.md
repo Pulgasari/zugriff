@@ -18,7 +18,7 @@ viele apps bauen ne eigene `IconBtn` component. in `zugriff/.shared/js/component
 
 ### ausserdem:
 
-in `.shared/js/data/icons.js` ist schon ne liste mit standard-icons, dessen namen verwendet werden sollen möglichst. und die liste kann gern erweitert werden. wird von `.shared/js/components/Icon.js` verstanden.
+in `aufbau/svg/data/icons.json` (`@aufbau/svg/aliases.js`) ist schon ne liste mit standard-icons, dessen namen verwendet werden sollen möglichst. und die liste kann gern erweitert werden. wird von `<svg-icon>` und den `btn-*` verstanden.
 
 ## Toasts
 

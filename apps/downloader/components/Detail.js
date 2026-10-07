@@ -11,7 +11,6 @@ import { progressOf, seconds }   from './Rows.js';
 const fmt = zugriff.fmt;
 const app = zugriff.app;
 
-const Button = await zugriff.component('Button');
 
 function Preview ({ download }) {
   const [url, setUrl] = useState(null);
@@ -74,13 +73,13 @@ export function Detail () {
         <a class='url' href=${download.url} target='_blank' rel='noopener noreferrer'>${download.url}</a>
         <dl>${facts.map(([key, value]) => html`<dt>${key}</dt><dd>${value}</dd>`)}</dl>
         <div class='actions'>
-          ${(download.state === 'running' || download.state === 'queued') && html`<${Button} icon='lucide:pause' label='pause' onClick=${() => engine.pause(download.id)} />`}
-          ${download.state === 'paused' && html`<${Button} icon='lucide:play' label='resume' onClick=${() => engine.resume(download.id)} />`}
-          ${(download.state === 'failed' || download.state === 'cancelled' || download.state === 'done') && html`<${Button} icon='lucide:rotate-cw' label=${download.state === 'done' ? 'again' : 'retry'} onClick=${() => engine.retry(download.id)} />`}
-          ${download.state !== 'done' && download.state !== 'cancelled' && html`<${Button} icon='lucide:circle-slash' label='cancel' onClick=${() => engine.cancel(download.id)} />`}
-          ${download.state === 'done' && download.place === 'library' && html`<${Button} icon='lucide:save' label='save' onClick=${() => saveFile(download)} />`}
-          <${Button} icon='lucide:copy' label='copy link' onClick=${() => copy(download.url)} />
-          <${Button} icon='lucide:trash-2' label='remove' onClick=${() => { engine.remove(download.id); closeDetail(); }} />
+          ${(download.state === 'running' || download.state === 'queued') && html`<btn-tap icon='lucide:pause' label='pause' onClick=${() => engine.pause(download.id)} />`}
+          ${download.state === 'paused' && html`<btn-tap icon='lucide:play' label='resume' onClick=${() => engine.resume(download.id)} />`}
+          ${(download.state === 'failed' || download.state === 'cancelled' || download.state === 'done') && html`<btn-tap icon='lucide:rotate-cw' label=${download.state === 'done' ? 'again' : 'retry'} onClick=${() => engine.retry(download.id)} />`}
+          ${download.state !== 'done' && download.state !== 'cancelled' && html`<btn-tap icon='lucide:circle-slash' label='cancel' onClick=${() => engine.cancel(download.id)} />`}
+          ${download.state === 'done' && download.place === 'library' && html`<btn-tap icon='lucide:save' label='save' onClick=${() => saveFile(download)} />`}
+          <btn-tap icon='lucide:copy' label='copy link' onClick=${() => copy(download.url)} />
+          <btn-tap icon='lucide:trash-2' label='remove' onClick=${() => { engine.remove(download.id); closeDetail(); }} />
         </div>
       </div>
     </app-panel>

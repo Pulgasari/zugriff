@@ -9,7 +9,7 @@ import { closeEditor, selected }        from '../modules/frame.js';
 import * as store                       from '../modules/store.js';
 import { removeTask, TaskRow }          from './Task.js';
 
-const [Button, Icon] = await Promise.all([zugriff.component('Button'), zugriff.component('Icon')]);
+const Icon = await zugriff.component('Icon');
 
 const PRIORITIES = [['0', 'none'], ['1', 'low'], ['2', 'medium'], ['3', 'high']];
 const UNITS      = [['', 'never'], ['day', 'days'], ['week', 'weeks'], ['month', 'months'], ['year', 'years']];
@@ -128,8 +128,8 @@ export function Editor () {
         ${!task.parent && html`<${Subtasks} task=${task} />`}
 
         <div class='actions'>
-          <${Button} icon='lucide:trash-2' label='delete' onClick=${() => { removeTask(task.id); closeEditor(); }} />
-          <${Button} icon='lucide:check' label='close' onClick=${closeEditor} />
+          <btn-tap icon='lucide:trash-2' label='delete' onClick=${() => { removeTask(task.id); closeEditor(); }} />
+          <btn-tap icon='lucide:check' label='close' onClick=${closeEditor} />
         </div>
       </div>
     </app-panel>

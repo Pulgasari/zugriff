@@ -1,11 +1,8 @@
 // podcasts :: components/EpisodesIndex.js
 
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
-import Button     from '/.shared/js/components/Button.js';
 import Date       from '/.shared/js/components/Date.js';
 import Empty      from '/.shared/js/components/Empty.js';
-import Index      from '/.shared/js/components/Index.js';
-import Progress   from '/.shared/js/components/Progress.js';
 
 import { useGesture } from '@aufbau/gestures/preact';
 
@@ -39,14 +36,14 @@ function Item ({ episode }) {
       />
       
       <div class='meta'>
-        ${podcast && html`<${Button} label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}
+        ${podcast && html`<btn-tap label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}
         <${Date} value=${episode.pubDate} />
         <span class='dur'>${zugriff.fmt.duration(episode.duration)}</span>
       </div>
       
-      <${Button} class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
+      <btn-tap class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
       
-      ${(state.position || state.done) && html`<${Progress} value=${pct} />`}
+      ${(state.position || state.done) && html`<aufbau-progress value=${pct}></aufbau-progress>`}
 
       <${ActionMenu} items=${[
         html`<${PlayToggle} episode=${episode} />`,
@@ -72,11 +69,11 @@ function EpisodesIndex ({ episodes, empty }) {
   if (!episodes.length) return html`<${Empty} ...${empty} />`;
 
   return html`
-    <${Index} viewmode='list'>
+    <data-index viewmode='list'>
       ${episodes.map(episode => html`
         <${Item} key=${episode.id} episode=${episode} />
       `)}
-    </${Index}>
+    </data-index>
   `;
 }
 

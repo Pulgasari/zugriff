@@ -4,7 +4,6 @@
 // re-fetches the feeds and re-attaches progress to them.
 
 import { useRef } from 'preact/hooks';
-import Button     from '/.shared/js/components/Button.js';
 
 const app = zugriff.app;
 
@@ -52,8 +51,8 @@ function Export () {
       <span class="field-label">Subscriptions</span>
       <i>Back up your subscriptions and listening progress as JSON, or restore from a file.</i>
       <span>
-        <${Button} icon='download' label='Export JSON' onClick=${exportFeeds} />
-        <${Button} icon='upload'   label='Import JSON' onClick=${() => fileRef.current?.click()} />
+        <btn-tap icon='download' label='Export JSON' onClick=${exportFeeds} />
+        <btn-tap icon='upload'   label='Import JSON' onClick=${() => fileRef.current?.click()} />
 
         <input hidden
           ref=${fileRef}

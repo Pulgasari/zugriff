@@ -24,11 +24,9 @@ const { area, current, go, openList, openTag, show } = frame;
 
 const // shared components
 Brand       = await zugriff.component('Brand'),
-Button      = await zugriff.component('Button'),
 Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
 Icon        = await zugriff.component('Icon'),
-IconButton  = await zugriff.component('IconButton'),
 InstallTip  = await zugriff.component('InstallTip'),
 SearchPanel = await zugriff.component('SearchPanel');
 
@@ -228,14 +226,14 @@ function Menu () {
         <${NavItem} icon='lucide:circle-check' label='Done' active=${view === 'done'} onClick=${() => go('done')} />
       </nav>
 
-      <h4 class='menu-head'>lists <${IconButton} icon='lucide:plus' title='new list' onClick=${newList} /></h4>
+      <h4 class='menu-head'>lists <btn-icon icon='lucide:plus' title='new list' onClick=${newList} /></h4>
       <nav>
         ${store.lists.value.map(list => html`
           <${NavItem} key=${list.id} icon=${list.id === store.INBOX ? 'lucide:inbox' : 'lucide:list'} label=${list.name} count=${listCount(list.id)}
                       active=${view === 'list' && frame.list.value === list.id} onClick=${() => openList(list.id)}>
             ${list.id !== store.INBOX && html`
-              <${IconButton} icon='lucide:pencil' title='rename' onClick=${() => renameList(list.id)} />
-              <${IconButton} icon='lucide:trash-2' title='delete' onClick=${() => deleteList(list.id)} />
+              <btn-icon icon='lucide:pencil' title='rename' onClick=${() => renameList(list.id)} />
+              <btn-icon icon='lucide:trash-2' title='delete' onClick=${() => deleteList(list.id)} />
             `}
           <//>
         `)}
@@ -260,9 +258,9 @@ function Menu () {
 function Header ({ title }) {
   return html`
     <header>
-      <${IconButton} icon='menu' title='lists' onClick=${() => area('menu')?.toggle()} />
+      <btn-icon icon='menu' title='lists' onClick=${() => area('menu')?.toggle()} />
       <h2>${title}</h2>
-      <${IconButton} icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
+      <btn-icon icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
     </header>
   `;
 }

@@ -1,9 +1,7 @@
 // prompts :: components/TagManager.js
 // the inline tag editor in the sidebar: list existing tags, delete them, add a new one.
 
-import Button     from '/.shared/js/components/Button.js';
 import Icon       from '/.shared/js/components/Icon.js';
-import IconButton from '/.shared/js/components/IconButton.js';
 
 import { useState } from 'preact/hooks';
 
@@ -24,14 +22,14 @@ function TagManager ({ show, onClose }) {
     <div class='TagManager'>
       <header>
         <span>Manage Tags</span>
-        <${IconButton} icon='close' onClick=${onClose} />
+        <btn-icon icon='close' onClick=${onClose} />
       </header>
       
       <div class="tag-manager-list">
         ${app.lib.tags.value.map(t => html`
           <div class="tag-manager-row">
             <span class="tag-badge" style=${{ '--tag-color': t.color }}>${t.name}</span>
-            <${IconButton} icon='trash' onClick=${() => app.removeTag(t.id)} />
+            <btn-icon icon='trash' onClick=${() => app.removeTag(t.id)} />
           </div>`)}
         ${app.lib.tags.value.length === 0 && html`<span class="empty-hint">No tags yet</span>`}
       </div>
@@ -53,7 +51,7 @@ function TagManager ({ show, onClose }) {
           onInput=${e => setColor(e.target.value)}
           />
           
-        <${Button} icon='add' label='add' onClick=${add} disabled=${!name.trim()} />
+        <btn-tap icon='add' label='add' onClick=${add} disabled=${!name.trim()} />
       </div>
     </div>
   `;

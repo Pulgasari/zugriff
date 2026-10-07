@@ -7,7 +7,6 @@
 
 import { isValidElement } from 'preact';
 
-import Button from './Button.js';
 import Icon   from './Icon.js';
 import Link   from './Link.js';
 
@@ -19,7 +18,7 @@ function ActionMenuItem (props) {
   return isFn(props)           ? props()
        : isValidElement(props) ? props
        : props.href            ? html`<${Link}   ...${props} />`
-       :                         html`<${Button} ...${props} />`;
+       :                         html`<btn-tap ...${props} />`;
 }
 
 function ActionMenu ({ items, ...rest }) {

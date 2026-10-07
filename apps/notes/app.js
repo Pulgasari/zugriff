@@ -15,17 +15,13 @@ import { sharedSpec } from '/.shared/js/components/Settings.js';
 
 const // shared components
 Brand       = await zugriff.component('Brand'),
-Button      = await zugriff.component('Button'),
-Breadcrumbs = await zugriff.component('Breadcrumbs'),
 Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
 FolderTree  = await zugriff.component('FolderTree'),
 Icon        = await zugriff.component('Icon'),
-IconButton  = await zugriff.component('IconButton'),
 InstallTip  = await zugriff.component('InstallTip'),
 Reader      = await zugriff.component('Reader'),
-SearchPanel = await zugriff.component('SearchPanel'),
-TOC         = await zugriff.component('TOC');
+SearchPanel = await zugriff.component('SearchPanel');
 
 
 // :::::: APP
@@ -94,7 +90,7 @@ function Menu () {
 
       <div class='side-foot'>
         <${InstallTip} />
-        <${Button} icon='folder-add' label='Open a folder' onClick=${addFolder} />
+        <btn-tap icon='folder-add' label='Open a folder' onClick=${addFolder} />
       </div>
     </div>
   `;
@@ -151,9 +147,9 @@ const currentNote = computed(() => {
 function Header ({ segments = [] }) {
   return html`
     <header>
-      <${IconButton} icon='menu' title='notes' onClick=${() => area('menu')?.toggle()} />
-      <${Breadcrumbs} segments=${segments} />
-      <${IconButton} icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
+      <btn-icon icon='menu' title='notes' onClick=${() => area('menu')?.toggle()} />
+      <nav-crumbs path=${segments.join('/')}></nav-crumbs>
+      <btn-icon icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
     </header>
   `;
 }
@@ -161,7 +157,7 @@ function Header ({ segments = [] }) {
 // no note open: open a folder, or pick a note from the tree
 function Start () {
   const hasSources = app.lib.sources.value.length > 0;
-  const action     = hasSources ? '' : html`<${Button} label='Open a folder' icon='folder-add' onClick=${addFolder} />`;
+  const action     = hasSources ? '' : html`<btn-tap label='Open a folder' icon='folder-add' onClick=${addFolder} />`;
   const hint       = hasSources ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.';
 
   return html`
@@ -173,7 +169,7 @@ function Start () {
 }
 
 // the open note: read its text off disk and hand it to the shared <${Reader}>,
-// which owns the markdown pipeline; <${TOC}> builds the "on this page" list
+// which owns the markdown pipeline; <nav-toc> builds the "on this page" list
 // off the rendered headings
 function NoteText ({ note }) {
   const [text, setText] = useState(null);
@@ -191,7 +187,7 @@ function NoteText ({ note }) {
   ? html`<div class='booting'><${Icon} name='loading' /></div>`
   : html`<>
     <${Reader} id='notes-reader' format='markdown' text=${text} />
-    <${TOC} target='#notes-reader' selector='h1, h2, h3' />
+    <nav-toc target='#notes-reader' selector='h1, h2, h3'></nav-toc>
   </>`;
 }
 

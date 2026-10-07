@@ -14,8 +14,6 @@ import { render }            from 'preact';
 const route = window.location.pathname.split('/')[1] || 'home';
 
 const // shared components
-Button      = await zugriff.component('Button'),
-GhostButton = await zugriff.component('GhostButton'),
 Icon        = await zugriff.component('Icon'),
 Nav         = await zugriff.component('Nav'),
 SearchPanel = await zugriff.component('SearchPanel');
@@ -101,7 +99,7 @@ else {
           value=${query.value}
           onInput=${event => query.value = event.target.value}
         />
-        ${query.value && html`<${Button} icon="close" onClick=${() => query.value = ''}>`}
+        ${query.value && html`<btn-icon icon="close" label="clear" onClick=${() => query.value = ''} />`}
       </div>`;
       */
   }
@@ -115,8 +113,8 @@ else {
         ${top && html`<${Filter} />`}
 
         <div class="launcher-categories">
-          <${Button} label='all' class='chip' class:active=${category.value === ''} onClick=${() => category.value = ''} />
-          ${categories.map(name => html`<${Button} label=${name} class='chip' class:active=${category.value === name} onClick=${() => category.value = name} />`)}
+          <btn-tap label='all' class=${category.value === '' ? 'chip active' : 'chip'} onClick=${() => category.value = ''} />
+          ${categories.map(name => html`<btn-tap label=${name} class=${category.value === name ? 'chip active' : 'chip'} onClick=${() => category.value = name} />`)}
         </div>
 
         <ul id="tools">

@@ -2,7 +2,6 @@
 
 import { enumSignal } from '@aufbau/signals';
 
-import IconButton from '/.shared/js/components/IconButton.js';
 import Picker     from '/.shared/js/components/Picker.js';
 import View       from '/.shared/js/components/View.js';
 
@@ -27,7 +26,7 @@ function PodcastsView () {
         <div class="view-tools">
           <${Picker} signal=${sorting}  look='segments' />
           <${Picker} signal=${viewmode} look='segments' />
-          <${IconButton} icon|label='add' onClick=${() => app.state.dialog = 'add'} />    
+          <btn-icon icon|label='add' onClick=${() => app.state.dialog = 'add'} />    
         </div>
       </header>
       

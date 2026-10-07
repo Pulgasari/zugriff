@@ -1,10 +1,8 @@
 // podcasts :: views/EpisodeDetailView.js
 
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
-import Button     from '/.shared/js/components/Button.js';
 import Empty      from '/.shared/js/components/Empty.js';
 import Icon       from '/.shared/js/components/Icon.js';
-import Progress   from '/.shared/js/components/Progress.js';
 import View       from '/.shared/js/components/View.js';
 
 import Art        from './../components/Artwork.js';
@@ -64,7 +62,7 @@ export default function EpisodeDetailView ({ id }) {
   return html`
     <${View} class='episode-view' id='episode'>
       <header>
-        <${Button} icon='arrow-left' ...${back} />
+        <btn-icon icon='arrow-left' label='back' ...${back} />
       </header>
 
       <main>
@@ -80,7 +78,7 @@ export default function EpisodeDetailView ({ id }) {
           </div>
 
           <${ActionMenu} items=${actions} />
-          <${Progress} value=${percent} />
+          <aufbau-progress value=${percent}></aufbau-progress>
         </div>
   
         ${paras.length

@@ -1,7 +1,6 @@
 // shared/js/components/CodeOutputPane.js
 
 import { html, useEffect, useRef } from './../vendors.js';
-import GhostButton                 from './GhostButton.js';
 import Icon                        from './Icon.js';
 import { hljs, ensureLang }        from './hljs.js';
 
@@ -70,9 +69,9 @@ function CodeOutputPane ({
         <span class='pane-title'>${title}</span>
         <div class='pane-actions'>
           ${hasOut && html`
-            <${GhostButton} icon='mdi:content-copy' text='Copy' onClick=${copy} />
-            ${filename && html`<${GhostButton} icon='mdi:download' text='Download' onClick=${download} />`}
-            <${GhostButton} icon='mdi:select-all' text='Select' onClick=${select} />
+            <btn-tap icon='mdi:content-copy' label='Copy' onClick=${copy} />
+            ${filename && html`<btn-tap icon='mdi:download' label='Download' onClick=${download} />`}
+            <btn-tap icon='mdi:select-all' label='Select' onClick=${select} />
           `}
         </div>
       </div>

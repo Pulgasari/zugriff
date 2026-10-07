@@ -9,7 +9,7 @@ import * as engine           from '../modules/engine.js';
 import { inspect, selected } from '../modules/frame.js';
 
 const fmt                = zugriff.fmt;
-const [Icon, IconButton] = await Promise.all([zugriff.component('Icon'), zugriff.component('IconButton')]);
+const Icon = await zugriff.component('Icon');
 
 const STATES = {
   cancelled : 'lucide:circle-slash',
@@ -54,10 +54,10 @@ function Actions ({ download }) {
   const { id, state } = download;
   return html`
     <span class='actions'>
-      ${(state === 'running' || state === 'queued') && html`<${IconButton} icon='lucide:pause' title='pause' onClick=${() => engine.pause(id)} />`}
-      ${state === 'paused'                           && html`<${IconButton} icon='lucide:play' title='resume' onClick=${() => engine.resume(id)} />`}
-      ${(state === 'failed' || state === 'cancelled') && html`<${IconButton} icon='lucide:rotate-cw' title='retry' onClick=${() => engine.retry(id)} />`}
-      <${IconButton} icon='lucide:x' title='remove' onClick=${() => engine.remove(id)} />
+      ${(state === 'running' || state === 'queued') && html`<btn-icon icon='lucide:pause' title='pause' onClick=${() => engine.pause(id)} />`}
+      ${state === 'paused'                           && html`<btn-icon icon='lucide:play' title='resume' onClick=${() => engine.resume(id)} />`}
+      ${(state === 'failed' || state === 'cancelled') && html`<btn-icon icon='lucide:rotate-cw' title='retry' onClick=${() => engine.retry(id)} />`}
+      <btn-icon icon='lucide:x' title='remove' onClick=${() => engine.remove(id)} />
     </span>
   `;
 }
@@ -113,9 +113,9 @@ export function PackageCard ({ pack, rows }) {
         <span class='name'>${pack?.name ?? 'downloads'}</span>
         <span class='status'>${done}/${rows.length}${total ? ` · ${fmt.bytes(received)} of ${fmt.bytes(total)}` : ''}</span>
         ${pack && html`
-          ${running && html`<${IconButton} icon='lucide:pause' title='pause all' onClick=${() => engine.pausePackage(pack.id)} />`}
-          ${stopped && !running && html`<${IconButton} icon='lucide:play' title='resume all' onClick=${() => engine.resumePackage(pack.id)} />`}
-          <${IconButton} icon='lucide:trash-2' title='remove the package' onClick=${() => engine.removePackage(pack.id)} />
+          ${running && html`<btn-icon icon='lucide:pause' title='pause all' onClick=${() => engine.pausePackage(pack.id)} />`}
+          ${stopped && !running && html`<btn-icon icon='lucide:play' title='resume all' onClick=${() => engine.resumePackage(pack.id)} />`}
+          <btn-icon icon='lucide:trash-2' title='remove the package' onClick=${() => engine.removePackage(pack.id)} />
         `}
       </header>
       ${rows.map(row => html`<${DownloadRow} key=${row.id} download=${row} />`)}

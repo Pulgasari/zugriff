@@ -3,7 +3,6 @@
 // render <${Prompt} /> once per app, call openPrompt() from anywhere.
 
 import { html, signal } from './../vendors.js';
-import GhostButton from './GhostButton.js';
 
 const promptState = signal(null);
 
@@ -35,7 +34,7 @@ function Prompt () {
       <div class="dialog" onClick=${event => event.stopPropagation()}>
         <div class="header">
           <span class="title">${state.title}</span>
-          <${GhostButton} icon="close" onClick=${cancel} />
+          <btn-icon icon="close" label="cancel" onClick=${cancel} />
         </div>
         <input
           type=${state.type}

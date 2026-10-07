@@ -4,7 +4,7 @@
 import { signal, effect }   from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { useGesture } from '@aufbau/gestures/preact';
-import { Icon, IconButton } from '/.shared/js/components/index.js';
+import { Icon } from '/.shared/js/components/index.js';
 import * as fx  from '../modules/filters.js';
 import { shots, idx, current, many, fmtSize, setFiles, vError } from '../modules/state.js';
 import { editCurrent } from './edit.js';
@@ -108,22 +108,22 @@ function ViewTopBar () {
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
       </div>
       <div class="iv-actions">
-        <${IconButton} className="iv-btn" icon="mdi:folder-open-outline"   label="Open images" onClick=${openPicker} />
-        <${IconButton} className="iv-btn" icon="mdi:image-edit-outline"    label="Edit this image" onClick=${editCurrent} disabled=${!s} />
-        <${IconButton} className="iv-btn" icon="zoom-out"                  label="Zoom out"    onClick=${() => setZoom(zoom.value / 1.4)} disabled=${!s || zoom.value <= 1} />
-        <${IconButton} className="iv-btn" icon="zoom-in"                   label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
-        <${IconButton} className="iv-btn" icon="mdi:fit-to-screen-outline" label="Fit"         onClick=${resetView} disabled=${!s || (zoom.value === 1 && pan.value.x === 0 && pan.value.y === 0)} />
-        <${IconButton} className="iv-btn" icon="download"                  label="Download"    onClick=${downloadCurrent} disabled=${!s} />
+        <btn-icon class="iv-btn" icon="mdi:folder-open-outline"   label="Open images" onClick=${openPicker} />
+        <btn-icon class="iv-btn" icon="mdi:image-edit-outline"    label="Edit this image" onClick=${editCurrent} disabled=${!s} />
+        <btn-icon class="iv-btn" icon="zoom-out"                  label="Zoom out"    onClick=${() => setZoom(zoom.value / 1.4)} disabled=${!s || zoom.value <= 1} />
+        <btn-icon class="iv-btn" icon="zoom-in"                   label="Zoom in"     onClick=${() => setZoom(zoom.value * 1.4)} disabled=${!s} />
+        <btn-icon class="iv-btn" icon="mdi:fit-to-screen-outline" label="Fit"         onClick=${resetView} disabled=${!s || (zoom.value === 1 && pan.value.x === 0 && pan.value.y === 0)} />
+        <btn-icon class="iv-btn" icon="download"                  label="Download"    onClick=${downloadCurrent} disabled=${!s} />
         ${s && html`
           <select class="iv-fx-select" title="Live effect (view only, not saved)" aria-label="Effect"
                   value=${vEffect.value} onChange=${e => vEffect.value = e.target.value}>
             ${fx.EFFECTS.filter(x => x.cssBacked).map(x => html`
               <option value=${x.id}>${x.id === 'none' ? 'No effect' : x.name}</option>`)}
           </select>`}
-        ${many.value && html`<${IconButton} className="iv-btn" icon=${strip.value ? 'mdi:view-carousel-outline' : 'mdi:view-carousel'} label="Toggle thumbnails" active=${strip.value} onClick=${() => strip.value = !strip.value} />`}
-        <${IconButton} className="iv-btn" icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
-        <${IconButton} className="iv-btn" icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
-        ${s && html`<${IconButton} className="iv-btn" icon="mdi:close" label="Close image" onClick=${removeCurrent} />`}
+        ${many.value && html`<btn-icon class="iv-btn" icon=${strip.value ? 'mdi:view-carousel-outline' : 'mdi:view-carousel'} label="Toggle thumbnails" aria-pressed=${strip.value} onClick=${() => strip.value = !strip.value} />`}
+        <btn-icon class="iv-btn" icon="mdi:fullscreen"            label="Fullscreen"  onClick=${toggleFullscreen} />
+        <btn-icon class="iv-btn" icon="mdi:eye-off-outline"       label="Hide chrome (tap image to restore)" onClick=${() => bare.value = true} disabled=${!s} />
+        ${s && html`<btn-icon class="iv-btn" icon="mdi:close" label="Close image" onClick=${removeCurrent} />`}
       </div>
     </header>`;
 }

@@ -8,7 +8,6 @@
 
 import Date    from '/.shared/js/components/Date.js';
 import Empty   from '/.shared/js/components/Empty.js';
-import Index   from '/.shared/js/components/Index.js';
 import Link    from '/.shared/js/components/Link.js';
 
 import Artwork from './Artwork.js';
@@ -42,9 +41,9 @@ function PreviewEpisodes ({ episodes, empty }) {
   if (!episodes.length) return html`<${Empty} ...${empty} />`;
 
   return html`
-    <${Index} class='preview-episodes' viewmode='list'>
+    <data-index class='preview-episodes' viewmode='list'>
       ${episodes.map(episode => html`<${Item} key=${episode.id} episode=${episode} />`)}
-    </${Index}>
+    </data-index>
   `;
 }
 
