@@ -28,6 +28,9 @@
   > img { block-size: 100%; inline-size: 100%; object-fit: cover; }
 }
 
+  *:disabled { --bg: --mix(bg, fg, 10%); cursor: default; }
+
+
 /*
 :::::::::::: SPACING ::::::::::::::::::::::::::::::::::::::::::::::::::
 - ich benutze ausser in sehr seltenen fällen gar kein 'margin` mehr
@@ -151,10 +154,9 @@ h2 { opacity: 0.55; text-align: center; text-transform: uppercase; }
 
 /*//////////// ROWS ////////////*/
 
-/* a row: the thumbnail tile, name and details, the menu button at the end */
 .row {
   align-items: center; display: flex; gap: 0.25rem;
-  &.selected { background: var(--hover); border-radius: var(--radius, 0.5rem); }
+  &.selected { background: var(--hover); --rad: true; }
 }
 
 .entry,
@@ -232,35 +234,22 @@ data-index[viewmode="grid"] {
   grid-template-columns : repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
 }
 
-.tile {
-  /* opaque: a pattern behind the app must not shine through */
-  background     : color-mix(in oklch, var(--color-bg), var(--color-fg) 6%);
-  border-radius  : var(--radius);
+.tile { --pad: normal; --rad: true; --bg: --mix(bg, fg, 10%);
   flex-direction : row-reverse;
   inline-size    : 100%;
   isolation      : isolate;
   overflow       : hidden;
-  padding        : 1.25rem;
   position       : relative;
 
   > svg-icon { flex: none; font-size: 1.5rem; }
 
-  &:hover:not(:disabled) { background: color-mix(in oklch, var(--color-bg), var(--color-fg) 10%); }
-
-  /* a shared button:disabled rule takes the background, this one keeps it */
-  &:disabled     { background: color-mix(in oklch, var(--color-bg), var(--color-fg) 6%); cursor: default; }
-  &:disabled > * { opacity: 0.5; }
+  &:hover:not(:disabled) { --bg: --mix(bg, fg, 10%); }
+  &:disabled             { --bg: --mix(bg, fg, 10%); cursor: default; }
+  &:disabled > *         { opacity: 0.5; }
 }
 
-.status {
-  align-items       : center;
-  display           : flex;
-  font-size         : 0.875rem;
-  gap               : 0.5rem;
-  opacity           : 0.7;
-}
-
-.hint { opacity: 0.7; }
+.status { align-items: center; display: flex; --gap: small; }
+.hint   { opacity: 0.7; }
 
 .link {
   background      : none;
@@ -272,21 +261,14 @@ data-index[viewmode="grid"] {
   text-decoration : underline;
 }
 
-.action[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
+.action[aria-pressed="true"] { --bg: ink; --fg: bg; }
 
 /*//////////// SYNC ////////////*/
 
-.address {
-  display        : flex;
-  flex-direction : column;
-  gap            : 0.5rem;
-  margin-block   : 0.75rem;
-}
+.address { display: flex; flex-direction: column; --gap: small; }
 
 app-view[name="sync"] :is(input-text, input-password) {
-  display          : flex;
-  gap              : 0.5rem;
-  margin-block-end : 0.5rem;
+  display: flex; --gap: small;
 }
 
 .action.primary { background: var(--color-ink); color: var(--color-bg); } /* .action.primary { --bg: ink; --fg: bg; } */
@@ -299,22 +281,17 @@ app-view[name="sync"] :is(input-text, input-password) {
   display        : flex;
   flex-direction : column;
   gap            : 0.5rem;
-  margin-block   : 0.5rem 1rem;
 
   > .action { align-self: flex-start; }
 }
 
-.error { color: var(--color-error, currentColor); font-size: 0.875rem; }
+.error { color: --color(error); }
 
 /*//////////// CLIPBOARD ////////////*/
 
-.pastebar {
+.pastebar { --bg: --mix(bg, fg, 10%); --gap: normal; --pad: small; --rad: true;
   align-items   : center;
-  background    : color-mix(in oklch, var(--color-bg), var(--color-fg) 8%);
-  border-radius : var(--radius, 0.5rem);
   flex          : none;
-  gap           : --space(normal);
-  padding       : --space(small);
 
   > .text { flex: 1 1 auto; }
 }
@@ -325,23 +302,18 @@ app-view[name="sync"] :is(input-text, input-password) {
 .tasks-button {
   align-items     : center;
   aspect-ratio    : 1;
-  background      : color-mix(in oklch, var(--color-bg), var(--color-fg) 6%);
+  background      : --mix(bg, fg, 10%);
   block-size      : 2.75rem;
   border          : 0;
   color           : inherit;
-  cursor          : pointer;
   display         : inline-flex;
   flex            : none;
-  font-size       : 1.25rem;
   justify-content : center;
   position        : relative;
 
   &.busy > svg-icon { animation: spin 1.2s linear infinite; }
 
-  > .badge {
-    background    : var(--color-ink);
-    border-radius : 999px;
-    color         : var(--color-bg);
+  > .badge { --bg: ink; --fg: bg; --rad: pill;
     font-size     : 0.65rem;
     inset         : 0.15rem 0.15rem auto auto;
     line-height   : 1;
@@ -430,7 +402,6 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
     border        : 0;
     border-radius : 999px;
     color         : inherit;
-    cursor        : pointer;
     display       : flex;
     font          : inherit;
     gap             : 1rem;
