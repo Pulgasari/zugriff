@@ -4,12 +4,15 @@
 // module (app.db); ephemeral ui state on app.state; the CORS proxy is a persisted scalar.
 
 // ::: vendors
-import { computed, signal, typedSignal }   from '@aufbau/signals';
-import { useEffect, useRef }  from 'preact/hooks';
+import { computed, signal, typedSignal } from '@aufbau/signals';
+import { useEffect }                     from 'preact/hooks';
+
+import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
 // ::: shared
-import { Icon, Image, Settings } from '/.shared/js/components/index.js';
-import { PROXY }                 from '/.shared/js/modules/http.js';
+import { Config }      from '/.shared/js/components/Config.js';
+import { Icon, Image } from '/.shared/js/components/index.js';
+import { PROXY }       from '/.shared/js/modules/http.js';
 
 // ::: app modules
 import * as db           from './modules/db.js';
@@ -21,36 +24,56 @@ app.db = db;
 // :::::: STATE
 // ephemeral ui state on app.state (no `.value`); the library itself is app.db (plain
 // signals). the CORS proxy is the one durable pref — a persisted scalar via `stored`.
+// the view on screen is #app's business (app-view, the hash).
 
-app.state.route   = { name: 'latest', id: null };   // { name:'latest'|'youtube'|'feed', id? }
-app.state.dialog  = null;    // 'add' | 'settings' | null
 app.state.$extend({
-  addVal  : { type: 'scalar', value: '' },      // add-feed input draft
-  navOpen : { type: 'scalar', value: false },   // mobile drawer
-  busy    : { type: 'scalar', value: '' },      // a label while a long task runs
+  busy   : { type: 'scalar', value: ''                },   // a label while a long task runs
+  feedId : { type: 'scalar', value: null, persist: true },   // the feed of the 'feed' view
 });
 
-const proxy = typedSignal({ value: PROXY, key: 'feeds:proxy' });
+const proxy   = typedSignal({ value: PROXY, key: 'feeds:proxy' });
+const current = signal('latest');   // the view on screen
 
-app.go    = (name, id = null) => { app.state.route = { name, id }; app.state.navOpen = false; };
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
+
+// :::::: FRAME
+// #app is the <app-root>: the views in the main area, the feeds in the menu area,
+// the settings in the config area
+
+const area = app.area;
+const show = app.show;
+const menu = () => area('menu');
+
+// a drawer closes once something in it was picked, a sidebar stays
+const closeMenu = () => { if (menu()?.isOverlay) menu().hide(); };
+
+app.go = (name, id = null) => {
+  if (id) app.state.feedId = id;
+  show(name);
+  closeMenu();
+};
+
+function onNavigate (event) {
+  current.value = event.detail.to;
+}
+
+app.root.addEventListener('navigate', onNavigate);
 
 // :::::: DERIVED
 
 const articleFeeds = computed(() => db.feeds.value.filter(f => f.kind !== 'youtube'));
 const youtubeFeeds = computed(() => db.feeds.value.filter(f => f.kind === 'youtube'));
 
-// the list + heading for whatever the route points at
-const currentView = computed(() => {
-  const r = app.state.$route;
-  if (r.name === 'youtube') return { title: 'YouTube', icon: 'youtube', kind: 'youtube', list: db.latestVideos.value };
-  if (r.name === 'feed') {
-    const f = db.feedById(r.id);
+// the list + heading of a view
+function viewOf (name) {
+  if (name === 'youtube') return { title: 'YouTube', icon: 'youtube', kind: 'youtube', list: db.latestVideos.value };
+  if (name === 'feed') {
+    const f = db.feedById(app.state.$feedId);
     if (!f) return { title: 'Gone', icon: 'rss', kind: 'feed', list: [] };
     return { title: f.title, icon: f.kind === 'youtube' ? 'youtube' : 'rss', kind: f.kind, list: db.itemsByFeed.value[f.id] || [], feed: f };
   }
   return { title: 'Latest', icon: 'mdi:playlist-star', kind: 'feed', list: db.latestArticles.value };
-});
+}
 
 // :::::: HELPERS
 
@@ -72,27 +95,24 @@ const feedName = it => db.feedById(it.feedId)?.title || hostOf(it.link);
 
 // :::::: ACTIONS
 
-async function submitAdd () {
-  const input = app.state.$addVal.trim();
+async function addFeed () {
+  const input = (await PopPrompt.prompt('Paste a feed URL, a site URL, or a YouTube channel / @handle / video link.', '', { confirm: 'Add' }))?.trim();
   if (!input) return;
   app.state.busy = 'Adding feed…';
   try {
     const rec = await db.addFeed(input, proxy.value);
     flash(`Added ${rec.title}`);
-    app.state.addVal = '';
-    app.state.dialog = null;
     app.go('feed', rec.id);
   } catch (err) {
     flash(err.message || String(err), 'err');
   } finally { app.state.busy = ''; }
 }
 
-async function refreshCurrent () {
-  const r = app.state.$route;
+async function refreshView (name = current.value) {
   app.state.busy = 'Refreshing…';
   try {
-    if (r.name === 'feed' && r.id) {
-      const n = await db.refresh(r.id, proxy.value);
+    if (name === 'feed' && app.state.$feedId) {
+      const n = await db.refresh(app.state.$feedId, proxy.value);
       flash(n ? `${n} new` : 'up to date');
     } else {
       const n = await db.refreshAll(proxy.value, (d, t) => app.state.busy = `Refreshing ${d}/${t}…`);
@@ -103,30 +123,24 @@ async function refreshCurrent () {
 }
 
 async function removeFeed (f) {
-  if (!confirm(`Unfollow “${f.title}”? Its stored entries are removed too.`)) return;
-  if (app.state.$route.id === f.id) app.go('latest');
+  if (!await PopPrompt.confirm(`Unfollow “${f.title}”? Its stored entries are removed too.`, { confirm: 'Unfollow' })) return;
+  if (current.value === 'feed' && app.state.$feedId === f.id) app.go('latest');
   await db.removeFeed(f.id);
   flash('Unfollowed');
 }
 
-function markAllRead () {
-  const list = currentView.value.list;
+function markAllRead (name) {
+  const list = viewOf(name).list;
   db.markAllRead(list);
   flash(`Marked ${list.length} read`);
 }
 
-// :::::: HOTKEYS
-
-app.actions = { 'close-dialog': () => app.state.dialog = null };
-app.hotKeys = { 'escape': { action: 'close-dialog', when: () => !!app.state.$dialog } };
-
 // :::::: SIDEBAR
 
-function NavItem ({ name, id, icon, label, count }) {
-  const r = app.state.$route;
-  const active = r.name === name && r.id === id;
+function NavItem ({ name, icon, label, count }) {
+  const active = current.value === name;
   return html`
-    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name, id)} title=${label}>
+    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)} title=${label}>
       <${Icon} name=${icon} />
       <span class="nav-label">${label}</span>
       ${count > 0 && html`<span class="nav-count">${count}</span>`}
@@ -136,7 +150,7 @@ function NavItem ({ name, id, icon, label, count }) {
 function FeedItem ({ feed: f }) {
   const list   = db.itemsByFeed.value[f.id] || [];
   const unread = db.unreadIn(list);
-  const active = app.state.$route.name === 'feed' && app.state.$route.id === f.id;
+  const active = current.value === 'feed' && app.state.$feedId === f.id;
   const spin   = db.refreshing.value[f.id];
   return html`
     <div class=${'feed-row' + (active ? ' active' : '')}>
@@ -158,14 +172,12 @@ function FeedItem ({ feed: f }) {
 function Sidebar () {
   const arts = articleFeeds.value, tubes = youtubeFeeds.value;
   return html`
-    <aside class=${'sidebar' + (app.state.$navOpen ? ' open' : '')}>
+    <div class="sidebar">
       <div class="brand">
         <${Icon} name="rss"/> <span>Feeds</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.navOpen = false}>
-          <${Icon} name="close"/></button>
       </div>
 
-      <button class="add-btn" onClick=${() => { app.state.addVal = ''; app.state.dialog = 'add'; }}>
+      <button class="add-btn" onClick=${addFeed}>
         <${Icon} name="plus" /> Add feed</button>
 
       <div class="nav-scroll">
@@ -193,12 +205,12 @@ function Sidebar () {
       </div>
 
       <div class="side-foot">
-        <button class="foot-btn" onClick=${refreshCurrent} disabled=${!!app.state.$busy || !db.feeds.value.length}>
+        <button class="foot-btn" onClick=${() => refreshView()} disabled=${!!app.state.$busy || !db.feeds.value.length}>
           <${Icon} name="refresh" /> Refresh</button>
-        <button class="foot-btn" onClick=${() => app.state.dialog = 'settings'}>
+        <button class="foot-btn" onClick=${() => { closeMenu(); area('config')?.toggle(); }}>
           <${Icon} name="settings" /> Settings</button>
       </div>
-    </aside>`;
+    </div>`;
 }
 
 // :::::: ITEM VIEWS
@@ -242,8 +254,8 @@ function VideoCard ({ item }) {
     </a>`;
 }
 
-function Body () {
-  const v = currentView.value;
+function Body ({ name }) {
+  const v = viewOf(name);
 
   if (!v.list.length) {
     const hasFeeds = db.feeds.value.length > 0;
@@ -251,7 +263,7 @@ function Body () {
       <div class="empty">
         <${Icon} name=${hasFeeds ? 'mdi:check-all' : 'rss'} />
         <p>${hasFeeds ? 'Nothing here yet — try Refresh.' : 'Follow a feed to see the latest here.'}</p>
-        ${!hasFeeds && html`<button class="cta" onClick=${() => { app.state.addVal = ''; app.state.dialog = 'add'; }}>
+        ${!hasFeeds && html`<button class="cta" onClick=${addFeed}>
           <${Icon} name="plus" /> Add your first feed</button>`}
       </div>`;
   }
@@ -261,11 +273,12 @@ function Body () {
   return html`<div class="posts">${v.list.map(it => html`<${ArticleRow} key=${it.key} item=${it} />`)}</div>`;
 }
 
-function Header () {
-  const v = currentView.value;
+// the menu button shows where the menu is a drawer
+function Header ({ name }) {
+  const v = viewOf(name);
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => app.state.navOpen = true}>
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}>
         <${Icon} name="menu" /></button>
       <${Icon} name=${v.icon} className="topbar-ic" />
       <h1 class="topbar-title" title=${v.title}>${v.title}</h1>
@@ -274,65 +287,39 @@ function Header () {
       <span class="topbar-spacer"></span>
       ${app.state.$busy && html`<span class="topbar-busy"><${Icon} name="loading" /> ${app.state.$busy}</span>`}
       ${v.list.length > 0 && html`
-        <button class="ibtn" title="Mark all read" onClick=${markAllRead}>
+        <button class="ibtn" title="Mark all read" onClick=${() => markAllRead(name)}>
           <${Icon} name="mdi:check-all" /></button>`}
-      <button class="ibtn" title="Refresh" onClick=${refreshCurrent} disabled=${!!app.state.$busy}>
+      <button class="ibtn" title="Refresh" onClick=${() => refreshView(name)} disabled=${!!app.state.$busy}>
         <${Icon} name="refresh" /></button>
     </header>`;
 }
 
-// :::::: DIALOGS
+// :::::: CONFIG
 
-function AddDialog () {
-  const ref = useRef(null);
-  useEffect(() => { ref.current?.focus(); }, []);
+function ProxyConfig () {
   return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.dialog = null; }}>
-      <div class="modal" role="dialog" aria-modal="true">
-        <h2>Add a feed</h2>
-        <p class="modal-hint">Paste a feed URL, a site URL, or a YouTube channel /
-           <code>@handle</code> / video link — YouTube channels are resolved to their feed.</p>
-        <input ref=${ref} class="modal-input" type="text" value=${app.state.$addVal}
-               placeholder="https://example.com/feed.xml"
-               onInput=${e => app.state.addVal = e.target.value}
-               onKeyDown=${e => { if (e.key === 'Enter') submitAdd(); }} />
-        <div class="modal-actions">
-          <button class="ghost" onClick=${() => app.state.dialog = null}>Cancel</button>
-          <button class="primary" disabled=${!!app.state.$busy} onClick=${submitAdd}>
-            ${app.state.$busy ? 'Adding…' : 'Add'}</button>
-        </div>
+    <section class="config-section">
+      <h4>CORS proxy</h4>
+      <p class="hint">Most feeds block direct browser requests. Feeds are fetched directly first,
+         then through this proxy. <code>{url}</code> is replaced with the feed URL. Clear it to
+         use direct requests only.</p>
+      <input type="text" value=${proxy.value} placeholder=${PROXY} onInput=${e => proxy.value = e.target.value} />
+      <div class="actions">
+        <button class="foot-btn" onClick=${() => proxy.value = PROXY}>Reset to default</button>
+        <button class="foot-btn" onClick=${() => proxy.value = ''}>Direct only</button>
       </div>
-    </div>`;
-}
-
-function SettingsDialog () {
-  const val = useRef(null);
-  return html`
-    <div class="scrim" onClick=${e => { if (e.target === e.currentTarget) app.state.dialog = null; }}>
-      <div class="modal" role="dialog" aria-modal="true">
-        <h2>Settings</h2>
-        <label class="field">
-          <span class="field-label">CORS proxy</span>
-          <span class="field-hint">Most feeds block direct browser requests. Feeds are fetched
-             directly first, then through this proxy. <code>{url}</code> is replaced with the feed
-             URL. Clear it to use direct requests only.</span>
-          <input ref=${val} class="modal-input" type="text" value=${proxy.value}
-                 placeholder=${PROXY} onInput=${e => proxy.value = e.target.value} />
-          <div class="field-row">
-            <button class="btn ghost small" onClick=${() => proxy.value = PROXY}>Reset to default</button>
-            <button class="btn ghost small" onClick=${() => proxy.value = ''}>Direct only</button>
-          </div>
-        </label>
-        <${Settings} />
-        <div class="modal-actions">
-          <button class="primary" onClick=${() => { app.state.dialog = null; flash('Settings saved'); }}>Done</button>
-        </div>
-      </div>
-    </div>`;
+    </section>`;
 }
 
 // :::::: APP
 
+const VIEWS = [
+  { name: 'latest',  route: '/'        },
+  { name: 'youtube', route: '/youtube' },
+  { name: 'feed',    route: '/feed'    },
+];
+
+// the feeds are the way through: a sidebar from the start where there is room
 function App () {
   useEffect(() => {
     db.load().then(() => {
@@ -342,19 +329,28 @@ function App () {
     }).catch(err => flash('Could not open the library: ' + err.message, 'err'));
   }, []);
 
+  useEffect(() => {
+    if (!db.ready.value) return;
+    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
+      if (!menu()?.isOverlay) menu()?.show();
+      current.value = app.root.view?.getAttribute('name') ?? 'latest';
+    });
+  }, [db.ready.value]);
+
   if (!db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
 
   return html`
-    <>
-      <${Sidebar} />
-      ${app.state.$navOpen && html`<div class="scrim-mobile" onClick=${() => app.state.navOpen = false}></div>`}
-      <main id="app-main">
-        <${Header} />
-        <div class="body-scroll"><${Body} /></div>
-      </main>
-      ${app.state.$dialog === 'add'      && html`<${AddDialog} />`}
-      ${app.state.$dialog === 'settings' && html`<${SettingsDialog} />`}
-    </>`;
+    <app-area name='main'>
+      ${VIEWS.map(({ name, route }) => html`
+        <app-view key=${name} name=${name} route=${route} active=${name === 'latest' || undefined}>
+          <${Header} name=${name} />
+          <div class="body-scroll"><${Body} name=${name} /></div>
+        </app-view>
+      `)}
+    </app-area>
+    <app-area name='menu' dock='start'><${Sidebar} /></app-area>
+    <app-area name='config' dock='end'><${Config}><${ProxyConfig} /></${Config}></app-area>
+  `;
 }
 
 // :::::: BOOT
