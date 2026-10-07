@@ -16,6 +16,7 @@ build with: **aufbau** + **capacitor** + **htx** + **preact**
 ## apps
 - [audio manager](https://zugriff.dev/audio-manager/)
 - [code](https://zugriff.dev/code/)
+- [downloader](https://zugriff.dev/downloader/)
 - [ebooks](https://zugriff.dev/ebooks/)
 - [feeds](https://zugriff.dev/feeds/)
 - [files](https://zugriff.dev/files/)
@@ -24,6 +25,7 @@ build with: **aufbau** + **capacitor** + **htx** + **preact**
 - [notes](https://zugriff.dev/notes/)
 - [podcasts](https://zugriff.dev/podcasts/)
 - [prompts](https://zugriff.dev/prompts/)
+- [todo](https://zugriff.dev/todo/)
 - [videos](https://zugriff.dev/videos/)
 
 ## tools
