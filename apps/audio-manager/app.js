@@ -4,11 +4,12 @@
 // engine live in modules (app.db / app.player); ephemeral ui state on app.state.
 
 // ::: vendors
-import { computed }  from '@aufbau/signals';
-import { useEffect } from 'preact/hooks';
+import { computed, signal } from '@aufbau/signals';
+import { useEffect }        from 'preact/hooks';
 
 // ::: shared
-import { Icon, IconButton, InstallTip, SettingsButton, SettingsModal } from '/.shared/js/components/index.js';
+import { Config }                       from '/.shared/js/components/Config.js';
+import { Icon, IconButton, InstallTip } from '/.shared/js/components/index.js';
 
 // ::: app modules
 import * as db     from './modules/db.js';
@@ -25,15 +26,38 @@ app.player = player;
 // ephemeral ui state on app.state (no `.value`); the library + player keep their own plain
 // signals (app.db / app.player), read with `.value`.
 
-app.state.route   = { name: 'songs', id: null };   // songs | albums | artists | album | artist
+// the view on screen is #app's business (app-view, the hash).
+
 app.state.$extend({
-  search  : { type: 'scalar', value: '' },
-  sort    : { type: 'scalar', value: { key: 'artist', dir: 1 } },
-  navOpen : { type: 'scalar', value: false },
+  album  : { type: 'scalar', value: null, persist: true },   // the key of the 'album' view
+  artist : { type: 'scalar', value: null, persist: true },   // the name of the 'artist' view
+  search : { type: 'scalar', value: '' },
+  sort   : { type: 'scalar', value: { key: 'artist', dir: 1 } },
 });
 
+const current = signal('songs');   // the view on screen
+
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
-app.go = (name, id = null) => { app.state.route = { name, id }; app.state.navOpen = false; };
+
+// :::::: FRAME :::::::::::::::::::::::::::::::::::::::::::::
+// #app is the <app-root>: the views and the player in the main area, folders and
+// navigation in the menu area, the settings in the config area
+
+const area = app.area;
+const show = app.show;
+const menu = () => area('menu');
+
+// a drawer closes once something in it was picked, a sidebar stays
+const closeMenu = () => { if (menu()?.isOverlay) menu().hide(); };
+
+// album and artist take the album's key or the artist's name as id
+app.go = (name, id = null) => {
+  if (id != null && (name === 'album' || name === 'artist')) app.state[name] = id;
+  show(name);
+  closeMenu();
+};
+
+app.root.addEventListener('navigate', event => { current.value = event.detail.to; });
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -122,7 +146,7 @@ function PlayGlyph ({ track }) {
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
 
 function NavItem ({ name, icon, label }) {
-  const active = app.state.$route.name === name;
+  const active = current.value === name;
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)}>
       <${Icon} name=${icon} /> <span>${label}</span>
@@ -147,10 +171,9 @@ function SourceRow ({ source }) {
 function Sidebar () {
   const needAuth = db.sources.value.some(s => db.perms.value[s.id] !== 'granted');
   return html`
-    <aside class=${'sidebar' + (app.state.$navOpen ? ' open' : '')}>
+    <div class="sidebar">
       <div class="brand">
         <${Icon} name="mdi:music-box-multiple-outline" /> <span>Music</span>
-        <button class="ibtn nav-close" aria-label="Close" onClick=${() => app.state.navOpen = false}><${Icon} name="mdi:close" /></button>
       </div>
 
       <nav class="nav-group">
@@ -172,7 +195,7 @@ function Sidebar () {
                        message="Install the app so your folders stay connected between visits." />
         <button class="btn primary" onClick=${addFolder}><${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
       </div>
-    </aside>`;
+    </div>`;
 }
 
 
@@ -314,14 +337,14 @@ function Empty ({ q }) {
 
 // :::::: HEADER + PLAYER :::::::::::::::::::::::::::::::::::
 
-function TopBar () {
-  const r = app.state.$route;
-  const title = r.name === 'album' ? 'Album' : r.name === 'artist' ? 'Artist' : r.name[0].toUpperCase() + r.name.slice(1);
-  const back  = r.name === 'album' || r.name === 'artist';
+// each view carries its own, `name` is the view's. the menu button shows where the menu is a drawer
+function TopBar ({ name }) {
+  const title = name[0].toUpperCase() + name.slice(1);
+  const back  = name === 'album' || name === 'artist';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => app.state.navOpen = true}><${Icon} name="mdi:menu" /></button>
-      ${back && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go(r.name === 'album' ? 'albums' : 'artists')} />`}
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}><${Icon} name="mdi:menu" /></button>
+      ${back && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go(name === 'album' ? 'albums' : 'artists')} />`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>
@@ -330,19 +353,17 @@ function TopBar () {
         <input type="search" placeholder="Search…" value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
       </div>
       <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><${Icon} name="mdi:refresh" /></button>
-      <${SettingsButton} /><${SettingsModal} />
+      <button class="ibtn" title="Settings" onClick=${() => area('config')?.toggle()}><${Icon} name="settings" /></button>
     </header>`;
 }
 
-function Content () {
-  switch (app.state.$route.name) {
-    case 'albums'  : return html`<${AlbumsGrid} />`;
-    case 'artists' : return html`<${ArtistsList} />`;
-    case 'album'   : return html`<${AlbumDetail} id=${app.state.$route.id} />`;
-    case 'artist'  : return html`<${ArtistDetail} id=${app.state.$route.id} />`;
-    default        : return html`<${SongsTable} />`;
-  }
-}
+const VIEWS = [
+  { name: 'songs',   route: '/',        Content: () => html`<${SongsTable} />`                         },
+  { name: 'albums',  route: '/albums',  Content: () => html`<${AlbumsGrid} />`                         },
+  { name: 'artists', route: '/artists', Content: () => html`<${ArtistsList} />`                        },
+  { name: 'album',   route: '/album',   Content: () => html`<${AlbumDetail}  id=${app.state.$album} />`  },
+  { name: 'artist',  route: '/artist',  Content: () => html`<${ArtistDetail} id=${app.state.$artist} />` },
+];
 
 function PlayerBar () {
   const t = player.current.value;
@@ -409,25 +430,38 @@ function Welcome () {
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
+// the folders are the way in: a sidebar from the start where there is room. without
+// a folder there is no frame yet, just the welcome
 function App () {
   useEffect(() => { db.load().catch(err => flash('Could not open the library: ' + err.message, 'err')); return dropCovers; }, []);
+
+  const framed = fs.supported() && db.ready.value && db.sources.value.length > 0;
+
+  useEffect(() => {
+    if (!framed) return;
+    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
+      if (!menu()?.isOverlay) menu()?.show();
+      current.value = app.root.view?.getAttribute('name') ?? 'songs';
+    });
+  }, [framed]);
 
   if (!fs.supported())          return html`<div class="centered"><${Unsupported} /></div>`;
   if (!db.ready.value)          return html`<div class="centered"><div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
   if (!db.sources.value.length) return html`<div class="centered"><${Welcome} /></div>`;
 
   return html`
-    <>
-      <div id="app-main">
-        <${Sidebar} />
-        ${app.state.$navOpen && html`<div class="scrim-mobile" onClick=${() => app.state.navOpen = false}></div>`}
-        <main class="main">
-          <${TopBar} />
+    <app-area name='main'>
+      ${VIEWS.map(({ name, route, Content }) => html`
+        <app-view key=${name} name=${name} route=${route} active=${name === 'songs' || undefined}>
+          <${TopBar} name=${name} />
           <div class="content"><${Content} /></div>
-        </main>
-      </div>
+        </app-view>
+      `)}
       <${PlayerBar} />
-    </>`;
+    </app-area>
+    <app-area name='menu' dock='start'><${Sidebar} /></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
+  `;
 }
 
 // :::::: BOOT

@@ -1,8 +1,6 @@
-/* the frame is <app-root> > <app-area name="main"> (the views and the dock),
+/* the frame is #app, the <app-root>, with <app-area name="main"> (the views and the dock),
    <app-area name="menu"> (the folder tree) and <app-area name="config">. the
    areas are sidebars where there is room and drawers where there is not */
-
-app-root { flex: 1 1 auto; min-block-size: 0; }
 
 .booting { block-size: 100%; color: var(--fg-50, var(--color-fg)); display: grid; inline-size: 100%; place-items: center; }
 

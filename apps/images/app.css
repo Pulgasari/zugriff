@@ -1,10 +1,10 @@
 /* apps/images/app.css — the unified images app.
 
-   base.css (linked by the shell) brings the reset, theme tokens and the #app
-   frame. this file is the app-level mode bar (.im-*) plus the two modes' own
-   chrome, ported wholesale from the old image-viewer (.iv-*) and image-editor
-   (.toolbar/.stage/.panel/…). the two mode stylesheets use disjoint class
-   names, so they simply coexist here. */
+   the frame is #app, the <app-root>, with <app-area name="main"> (the mode bar and a
+   view per mode) and <app-area name="config">. this file is the app-level mode bar
+   (.im-*) plus the two modes' own chrome, ported wholesale from the old image-viewer
+   (.iv-*) and image-editor (.toolbar/.stage/.panel/…). the two mode stylesheets use
+   disjoint class names, so they simply coexist here. */
 
 /* ── shell: mode bar ─────────────────────────────────────────────────────── */
 
@@ -47,7 +47,8 @@
 
 .im-modebar-actions { margin-left: auto; display: flex; align-items: center; }
 
-#app-main { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; }
+/* a mode fills its app-view, a row as the modes expect */
+app-area[name="main"] > app-view { display: flex; min-width: 0; }
 
 @media (max-width: 620px) {
   .im-brand span { display: none; }

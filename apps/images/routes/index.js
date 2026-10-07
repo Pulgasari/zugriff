@@ -1,6 +1,6 @@
 // apps/images/routes/index.js
-// the route table — id + nav metadata + component, in nav order. the shared
-// router (see app.js) resolves ?mode= against these and renders the active one.
+// the route table — id + nav metadata + component, in nav order. app.js makes an
+// app-view of each, mounted while it is on screen.
 
 import LibraryMode from './library.js';
 import ViewMode    from './view.js';

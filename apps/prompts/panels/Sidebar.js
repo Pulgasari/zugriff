@@ -1,7 +1,7 @@
 // prompts :: panels/Sidebar.js
 
 // the list pane: new-prompt button, search, tag filter + manager, sort, and the filtered
-// prompt list. reads ui state off app.state, the library off app.db.
+// prompt list. reads ui state off app.state, the library off app.lib.
 
 import Icon        from '/.shared/js/components/Icon.js';
 import Picker      from '/.shared/js/components/Picker.js';
@@ -54,7 +54,7 @@ export default function Sidebar () {
         <div class="tag-filter-list">
           <button class=${'tag-filter-btn' + (!app.state.$activeTag ? ' active' : '')}
             onClick=${() => app.state.activeTag = null}>All</button>
-          ${app.db.tags.value.map(t => html`
+          ${app.lib.tags.value.map(t => html`
             <button
               class=${'tag-filter-btn' + (app.state.$activeTag === t.id ? ' active' : '')}
               style=${{ '--tag-color': t.color }}

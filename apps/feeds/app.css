@@ -1,27 +1,30 @@
-/* apps/feeds/app.css */
+/* apps/feeds/app.css
+   the frame is #app, the <app-root>, with <app-area name="main"> (latest, youtube, feed),
+   <app-area name="menu"> (the feeds) and <app-area name="config">. menu and config are
+   sidebars where there is room and drawers where there is not */
 
-#app { flex-direction: row; }
 .booting { margin: auto; color: var(--color-ink); }
 
-#app-main {
-  flex          : 1 1 auto;
-  display       : flex;
-  flex-direction: column;
-  min-width     : 0;
-  min-height    : 0;
+app-area[name="menu"] { --area-size: min(84vw, 16rem); }
+
+app-view {
+  block-size     : 100%;
+  display        : flex;
+  flex-direction : column;
 }
+
+/* the menu button, where the menu is a drawer */
+#app:has(> app-area[name="menu"]:state(overlay)) .nav-toggle { display: inline-flex; }
 
 /* ── sidebar ─────────────────────────────────────────────────────────────── */
 
 .sidebar {
-  width         : 256px;
-  flex          : none;
+  block-size    : 100%;
   display       : flex;
   flex-direction: column;
   gap           : 0.75rem;
   padding       : 0.9rem;
   background    : var(--panel-2);
-  border-right  : 1px solid var(--line);
 }
 
 .brand {
@@ -32,9 +35,7 @@
   font-weight: 700;
   color      : var(--color-ink);
   padding    : 0.1rem 0.15rem;
-
-  .nav-close { display: none; margin-left: auto; }
-} 
+}
 
 .ibtn {
   display        : inline-flex;
@@ -311,25 +312,3 @@
 .vid:hover .vid-title { color: var(--color-ink); }
 .vid.read  .vid-title { color: var(--fg-50); font-weight: 500; }
 .vid-meta { font-size: 0.76rem; color: var(--fg-50); }
-
-
-
-/* ── mobile drawer ───────────────────────────────────────────────────────── */
-
-.scrim-mobile { display: none; }
-
-@media (max-width: 900px) {
-  .nav-toggle { display: inline-flex; }
-  .brand .nav-close { display: inline-flex; }
-  .sidebar {
-    position  : fixed;
-    inset     : var(--safe-top) auto var(--safe-bottom) var(--safe-left);
-    z-index   : 70;
-    width     : min(300px, 84vw);
-    transform : translateX(-100%);
-    transition: transform 0.2s ease;
-    box-shadow: 4px 0 24px rgb(0 0 0 / 0.35);
-  }
-  .sidebar.open { transform: translateX(0); }
-  .scrim-mobile { display: block; position: fixed; inset: 0; z-index: 65; background: rgb(0 0 0 / 0.5); }
-}

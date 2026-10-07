@@ -44,9 +44,8 @@ const open = typedSignal({ type: 'scalar', value: null, key: 'notes:open', stora
 
 // :::::: FRAME
 
-const rootRef = { current: null };
-const show    = name => rootRef.current?.show(name);
-const area    = name => rootRef.current?.area(name);
+const show = app.show;
+const area = app.area;
 
 // a drawer closes once something in it was picked, a sidebar stays
 const closeMenu = () => { if (area('menu')?.isOverlay) area('menu').hide(); };
@@ -217,16 +216,14 @@ const dockItems = [
   { icon: 'settings', label: 'settings', onClick: () => area('config')?.toggle() },
 ];
 
+// the areas of #app, the root
 function App () {
-  const root = useRef(null);
-
   useEffect(() => { app.lib.load().catch(app.toast); }, []);
 
   // the tree is the way through the notes: a sidebar from the start where there is
   // room. the elements are defined by the autoloader, so this waits for them
   useEffect(() => {
-    rootRef.current = root.current;
-    if (!root.current) return;
+    if (!app.lib.ready.value) return;
     Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
       const menu = area('menu');
       if (menu && !menu.isOverlay) menu.show();
@@ -236,15 +233,13 @@ function App () {
   if (!app.lib.ready.value) return html`<div class='booting'><${Icon} name='loading' /></div>`;
 
   return html`
-    <app-root ref=${root} routing='hash'>
-      <app-area name='main'>
-        <app-view name='start' route='/' active=${current.value === 'start' || undefined}><${Start} /></app-view>
-        <app-view name='note' route='/note' transition-on='glide' active=${current.value === 'note' || undefined}><${Note} /></app-view>
-        <${Dock} items=${dockItems} />
-      </app-area>
-      <app-area name='menu' dock='start'><${Menu} /></app-area>
-      <app-area name='config' dock='end'><${Config} /></app-area>
-    </app-root>
+    <app-area name='main'>
+      <app-view name='start' route='/' active=${current.value === 'start' || undefined}><${Start} /></app-view>
+      <app-view name='note' route='/note' transition-on='glide' active=${current.value === 'note' || undefined}><${Note} /></app-view>
+      <${Dock} items=${dockItems} />
+    </app-area>
+    <app-area name='menu' dock='start'><${Menu} /></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
   `;
 }
 

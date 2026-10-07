@@ -204,10 +204,15 @@ class ZugriffApp {
   get hotkeys ()    { return this._hotkeys; }
   set hotkeys (map) { this._hotkeys.define(map); }
 
-  // ::: routes, each change a view transition (transitions.js). an app with a
-  // router gets setRoute rewired to keep the url in sync
+  // ::: routes, each change a view transition (transitions.js). an app on #app's
+  // views rewires setRoute to app.show
   setRoute = (id = null)       => transition(() => { this.state.route = id; });
   go       = (name, id = null) => transition(() => { this.state.route = { name, id }; });
+
+  // ::: the frame. #app is the page's <app-root>, its areas and views are the app's
+  get root () { return document.getElementById('app'); }
+  area = name => this.root?.area?.(name) ?? null;
+  show = name => this.root?.show?.(name);
 
   // ::: dialogs and panels, one of each open at a time. the same id closes it again
   toggleDialog = id => { this.state.dialog = this.state.$dialog === id ? null : id; };
@@ -218,7 +223,7 @@ class ZugriffApp {
   isInstalled   = isInstalled;
   promptInstall = promptInstall;
 
-  // ::: mount. the app owns the whole #app root; App is the top-level component.
+  // ::: mount. App renders into #app, the <app-root>: its areas, or anything else
   init = async ({ App, target = '#app' } = {}) => {
     // aufbau.css comes with index.css, the palette is the app's own
     await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin } });

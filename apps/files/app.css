@@ -49,7 +49,6 @@ div { --gap: small; --pad: huge;  } // hübscher, aber bissl magisch, robust mac
 div ( gap: small; padding: small; } // perfekte form, aber braucht js oder build-step     
 */
 
-app-root         { flex: 1 1 auto; min-block-size: 0; }
 app-view         { flex-direction: column; overflow: hidden; }
 app-view[active] { display: flex; }
 app-panel h3     { font-size: 1rem; font-weight: 500; }

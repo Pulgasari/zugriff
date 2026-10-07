@@ -1,25 +1,34 @@
 /* apps/audio-manager/app.css — the app's own chrome.
-   reset, theme tokens and the #app frame come from ./../base.css. */
+   the frame is #app, the <app-root>, with <app-area name="main"> (the views and the
+   player), <app-area name="menu"> (navigation and folders) and <app-area name="config">.
+   menu and config are sidebars where there is room and drawers where there is not */
 
 .centered { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
-#app-main { flex: 1 1 auto; display: flex; min-height: 0; min-width: 0; }
 .booting { color: var(--color-ink); }
+
+app-area[name="menu"] { --area-size: min(82vw, 15rem); }
+
+app-view {
+  block-size     : 100%;
+  display        : flex;
+  flex-direction : column;
+}
+
+/* the menu button, where the menu is a drawer */
+#app:has(> app-area[name="menu"]:state(overlay)) .nav-toggle { display: inline-flex; }
 
 /* ── sidebar ─────────────────────────────────────────────────────────────── */
 
 .sidebar {
-  width         : 240px;
-  flex          : none;
+  block-size    : 100%;
   display       : flex;
   flex-direction: column;
   gap           : 0.75rem;
   padding       : 0.9rem;
   background    : var(--panel-2);
-  border-right  : 1px solid var(--line);
   min-height    : 0;
 }
 .brand { display: flex; align-items: center; gap: 0.5rem; font-size: 1.05rem; font-weight: 700; color: var(--color-ink); padding: 0.1rem 0.15rem; }
-.brand .nav-close { display: none; margin-left: auto; }
 
 .ibtn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -64,8 +73,6 @@
 .tip-hint { opacity: 0.75; }
 
 /* ── main + topbar ───────────────────────────────────────────────────────── */
-
-.main { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 
 .topbar {
   flex: none; display: flex; align-items: center; gap: 0.5rem;
@@ -211,17 +218,8 @@
   .seek     { display: none; }
 }
 
-/* ── toast + mobile drawer ───────────────────────────────────────────────── */
+/* ── toast ───────────────────────────────────────────────────────────────── */
 
 .toasts { position: fixed; left: 0; right: 0; bottom: calc(5.5rem + var(--safe-bottom)); display: flex; justify-content: center; pointer-events: none; z-index: 80; }
 .toast { padding: 0.6rem 1rem; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 8px 24px rgb(0 0 0 / 0.35); font-size: 0.85rem; }
 .toast.err { border-color: color-mix(in oklch, var(--c-null, #e06c75) 55%, var(--line)); color: var(--c-null, #e06c75); }
-
-.scrim-mobile { display: none; }
-@media (max-width: 860px) {
-  .nav-toggle { display: inline-flex; }
-  .brand .nav-close { display: inline-flex; }
-  .sidebar { position: fixed; inset: var(--safe-top) auto var(--safe-bottom) var(--safe-left); z-index: 70; width: min(280px, 82vw); transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 4px 0 24px rgb(0 0 0 / 0.35); }
-  .sidebar.open { transform: translateX(0); }
-  .scrim-mobile { display: block; position: fixed; inset: 0; z-index: 65; background: rgb(0 0 0 / 0.5); }
-}

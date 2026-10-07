@@ -1,14 +1,16 @@
 // apps/videos/app.js
 //
-// the videos app: one PWA, several routes switched by ?mode= via the shared query-param
-// router — a video-manager (library), a player (the shared engine) and a hinted editor. the
-// shell is a mode bar plus the router outlet. the OS "open with" / launchQueue drops a
-// launched clip into the player. the runtime binds zugriff (+ zugriff.app, html) to window
-// before this runs, so nothing here imports the runtime.
+// the videos app: one PWA, several modes as the views of #app, the <app-root> — a
+// video-manager (library), a player (the shared engine) and a hinted editor. the main area
+// is a mode bar plus a view per mode. the OS "open with" / launchQueue drops a launched
+// clip into the player. the runtime binds zugriff (+ zugriff.app, html) to window before
+// this runs, so nothing here imports the runtime.
 
-import { Icon, SettingsButton, SettingsModal } from '/.shared/js/components/index.js';
-import { createRouter }   from '/.shared/js/modules/router.js';
-import { useEffect }      from 'preact/hooks';
+import { signal }    from '@aufbau/signals';
+import { useEffect } from 'preact/hooks';
+
+import { Config }           from '/.shared/js/components/Config.js';
+import { Icon, IconButton } from '/.shared/js/components/index.js';
 
 import lib          from './modules/library.js';
 import { routes }   from './routes/index.js';
@@ -18,7 +20,14 @@ import { loadFile } from '/.shared/js/media/videoplayer.js';
 const app = zugriff.app;
 app.lib = lib;
 
-const router = createRouter(app, { routes, param: 'mode', fallback: 'library' });
+// :::::: FRAME
+// a mode is an app-view in the main area, mounted while it is on screen only.
+// opening one stays one call: app.setRoute('player')
+
+const current = signal('library');   // the mode on screen
+
+app.setRoute = id => app.show(id);
+app.root.addEventListener('navigate', event => { current.value = event.detail.to; });
 
 // a clip opened via the OS "open with" arrives here on launch — into the player
 function wireLaunchQueue () {
@@ -42,23 +51,36 @@ function ModeBar () {
     <header class="im-modebar">
       <div class="im-brand"><${Icon} name="mdi:movie-open-outline" /> <span>videos</span></div>
       <nav class="im-modes">
-        ${router.routes.map(m => html`
-          <button class=${'im-mode' + (app.state.$route === m.id ? ' active' : '')} key=${m.id}
+        ${routes.map(m => html`
+          <button class=${'im-mode' + (current.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => app.setRoute(m.id)} title=${m.label}>
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
-      <div class="im-modebar-actions"><${SettingsButton} /><${SettingsModal} /></div>
+      <div class="im-modebar-actions"><${IconButton} icon='settings' label='Settings' onClick=${() => app.area('config')?.toggle()} /></div>
     </header>`;
 }
 
+// the library is at the root, the other modes at their id
 function App () {
-  useEffect(() => { wireLaunchQueue(); }, []);
+  useEffect(() => {
+    wireLaunchQueue();
+    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
+      current.value = app.root.view?.getAttribute('name') ?? 'library';
+    });
+  }, []);
+
   return html`
-    <>
+    <app-area name='main'>
       <${ModeBar} />
-      <div id="app-main"><${router.Outlet} /></div>
-    </>`;
+      ${routes.map(({ id, component: Mode }) => html`
+        <app-view key=${id} name=${id} route=${id === 'library' ? '/' : `/${id}`} active=${id === 'library' || undefined}>
+          ${current.value === id && html`<${Mode} />`}
+        </app-view>
+      `)}
+    </app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
+  `;
 }
 
 // :::::: BOOT

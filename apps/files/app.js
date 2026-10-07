@@ -73,9 +73,8 @@ const file     = signal(null);     // the entry in the preview
 const current  = signal('dashboard');
 const sheet    = signal(null);      // what the context area shows instead: 'tasks', 'remotes'
 
-const rootRef = { current: null };
-const show    = name => rootRef.current?.show(name);
-const area    = name => rootRef.current?.area(name);
+const show = app.show;
+const area = app.area;
 
 const touch      = () => globalThis.matchMedia?.('(pointer: coarse)').matches;
 const opensOnTap = () => app.state.$open === 'single' || (app.state.$open === 'auto' && touch());
@@ -1102,9 +1101,10 @@ const CONTROLS = {
 // the setting's key names the custom properties too: --pattern-bg-image, --pattern-bg-opacity
 const PATTERNS = ['pattern-bg', 'pattern-tile'];
 
-function usePatterns (root) {
+// on #app, the root
+function usePatterns () {
   useEffect(() => effect(() => {
-    const element = root.current;
+    const element = app.root;
     if (!element) return;
 
     for (const name of PATTERNS) {
@@ -1178,27 +1178,26 @@ function onNavigate (event) {
   else if (event.detail.from === 'sync') sync.stop();
 }
 
+app.root.addEventListener('navigate', onNavigate);
+
+// the areas of #app, the root
 function App () {
-  const root = useRef(null);
-  usePatterns(root);
+  usePatterns();
 
   useEffect(() => {
-    rootRef.current = root.current;
     app.db.load().catch(err => console.warn('[files] load failed', err));
   }, []);
 
   return html`
-    <app-root ref=${root} routing='hash' onnavigate=${onNavigate}>
-      <app-area name='main'>
-        <app-view name='dashboard' route='/' active><${Dashboard} /></app-view>
-        <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
-        <app-view name='preview' route='/preview' transition-on='glide'><${Preview} /></app-view>
-        <app-view name='sync' route='/sync' transition-on='glide'><${SyncView} Bar=${Bar} IconButton=${IconButton} Action=${Action} Actions=${Actions} /></app-view>
-      </app-area>
-      <app-area name='menu' dock='start'><${Menu} /></app-area>
-      <app-area name='config' dock='end'><${Config} /></app-area>
-      <app-area name='context' dock='bottom' peek ontoggle=${event => { if (!event.detail?.open) sheet.value = null; }}><${Context} /></app-area>
-    </app-root>
+    <app-area name='main'>
+      <app-view name='dashboard' route='/' active><${Dashboard} /></app-view>
+      <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
+      <app-view name='preview' route='/preview' transition-on='glide'><${Preview} /></app-view>
+      <app-view name='sync' route='/sync' transition-on='glide'><${SyncView} Bar=${Bar} IconButton=${IconButton} Action=${Action} Actions=${Actions} /></app-view>
+    </app-area>
+    <app-area name='menu' dock='start'><${Menu} /></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
+    <app-area name='context' dock='bottom' peek ontoggle=${event => { if (!event.detail?.open) sheet.value = null; }}><${Context} /></app-area>
   `;
 }
 
