@@ -178,6 +178,8 @@ function applyGestalt ({ prefix }) {
       "@aufbau/elements/htx"    : `${pkg}/aufbau/elements/adapters/htx.js`,
       "@aufbau/elements/"       : `${pkg}/aufbau/elements/`,
       "@aufbau/filters"         : `${pkg}/aufbau/filters/index.js`,
+      "@aufbau/gestalt"         : `${pkg}/aufbau/gestalt/index.js`,
+      "@aufbau/gestalt/"        : `${pkg}/aufbau/gestalt/`,
       "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
       "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
       "@aufbau/gui"             : `${pkg}/aufbau/gui/index.js`,
