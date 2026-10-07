@@ -1,6 +1,5 @@
 // shared/js/components/Icon.js
 
-import { html }        from './../vendors.js';
 import { resolveIcon } from './../data/icons.js';
 
 // a bare number means pixels — call sites pass both 32 and "32"
@@ -9,13 +8,13 @@ const length = value =>
   : /^-?\d*\.?\d+$/.test(String(value)) ? `${value}px`
   : value;
 
-function Icon ({ name, size, color, className, class: klass, onClick, title, style }) {
+function Icon ({ name, size, ...rest }) {
   return html`
     <svg-icon
-      class=${['icon', className, klass].filter(Boolean).join(' ')}
+      class='icon'
       icon=${resolveIcon(name)}
       size=${length(size)}
-      ...${{ color, onClick, style, title }}
+      ...${rest}
     ></svg-icon>`;
 }
 
