@@ -25,6 +25,7 @@ build with: **aufbau** + **capacitor** + **htx** + **preact**
 - [notes](https://zugriff.dev/notes/)
 - [podcasts](https://zugriff.dev/podcasts/)
 - [prompts](https://zugriff.dev/prompts/)
+- [tools](https://zugriff.dev/tools/)
 - [todo](https://zugriff.dev/todo/)
 - [videos](https://zugriff.dev/videos/)
 
