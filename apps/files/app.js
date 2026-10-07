@@ -21,7 +21,6 @@ import { patternStyle }             from '@aufbau/elements/webcomponents/input/t
 
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import Icon               from '/.shared/js/components/Icon.js';
 import { sharedSpec }     from '/.shared/js/components/Settings.js';
 import fmt                from '/.shared/js/modules/fmt.js';
 import { createThumbCache } from '/.shared/js/thumbs.js';
@@ -316,7 +315,7 @@ function IconButton ({ icon, label, onClick, pressed, disabled }) {
   return html`
     <button class='icon-button' type='button' aria-label=${label} title=${label}
             aria-pressed=${pressed == null ? null : String(pressed)} disabled=${disabled} onClick=${onClick}>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon} />
     </button>
   `;
 }
@@ -337,7 +336,7 @@ function Bar ({ title, back, children }) {
 function Hero ({ icon, title, children }) {
   return html`
     <div-y class='hero'>
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon} />
       <h2>${title}</h2>
       ${children}
     </div-y>
@@ -368,7 +367,7 @@ function Thumb ({ entry, at, from = null }) {
 
   return html`
     <span class='thumb' ref=${holder}>
-      ${url ? html`<img src=${url} alt='' loading='lazy' />` : html`<${Icon} name=${iconOf(entry, from ? null : at)} />`}
+      ${url ? html`<img src=${url} alt='' loading='lazy' />` : html`<svg-icon icon=${iconOf(entry, from ? null : at)} />`}
     </span>
   `;
 }
@@ -376,7 +375,7 @@ function Thumb ({ entry, at, from = null }) {
 function Status () {
   const scanning = app.scan.scanning.value;
   const index    = app.scan.index.value;
-  if (scanning) return html`<p class='status'><${Icon} name='loading' /> Reading the folder … ${scanning.files} files</p>`;
+  if (scanning) return html`<p class='status'><svg-icon icon='loading' /> Reading the folder … ${scanning.files} files</p>`;
   if (index)    return html`<p class='status'>${index.total} files · ${fmt.bytes(index.size)} · read ${fmt.date(index.scannedAt)}</p>`;
   return null;
 }
@@ -424,7 +423,7 @@ function Categories () {
           return html`
             <li key=${id}>
               <button class='tile' type='button' disabled=${!stats?.count} onClick=${() => { category.value = id; }}>
-                <${Icon} name=${icon} />
+                <svg-icon icon=${icon} />
                 <span class='text'>
                   <span class='name'>${label}</span>
                   <small>${stats ? `${stats.count} · ${fmt.bytes(stats.size)}` : '…'}</small>
@@ -465,7 +464,7 @@ function Places () {
       <ul class='tiles'>
         <li>
           <button class='tile' type='button' onClick=${() => { goTo([]); show('library'); }}>
-            <${Icon} name='lucide:folder-open' />
+            <svg-icon icon='lucide:folder-open' />
             <span class='text'>
               <span class='name'>${folderName()}</span>
               <small>${app.scan.index.value ? fmt.bytes(app.scan.index.value.size) : 'the granted folder'}</small>
@@ -489,7 +488,7 @@ function Bookmarks () {
             ${list.map(bookmark => html`
               <li key=${bookmark.path.join('/')}>
                 <button class='tile' type='button' onClick=${() => { goTo(bookmark.path); show('library'); }}>
-                  <${Icon} name=${app.places.typeOf(bookmark.path)?.icon ?? 'lucide:bookmark'} />
+                  <svg-icon icon=${app.places.typeOf(bookmark.path)?.icon ?? 'lucide:bookmark'} />
                   <span class='text'>
                     <span class='name'>${bookmark.name}</span>
                     <small>/${bookmark.path.join('/')}</small>
@@ -533,7 +532,7 @@ function Remotes () {
         ${connections.map(connection => html`
           <li key=${connection.id}>
             <button class='tile' type='button' onClick=${() => openRemote(connection.id)}>
-              <${Icon} name='lucide:cloud' />
+              <svg-icon icon='lucide:cloud' />
               <span class='text'>
                 <span class='name'>${connection.name}</span>
                 <small>${new URL(connection.url).host}</small>
@@ -543,7 +542,7 @@ function Remotes () {
         `)}
         <li>
           <button class='tile' type='button' onClick=${manageRemotes}>
-            <${Icon} name='lucide:cloud-cog' />
+            <svg-icon icon='lucide:cloud-cog' />
             <span class='text'>
               <span class='name'>WebDAV, Nextcloud</span>
               <small>${connections.length ? 'add or remove' : 'connect a server'}</small>
@@ -553,7 +552,7 @@ function Remotes () {
         ${PLANNED.map(remote => html`
           <li key=${remote.label}>
             <button class='tile' type='button' disabled title=${remote.note}>
-              <${Icon} name=${remote.icon} />
+              <svg-icon icon=${remote.icon} />
               <span class='text'>
                 <span class='name'>${remote.label}</span>
                 <small>soon · ${remote.note}</small>
@@ -601,7 +600,7 @@ function RemoteManager () {
       <ul class='tasks'>
         ${app.remotes.connections.value.map(connection => html`
           <li class='task' key=${connection.id}>
-            <${Icon} name='lucide:cloud' />
+            <svg-icon icon='lucide:cloud' />
             <span class='text'><span class='name'>${connection.name}</span><small>${connection.url}</small></span>
             <${IconButton} icon='lucide:trash-2' label=${`forget ${connection.name}`} onClick=${() => remove(connection)} />
           </li>
@@ -614,7 +613,7 @@ function RemoteManager () {
       <input-password name='password' placeholder='password or app password' autocomplete='current-password'></input-password>
       <input-text     name='name'     placeholder='name (optional)'></input-text>
       ${remoteError.value && html`<p class='error'>${remoteError.value}</p>`}
-      <button class='action' type='submit' disabled=${remoteBusy.value}><${Icon} name=${remoteBusy.value ? 'loading' : 'lucide:plug'} /> connect</button>
+      <button class='action' type='submit' disabled=${remoteBusy.value}><svg-icon icon=${remoteBusy.value ? 'loading' : 'lucide:plug'} /> connect</button>
     </form>
     <p class='hint'>In a browser the server has to allow this app (cors), the android app needs nothing of the kind. Nextcloud: the url ends in /remote.php/dav/files/${'<user>'}/, best with an app password. The password stays on this device.</p>
   `;
@@ -654,19 +653,19 @@ function Welcome () {
     </${Hero}>
   `;
 
-  if (!app.db.ready.value) return html`<${Icon} name='loading' />`;
+  if (!app.db.ready.value) return html`<svg-icon icon='loading' />`;
 
   if (!app.db.folder.value) return html`
     <${Hero} icon='folder-open' title='Browse a folder'>
       <p>Pick a folder of your device, it becomes the root. Nothing is uploaded or copied.</p>
-      <button class='action' type='button' onClick=${chooseFolder}><${Icon} name='folder-add' /> Open a folder</button>
+      <button class='action' type='button' onClick=${chooseFolder}><svg-icon icon='folder-add' /> Open a folder</button>
     </${Hero}>
   `;
 
   return html`
     <${Hero} icon='folder-key' title=${`Reconnect “${folderName()}”`}>
       <p>This folder needs permission again for this visit.</p>
-      <button class='action' type='button' onClick=${reconnect}><${Icon} name='folder-key' /> Reconnect</button>
+      <button class='action' type='button' onClick=${reconnect}><svg-icon icon='folder-key' /> Reconnect</button>
     </${Hero}>
   `;
 }
@@ -750,7 +749,7 @@ function Crumbs () {
     return () => element?.removeEventListener('nav-crumbs', onCrumb);
   }, []);
 
-  return html`<nav-crumbs ref=${crumbs} root=${folderName()} path=${'/' + path.value.join('/')}></nav-crumbs>`;
+  return html`<nav-crumbs ref=${crumbs} root=${folderName()} path=${'/' + path.value.join('/')} />`;
 }
 
 function Library () {
@@ -774,13 +773,13 @@ function Library () {
     <${Crumbs} />
     <div class='pane'>
       <div class='listing'>
-        ${loading.value ? html`<${Icon} name='loading' />`
+        ${loading.value ? html`<svg-icon icon='loading' />`
         : list.length
           ? html`<data-index viewmode=${viewmode} item-size='128px' item-size-min='80px' item-size-max='320px'>${list.map(entry => html`<${Entry} key=${entry.name} entry=${entry} />`)}</data-index>`
           : html`<p class='empty'>${filter.value ? 'nothing matches the filter' : 'this folder is empty'}</p>`}
       </div>
       <app-float anchor='bottom-end'>
-        <button class='fab' type='button' aria-label='new folder' title='new folder' onClick=${newFolder}><${Icon} name='lucide:folder-plus' /></button>
+        <button class='fab' type='button' aria-label='new folder' title='new folder' onClick=${newFolder}><svg-icon icon='lucide:folder-plus' /></button>
       </app-float>
     </div>
     <${PasteBar} />
@@ -798,9 +797,9 @@ function PasteBar () {
 
   return html`
     <div-x class='pastebar'>
-      <${Icon} name=${board.mode === 'move' ? 'lucide:scissors' : 'lucide:copy'} />
+      <svg-icon icon=${board.mode === 'move' ? 'lucide:scissors' : 'lucide:copy'} />
       <span class='text'><span class='name'>${what}</span><small>${board.mode === 'move' ? 'to move' : 'to copy'}</small></span>
-      <button class='action' type='button' onClick=${paste}><${Icon} name='lucide:clipboard-paste' /> here</button>
+      <button class='action' type='button' onClick=${paste}><svg-icon icon='lucide:clipboard-paste' /> here</button>
       <${IconButton} icon='lucide:x' label='empty the clipboard' onClick=${app.transfer.clear} />
     </div-x>
   `;
@@ -836,7 +835,7 @@ function Preview () {
       <${IconButton} icon='lucide:info' label='details' onClick=${() => { selected.value = null; area('context')?.toggle(); }} />
     </${Bar}>
     <div class='stage'>
-      ${isImage(entry) ? html`<img ref=${image} alt=${entry.name} />` : html`<${Icon} name=${iconOf(entry)} />`}
+      ${isImage(entry) ? html`<img ref=${image} alt=${entry.name} />` : html`<svg-icon icon=${iconOf(entry)} />`}
     </div>
   `;
 }
@@ -853,7 +852,7 @@ function Actions ({ children }) {
 }
 
 function Action ({ icon, label, onClick, disabled }) {
-  return html`<button class='action' type='button' disabled=${disabled} onClick=${onClick}><${Icon} name=${icon} /> ${label}</button>`;
+  return html`<button class='action' type='button' disabled=${disabled} onClick=${onClick}><svg-icon icon=${icon} /> ${label}</button>`;
 }
 
 function EntryContext ({ entry }) {
@@ -912,7 +911,7 @@ function FolderType () {
       ${app.places.types().map(type => html`
         <button class='action' type='button' key=${type.id} aria-pressed=${String(current?.id === type.id)}
                 onClick=${() => app.places.setType(at, current?.id === type.id ? null : type.id)}>
-          <${Icon} name=${type.icon} /> ${type.label}
+          <svg-icon icon=${type.icon} /> ${type.label}
         </button>
       `)}
       <${Action} icon='lucide:plus' label='new type' onClick=${create} />
@@ -999,7 +998,7 @@ function TasksButton () {
 
   return html`
     <button class=${busy ? 'tasks-button busy' : 'tasks-button'} type='button' aria-label=${label} title=${label} onClick=${openTasks}>
-      <${Icon} name=${busy ? 'lucide:loader' : 'lucide:list-checks'} />
+      <svg-icon icon=${busy ? 'lucide:loader' : 'lucide:list-checks'} />
       ${count > 0 && html`<span class='badge'>${count}</span>`}
     </button>
   `;
@@ -1014,7 +1013,7 @@ function TaskRow ({ task }) {
 
   return html`
     <li class=${`task ${task.state}`}>
-      <${Icon} name=${task.icon} />
+      <svg-icon icon=${task.icon} />
       <span class='text'>
         <span class='name'>${task.label}</span>
         <small>${task.error ?? [state, task.endedAt && fmt.date(task.endedAt)].filter(Boolean).join(' · ')}</small>
@@ -1061,13 +1060,13 @@ function Menu () {
       <nav class='menu'>
         ${MENU.map(item => html`
           <button type='button' key=${item.name} aria-current=${current.value === item.name ? 'page' : null} onClick=${() => go(item.name)}>
-            <${Icon} name=${item.icon} /> ${item.label}
+            <svg-icon icon=${item.icon} /> ${item.label}
           </button>
         `)}
         <hr />
-        ${SOON.map(item => html`<button type='button' key=${item.label} disabled><${Icon} name=${item.icon} /> ${item.label} <small>soon</small></button>`)}
+        ${SOON.map(item => html`<button type='button' key=${item.label} disabled><svg-icon icon=${item.icon} /> ${item.label} <small>soon</small></button>`)}
         <hr />
-        <button type='button' onClick=${() => area('config')?.show()}><${Icon} name='lucide:settings' /> Settings</button>
+        <button type='button' onClick=${() => area('config')?.show()}><svg-icon icon='lucide:settings' /> Settings</button>
       </nav>
     </app-panel>
   `;
@@ -1158,7 +1157,7 @@ function Config () {
       <h3>Folder</h3>
       ${folder
         ? html`
-          <p class='folder'><${Icon} name='folder-open' /> ${folder.name}</p>
+          <p class='folder'><svg-icon icon='folder-open' /> ${folder.name}</p>
           <${Actions}>
             <${Action} icon='mdi:folder-swap-outline' label='change' onClick=${chooseFolder} />
             <${Action} icon='close' label='close' onClick=${closeFolder} />

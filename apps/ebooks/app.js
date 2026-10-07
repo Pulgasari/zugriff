@@ -92,8 +92,7 @@ app.addFolder = async () => {
 const { LibraryView, ReaderView } = await app.views('LibraryView', 'ReaderView');
 
 const // ::: shared components
-Config = await zugriff.component('Config'),
-Icon   = await zugriff.component('Icon');
+Config = await zugriff.component('Config');
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -108,7 +107,7 @@ function App () {
     });
   }, [app.db.ready.value]);
 
-  if (!app.db.ready.value) return html`<div class="booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`;
+  if (!app.db.ready.value) return html`<div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div>`;
 
   const key = app.state.$bookKey;
 

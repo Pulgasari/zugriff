@@ -5,7 +5,6 @@ import { useState } from 'preact/hooks';
 import { typedSignal } from '@aufbau/signals';
 
 import Modal from './Modal.js';
-import Icon  from '/.shared/js/components/Icon.js';
 
 const app = zugriff.app;
 
@@ -39,7 +38,7 @@ export default function Commands () {
         <strong>${cmd.name || key}</strong>
         <small>${key}</small>
         <div class="fav-btn" onClick=${event => toggleFavorite(event, key)}>
-          <${Icon} name=${isFav ? 'bxs:heart' : 'bx:heart'} color=${isFav ? 'var(--color-ink, currentcolor)' : 'currentColor'} />
+          <svg-icon icon=${isFav ? 'bxs:heart' : 'bx:heart'} color=${isFav ? 'var(--color-ink, currentcolor)' : 'currentColor'} />
         </div>
       </li>`;
   };

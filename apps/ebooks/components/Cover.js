@@ -1,7 +1,6 @@
 // ebooks :: components/Cover.js
 
 import { useEffect, useRef } from 'preact/hooks';
-import Icon                  from '/.shared/js/components/Icon.js';
 
 // a stable pastel from a title, for the placeholder cover
 function hueOf (text = '') {
@@ -26,7 +25,7 @@ function Cover ({ book, className = '' }) {
     <div ref=${ref} class=${'cover ' + className} style=${`--hue:${hueOf(book.title)}`}>
       ${!book.cover && html`
         <div class="cover-fallback">
-          <${Icon} name=${book.kind === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:book-open-page-variant-outline'} />
+          <svg-icon icon=${book.kind === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:book-open-page-variant-outline'} />
           <span class="cover-title">${book.title}</span>
           ${book.author && html`<span class="cover-author">${book.author}</span>`}
         </div>`}

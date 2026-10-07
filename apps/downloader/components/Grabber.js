@@ -11,7 +11,7 @@ import * as grabber from '../modules/grabber.js';
 const app = zugriff.app;
 const fmt = zugriff.fmt;
 
-const [Empty, Icon] = await Promise.all(['Empty', 'Icon'].map(name => zugriff.component(name)));
+const Empty = await zugriff.component('Empty');
 
 const TARGETS = [['library', 'library'], ['folder', 'folder'], ['webdav', 'webdav'], ['save', 'save']];
 

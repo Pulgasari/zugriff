@@ -5,7 +5,6 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon } from '/.shared/js/components/index.js';
 
 const { boot } = defineTool('downloader');
 
@@ -55,7 +54,7 @@ function App() {
           onKeyDown=${onKeyDown}
         />
         <button class="btn primary" onClick=${doDownload} disabled=${busy || !url.value}>
-          <${Icon} name=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''} />
+          <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''} />
           ${busy ? 'Fetching…' : 'Download'}
         </button>
       </div>

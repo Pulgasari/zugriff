@@ -18,7 +18,7 @@ app-view[name="reader"] { overflow: hidden; }
   margin: auto; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
   text-align: center; padding: 4rem 1rem; color: var(--fg-50, var(--color-fg));
 }
-.empty .icon { opacity: 0.6; }
+.empty svg-icon { opacity: 0.6; }
 .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--color-fg); }
 .empty-hint { max-width: 28rem; font-size: 0.9rem; }
 .empty .btn { margin-top: 0.75rem; }
@@ -29,7 +29,7 @@ app-view[name="reader"] { overflow: hidden; }
 
 .lib-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 0.5rem; font-size: 1.35rem; flex: 1 1 auto; }
-.brand .icon { color: var(--color-ink); }
+.brand svg-icon { color: var(--color-ink); }
 .lib-tools { display: flex; align-items: center; gap: 0.5rem; }
 .scan-note { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; color: var(--fg-50, var(--color-fg)); }
 
@@ -40,7 +40,7 @@ app-view[name="reader"] { overflow: hidden; }
   background: color-mix(in oklch, var(--color-ink) 8%, var(--panel));
   font-size: 0.85rem;
 }
-.reconnect-bar > .icon { color: var(--color-ink); }
+.reconnect-bar > svg-icon { color: var(--color-ink); }
 .reconnect-item { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
 .reconnect-name { font-weight: 600; }
 
@@ -51,7 +51,7 @@ app-view[name="reader"] { overflow: hidden; }
   padding: 0.4rem 0.7rem; background: var(--color-bg); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .lib-search:focus-within { border-color: var(--color-ink); }
-.lib-search .icon { color: var(--fg-50, var(--color-fg)); flex: none; }
+.lib-search svg-icon { color: var(--fg-50, var(--color-fg)); flex: none; }
 .lib-search input { flex: 1 1 auto; min-width: 0; border: none; background: none; color: var(--color-fg); font: inherit; outline: none; }
 
 .folder-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
@@ -95,7 +95,7 @@ app-view[name="reader"] { overflow: hidden; }
   margin: auto; display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
   padding: 0.75rem; text-align: center; color: #fff;
 }
-.cover-fallback .icon { opacity: 0.85; }
+.cover-fallback svg-icon { opacity: 0.85; }
 .cover-title { font-size: 0.82rem; font-weight: 700; line-height: 1.25;
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .cover-author { font-size: 0.72rem; opacity: 0.85; }

@@ -2,7 +2,6 @@
 // convert route (ex image-converter): re-encode a batch of images.
 
 import { signal, typedSignal } from '@aufbau/signals';
-import { Icon } from '/.shared/js/components/index.js';
 import { dropEntries, ImgDrop, ToolFileItem } from './tools.js';
 
 const cvFiles   = signal([]);
@@ -72,9 +71,9 @@ function ConvertMode () {
 
         <div class="im-tool-actions">
           ${pendingCnt > 0 && html`<button class="btn primary" onClick=${cvConvertAll}>
-            <${Icon} name="mdi:cog-outline" /> Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}</button>`}
+            <svg-icon icon="mdi:cog-outline" /> Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}</button>`}
           ${hasDone && html`<button class="btn" onClick=${cvDownloadAll}>
-            <${Icon} name="mdi:download-multiple" /> Download all</button>`}
+            <svg-icon icon="mdi:download-multiple" /> Download all</button>`}
         </div>`}
     </div>`;
 }

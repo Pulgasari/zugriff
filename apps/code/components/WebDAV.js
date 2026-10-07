@@ -5,7 +5,6 @@
 
 import { html, useState, useEffect } from './../vendors.js';
 import Modal from './Modal.js';
-import Icon from '/.shared/js/components/Icon.js';
 import WebDAVTree from './WebDAVTree.js';
 
 const app = zugriff.app;
@@ -78,12 +77,12 @@ export default function WebDAV () {
           ${conns.map(c => html`
             <li key=${c.id}>
               <span class="gh-reporow" onClick=${() => { webdav.selectConnection(c.id); setShowList(false); }}>
-                <${Icon} name="material-symbols:cloud-outline" />
+                <svg-icon icon="material-symbols:cloud-outline" />
                 <span class="gh-reponame">${c.name}</span>
                 <span class="gh-ro">${new URL(c.url).host}</span>
               </span>
               <button class="rowmenu-btn" title="Remove" onClick=${() => webdav.removeConnection(c.id)}>
-                <${Icon} name="material-symbols:close" />
+                <svg-icon icon="material-symbols:close" />
               </button>
             </li>`)}
         </ul>`}
@@ -91,25 +90,25 @@ export default function WebDAV () {
 
   return html`
     <${Modal} id="webdav" title="WebDAV">
-      ${err && html`<div class="gh-error"><${Icon} name="material-symbols:error-outline" /> ${err}</div>`}
+      ${err && html`<div class="gh-error"><svg-icon icon="material-symbols:error-outline" /> ${err}</div>`}
 
       ${picking ? pickerSection : html`
         <div class="gh-repobar">
           <button class="gh-repochip" onClick=${() => setShowList(true)} title="Change connection">
-            <${Icon} name="material-symbols:cloud-outline" /> ${active.name}
+            <svg-icon icon="material-symbols:cloud-outline" /> ${active.name}
           </button>
           <button class="gh-textbtn" onClick=${() => { webdav.active.value = null; }}>Close</button>
         </div>
 
         <div class="tree-rootbar">
-          <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><${Icon} name="material-symbols:note-add-outline" /></button>
-          <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><${Icon} name="material-symbols:create-new-folder-outline" /></button>
-          ${clipboard.value?.source === 'webdav' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><${Icon} name="paste" /></button>`}
+          <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><svg-icon icon="material-symbols:note-add-outline" /></button>
+          <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><svg-icon icon="material-symbols:create-new-folder-outline" /></button>
+          ${clipboard.value?.source === 'webdav' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><svg-icon icon="paste" /></button>`}
         </div>
 
         <div class="filebrowser-body">
-          ${loading && html`<div class="none"><${Icon} name="material-symbols:hourglass-empty" /><br/>Loading…</div>`}
-          ${treeErr && html`<div class="gh-error"><${Icon} name="material-symbols:error-outline" /> ${treeErr}</div>`}
+          ${loading && html`<div class="none"><svg-icon icon="material-symbols:hourglass-empty" /><br/>Loading…</div>`}
+          ${treeErr && html`<div class="gh-error"><svg-icon icon="material-symbols:error-outline" /> ${treeErr}</div>`}
           ${rootTree && !loading && html`
             <ul class="tree-root">
               ${rootTree.length === 0

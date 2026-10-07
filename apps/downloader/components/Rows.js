@@ -9,7 +9,6 @@ import * as engine           from '../modules/engine.js';
 import { inspect, selected } from '../modules/frame.js';
 
 const fmt                = zugriff.fmt;
-const Icon = await zugriff.component('Icon');
 
 const STATES = {
   cancelled : 'lucide:circle-slash',
@@ -88,7 +87,7 @@ export function DownloadRow ({ download }) {
 
   return html`
     <div ref=${ref} class='download' data-state=${download.state} aria-current=${selected.value === download.id ? 'true' : null}>
-      <${Icon} name=${STATES[download.state]} />
+      <svg-icon icon=${STATES[download.state]} />
       <button type='button' class='body' onClick=${() => inspect(download.id)}>
         <span class='name'>${download.name}</span>
         <span class='status'>${statusOf(download, meter)}</span>
@@ -109,7 +108,7 @@ export function PackageCard ({ pack, rows }) {
   return html`
     <section class='package'>
       <header>
-        <${Icon} name='lucide:package' />
+        <svg-icon icon='lucide:package' />
         <span class='name'>${pack?.name ?? 'downloads'}</span>
         <span class='status'>${done}/${rows.length}${total ? ` · ${fmt.bytes(received)} of ${fmt.bytes(total)}` : ''}</span>
         ${pack && html`

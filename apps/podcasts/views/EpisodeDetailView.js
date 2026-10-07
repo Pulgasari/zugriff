@@ -2,7 +2,6 @@
 
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
 import Empty      from '/.shared/js/components/Empty.js';
-import Icon       from '/.shared/js/components/Icon.js';
 import View       from '/.shared/js/components/View.js';
 
 import Art        from './../components/Artwork.js';
@@ -74,11 +73,11 @@ export default function EpisodeDetailView ({ id }) {
           <div class="meta">
             <span>${fmtDate(episode.pubDate)}</span>
             ${episode.duration && html`<span> ${fmtDuration(episode.duration)}</span>`}
-            ${state.done       && html`<span>· <${Icon} name="mdi:check-circle" /> done</span>`}
+            ${state.done       && html`<span>· <svg-icon icon="mdi:check-circle" /> done</span>`}
           </div>
 
           <${ActionMenu} items=${actions} />
-          <aufbau-progress value=${percent}></aufbau-progress>
+          <aufbau-progress value=${percent} />
         </div>
   
         ${paras.length

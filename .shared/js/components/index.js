@@ -5,7 +5,6 @@ export * from './Dropzone.js';
 export * from './Empty.js';
 export * from './FileExplorer.js';
 export * from './FolderTree.js';
-export * from './Icon.js';
 export * from './Image.js';
 export * from './InstallTip.js';
 export * from './Nav.js';

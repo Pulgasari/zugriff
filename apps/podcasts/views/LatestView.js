@@ -1,6 +1,5 @@
 // podcasts :: views/LatestView.js
 
-import Icon        from '/.shared/js/components/Icon.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import View        from '/.shared/js/components/View.js';
 

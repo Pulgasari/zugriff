@@ -10,7 +10,6 @@ import { html } from '/.shared/js/vendors.js';
 // adding a `{ type: 'tool', slug: '<slug>', … }` entry to .shared/js/data/apps.js.
 // `config` is that entry, boot mounts the app in the shared Shell.
 import defineTool from '/.shared/js/tool.js';
-import { Icon } from '/.shared/js/components/index.js';
 
 const { boot, config } = defineTool('template');
 
@@ -19,7 +18,7 @@ const { boot, config } = defineTool('template');
 function App () {
   return html`
     <div id="app-body">
-      <${Icon} name=${config.icon} />
+      <svg-icon icon=${config.icon} />
       <p>${config.description}</p>
     </div>`;
 }

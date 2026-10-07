@@ -4,7 +4,6 @@
 import { signal, effect }   from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import { useGesture } from '@aufbau/gestures/preact';
-import { Icon } from '/.shared/js/components/index.js';
 import * as fx  from '../modules/filters.js';
 import { shots, idx, current, many, fmtSize, setFiles, vError } from '../modules/state.js';
 import { editCurrent } from './edit.js';
@@ -102,7 +101,7 @@ function ViewTopBar () {
   return html`
     <header class="iv-top">
       <div class="iv-title">
-        <${Icon} name="image" />
+        <svg-icon icon="image" />
         <span class="iv-name" title=${s?.name}>${s?.name || 'Image Viewer'}</span>
         ${many.value && html`<span class="iv-count">${idx.value + 1} / ${shots.value.length}</span>`}
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
@@ -144,17 +143,17 @@ function OpenWithTip () {
   const canHandle = 'launchQueue' in window;
   if (!canHandle) return null;
   if (pwa.isInstalled.value) {
-    return html`<p class="iv-tip"><${Icon} name="mdi:check-circle-outline" />
+    return html`<p class="iv-tip"><svg-icon icon="mdi:check-circle-outline" />
       Installed — pick <b>Images</b> from your device’s <b>Open with</b> menu to send images straight here.</p>`;
   }
   return html`
     <div class="iv-tip install">
-      <${Icon} name="mdi:cellphone-arrow-down" />
+      <svg-icon icon="mdi:cellphone-arrow-down" />
       <div>
         <span>Install the app to open images from your gallery or files with it.</span>
         ${pwa.canInstall.value
           ? html`<button class="iv-cta small" onClick=${() => pwa.promptInstall()}>
-              <${Icon} name="download" /> Install app</button>`
+              <svg-icon icon="download" /> Install app</button>`
           : html`<span class="iv-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
       </div>
     </div>`;
@@ -163,13 +162,13 @@ function OpenWithTip () {
 function Welcome () {
   return html`
     <div class="iv-welcome">
-      <${Icon} name="images" />
+      <svg-icon icon="images" />
       <h1>View an image</h1>
       <p>Open images from your device, or just drop them here. Nothing is
          uploaded — they stay on your machine.</p>
       <button class="iv-cta" onClick=${openPicker}>
-        <${Icon} name="mdi:folder-open-outline" /> Open images</button>
-      ${vError.value && html`<p class="iv-error"><${Icon} name="mdi:alert-outline" /> ${vError.value}</p>`}
+        <svg-icon icon="mdi:folder-open-outline" /> Open images</button>
+      ${vError.value && html`<p class="iv-error"><svg-icon icon="mdi:alert-outline" /> ${vError.value}</p>`}
       <${OpenWithTip} />
     </div>`;
 }
@@ -253,9 +252,9 @@ function ViewMode () {
 
         ${many.value && !bare.value && html`
           <button class="iv-nav prev" aria-label="Previous" onClick=${e => { e.stopPropagation(); go(-1); }}>
-            <${Icon} name="mdi:chevron-left" /></button>
+            <svg-icon icon="mdi:chevron-left" /></button>
           <button class="iv-nav next" aria-label="Next" onClick=${e => { e.stopPropagation(); go(1); }}>
-            <${Icon} name="mdi:chevron-right" /></button>`}
+            <svg-icon icon="mdi:chevron-right" /></button>`}
       </div>
 
       ${!bare.value && html`<${ThumbStrip} />`}

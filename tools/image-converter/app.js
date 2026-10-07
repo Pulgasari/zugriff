@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
+import { Dropzone, Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('image-converter');
@@ -90,19 +90,19 @@ function FileItem ({ entry }) {
         <img src=${entry.previewUrl} alt=${entry.file.name} />
       </div>
       
-      <${Icon} name=${icon} />
+      <svg-icon icon=${icon} />
       <span class="name">${entry.file.name}</span>
       <span class="label">${label}</span>
       
       ${entry.status === 'done' && html`
         <a class="icon-btn" href=${entry.blobUrl} download=${entry.outName} title="Download">
-          <${Icon} name="mdi:download" />
+          <svg-icon icon="mdi:download" />
         </a>
       `}
         
       ${entry.status !== 'converting' && html`
         <button class="icon-btn remove" onClick=${() => files.value = files.value.filter(file => file.id !== entry.id)} title="Remove">
-          <${Icon} name="close" />
+          <svg-icon icon="close" />
         </button>
       `}
       

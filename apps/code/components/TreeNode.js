@@ -6,7 +6,6 @@
 // every open folder reloads.
 
 import { html, useState, useEffect } from './../vendors.js';
-import Icon from '/.shared/js/components/Icon.js';
 import RowMenu from './RowMenu.js';
 
 const app = zugriff.app;
@@ -92,10 +91,10 @@ export default function TreeNode ({ entry, parent, depth = 0 }) {
       <div class="tree-row clickable" style=${`padding-left: ${indent + 6}px`} onClick=${toggle}>
         ${isDir
           ? html`<span class=${'tree-arrow ' + (isOpen ? 'open' : '')}>
-              <${Icon} name=${isLoading ? 'material-symbols:progress-activity' : 'material-symbols:chevron-right'} />
+              <svg-icon icon=${isLoading ? 'material-symbols:progress-activity' : 'material-symbols:chevron-right'} />
             </span>`
           : html`<span class="tree-arrow-spacer"></span>`}
-        <${Icon} name=${isDir ? (isOpen ? 'folder-open' : 'folder') : 'file'} color=${isDir ? '#f6c744' : '#888'} />
+        <svg-icon icon=${isDir ? (isOpen ? 'folder-open' : 'folder') : 'file'} color=${isDir ? '#f6c744' : '#888'} />
         <span class="tree-name">${entry.name}</span>
         <${RowMenu} items=${items} />
       </div>

@@ -1,6 +1,5 @@
 // ebooks :: components/TocPanel.js
 
-import Icon from '/.shared/js/components/Icon.js';
 
 function TocPanel ({ items, kind, onPick }) {
   const render = list => html`
@@ -15,7 +14,7 @@ function TocPanel ({ items, kind, onPick }) {
     <aside class="toc-panel">
       <div class="toc-head">Contents</div>
       ${items == null
-        ? html`<div class="toc-loading"><${Icon} name="svg-spinners:bars-scale-middle" /></div>`
+        ? html`<div class="toc-loading"><svg-icon icon="svg-spinners:bars-scale-middle" /></div>`
         : items.length ? render(items) : html`<div class="toc-empty">No contents in this book.</div>`}
     </aside>
   `;

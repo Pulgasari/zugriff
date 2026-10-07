@@ -5,7 +5,6 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon } from '/.shared/js/components/index.js';
 import { CodeInputPane, CodeOutputPane } from '/.shared/js/components/code.js';
 import { typedSignal } from '@aufbau/signals';
 
@@ -84,11 +83,11 @@ function App () {
 
       <div id="app-actions">
         <button class="btn primary" onClick=${doFormat} disabled=${!input.value}>
-          <${Icon} name="mdi:auto-fix" /> Format
+          <svg-icon icon="mdi:auto-fix" /> Format
         </button>
         <${IndentPicker} />
         <button class="btn secondary" onClick=${clear} disabled=${!input.value}>
-          <${Icon} name="mdi:close" /> Clear
+          <svg-icon icon="mdi:close" /> Clear
         </button>
       </div>
 

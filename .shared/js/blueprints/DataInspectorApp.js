@@ -6,7 +6,6 @@ import { html, signal, preact } from './../vendors.js';
 const { useState } = preact;
 
 import CodeInputPane from './../components/CodeInputPane.js';
-import Icon          from './../components/Icon.js';
 
 import { typedSignal } from '@aufbau/signals';
 
@@ -32,14 +31,14 @@ function Node ({ keyName, value, path, depth = 0 }) {
     return html`
       <div class=${'node depth-' + depth}>
         <div class="node-row" onClick=${() => setOpen(o => !o)}>
-          <${Icon} name=${open ? 'mdi:chevron-down' : 'mdi:chevron-right'} class="toggle-icon" />
+          <svg-icon icon=${open ? 'mdi:chevron-down' : 'mdi:chevron-right'} class="toggle-icon" />
           ${keyName !== undefined && html`<span class="node-key">${keyName}</span><span class="colon">:</span>`}
-          <${Icon} name=${typeIcon(type)} class="type-icon" />
+          <svg-icon icon=${typeIcon(type)} class="type-icon" />
           <span class="bracket">${bracket[0]}</span>
           ${!open && html`<span class="preview">${entries.length} ${entries.length === 1 ? 'item' : 'items'}</span><span class="bracket">${bracket[1]}</span>`}
           <div class="node-actions" onClick=${e => e.stopPropagation()}>
-            <button class="act-btn" title="Copy path"  onClick=${() => copyPath(path)}><${Icon} name="mdi:vector-link" /></button>
-            <button class="act-btn" title="Copy value" onClick=${() => copyVal(value)}><${Icon} name="mdi:content-copy" /></button>
+            <button class="act-btn" title="Copy path"  onClick=${() => copyPath(path)}><svg-icon icon="mdi:vector-link" /></button>
+            <button class="act-btn" title="Copy value" onClick=${() => copyVal(value)}><svg-icon icon="mdi:content-copy" /></button>
           </div>
         </div>
         ${open && html`
@@ -59,11 +58,11 @@ function Node ({ keyName, value, path, depth = 0 }) {
       <div class="node-row leaf">
         <span class="leaf-indent" />
         ${keyName !== undefined && html`<span class="node-key">${keyName}</span><span class="colon">:</span>`}
-        <${Icon} name=${typeIcon(type)} class="type-icon" style=${{ color: typeColor(type) }} />
+        <svg-icon icon=${typeIcon(type)} class="type-icon" style=${{ color: typeColor(type) }} />
         <span class="prim-val" style=${{ color: typeColor(type) }}>${strVal}</span>
         <div class="node-actions">
-          <button class="act-btn" title="Copy path"  onClick=${() => copyPath(path)}><${Icon} name="mdi:vector-link" /></button>
-          <button class="act-btn" title="Copy value" onClick=${() => copyVal(value)}><${Icon} name="mdi:content-copy" /></button>
+          <button class="act-btn" title="Copy path"  onClick=${() => copyPath(path)}><svg-icon icon="mdi:vector-link" /></button>
+          <button class="act-btn" title="Copy value" onClick=${() => copyVal(value)}><svg-icon icon="mdi:content-copy" /></button>
         </div>
       </div>
     </div>`;
@@ -96,7 +95,7 @@ function Stats ({ value }) {
         ['mdi:null',                  s.nulls,    'nulls'     ],
         ['mdi:arrow-collapse-down',   s.depth,    'max depth' ],
       ].map(([icon, val, label]) => val > 0 && html`
-        <span class="stat"><${Icon} name=${icon} /> ${val} ${label}</span>`)}
+        <span class="stat"><svg-icon icon=${icon} /> ${val} ${label}</span>`)}
     </div>`;
 }
 
@@ -150,20 +149,20 @@ function DataInspectorApp ({
             <${CodeInputPane} signal=${input} lang=${lang} placeholder=${placeholder} />
             <div class="input-actions">
               <button class="btn primary" onClick=${doParse} disabled=${!input.value}>
-                <${Icon} name="mdi:magnify" /> Inspect
+                <svg-icon icon="mdi:magnify" /> Inspect
               </button>
               ${doFormat && data && html`
                 <button class="btn secondary" onClick=${doFormat}>
-                  <${Icon} name="mdi:auto-fix" /> Format
+                  <svg-icon icon="mdi:auto-fix" /> Format
                 </button>`}
               ${input.value && html`
                 <button class="btn secondary" onClick=${clear}>
-                  <${Icon} name="mdi:close" /> Clear
+                  <svg-icon icon="mdi:close" /> Clear
                 </button>`}
             </div>
             ${err && html`
               <div class="err-block">
-                <${Icon} name="mdi:alert-circle-outline" /> ${err}
+                <svg-icon icon="mdi:alert-circle-outline" /> ${err}
               </div>`}
           </div>
 
@@ -171,17 +170,17 @@ function DataInspectorApp ({
             ${data !== null && data !== undefined ? html`
               <${Stats} value=${data} />
               <div class="search-row">
-                <${Icon} name="mdi:magnify" class="search-icon" />
+                <svg-icon icon="mdi:magnify" class="search-icon" />
                 <input class="search-input" type="text" placeholder="Filter keys & values…"
                   value=${q} onInput=${e => search.value = e.target.value} />
-                ${q && html`<button class="act-btn" onClick=${() => search.value = ''}><${Icon} name="mdi:close" /></button>`}
+                ${q && html`<button class="act-btn" onClick=${() => search.value = ''}><svg-icon icon="mdi:close" /></button>`}
               </div>
               <div class="tree">
                 ${filteredNode(data, '$', 0)}
               </div>
             ` : html`
               <div class="tree-empty">
-                <${Icon} name=${emptyIcon} />
+                <svg-icon icon=${emptyIcon} />
                 <span>${emptyLabel}</span>
               </div>`}
           </div>

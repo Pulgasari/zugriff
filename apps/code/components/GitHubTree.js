@@ -6,7 +6,6 @@
 // node just fires the op and bumps.
 
 import { html, useState } from './../vendors.js';
-import Icon from '/.shared/js/components/Icon.js';
 import RowMenu from './RowMenu.js';
 
 const app = zugriff.app;
@@ -99,12 +98,12 @@ export default function GitHubTree ({ entry, prefix = '', depth = 0 }) {
       <div class="tree-row clickable" style=${`padding-left: ${indent + 6}px`} onClick=${toggle}>
         ${isDir
           ? html`<span class=${'tree-arrow ' + (isOpen ? 'open' : '')}>
-              <${Icon} name=${isLoading ? 'material-symbols:progress-activity' : 'material-symbols:chevron-right'} />
+              <svg-icon icon=${isLoading ? 'material-symbols:progress-activity' : 'material-symbols:chevron-right'} />
             </span>`
           : html`<span class="tree-arrow-spacer"></span>`}
-        <${Icon} name=${isDir ? (isOpen ? 'folder-open' : 'folder') : 'file'} color=${isDir ? '#f6c744' : '#888'} />
+        <svg-icon icon=${isDir ? (isOpen ? 'folder-open' : 'folder') : 'file'} color=${isDir ? '#f6c744' : '#888'} />
         <span class="tree-name">${entry.path}</span>
-        ${!isDir && isLoading && html`<${Icon} name="material-symbols:progress-activity" />`}
+        ${!isDir && isLoading && html`<svg-icon icon="material-symbols:progress-activity" />`}
         ${items.length > 0 && html`<${RowMenu} items=${items} />`}
       </div>
 

@@ -7,7 +7,7 @@ import { fetchFile } from '@ffmpeg/util';
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
 import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
-import { Dropzone, Icon, Picker } from '/.shared/js/components/index.js';
+import { Dropzone, Picker } from '/.shared/js/components/index.js';
 
 const { boot } = defineTool('audio-converter');
 
@@ -94,7 +94,7 @@ function FileItem({ entry: e }) {
   let icon = { pending: 'mdi:music-note-outline', converting: 'mdi:loading', done: 'mdi:check-circle-outline', error: 'mdi:alert-circle-outline' }[e.status];
   return html`
     <div class=${'file-item ' + e.status}>
-      <${Icon} name=${icon} className=${e.status === 'converting' ? 'spin' : ''} />
+      <svg-icon icon=${icon} class=${e.status === 'converting' ? 'spin' : ''} />
       <span class="name">${e.file.name}</span>
       <span class="label">
         ${e.status === 'pending'    ? '—'
@@ -106,11 +106,11 @@ function FileItem({ entry: e }) {
         <div class="progress-bar"><div style=${'width:' + e.progress + '%'} /></div>`}
       ${e.status === 'done' && html`
         <a class="icon-btn" href=${e.blobUrl} download=${e.outName} title="Download">
-          <${Icon} name="mdi:download" />
+          <svg-icon icon="mdi:download" />
         </a>`}
       ${e.status !== 'converting' && html`
         <button class="icon-btn remove" onClick=${() => files.value = files.value.filter(f => f.id !== e.id)}>
-          <${Icon} name="mdi:close" />
+          <svg-icon icon="mdi:close" />
         </button>`}
     </div>`;
 }
@@ -129,13 +129,13 @@ function App() {
         <div class="actions">
           ${pendingCnt > 0 && html`
             <button class="btn primary" onClick=${convertAll} disabled=${ffLoading.value}>
-              <${Icon} name=${ffLoading.value ? 'mdi:loading' : 'mdi:cog-outline'}
-                            className=${ffLoading.value ? 'spin' : ''} />
+              <svg-icon icon=${ffLoading.value ? 'mdi:loading' : 'mdi:cog-outline'}
+                            class=${ffLoading.value ? 'spin' : ''} />
               ${ffLoading.value ? 'Loading ffmpeg…' : 'Convert ' + pendingCnt + ' file' + (pendingCnt > 1 ? 's' : '')}
             </button>`}
           ${hasDone && html`
             <button class="btn secondary" onClick=${downloadAll}>
-              <${Icon} name="mdi:download-multiple-outline" /> Download all
+              <svg-icon icon="mdi:download-multiple-outline" /> Download all
             </button>`}
         </div>`}
     </div>`;

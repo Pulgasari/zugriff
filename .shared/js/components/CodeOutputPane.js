@@ -1,7 +1,6 @@
 // shared/js/components/CodeOutputPane.js
 
 import { html, useEffect, useRef } from './../vendors.js';
-import Icon                        from './Icon.js';
 import { hljs, ensureLang }        from './hljs.js';
 
 function Highlighted ({ code, lang, innerRef }) {
@@ -82,7 +81,7 @@ function CodeOutputPane ({
         `}
         ${status?.value === 'error' && html`
           <div class="err-block">
-            <${Icon} name="mdi:alert-circle-outline" /><pre>${errorMessage?.value}</pre>
+            <svg-icon icon="mdi:alert-circle-outline" /><pre>${errorMessage?.value}</pre>
           </div>
         `}
         ${hasOut && html`<${Highlighted} code=${signal.value} lang=${lang} innerRef=${codeRef} />`}

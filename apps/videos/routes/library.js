@@ -5,7 +5,7 @@
 
 import { signal, computed }            from '@aufbau/signals';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { Icon, InstallTip }            from '/.shared/js/components/index.js';
+import { InstallTip }            from '/.shared/js/components/index.js';
 import { loadFile }                    from '/.shared/js/media/videoplayer.js';
 
 const app = zugriff.app;
@@ -66,7 +66,7 @@ function Thumb ({ clip }) {
     <button ref=${ref} class="im-thumb vid-thumb" title=${clip.path} onClick=${() => openInPlayer(clip)}>
       ${url
         ? html`<img src=${url} alt=${clip.name} loading="lazy" />`
-        : html`<div class="im-thumb-ph"><${Icon} name="mdi:movie-outline" /></div>`}
+        : html`<div class="im-thumb-ph"><svg-icon icon="mdi:movie-outline" /></div>`}
       <span class="im-thumb-name">${clip.name}</span>
     </button>`;
 }
@@ -76,7 +76,7 @@ function ReconnectBar () {
   if (!stale.length) return null;
   return html`
     <div class="im-reconnect">
-      <${Icon} name="mdi:folder-alert-outline" />
+      <svg-icon icon="mdi:folder-alert-outline" />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(s => html`
         <div class="im-reconnect-item" key=${s.id}>
@@ -84,10 +84,10 @@ function ReconnectBar () {
           <button class="btn small primary" onClick=${() => app.lib.reconnect(s.id).then(res => {
             if (!res.granted) libMsg.value = `Reconnect failed — ${res.error ? (res.error.name || 'error') : 'browser said “' + res.state + '”'}. Try “Choose folder”.`;
           })}>
-            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
+            <svg-icon icon="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works"
                   onClick=${() => app.lib.repick(s.id).then(ok => { if (!ok) libMsg.value = `Could not open ${s.name}`; })}>
-            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
+            <svg-icon icon="mdi:folder-search-outline" /> Choose folder</button>
         </div>`)}
     </div>`;
 }
@@ -108,7 +108,7 @@ function LibraryRoute () {
   useEffect(() => { app.lib.ensureLoaded(); }, []);
 
   if (!app.lib.ready.value) {
-    return html`<div class="im-lib"><div class="im-booting"><${Icon} name="svg-spinners:bars-scale-middle" /></div></div>`;
+    return html`<div class="im-lib"><div class="im-booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div></div>`;
   }
 
   const clips      = visibleClips.value;
@@ -118,21 +118,21 @@ function LibraryRoute () {
   return html`
     <div class="im-lib">
       <header class="im-lib-head">
-        ${scanning && html`<span class="im-scan-note"><${Icon} name="svg-spinners:bars-scale-middle" /> scanning…</span>`}
+        ${scanning && html`<span class="im-scan-note"><svg-icon icon="svg-spinners:bars-scale-middle" /> scanning…</span>`}
         <div class="im-lib-search">
-          <${Icon} name="mdi:magnify" />
+          <svg-icon icon="mdi:magnify" />
           <input type="search" placeholder="Search clips…" value=${libSearch.value}
                  onInput=${e => libSearch.value = e.target.value} />
           ${libSearch.value && html`<button class="iv-btn" aria-label="Clear" onClick=${() => libSearch.value = ''}>
-            <${Icon} name="mdi:close" /></button>`}
+            <svg-icon icon="mdi:close" /></button>`}
         </div>
-        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => app.lib.rescanAll()}><${Icon} name="mdi:refresh" /></button>`}
+        ${hasFolders && html`<button class="iv-btn" title="Rescan folders" onClick=${() => app.lib.rescanAll()}><svg-icon icon="mdi:refresh" /></button>`}
         <button class="btn primary" onClick=${addFolderAction}>
-          <${Icon} name="mdi:folder-plus-outline" /> Add folder</button>
+          <svg-icon icon="mdi:folder-plus-outline" /> Add folder</button>
       </header>
 
-      ${libMsg.value && html`<div class="im-lib-msg"><${Icon} name="mdi:alert-outline" /> ${libMsg.value}
-        <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><${Icon} name="mdi:close" /></button></div>`}
+      ${libMsg.value && html`<div class="im-lib-msg"><svg-icon icon="mdi:alert-outline" /> ${libMsg.value}
+        <button class="iv-btn" aria-label="Dismiss" onClick=${() => libMsg.value = ''}><svg-icon icon="mdi:close" /></button></div>`}
 
       <${ReconnectBar} />
       <${InstallTip} show=${app.lib.sources.value.length > 0}
@@ -142,11 +142,11 @@ function LibraryRoute () {
       ${!hasFolders
         ? html`
           <div class="im-lib-empty">
-            <${Icon} name="mdi:folder-multiple-outline" />
+            <svg-icon icon="mdi:folder-multiple-outline" />
             <p class="im-empty-title">Browse a video folder</p>
             <p class="im-empty-hint">Grant a folder off your device and browse it as a gallery — open any clip into the player. Nothing is uploaded; only the folder permission is remembered.</p>
             <button class="btn primary" onClick=${addFolderAction}>
-              <${Icon} name="mdi:folder-plus-outline" /> Add a folder</button>
+              <svg-icon icon="mdi:folder-plus-outline" /> Add a folder</button>
           </div>`
         : clips.length
           ? html`<div class="im-scroll"><aufbau-index class="im-grid" viewmode="grid" item-size="160px" gap="0.6rem">
@@ -154,7 +154,7 @@ function LibraryRoute () {
             </aufbau-index></div>`
           : html`
             <div class="im-lib-empty">
-              <${Icon} name=${libSearch.value ? 'mdi:magnify-close' : 'mdi:movie-off-outline'} />
+              <svg-icon icon=${libSearch.value ? 'mdi:magnify-close' : 'mdi:movie-off-outline'} />
               <p class="im-empty-title">${libSearch.value ? 'Nothing matches your search' : 'No clips here yet'}</p>
               ${!libSearch.value && html`<p class="im-empty-hint">Scanning may still be running, or this folder has no videos.</p>`}
             </div>`}

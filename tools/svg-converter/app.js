@@ -6,7 +6,7 @@ import { PDFDocument } from 'pdf-lib';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Dropzone, Icon, Slider } from '/.shared/js/components/index.js';
+import { Dropzone, Slider } from '/.shared/js/components/index.js';
 
 const { boot } = defineTool('svg-converter');
 
@@ -176,7 +176,7 @@ function App() {
               <span>${natW.value} × ${natH.value}px</span>
               <span>${fileName.value}.svg</span>
               <button class="ghost-btn" onClick=${() => { svgSrc.value = ''; fileName.value = ''; }}>
-                <${Icon} name="mdi:close" /> Remove
+                <svg-icon icon="mdi:close" /> Remove
               </button>
             </div>
           </div>
@@ -196,7 +196,7 @@ function App() {
                 <button class=${'lock-btn' + (lockAR.value ? ' active' : '')}
                   onClick=${() => lockAR.value = !lockAR.value}
                   title=${lockAR.value ? 'Unlock aspect ratio' : 'Lock aspect ratio'}>
-                  <${Icon} name=${lockAR.value ? 'mdi:lock-outline' : 'mdi:lock-open-outline'} />
+                  <svg-icon icon=${lockAR.value ? 'mdi:lock-outline' : 'mdi:lock-open-outline'} />
                 </button>
                 <div class="size-field">
                   <span class="size-unit">H</span>
@@ -208,7 +208,7 @@ function App() {
                 ${(outW.value || outH.value) && html`
                   <button class="ghost-btn" onClick=${() => { outW.value = 0; outH.value = 0; }}
                     title="Reset to natural size">
-                    <${Icon} name="mdi:refresh" />
+                    <svg-icon icon="mdi:refresh" />
                   </button>`}
               </div>
               <span class="size-hint">→ ${w} × ${h}px</span>
@@ -225,7 +225,7 @@ function App() {
               <div class="export-btns">
                 ${FORMATS.map(fmt => html`
                   <button class="btn primary" onClick=${() => doExport(fmt)}>
-                    <${Icon} name=${fmt === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:download'} />
+                    <svg-icon icon=${fmt === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:download'} />
                     .${fmt}
                   </button>`)}
               </div>
@@ -237,7 +237,7 @@ function App() {
 
         ${status.value === 'error' && html`
           <div class="err-row">
-            <${Icon} name="mdi:alert-circle-outline" /> ${errMsg.value}
+            <svg-icon icon="mdi:alert-circle-outline" /> ${errMsg.value}
           </div>`}
       `}
     </div>`;

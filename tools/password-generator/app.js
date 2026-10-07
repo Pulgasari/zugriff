@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon, Picker, Slider } from '/.shared/js/components/index.js';
+import { Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('password-generator');
@@ -173,11 +173,11 @@ function RandomSettings() {
       <${Slider} label="Length" min=4 max=128
         value=${length.value} onChange=${v => length.value = v} />
       <div class="toggles">
-        <label class='toggle'><input-bool look='switch' checked=${useUpper.value} onChange=${e => useUpper.value = e.target.checked}></input-bool><span>A–Z uppercase</span></label>
-        <label class='toggle'><input-bool look='switch' checked=${useLower.value} onChange=${e => useLower.value = e.target.checked}></input-bool><span>a–z lowercase</span></label>
-        <label class='toggle'><input-bool look='switch' checked=${useDigits.value} onChange=${e => useDigits.value = e.target.checked}></input-bool><span>0–9 digits</span></label>
-        <label class='toggle'><input-bool look='switch' checked=${useSymbols.value} onChange=${e => useSymbols.value = e.target.checked}></input-bool><span>!@# symbols</span></label>
-        <label class='toggle'><input-bool look='switch' checked=${noSimilar.value} onChange=${e => noSimilar.value = e.target.checked}></input-bool><span>No similar chars (i l 1 o 0)</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useUpper.value} onChange=${e => useUpper.value = e.target.checked} /><span>A–Z uppercase</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useLower.value} onChange=${e => useLower.value = e.target.checked} /><span>a–z lowercase</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useDigits.value} onChange=${e => useDigits.value = e.target.checked} /><span>0–9 digits</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useSymbols.value} onChange=${e => useSymbols.value = e.target.checked} /><span>!@# symbols</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${noSimilar.value} onChange=${e => noSimilar.value = e.target.checked} /><span>No similar chars (i l 1 o 0)</span></label>
       </div>
     </div>`;
 }
@@ -217,7 +217,7 @@ function PasswordRow({ pw }) {
   return html`
     <div class="pw-row" onClick=${() => copyOne(pw)} title="Click to copy">
       <code class="pw-value">${pw}</code>
-      <${Icon} name=${isCopied ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon" />
+      <svg-icon icon=${isCopied ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon" />
     </div>`;
 }
 
@@ -250,11 +250,11 @@ function App() {
 
         <div class="actions">
           <button class="btn primary" onClick=${generate}>
-            <${Icon} name="mdi:refresh" /> Generate
+            <svg-icon icon="mdi:refresh" /> Generate
           </button>
           ${list.length > 1 && html`
             <button class="btn secondary" onClick=${copyAll}>
-              <${Icon} name=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'} />
+              <svg-icon icon=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'} />
               ${copied.value === '__all__' ? 'Copied!' : 'Copy all'}
             </button>`}
         </div>

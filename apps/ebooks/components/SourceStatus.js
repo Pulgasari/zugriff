@@ -1,7 +1,6 @@
 // ebooks :: components/SourceStatus.js
 // the folders that need reconnecting after a reload
 
-import Icon from '/.shared/js/components/Icon.js';
 
 const app = zugriff.app;
 
@@ -22,15 +21,15 @@ function SourceStatus () {
   if (!stale.length) return null;
   return html`
     <div class="reconnect-bar">
-      <${Icon} name="mdi:folder-alert-outline" />
+      <svg-icon icon="mdi:folder-alert-outline" />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(source => html`
         <div key=${source.id} class="reconnect-item">
           <span class="reconnect-name">${source.name}</span>
           <button class="btn small primary" onClick=${() => reconnect(source)}>
-            <${Icon} name="mdi:folder-key-outline" /> Reconnect</button>
+            <svg-icon icon="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works" onClick=${() => repick(source)}>
-            <${Icon} name="mdi:folder-search-outline" /> Choose folder</button>
+            <svg-icon icon="mdi:folder-search-outline" /> Choose folder</button>
         </div>`)}
     </div>
   `;
