@@ -23,6 +23,6 @@ three types so far — `boolean`, `enum`, `color`.
 
 ### themes
 
-- a theme is a preset name of `aufbau/css/themes.css` or any css color, set as `--theme` through `aufbau.gestalt`.
+- a theme is a preset name of `aufbau/gestalt/themes.css` or any css color, set as `--theme` through `aufbau.gestalt`.
 - themes.css derives `--bg`, `--fg`, `--accent` from it on `body`, and `shared/css/theme.css` derives the rest of the palette from those.
 - editing a colour by hand switches the preset to `custom`.

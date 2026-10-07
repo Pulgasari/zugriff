@@ -90,7 +90,7 @@ const $root = $doc?.documentElement ?? null;
 
 const bodyReady = () => $doc.body ? Promise.resolve() : new Promise(resolve => $doc.addEventListener('DOMContentLoaded', resolve, { once: true }));
 
-// a preset of aufbau/css/palettes.css or any css color. gestalt sets --palette,
+// a preset of aufbau/gestalt/palettes.css or any css color. gestalt sets --palette,
 // the css derives the rest, and the resolved bg feeds what css cannot reach
 const applyPalette = async palette => {
   if (!$root || !palette) return;
