@@ -221,7 +221,7 @@ class ZugriffApp {
   // ::: mount. the app owns the whole #app root; App is the top-level component.
   init = async ({ App, target = '#app' } = {}) => {
     // aufbau.css comes with index.css, the palette is the app's own
-    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin, theme: false } });
+    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin } });
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);

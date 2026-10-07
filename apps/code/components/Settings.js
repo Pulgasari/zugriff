@@ -1,5 +1,5 @@
 // apps/code/components/Settings.js
-// the settings modal: a UI section (app theme, chrome options) and an editor
+// the settings modal: a UI section (app palette, chrome options) and an editor
 // section (Monaco theme + construction options).
 
 import { html } from './../vendors.js';
@@ -9,8 +9,8 @@ import Picker from './Picker.js';
 import Toggle from './Toggle.js';
 import Dropdown from './Dropdown.js';
 
-const app    = zugriff.app;
-const themes = await gestalt.themes();   // the presets of aufbau's themes.css
+const app      = zugriff.app;
+const palettes = await gestalt.palettes();   // the presets of aufbau's palettes.css
 
 const editorPickers = [
   { key: 'fontSize'         , options: [8, 9, 10, 11, 12, 13, 14, 16, 18] },
@@ -63,9 +63,9 @@ export default function Settings () {
       <div class="section">
         <h3>UI</h3>
         <${Dropdown}
-          options=${themes}
-          selected=${app.state.$theme}
-          onChange=${event => (app.state.theme = event.currentTarget.value)}
+          options=${palettes}
+          selected=${app.state.$palette}
+          onChange=${event => (app.state.palette = event.currentTarget.value)}
         />
         ${uiToggles.map(UiToggleField)}
         ${uiPickers.map(UiPickerField)}
