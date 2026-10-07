@@ -4,7 +4,6 @@
 
 import { typedSignal } from '@aufbau/signals';
 
-import Button  from './Button.js';
 import Icon    from './Icon.js';
 import Loading from './Loading.js';
 import Tree    from './Tree.js';
@@ -115,8 +114,8 @@ function FolderTree ({
         <div class='reconnect'>
           <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
           <div class='row'>
-            <${Button} icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
-            <${Button} icon='folder-search' label='Choose folder' onClick=${repick}       />
+            <btn-push icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
+            <btn-push icon='folder-search' label='Choose folder' onClick=${repick}       />
           </div>
         </div>`;
     } else if (busy && !tree) {
@@ -135,8 +134,8 @@ function FolderTree ({
         <div class='head'>
           <${Icon} name='folder' />
           <span class='name' title=${source.name}>${source.name}</span>
-          <${Button} icon='refresh' title='refresh' onClick=${refresh} disabled=${disabled} />
-          <${Button} icon='close'   title='close'   onClick=${remove} />
+          <btn-icon icon='refresh' label='refresh' onClick=${refresh} disabled=${disabled} />
+          <btn-icon icon='close'   label='close'   onClick=${remove} />
         </div>
         ${body}
       </div>

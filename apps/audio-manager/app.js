@@ -9,7 +9,7 @@ import { useEffect }        from 'preact/hooks';
 
 // ::: shared
 import { Config }                       from '/.shared/js/components/Config.js';
-import { Icon, IconButton, InstallTip } from '/.shared/js/components/index.js';
+import { Icon, InstallTip } from '/.shared/js/components/index.js';
 
 // ::: app modules
 import * as db     from './modules/db.js';
@@ -344,7 +344,7 @@ function TopBar ({ name }) {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}><${Icon} name="mdi:menu" /></button>
-      ${back && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => app.go(name === 'album' ? 'albums' : 'artists')} />`}
+      ${back && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => app.go(name === 'album' ? 'albums' : 'artists')} />`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>

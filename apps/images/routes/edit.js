@@ -4,7 +4,7 @@
 
 import { computed, signal, typedSignal }   from '@aufbau/signals';
 import { useEffect, useRef }  from 'preact/hooks';
-import { Icon, IconButton } from '/.shared/js/components/index.js';
+import { Icon } from '/.shared/js/components/index.js';
 import * as edit from '../modules/edit.js';
 import * as fx   from '../modules/filters.js';
 import { current, isImageFile } from '../modules/state.js';

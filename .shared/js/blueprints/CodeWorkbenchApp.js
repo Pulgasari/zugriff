@@ -14,7 +14,6 @@ import { debounce, html, effect, signal } from './../vendors.js';
 import CodeInputPane  from './../components/CodeInputPane.js';
 import CodeOutputPane from './../components/CodeOutputPane.js';
 import Icon           from './../components/Icon.js';
-import Toggle         from './../components/Toggle.js';
 
 // muss aufs neue @aufbau/signals umgestellt werden
 import { typedSignal } from '@aufbau/signals';
@@ -145,7 +144,7 @@ function CodeWorkbenchApp ({
               ${busy ? 'Running…' : actionLabel}
             </button>`}
 
-          <${Toggle} value=${live.value} onChange=${v => live.value = v} label="Live-Mode" />
+          <label class='toggle'><input-bool look='switch' checked=${live.value} onChange=${e => live.value = e.target.checked}></input-bool><span>Live-Mode</span></label>
         </div>
 
       </div>

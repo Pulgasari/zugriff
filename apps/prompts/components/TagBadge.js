@@ -2,7 +2,6 @@
 // a coloured tag chip, optionally with a remove button.
 
 import Icon       from '/.shared/js/components/Icon.js';
-import IconButton from '/.shared/js/components/IconButton.js';
 
 const app = zugriff.app;
 
@@ -14,7 +13,7 @@ function TagBadge ({ tagId, removable, onRemove }) {
   return html`
     <span class="tag-badge" style=${{ '--tag-color': tag.color }}>
       ${tag.name}
-      ${removable && html`<${IconButton} icon='close' onClick=${e => { e.stopPropagation(); onRemove(tagId); }} />`}      
+      ${removable && html`<btn-icon icon='close' onClick=${e => { e.stopPropagation(); onRemove(tagId); }} />`}      
     </span>
   `;
 }

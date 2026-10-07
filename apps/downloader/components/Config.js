@@ -17,7 +17,6 @@ const app = zugriff.app;
 const fmt = zugriff.fmt;
 const fs  = zugriff.fs;
 
-const [Button, IconButton] = await Promise.all([zugriff.component('Button'), zugriff.component('IconButton')]);
 
 export const FIELDS = {
   parallel   : { type: 'number',  label: 'At once',              min: 1, max: 8,     step: 1,   default: 3 },
@@ -97,13 +96,13 @@ function Targets () {
       <h4>targets</h4>
       <div class='target'>
         <span><b>folder</b> ${folderName ?? 'none yet'}</span>
-        ${fs.supported() && html`<${Button} icon='lucide:folder' label=${folderName ? 'change' : 'choose'} onClick=${pickFolder} />`}
-        ${folderName && html`<${IconButton} icon='lucide:x' title='forget' onClick=${() => store({ ...places, folder: null })} />`}
+        ${fs.supported() && html`<btn-push icon='lucide:folder' label=${folderName ? 'change' : 'choose'} onClick=${pickFolder} />`}
+        ${folderName && html`<btn-icon icon='lucide:x' title='forget' onClick=${() => store({ ...places, folder: null })} />`}
       </div>
       <div class='target'>
         <span><b>webdav</b> ${places.webdav ? `${places.webdav.url} ${places.webdav.path}` : 'none yet'}</span>
-        <${Button} icon='lucide:server' label=${places.webdav ? 'change' : 'add'} onClick=${addDav} />
-        ${places.webdav && html`<${IconButton} icon='lucide:x' title='forget' onClick=${() => store({ ...places, webdav: null })} />`}
+        <btn-push icon='lucide:server' label=${places.webdav ? 'change' : 'add'} onClick=${addDav} />
+        ${places.webdav && html`<btn-icon icon='lucide:x' title='forget' onClick=${() => store({ ...places, webdav: null })} />`}
       </div>
     </section>
   `;
@@ -130,9 +129,9 @@ function Plugins () {
       <h4>plugins</h4>
       <p class='hint'>built in: ${plugins.BUILT_IN.map(plugin => plugin.name).join(', ')}. your own run in a worker each, away from the page.</p>
       ${sources.map((source, index) => html`
-        <div class='target'><span>${source}</span><${IconButton} icon='lucide:x' title='remove' onClick=${() => removeAt(index)} /></div>
+        <div class='target'><span>${source}</span><btn-icon icon='lucide:x' title='remove' onClick=${() => removeAt(index)} /></div>
       `)}
-      <${Button} icon='lucide:plus' label='add a plugin' onClick=${add} />
+      <btn-push icon='lucide:plus' label='add a plugin' onClick=${add} />
     </section>
   `;
 }
@@ -150,7 +149,7 @@ function Storage () {
         ${library.length} ${library.length === 1 ? 'file' : 'files'} in the library
         ${estimate && html`<br />${fmt.bytes(estimate.usage)} of ${fmt.bytes(estimate.quota)} used by this site`}
       </p>
-      <${Button} icon='lucide:broom' label='clear failed and cancelled' onClick=${() => engine.clearEnded()} />
+      <btn-push icon='lucide:broom' label='clear failed and cancelled' onClick=${() => engine.clearEnded()} />
     </section>
   `;
 }

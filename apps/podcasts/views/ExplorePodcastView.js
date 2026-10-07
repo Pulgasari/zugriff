@@ -10,7 +10,6 @@
 import { useSignal } from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
 
-import Button       from '/.shared/js/components/Button.js';
 import Empty        from '/.shared/js/components/Empty.js';
 import GoBackButton from '/.shared/js/components/GoBackButton.js';
 import Link         from '/.shared/js/components/Link.js';
@@ -83,12 +82,12 @@ export default function ExplorePodcastView ({ id: url }) {
         ${back}
         <h1>${podcast.title}</h1>
         <div class='actions'>
-          <${Button}
+          <btn-push
             icon=${remembered ? 'bookmark' : 'bookmark-unfilled'}
             title=${remembered ? 'Remove from the shortlist' : 'Keep for a closer look later'}
             onClick=${remember}
             />
-          <${Button} ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
+          <btn-push ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
         </div>
       </header>
 

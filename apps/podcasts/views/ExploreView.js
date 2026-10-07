@@ -7,11 +7,8 @@ import { useEffect }              from 'preact/hooks';
 
 // ::: shared components
 import ActionMenu  from '/.shared/js/components/ActionMenu.js';
-import Button      from '/.shared/js/components/Button.js';
 import DateLabel   from '/.shared/js/components/Date.js';
 import Empty       from '/.shared/js/components/Empty.js';
-import IconButton  from '/.shared/js/components/IconButton.js';
-import Index       from '/.shared/js/components/Index.js';
 import Loading     from '/.shared/js/components/Loading.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
@@ -180,7 +177,7 @@ function PodcastItem ({ entry, isRemembered, isSubscribed }) {
     <data-item class:subscribed=${isSubscribed}>
       <${Artwork} aria-label='open podcast' onClick=${() => open(entry.url)} src=${entry.image} />
       <div class='meta'>${meta}</div>
-      <${Button} class='title' label=${entry.title} onClick=${() => open(entry.url)} />
+      <btn-push class='title' label=${entry.title} onClick=${() => open(entry.url)} />
       <${ActionMenu} items=${[
         rememberAction (entry, isRemembered),
         subscribeAction(entry, isSubscribed),
@@ -200,7 +197,7 @@ function EpisodeItem ({ entry, isRemembered, isSubscribed }) {
         <${DateLabel} value=${entry.date} />
         <span class='dur'>${zugriff.fmt.duration(entry.duration)}</span>
       </div>
-      <${Button} class='title' label=${entry.title} onClick=${() => open(entry.url)} />
+      <btn-push class='title' label=${entry.title} onClick=${() => open(entry.url)} />
       ${teaser && html`<p class='teaser'>${teaser}</p>`}
       <${ActionMenu} items=${[
         rememberAction (podcast, isRemembered),
@@ -220,7 +217,7 @@ function Results ({ tab, entries, empty, remembered, subscribed }) {
   const podcastId  = isEpisodes ? (entry => entry.podcastId) : (entry => entry.id);
 
   return html`
-    <${Index} class=${isEpisodes ? 'explore-episodes' : undefined} viewmode='list'>
+    <data-index class=${isEpisodes ? 'explore-episodes' : undefined} viewmode='list'>
       ${entries.map(entry => html`
         <${Item}
           key=${entry.id}
@@ -229,7 +226,7 @@ function Results ({ tab, entries, empty, remembered, subscribed }) {
           isSubscribed=${subscribed.has(podcastId(entry))}
           />
       `)}
-    </${Index}>
+    </data-index>
   `;
 }
 
@@ -282,7 +279,7 @@ function ExploreView () {
   const entries = text ? results.value : (tab === 'podcasts' ? shortlist ?? [] : []);
   const empty   = text ? EMPTY.search  : EMPTY[tab];
 
-  const tools = html`<${IconButton} icon='add' label='Add by URL' onClick=${() => app.state.dialog = 'add'} />`;
+  const tools = html`<btn-icon icon='add' label='Add by URL' onClick=${() => app.state.dialog = 'add'} />`;
 
   return html`
     <${View} class='explore-view' id|title='explore' tools=${tools}>
@@ -296,7 +293,7 @@ function ExploreView () {
           <${Picker} class|placeholder='attribute' look='combobox' signal=${state.attribute} options=${ATTRIBUTES} />
         </div>
 
-        ${isUrl      && html`<${Button} icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
+        ${isUrl      && html`<btn-push icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
         ${note.value && html`<i class='note'>${note.value}</i>`}
         ${busy.value && html`<${Loading} text='searching …' />`}
 

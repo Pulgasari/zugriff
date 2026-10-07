@@ -11,7 +11,7 @@ import * as grabber from '../modules/grabber.js';
 const app = zugriff.app;
 const fmt = zugriff.fmt;
 
-const [Button, Empty, Icon, IconButton] = await Promise.all(['Button', 'Empty', 'Icon', 'IconButton'].map(name => zugriff.component(name)));
+const [Empty, Icon] = await Promise.all(['Empty', 'Icon'].map(name => zugriff.component(name)));
 
 const TARGETS = [['library', 'library'], ['folder', 'folder'], ['webdav', 'webdav'], ['save', 'save']];
 
@@ -47,7 +47,7 @@ function Group ({ group }) {
         <input type='checkbox' checked=${all} title='all' onChange=${() => group.entries.forEach(entry => grabber.update(group.id, entry.id, { selected: !all }))} />
         <input class='name' type='text' value=${group.name} onChange=${event => grabber.update(group.id, null, { name: event.currentTarget.value })} />
         <span class='status'>${chosen.length}/${group.entries.length}${size ? ` · ${fmt.bytes(size)}` : ''}</span>
-        <${IconButton} icon='lucide:x' title='drop' onClick=${() => grabber.drop(group.id)} />
+        <btn-icon icon='lucide:x' title='drop' onClick=${() => grabber.drop(group.id)} />
       </header>
       ${group.entries.map(entry => html`
         <label key=${entry.id} class='entry' data-error=${entry.error ? '' : null}>
@@ -62,7 +62,7 @@ function Group ({ group }) {
         <input-value look='segments' value=${target} onChange=${event => setTarget(event.currentTarget.value)}>
           ${TARGETS.map(([value, label]) => html`<input-option value=${value}>${label}</input-option>`)}
         </input-value>
-        <${Button} icon='lucide:download' label='start' disabled=${!chosen.length} onClick=${() => start(group, target)} />
+        <btn-push icon='lucide:download' label='start' disabled=${!chosen.length} onClick=${() => start(group, target)} />
       </footer>
     </section>
   `;
@@ -81,16 +81,16 @@ export function Grabber () {
     <form class='grab' onSubmit=${submit}>
       <textarea rows='4' placeholder='paste links, one or many, in any text' value=${text} onInput=${event => setText(event.currentTarget.value)}></textarea>
       <div class='actions'>
-        <${Button} icon='lucide:clipboard-paste' label='from the clipboard' onClick=${fromClipboard} />
-        <${Button} icon='lucide:search' label=${grabber.busy.value ? `finding … ${grabber.pending.value}` : 'find links'} disabled=${!text.trim() || grabber.busy.value} onClick=${submit} />
+        <btn-push icon='lucide:clipboard-paste' label='from the clipboard' onClick=${fromClipboard} />
+        <btn-push icon='lucide:search' label=${grabber.busy.value ? `finding … ${grabber.pending.value}` : 'find links'} disabled=${!text.trim() || grabber.busy.value} onClick=${submit} />
       </div>
     </form>
     ${found.length
       ? html`
         <div class='found-head'>
           <span>${found.length} ${found.length === 1 ? 'package' : 'packages'}</span>
-          <${Button} icon='lucide:download' label='start all' onClick=${() => found.forEach(group => start(group, app.state.$target ?? 'library'))} />
-          <${Button} icon='lucide:x' label='clear' onClick=${grabber.clear} />
+          <btn-push icon='lucide:download' label='start all' onClick=${() => found.forEach(group => start(group, app.state.$target ?? 'library'))} />
+          <btn-push icon='lucide:x' label='clear' onClick=${grabber.clear} />
         </div>
         ${found.map(group => html`<${Group} key=${group.id} group=${group} />`)}`
       : html`<${Empty} icon='lucide:link' title='No links yet' hint='paste them above, drop them on the app or share them into it' />`}

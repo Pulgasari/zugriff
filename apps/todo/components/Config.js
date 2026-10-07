@@ -14,7 +14,6 @@ import * as store from '../modules/store.js';
 import sync       from '../modules/sync.js';
 
 const app    = zugriff.app;
-const Button = await zugriff.component('Button');
 
 // :::::: FILES :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -93,14 +92,14 @@ function Sync () {
         ? html`
           <p class='hint'>${place.kind}: ${place.name}<br />${sync.status.value}</p>
           <div class='actions'>
-            <${Button} icon='lucide:refresh-cw' label='sync now' onClick=${() => sync.pull()} />
-            <${Button} icon='lucide:unlink' label='stop' onClick=${() => sync.disconnect()} />
+            <btn-push icon='lucide:refresh-cw' label='sync now' onClick=${() => sync.pull()} />
+            <btn-push icon='lucide:unlink' label='stop' onClick=${() => sync.disconnect()} />
           </div>`
         : html`
           <p class='hint'>a todo.json in a folder or on a webdav server, merged task by task.</p>
           <div class='actions'>
-            ${zugriff.fs.supported() && html`<${Button} icon='lucide:folder' label='folder' onClick=${connectFolder} />`}
-            <${Button} icon='lucide:server' label='webdav' onClick=${connectDav} />
+            ${zugriff.fs.supported() && html`<btn-push icon='lucide:folder' label='folder' onClick=${connectFolder} />`}
+            <btn-push icon='lucide:server' label='webdav' onClick=${connectDav} />
           </div>`}
     </section>
   `;
@@ -120,7 +119,7 @@ function Reminders () {
     <section class='config-section'>
       <h4>reminders</h4>
       <p class='hint'>${text}</p>
-      ${permission === 'default' && html`<${Button} icon='lucide:bell' label='allow notifications' onClick=${async () => setPermission(await reminders.ask())} />`}
+      ${permission === 'default' && html`<btn-push icon='lucide:bell' label='allow notifications' onClick=${async () => setPermission(await reminders.ask())} />`}
     </section>
   `;
 }
@@ -133,9 +132,9 @@ function Exchange () {
     <section class='config-section'>
       <h4>export and import</h4>
       <div class='actions'>
-        <${Button} icon='lucide:download' label='json' onClick=${() => save(`todo-${stamp}.json`, JSON.stringify(store.snapshot(), null, 2), 'application/json')} />
-        <${Button} icon='lucide:download' label='todo.txt' onClick=${() => save(`todo-${stamp}.txt`, store.toTodoTxt(), 'text/plain')} />
-        <${Button} icon='lucide:upload' label='import' onClick=${() => input.current?.click()} />
+        <btn-push icon='lucide:download' label='json' onClick=${() => save(`todo-${stamp}.json`, JSON.stringify(store.snapshot(), null, 2), 'application/json')} />
+        <btn-push icon='lucide:download' label='todo.txt' onClick=${() => save(`todo-${stamp}.txt`, store.toTodoTxt(), 'text/plain')} />
+        <btn-push icon='lucide:upload' label='import' onClick=${() => input.current?.click()} />
       </div>
       <input ref=${input} type='file' accept='.json,.txt,application/json,text/plain' hidden
              onChange=${event => { importFile(event.currentTarget.files[0]); event.currentTarget.value = ''; }} />

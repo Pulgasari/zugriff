@@ -2,7 +2,6 @@
 // the docked player bar — artwork/meta, transport, scrubber and speed/done/close.
 
 import Icon            from '/.shared/js/components/Icon.js';
-import IconButton      from '/.shared/js/components/IconButton.js';
 import Art             from './../components/Artwork.js';
 import { useTable }    from './../modules/hooks.js';
 import { fmtDuration } from './../modules/methods.js';
@@ -35,20 +34,20 @@ export default function PlayerPanel () {
       </div>
 
       <div class="controls">
-        <${IconButton}
+        <btn-icon
           icon="mdi:rewind-15"
           label="Back 15s"
           onClick=${() => app.player.skip(-15)} 
           />
           
-        <${IconButton} 
+        <btn-icon 
           class="play" 
           title=${app.player.isPlaying ? 'Pause' : 'Play'} 
           onClick=${app.player.toggle}
           icon=${app.player.isWaiting ? 'loading' : app.player.isPlaying ? 'mdi:pause' : 'mdi:play'}
           />
           
-        <${IconButton}
+        <btn-icon
           icon="mdi:fast-forward-30"
           label="Forward 30s"
           onClick=${() => app.player.skip(30)}
@@ -76,14 +75,14 @@ export default function PlayerPanel () {
           ${app.player.rate}×
         </button>
         
-        <${IconButton} 
+        <btn-icon 
           icon=${app.library.stateOf(episode.id).done ? 'mdi:check-circle' : 'mdi:check-circle-outline'}
           label="Mark as done"
-          active=${app.library.stateOf(episode.id).done}
+          aria-pressed=${app.library.stateOf(episode.id).done}
           onClick=${() => app.library.toggleDone(episode.id)} 
           />
           
-        <${IconButton}
+        <btn-icon
           icon="close"
           label="Close player"
           onClick=${() => app.player.close()}

@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Dropzone, GhostButton, Icon } from '/.shared/js/components/index.js';
+import { Dropzone, Icon } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('image-batch-processor');
@@ -220,9 +220,9 @@ function TaskPane ({ task, index, total, children }) {
           <${Icon} name=${icon} /> ${label}
         </span>
         <menu class='actions'>
-          <${GhostButton} icon='mdi:chevron-up'   onClick=${moveUp}   disabled=${index === 0}         />
-          <${GhostButton} icon='mdi:chevron-down' onClick=${moveDown} disabled=${index === total - 1} />
-          <${GhostButton} icon='mdi:close'        onClick=${remove}   />
+          <btn-icon icon='mdi:chevron-up'   label='up'     onClick=${moveUp}   disabled=${index === 0}         />
+          <btn-icon icon='mdi:chevron-down' label='down'   onClick=${moveDown} disabled=${index === total - 1} />
+          <btn-icon icon='mdi:close'        label='remove' onClick=${remove}   />
         </menu>
       </header>
       <main>${children}</main>

@@ -20,8 +20,7 @@ import { editCurrent }  from './routes/edit.js';
 const
 Brand      = await zugriff.component('Brand'),
 Config     = await zugriff.component('Config'),
-Icon       = await zugriff.component('Icon'),
-IconButton = await zugriff.component('IconButton');
+Icon       = await zugriff.component('Icon');
 
 // ::: the app handle — the data layer hangs off it as app.lib
 const app = zugriff.app;
@@ -67,7 +66,7 @@ function ModeBar () {
             <${Icon} name=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
-      <div class="im-modebar-actions"><${IconButton} icon='settings' label='Settings' onClick=${() => app.area('config')?.toggle()} /></div>
+      <div class="im-modebar-actions"><btn-icon icon='settings' label='Settings' onClick=${() => app.area('config')?.toggle()} /></div>
     </header>`;
 }
 

@@ -1,6 +1,5 @@
 // shared/js/components/Icon.js
-
-import { resolveIcon } from './../data/icons.js';
+// <svg-icon> resolves a bare name through the @aufbau/svg aliases itself
 
 // a bare number means pixels — call sites pass both 32 and "32"
 const length = value =>
@@ -12,13 +11,11 @@ function Icon ({ name, size, ...rest }) {
   return html`
     <svg-icon
       class='icon'
-      icon=${resolveIcon(name)}
+      icon=${name}
       size=${length(size)}
       ...${rest}
     ></svg-icon>`;
 }
-
-export { icons, resolveIcon } from './../data/icons.js';
 
 export       { Icon };
 export default Icon;

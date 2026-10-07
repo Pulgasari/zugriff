@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Button, Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
+import { Dropzone, Icon, Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('image-converter');
@@ -132,8 +132,8 @@ function App() {
         </div>
         
         <div id='app-actions'>
-          ${pendingCnt > 0 && html`<${Button} className='primary'   onClick=${convertAll}  icon='mdi:cog-outline'   label=${`Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}`} />`}
-          ${hasDone        && html`<${Button} className='secondary' onClick=${downloadAll} icon='download-multiple' label='Download all' />`}
+          ${pendingCnt > 0 && html`<btn-push class='primary'   onClick=${convertAll}  icon='mdi:cog-outline'   label=${`Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}`} />`}
+          ${hasDone        && html`<btn-push class='secondary' onClick=${downloadAll} icon='download-multiple' label='Download all' />`}
         </div>
         
       `}

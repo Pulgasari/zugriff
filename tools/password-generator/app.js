@@ -5,7 +5,7 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
-import { Icon, Picker, Slider, Toggle } from '/.shared/js/components/index.js';
+import { Icon, Picker, Slider } from '/.shared/js/components/index.js';
 import { typedSignal } from '@aufbau/signals';
 
 const { boot } = defineTool('password-generator');
@@ -173,11 +173,11 @@ function RandomSettings() {
       <${Slider} label="Length" min=4 max=128
         value=${length.value} onChange=${v => length.value = v} />
       <div class="toggles">
-        <${Toggle} value=${useUpper.value} onChange=${v => useUpper.value = v}   label="A–Z uppercase" />
-        <${Toggle} value=${useLower.value} onChange=${v => useLower.value = v}   label="a–z lowercase" />
-        <${Toggle} value=${useDigits.value} onChange=${v => useDigits.value = v}  label="0–9 digits"    />
-        <${Toggle} value=${useSymbols.value} onChange=${v => useSymbols.value = v} label="!@# symbols"   />
-        <${Toggle} value=${noSimilar.value} onChange=${v => noSimilar.value = v}  label="No similar chars (i l 1 o 0)" />
+        <label class='toggle'><input-bool look='switch' checked=${useUpper.value} onChange=${e => useUpper.value = e.target.checked}></input-bool><span>A–Z uppercase</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useLower.value} onChange=${e => useLower.value = e.target.checked}></input-bool><span>a–z lowercase</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useDigits.value} onChange=${e => useDigits.value = e.target.checked}></input-bool><span>0–9 digits</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${useSymbols.value} onChange=${e => useSymbols.value = e.target.checked}></input-bool><span>!@# symbols</span></label>
+        <label class='toggle'><input-bool look='switch' checked=${noSimilar.value} onChange=${e => noSimilar.value = e.target.checked}></input-bool><span>No similar chars (i l 1 o 0)</span></label>
       </div>
     </div>`;
 }

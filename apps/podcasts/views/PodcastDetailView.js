@@ -2,7 +2,6 @@
 
 //import { enumSignal } from '@aufbau/signals';
 
-import Button       from '/.shared/js/components/Button.js';
 import Empty        from '/.shared/js/components/Empty.js';
 import GoBackButton from '/.shared/js/components/GoBackButton.js';
 import Icon         from '/.shared/js/components/Icon.js';
@@ -61,8 +60,8 @@ function PodcastDetailView ({ id }) {
         <${GoBackButton} go='podcasts'/>
         <h1>${podcast.title}</h1>
         <div class='actions'>
-          <${Button} icon='refresh' onClick=${refreshOne} disabled=${!!app.state.$busy} />
-          <${Button} icon='trash'   onClick=${remove} class='danger' />
+          <btn-icon icon='refresh' label='refresh' onClick=${refreshOne} disabled=${!!app.state.$busy} />
+          <btn-icon icon='trash'   label='delete'  onClick=${remove} class='danger' />
         </div>
       </header>
 

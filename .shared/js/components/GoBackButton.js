@@ -1,13 +1,6 @@
 // components/GoBackButton.js
-
-import Button from './Button.js';
+// <${GoBackButton} go='podcasts' /> — a btn-icon back to the named route
 
 export default function ({ go, ...rest }) {
-  return html`
-    <${Button} 
-      icon='arrow-left' 
-      onClick=${() => zugriff.app.go(go)}
-      ...${rest}
-    />
-  `;
+  return html`<btn-icon icon='arrow-left' label='back' onClick=${() => zugriff.app.go(go)} ...${rest} />`;
 }

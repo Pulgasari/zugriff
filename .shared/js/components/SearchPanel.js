@@ -1,6 +1,5 @@
 // components/SearchPanel.js
 
-import Button      from './Button.js';
 import SearchInput from './SearchInput.js';
 
 const app = zugriff.app;
@@ -23,7 +22,7 @@ function SearchPanel ({ placeholder, signal, appStateId: id = 'search' }) {
   return html`
     <div class='SearchPanel search-panel'>
       <${SearchInput} ...${{ onInput, placeholder, value }} />
-      ${value && html`<${Button} aria-label='clear filter' icon='close' onClick=${clear} />`}    
+      ${value && html`<btn-icon label='clear filter' icon='close' onClick=${clear} />`}    
     </div>
   `;
 }

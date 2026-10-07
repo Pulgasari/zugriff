@@ -1,6 +1,5 @@
 // components/Modal.js
 
-import Button from './Button.js';
 
 function Modal ({ children, headline, info, actions, onClose, ...rest }) {
   // only the backdrop itself dismisses — clicks inside the dialog bubble up too
@@ -20,7 +19,7 @@ function Modal ({ children, headline, info, actions, onClose, ...rest }) {
 
         ${actions?.length && html`
           <footer>
-            ${actions.map((action, i) => html`<${Button} key=${i} ...${action} />`)}
+            ${actions.map((action, i) => html`<btn-push key=${i} ...${action} />`)}
           </footer>
         `}
       </div>

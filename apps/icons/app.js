@@ -13,12 +13,10 @@ import { useEffect, useRef } from 'preact/hooks';
 import createElement from '@domina/methods/createElement.js';
 
 const // ::: shared components
-Button     = await zugriff.component('Button'),
 Config     = await zugriff.component('Config'),
 Dock       = await zugriff.component('Dock'),
 Empty      = await zugriff.component('Empty'),
 Icon       = await zugriff.component('Icon'),
-IconButton = await zugriff.component('IconButton'),
 Loading    = await zugriff.component('Loading');
 
 // ::: the app handle
@@ -169,7 +167,7 @@ function IconCell ({ name }) {
     <button class="cell" onClick=${() => inspect(name)} title=${name}>
       <span class="glyph"><${IconGlyph} name=${name} /></span>
       <span class="cname">${name.split(':')[1]}</span>
-      <${Button}
+      <btn-push
         class=${'heart' + (fav ? ' on' : '')}
         icon=${fav ? 'heart' : 'heart-outline'}
         title="Favourite"
@@ -211,8 +209,8 @@ function HomeView () {
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <${Button} icon='images' label='browse sets' onClick=${() => show('sets')}   />
-          <${Button} icon='search' label='search'      onClick=${() => show('search')} />
+          <btn-push icon='images' label='browse sets' onClick=${() => show('sets')}   />
+          <btn-push icon='search' label='search'      onClick=${() => show('search')} />
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -257,7 +255,7 @@ function SetView () {
           <h1>${d.title}</h1>
           <div class="sub">${nfmt(d.total)} icons · <code>${d.prefix}</code></div>
         </div>
-        <${Button} class='small' icon='copy' label='copy prefix' onClick=${() => copy(d.prefix)} />
+        <btn-push class='small' icon='copy' label='copy prefix' onClick=${() => copy(d.prefix)} />
       </header>
       <${IconGrid} names=${d.icons} />
     </div>`;
@@ -299,7 +297,7 @@ function TopBar ({ name }) {
   const grid = name === 'set' || name === 'search' || name === 'favs';
   return html`
     <header class="topbar">
-      ${name === 'set' && html`<${IconButton} icon="arrow-left" label="Back" onClick=${() => show('sets')} />`}
+      ${name === 'set' && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => show('sets')} />`}
 
       ${name === 'search'
         ? html`<div class="searchbox big">
@@ -331,10 +329,10 @@ function Detail () {
         <div class="sheet-preview"><iconify-icon icon=${name}></iconify-icon></div>
         <div class="sheet-set"><button class="linkish" onClick=${() => { closeDetail(); openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
-          <${Button} icon='copy'     label='copy name' onClick=${() => copy        (name)} />
-          <${Button} icon='svg'      label='copy svg'  onClick=${() => copySvg     (name)} />
-          <${Button} icon='download' label='download'  onClick=${() => downloadSvg (name)} />
-          <${Button}
+          <btn-push icon='copy'     label='copy name' onClick=${() => copy        (name)} />
+          <btn-push icon='svg'      label='copy svg'  onClick=${() => copySvg     (name)} />
+          <btn-push icon='download' label='download'  onClick=${() => downloadSvg (name)} />
+          <btn-push
             icon=${fav ? 'heart' : 'heart-outline'}
             label=${fav ? 'Favourited' : 'Favourite'}
             onClick=${() => app.db.toggleFav(name)}

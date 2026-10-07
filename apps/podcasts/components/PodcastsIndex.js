@@ -2,7 +2,6 @@
 
 import Artwork from './Artwork.js';
 import Empty   from '/.shared/js/components/Empty.js';
-import Index   from '/.shared/js/components/Index.js';
 
 const viewmode = 'list';
 
@@ -20,9 +19,9 @@ function PodcastsIndex ({ podcasts, empty }) {
   return !podcasts.length
   ? html`<${Empty} ...${empty} />`
   : html`
-    <${Index} viewmode=${viewmode} itemSize='150px'>
+    <data-index viewmode=${viewmode} item-size='150px'>
       ${podcasts.map(p => html`<${Item} key=${p.id} podcast=${p} />`)}
-    </${Index}>
+    </data-index>
   `;
 }
 

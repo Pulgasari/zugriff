@@ -1,7 +1,6 @@
 // podcasts :: components/PlayToggle.js
 // the play/pause control for one episode, reflecting the live player state.
 
-import Button from '/.shared/js/components/Button.js';
 
 const app = zugriff.app;
 
@@ -13,7 +12,7 @@ function PlayToggle ({ episode, size = 20 }) {
   const title     = isPlaying ? 'Pause' : 'Play';
   
   return html`
-    <${Button}
+    <btn-push
       aria-label=${title}
       class='play-toggle'
       icon=${icon}

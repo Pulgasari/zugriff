@@ -1,10 +1,7 @@
 // ebooks :: views/LibraryView.js
 
-import Button      from '/.shared/js/components/Button.js';
 import Empty       from '/.shared/js/components/Empty.js';
 import Icon        from '/.shared/js/components/Icon.js';
-import IconButton  from '/.shared/js/components/IconButton.js';
-import Index       from '/.shared/js/components/Index.js';
 import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
@@ -19,9 +16,9 @@ const app = zugriff.app;
 
 function BooksIndex ({ books }) {
   return html`
-    <${Index} viewmode='grid' item-size='150px' gap='1rem'>
+    <data-index viewmode='grid' item-size='150px' gap='1rem'>
       ${books.map(book => html`<aufbau-item key=${book.key}><${BookItem} book=${book} /></aufbau-item>`)}
-    </${Index}>
+    </data-index>
   `;
 }
 
@@ -40,7 +37,7 @@ const EmptySearch  = () => html`<${Empty} icon='mdi:magnify-close' title='Nothin
 const NoFolders = () => html`
   <${Empty} icon='books' title='Your library is empty'
     hint='Add a folder of EPUB and PDF files. It stays on your device — only the folder permission is remembered.'
-    action=${html`<${Button} icon='folder-add' label='Add a folder' onClick=${app.addFolder} />`} />`;
+    action=${html`<btn-push icon='folder-add' label='Add a folder' onClick=${app.addFolder} />`} />`;
 
 // :::::: VIEW
 
@@ -50,9 +47,9 @@ function LibraryView () {
 
   const tools = html`
     ${pending > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${pending} left</span>`}
-    <${IconButton} icon='refresh'    label='Rescan folders' onClick=${() => app.db.rescanAll()} />
-    <${IconButton} icon='folder-add' label='Add folder'     onClick=${app.addFolder} />
-    <${IconButton} icon='settings'   label='Settings'       onClick=${app.toggleConfig} />
+    <btn-icon icon='refresh'    label='Rescan folders' onClick=${() => app.db.rescanAll()} />
+    <btn-icon icon='folder-add' label='Add folder'     onClick=${app.addFolder} />
+    <btn-icon icon='settings'   label='Settings'       onClick=${app.toggleConfig} />
   `;
 
   return html`

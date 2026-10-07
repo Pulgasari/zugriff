@@ -5,7 +5,6 @@
 // after every repaint.
 
 import { html, useEffect, useRef } from './../vendors.js';
-import GhostButton                 from './GhostButton.js';
 import { Prompt, openPrompt }      from './Prompt.js';
 import { hljs, ensureLang }        from './hljs.js';
 
@@ -166,14 +165,14 @@ function CodeInputPane ({
         <div class="pane-actions">
           ${couldUpload && html`
             <input type="file" ref=${fileRef} accept=${uploadAccept} style="display:none" onChange=${onFileChange} />
-            <${GhostButton} icon="mdi:upload" text="Upload" onClick=${triggerUpload} />
+            <btn-tap icon="mdi:upload" label="Upload" onClick=${triggerUpload} />
           `}
-          ${couldURL && html`<${GhostButton} icon="mdi:web" text="URL" onClick=${loadFromURL} />`}
+          ${couldURL && html`<btn-tap icon="mdi:web" label="URL" onClick=${loadFromURL} />`}
           ${signal.value && html`
-            <${GhostButton} icon="mdi:content-copy" text="Copy" onClick=${copy} />
-            ${(filename || couldDownload) && html`<${GhostButton} icon="mdi:download"   text="Download" onClick=${download} />`}
-            ${couldSelect                 && html`<${GhostButton} icon="mdi:select-all" text="Select"   onClick=${select}   />`}
-            <${GhostButton} icon="mdi:close" text="Clear" onClick=${clear} />
+            <btn-tap icon="mdi:content-copy" label="Copy" onClick=${copy} />
+            ${(filename || couldDownload) && html`<btn-tap icon="mdi:download"   label="Download" onClick=${download} />`}
+            ${couldSelect                 && html`<btn-tap icon="mdi:select-all" label="Select"   onClick=${select}   />`}
+            <btn-tap icon="mdi:close" label="Clear" onClick=${clear} />
           `}
         </div>
       </div>

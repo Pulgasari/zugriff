@@ -35,8 +35,8 @@ app-area[name="menu"] { --area-size: min(85vw, 18rem); }
   align-items : center;
   display     : flex;
 
-  > button:not(.nav-link) { opacity: 0; }
-  &:hover > button, &:focus-within > button { opacity: 1; }
+  > btn-icon { opacity: 0; }
+  &:hover > btn-icon, &:focus-within > btn-icon { opacity: 1; }
   &[aria-current="page"] .nav-link { background: color-mix(in srgb, currentColor 12%, transparent); }
 }
 

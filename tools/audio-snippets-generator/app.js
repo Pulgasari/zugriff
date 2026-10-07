@@ -7,7 +7,7 @@ import { fetchFile } from '@ffmpeg/util';
 // ::: shared
 import defineTool from '/.shared/js/tool.js';
 import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
-import { Dropzone, Button, GhostButton, Icon, Picker } from '/.shared/js/components/index.js';
+import { Dropzone, Icon, Picker } from '/.shared/js/components/index.js';
 import { WaveformWithHandles } from '/.shared/js/components/index.js';
 
 const { boot } = defineTool('audio-snippets-generator');
@@ -225,9 +225,9 @@ function SnippetPane({ snippet, index, total }) {
         <span class="pane-title">${file.name}</span>
         <span class="sel-dur">${fmtT(end - start)}</span>
         <div class="pane-controls">
-          <${GhostButton} icon='mdi:chevron-up'   onClick=${moveUp}   disabled=${index === 0}         />
-          <${GhostButton} icon='mdi:chevron-down' onClick=${moveDown} disabled=${index === total - 1} />
-          <${GhostButton} icon='mdi:close'        onClick=${remove}   />
+          <btn-icon icon='mdi:chevron-up'   label='up'     onClick=${moveUp}   disabled=${index === 0}         />
+          <btn-icon icon='mdi:chevron-down' label='down'   onClick=${moveDown} disabled=${index === total - 1} />
+          <btn-icon icon='mdi:close'        label='remove' onClick=${remove}   />
         </div>
       </div>
       
