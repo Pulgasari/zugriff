@@ -204,8 +204,8 @@ class ZugriffApp {
   get hotkeys ()    { return this._hotkeys; }
   set hotkeys (map) { this._hotkeys.define(map); }
 
-  // ::: routes, each change a view transition (transitions.js). an app with a
-  // router gets setRoute rewired to keep the url in sync
+  // ::: routes, each change a view transition (transitions.js). an app on #app's
+  // views rewires setRoute to app.show
   setRoute = (id = null)       => transition(() => { this.state.route = id; });
   go       = (name, id = null) => transition(() => { this.state.route = { name, id }; });
 
