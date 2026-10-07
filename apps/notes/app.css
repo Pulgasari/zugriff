@@ -46,11 +46,11 @@ app-area[name="menu"] { --area-size: min(85vw, 20rem); }
 
 /* ── markdown typography ─────────────────────────────────────────────────── */
 
-aufbau-reader {
+output-md {
   overflow-y: auto;
 }
 
-aufbau-reader article {
+output-md article {
   display     : flex;
   flex-flow   : column;
   gap         : 1rem;
