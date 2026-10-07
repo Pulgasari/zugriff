@@ -19,7 +19,7 @@ function Modal ({ children, headline, info, actions, onClose, ...rest }) {
 
         ${actions?.length && html`
           <footer>
-            ${actions.map((action, i) => html`<btn-tap key=${i} ...${action} />`)}
+            ${actions.map((action, i) => html`<btn-push key=${i} ...${action} />`)}
           </footer>
         `}
       </div>

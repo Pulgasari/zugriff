@@ -113,8 +113,8 @@ else {
         ${top && html`<${Filter} />`}
 
         <div class="launcher-categories">
-          <btn-tap label='all' class=${category.value === '' ? 'chip active' : 'chip'} onClick=${() => category.value = ''} />
-          ${categories.map(name => html`<btn-tap label=${name} class=${category.value === name ? 'chip active' : 'chip'} onClick=${() => category.value = name} />`)}
+          <btn-push label='all' class=${category.value === '' ? 'chip active' : 'chip'} onClick=${() => category.value = ''} />
+          ${categories.map(name => html`<btn-push label=${name} class=${category.value === name ? 'chip active' : 'chip'} onClick=${() => category.value = name} />`)}
         </div>
 
         <ul id="tools">

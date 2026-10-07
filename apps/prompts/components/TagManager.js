@@ -51,7 +51,7 @@ function TagManager ({ show, onClose }) {
           onInput=${e => setColor(e.target.value)}
           />
           
-        <btn-tap icon='add' label='add' onClick=${add} disabled=${!name.trim()} />
+        <btn-push icon='add' label='add' onClick=${add} disabled=${!name.trim()} />
       </div>
     </div>
   `;

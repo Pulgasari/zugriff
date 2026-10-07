@@ -12,7 +12,7 @@ function PlayToggle ({ episode, size = 20 }) {
   const title     = isPlaying ? 'Pause' : 'Play';
   
   return html`
-    <btn-tap
+    <btn-push
       aria-label=${title}
       class='play-toggle'
       icon=${icon}

@@ -208,12 +208,12 @@ function App () {
         <${Options} />
 
         <div id="app-actions">
-          <btn-tap class="primary" onClick=${generate}
+          <btn-push class="primary" onClick=${generate}
                      disabled=${busy.value || !sizes.value.length}
                      icon=${busy.value ? 'loading' : 'mdi:cog-outline'}
                      label=${busy.value ? 'Rendering…' : `Render ${sizes.value.length} size${sizes.value.length === 1 ? '' : 's'}`} />
           ${results.value.length > 0 && html`
-            <btn-tap class="secondary" onClick=${downloadAll}
+            <btn-push class="secondary" onClick=${downloadAll}
                        icon="download-multiple" label="Download all" />`}
         </div>
 

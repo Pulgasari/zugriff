@@ -96,12 +96,12 @@ function Targets () {
       <h4>targets</h4>
       <div class='target'>
         <span><b>folder</b> ${folderName ?? 'none yet'}</span>
-        ${fs.supported() && html`<btn-tap icon='lucide:folder' label=${folderName ? 'change' : 'choose'} onClick=${pickFolder} />`}
+        ${fs.supported() && html`<btn-push icon='lucide:folder' label=${folderName ? 'change' : 'choose'} onClick=${pickFolder} />`}
         ${folderName && html`<btn-icon icon='lucide:x' title='forget' onClick=${() => store({ ...places, folder: null })} />`}
       </div>
       <div class='target'>
         <span><b>webdav</b> ${places.webdav ? `${places.webdav.url} ${places.webdav.path}` : 'none yet'}</span>
-        <btn-tap icon='lucide:server' label=${places.webdav ? 'change' : 'add'} onClick=${addDav} />
+        <btn-push icon='lucide:server' label=${places.webdav ? 'change' : 'add'} onClick=${addDav} />
         ${places.webdav && html`<btn-icon icon='lucide:x' title='forget' onClick=${() => store({ ...places, webdav: null })} />`}
       </div>
     </section>
@@ -131,7 +131,7 @@ function Plugins () {
       ${sources.map((source, index) => html`
         <div class='target'><span>${source}</span><btn-icon icon='lucide:x' title='remove' onClick=${() => removeAt(index)} /></div>
       `)}
-      <btn-tap icon='lucide:plus' label='add a plugin' onClick=${add} />
+      <btn-push icon='lucide:plus' label='add a plugin' onClick=${add} />
     </section>
   `;
 }
@@ -149,7 +149,7 @@ function Storage () {
         ${library.length} ${library.length === 1 ? 'file' : 'files'} in the library
         ${estimate && html`<br />${fmt.bytes(estimate.usage)} of ${fmt.bytes(estimate.quota)} used by this site`}
       </p>
-      <btn-tap icon='lucide:broom' label='clear failed and cancelled' onClick=${() => engine.clearEnded()} />
+      <btn-push icon='lucide:broom' label='clear failed and cancelled' onClick=${() => engine.clearEnded()} />
     </section>
   `;
 }

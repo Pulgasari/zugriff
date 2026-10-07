@@ -28,7 +28,7 @@ export default function LatestView () {
     ? {
       icon   : 'mdi:rss', title: 'No subscriptions yet',
       hint   : 'Add a podcast by its RSS feed URL to see its latest episodes here.',
-      action : html`<btn-tap icon='add' label='Add a podcast' onClick=${() => app.state.dialog = 'add'} />`     
+      action : html`<btn-push icon='add' label='Add a podcast' onClick=${() => app.state.dialog = 'add'} />`     
     } : { 
       icon  : app.state.search.value ? 'mdi:magnify-close'           : 'mdi:playlist-remove',
       title : app.state.search.value ? 'Nothing matches your filter' : 'No episodes found',

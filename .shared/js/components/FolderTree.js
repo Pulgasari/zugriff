@@ -114,8 +114,8 @@ function FolderTree ({
         <div class='reconnect'>
           <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>
           <div class='row'>
-            <btn-tap icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
-            <btn-tap icon='folder-search' label='Choose folder' onClick=${repick}       />
+            <btn-push icon='folder-key'    label='Reconnect'     onClick=${tryReconnect} />
+            <btn-push icon='folder-search' label='Choose folder' onClick=${repick}       />
           </div>
         </div>`;
     } else if (busy && !tree) {

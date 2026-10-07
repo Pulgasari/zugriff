@@ -90,7 +90,7 @@ function Menu () {
 
       <div class='side-foot'>
         <${InstallTip} />
-        <btn-tap icon='folder-add' label='Open a folder' onClick=${addFolder} />
+        <btn-push icon='folder-add' label='Open a folder' onClick=${addFolder} />
       </div>
     </div>
   `;
@@ -157,7 +157,7 @@ function Header ({ segments = [] }) {
 // no note open: open a folder, or pick a note from the tree
 function Start () {
   const hasSources = app.lib.sources.value.length > 0;
-  const action     = hasSources ? '' : html`<btn-tap label='Open a folder' icon='folder-add' onClick=${addFolder} />`;
+  const action     = hasSources ? '' : html`<btn-push label='Open a folder' icon='folder-add' onClick=${addFolder} />`;
   const hint       = hasSources ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.';
 
   return html`

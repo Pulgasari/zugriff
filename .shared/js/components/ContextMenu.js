@@ -2,7 +2,7 @@
 
 
 function ContextMenuItem ({ icon, label, onClick, ...rest }) {
-  return html`<btn-tap class='ContextMenuItem' ...${{ icon, label, onClick, ...rest }} />`;
+  return html`<btn-push class='ContextMenuItem' ...${{ icon, label, onClick, ...rest }} />`;
 }
 
 function ContextMenu ({ items, ...rest }) {

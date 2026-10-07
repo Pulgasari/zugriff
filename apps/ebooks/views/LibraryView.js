@@ -37,7 +37,7 @@ const EmptySearch  = () => html`<${Empty} icon='mdi:magnify-close' title='Nothin
 const NoFolders = () => html`
   <${Empty} icon='books' title='Your library is empty'
     hint='Add a folder of EPUB and PDF files. It stays on your device — only the folder permission is remembered.'
-    action=${html`<btn-tap icon='folder-add' label='Add a folder' onClick=${app.addFolder} />`} />`;
+    action=${html`<btn-push icon='folder-add' label='Add a folder' onClick=${app.addFolder} />`} />`;
 
 // :::::: VIEW
 

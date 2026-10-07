@@ -132,8 +132,8 @@ function App() {
         </div>
         
         <div id='app-actions'>
-          ${pendingCnt > 0 && html`<btn-tap class='primary'   onClick=${convertAll}  icon='mdi:cog-outline'   label=${`Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}`} />`}
-          ${hasDone        && html`<btn-tap class='secondary' onClick=${downloadAll} icon='download-multiple' label='Download all' />`}
+          ${pendingCnt > 0 && html`<btn-push class='primary'   onClick=${convertAll}  icon='mdi:cog-outline'   label=${`Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}`} />`}
+          ${hasDone        && html`<btn-push class='secondary' onClick=${downloadAll} icon='download-multiple' label='Download all' />`}
         </div>
         
       `}

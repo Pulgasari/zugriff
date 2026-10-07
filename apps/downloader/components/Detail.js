@@ -73,13 +73,13 @@ export function Detail () {
         <a class='url' href=${download.url} target='_blank' rel='noopener noreferrer'>${download.url}</a>
         <dl>${facts.map(([key, value]) => html`<dt>${key}</dt><dd>${value}</dd>`)}</dl>
         <div class='actions'>
-          ${(download.state === 'running' || download.state === 'queued') && html`<btn-tap icon='lucide:pause' label='pause' onClick=${() => engine.pause(download.id)} />`}
-          ${download.state === 'paused' && html`<btn-tap icon='lucide:play' label='resume' onClick=${() => engine.resume(download.id)} />`}
-          ${(download.state === 'failed' || download.state === 'cancelled' || download.state === 'done') && html`<btn-tap icon='lucide:rotate-cw' label=${download.state === 'done' ? 'again' : 'retry'} onClick=${() => engine.retry(download.id)} />`}
-          ${download.state !== 'done' && download.state !== 'cancelled' && html`<btn-tap icon='lucide:circle-slash' label='cancel' onClick=${() => engine.cancel(download.id)} />`}
-          ${download.state === 'done' && download.place === 'library' && html`<btn-tap icon='lucide:save' label='save' onClick=${() => saveFile(download)} />`}
-          <btn-tap icon='lucide:copy' label='copy link' onClick=${() => copy(download.url)} />
-          <btn-tap icon='lucide:trash-2' label='remove' onClick=${() => { engine.remove(download.id); closeDetail(); }} />
+          ${(download.state === 'running' || download.state === 'queued') && html`<btn-push icon='lucide:pause' label='pause' onClick=${() => engine.pause(download.id)} />`}
+          ${download.state === 'paused' && html`<btn-push icon='lucide:play' label='resume' onClick=${() => engine.resume(download.id)} />`}
+          ${(download.state === 'failed' || download.state === 'cancelled' || download.state === 'done') && html`<btn-push icon='lucide:rotate-cw' label=${download.state === 'done' ? 'again' : 'retry'} onClick=${() => engine.retry(download.id)} />`}
+          ${download.state !== 'done' && download.state !== 'cancelled' && html`<btn-push icon='lucide:circle-slash' label='cancel' onClick=${() => engine.cancel(download.id)} />`}
+          ${download.state === 'done' && download.place === 'library' && html`<btn-push icon='lucide:save' label='save' onClick=${() => saveFile(download)} />`}
+          <btn-push icon='lucide:copy' label='copy link' onClick=${() => copy(download.url)} />
+          <btn-push icon='lucide:trash-2' label='remove' onClick=${() => { engine.remove(download.id); closeDetail(); }} />
         </div>
       </div>
     </app-panel>

@@ -15,7 +15,7 @@ function InstallTip ({ message = DEFAULT_MESSAGE }) {
       <${Icon} name='info' />
       <span class='text'>${message}</span>
       ${zugriff.app.canInstall
-        ? html`<btn-tap onClick=${zugriff.app.promptInstall} icon='download' label='Install app' />`      
+        ? html`<btn-push onClick=${zugriff.app.promptInstall} icon='download' label='Install app' />`      
         : html`<span class='hint'>Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
     </div>`;
 }

@@ -18,7 +18,7 @@ function ActionMenuItem (props) {
   return isFn(props)           ? props()
        : isValidElement(props) ? props
        : props.href            ? html`<${Link}   ...${props} />`
-       :                         html`<btn-tap ...${props} />`;
+       :                         html`<btn-push ...${props} />`;
 }
 
 function ActionMenu ({ items, ...rest }) {

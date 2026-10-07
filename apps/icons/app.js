@@ -167,7 +167,7 @@ function IconCell ({ name }) {
     <button class="cell" onClick=${() => inspect(name)} title=${name}>
       <span class="glyph"><${IconGlyph} name=${name} /></span>
       <span class="cname">${name.split(':')[1]}</span>
-      <btn-tap
+      <btn-push
         class=${'heart' + (fav ? ' on' : '')}
         icon=${fav ? 'heart' : 'heart-outline'}
         title="Favourite"
@@ -209,8 +209,8 @@ function HomeView () {
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <btn-tap icon='images' label='browse sets' onClick=${() => show('sets')}   />
-          <btn-tap icon='search' label='search'      onClick=${() => show('search')} />
+          <btn-push icon='images' label='browse sets' onClick=${() => show('sets')}   />
+          <btn-push icon='search' label='search'      onClick=${() => show('search')} />
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -255,7 +255,7 @@ function SetView () {
           <h1>${d.title}</h1>
           <div class="sub">${nfmt(d.total)} icons · <code>${d.prefix}</code></div>
         </div>
-        <btn-tap class='small' icon='copy' label='copy prefix' onClick=${() => copy(d.prefix)} />
+        <btn-push class='small' icon='copy' label='copy prefix' onClick=${() => copy(d.prefix)} />
       </header>
       <${IconGrid} names=${d.icons} />
     </div>`;
@@ -329,10 +329,10 @@ function Detail () {
         <div class="sheet-preview"><iconify-icon icon=${name}></iconify-icon></div>
         <div class="sheet-set"><button class="linkish" onClick=${() => { closeDetail(); openSet(prefix); }}>${prefix}</button></div>
         <div class="sheet-actions">
-          <btn-tap icon='copy'     label='copy name' onClick=${() => copy        (name)} />
-          <btn-tap icon='svg'      label='copy svg'  onClick=${() => copySvg     (name)} />
-          <btn-tap icon='download' label='download'  onClick=${() => downloadSvg (name)} />
-          <btn-tap
+          <btn-push icon='copy'     label='copy name' onClick=${() => copy        (name)} />
+          <btn-push icon='svg'      label='copy svg'  onClick=${() => copySvg     (name)} />
+          <btn-push icon='download' label='download'  onClick=${() => downloadSvg (name)} />
+          <btn-push
             icon=${fav ? 'heart' : 'heart-outline'}
             label=${fav ? 'Favourited' : 'Favourite'}
             onClick=${() => app.db.toggleFav(name)}

@@ -82,12 +82,12 @@ export default function ExplorePodcastView ({ id: url }) {
         ${back}
         <h1>${podcast.title}</h1>
         <div class='actions'>
-          <btn-tap
+          <btn-push
             icon=${remembered ? 'bookmark' : 'bookmark-unfilled'}
             title=${remembered ? 'Remove from the shortlist' : 'Keep for a closer look later'}
             onClick=${remember}
             />
-          <btn-tap ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
+          <btn-push ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
         </div>
       </header>
 

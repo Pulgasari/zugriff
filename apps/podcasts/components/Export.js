@@ -51,8 +51,8 @@ function Export () {
       <span class="field-label">Subscriptions</span>
       <i>Back up your subscriptions and listening progress as JSON, or restore from a file.</i>
       <span>
-        <btn-tap icon='download' label='Export JSON' onClick=${exportFeeds} />
-        <btn-tap icon='upload'   label='Import JSON' onClick=${() => fileRef.current?.click()} />
+        <btn-push icon='download' label='Export JSON' onClick=${exportFeeds} />
+        <btn-push icon='upload'   label='Import JSON' onClick=${() => fileRef.current?.click()} />
 
         <input hidden
           ref=${fileRef}

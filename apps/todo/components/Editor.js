@@ -128,8 +128,8 @@ export function Editor () {
         ${!task.parent && html`<${Subtasks} task=${task} />`}
 
         <div class='actions'>
-          <btn-tap icon='lucide:trash-2' label='delete' onClick=${() => { removeTask(task.id); closeEditor(); }} />
-          <btn-tap icon='lucide:check' label='close' onClick=${closeEditor} />
+          <btn-push icon='lucide:trash-2' label='delete' onClick=${() => { removeTask(task.id); closeEditor(); }} />
+          <btn-push icon='lucide:check' label='close' onClick=${closeEditor} />
         </div>
       </div>
     </app-panel>

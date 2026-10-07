@@ -36,12 +36,12 @@ function Item ({ episode }) {
       />
       
       <div class='meta'>
-        ${podcast && html`<btn-tap label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}
+        ${podcast && html`<btn-push label=${podcast.title} onClick=${() => app.go('podcast', podcast.id)} />`}
         <${Date} value=${episode.pubDate} />
         <span class='dur'>${zugriff.fmt.duration(episode.duration)}</span>
       </div>
       
-      <btn-tap class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
+      <btn-push class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
       
       ${(state.position || state.done) && html`<aufbau-progress value=${pct}></aufbau-progress>`}
 

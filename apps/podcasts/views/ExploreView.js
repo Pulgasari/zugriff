@@ -177,7 +177,7 @@ function PodcastItem ({ entry, isRemembered, isSubscribed }) {
     <data-item class:subscribed=${isSubscribed}>
       <${Artwork} aria-label='open podcast' onClick=${() => open(entry.url)} src=${entry.image} />
       <div class='meta'>${meta}</div>
-      <btn-tap class='title' label=${entry.title} onClick=${() => open(entry.url)} />
+      <btn-push class='title' label=${entry.title} onClick=${() => open(entry.url)} />
       <${ActionMenu} items=${[
         rememberAction (entry, isRemembered),
         subscribeAction(entry, isSubscribed),
@@ -197,7 +197,7 @@ function EpisodeItem ({ entry, isRemembered, isSubscribed }) {
         <${DateLabel} value=${entry.date} />
         <span class='dur'>${zugriff.fmt.duration(entry.duration)}</span>
       </div>
-      <btn-tap class='title' label=${entry.title} onClick=${() => open(entry.url)} />
+      <btn-push class='title' label=${entry.title} onClick=${() => open(entry.url)} />
       ${teaser && html`<p class='teaser'>${teaser}</p>`}
       <${ActionMenu} items=${[
         rememberAction (podcast, isRemembered),
@@ -293,7 +293,7 @@ function ExploreView () {
           <${Picker} class|placeholder='attribute' look='combobox' signal=${state.attribute} options=${ATTRIBUTES} />
         </div>
 
-        ${isUrl      && html`<btn-tap icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
+        ${isUrl      && html`<btn-push icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
         ${note.value && html`<i class='note'>${note.value}</i>`}
         ${busy.value && html`<${Loading} text='searching …' />`}
 

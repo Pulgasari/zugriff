@@ -132,7 +132,7 @@ function Queue () {
       <main class='list'>
         ${groups.length
           ? groups.map(({ pack, rows }) => html`<${PackageCard} key=${pack?.id ?? 'none'} pack=${pack} rows=${rows} />`)
-          : html`<${Empty} icon='lucide:download-cloud' title='Nothing in the queue' hint='paste links anywhere, or add them in the grabber' action=${html`<btn-tap icon='lucide:link' label='add links' onClick=${() => show('grab')} />`} />`}
+          : html`<${Empty} icon='lucide:download-cloud' title='Nothing in the queue' hint='paste links anywhere, or add them in the grabber' action=${html`<btn-push icon='lucide:link' label='add links' onClick=${() => show('grab')} />`} />`}
       </main>
     </div>
   `;
