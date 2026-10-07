@@ -61,6 +61,7 @@ function buildManifest (app) {
     ...(m.launch_handler  ? { launch_handler  : m.launch_handler  } : {}),
     ...(m.display_override ? { display_override: m.display_override } : {}),
     ...(m.protocol_handlers ? { protocol_handlers: m.protocol_handlers } : {}),
+    ...(m.share_target    ? { share_target    : m.share_target    } : {}),
     ...(m.shortcuts       ? { shortcuts       : m.shortcuts       } : {}),
   };
 }

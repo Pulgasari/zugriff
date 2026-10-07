@@ -66,7 +66,7 @@ export function createHotkeys (actions) {
     if (!spec) return;
 
     // don't hijack plain typing unless the spec opts in, or a modifier is held
-    if (!spec.global && !(event.ctrlKey || event.metaKey || event.altKey) && isEditable(event.target)) return;
+    if (!spec.global && !(event.ctrlKey || event.metaKey || event.altKey) && isEditable(event.composedPath?.()[0] ?? event.target)) return;
     if (spec.when && !spec.when()) return;
 
     const run = resolve(spec.action);
