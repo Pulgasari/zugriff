@@ -1,9 +1,9 @@
 /* apps/ebooks/app.css — the eBooks app's own look.
 
-   the reset, the theme tokens and the #app frame come from ./../base.css.
-   this app has two faces: a library grid and a full-bleed reader. */
+   the frame is #app, the <app-root>, with <app-area name="main"> (library, reader) and
+   <app-area name="config">. this app has two faces: a library grid and a full-bleed reader. */
 
-#app-main { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+app-view[name="reader"] { overflow: hidden; }
 
 /* ── shared controls (kept in step with the other apps) ───────────────────── */
 

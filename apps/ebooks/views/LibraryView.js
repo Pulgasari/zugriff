@@ -9,7 +9,6 @@ import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
 import View        from '/.shared/js/components/View.js';
-import { SettingsButton, SettingsModal } from '/.shared/js/components/Settings.js';
 
 import BookItem     from './../components/BookItem.js';
 import SourceStatus from './../components/SourceStatus.js';
@@ -53,7 +52,7 @@ function LibraryView () {
     ${pending > 0 && html`<span class="scan-note"><${Icon} name="loading" /> ${pending} left</span>`}
     <${IconButton} icon='refresh'    label='Rescan folders' onClick=${() => app.db.rescanAll()} />
     <${IconButton} icon='folder-add' label='Add folder'     onClick=${app.addFolder} />
-    <${SettingsButton} /><${SettingsModal} />
+    <${IconButton} icon='settings'   label='Settings'       onClick=${app.toggleConfig} />
   `;
 
   return html`
