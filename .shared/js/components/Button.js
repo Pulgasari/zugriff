@@ -1,25 +1,15 @@
 // components/Button.js
 
-import Icon     from './Icon.js';
+import Icon from './Icon.js';
 
-function Button ({ children, className, class: klass, icon, onClick, label, text, disabled, title, 'aria-current': current }) {
-  return html`
-    <button class=${className || klass} aria-current=${current} ...${{ disabled, onClick, title }}>
-      ${icon && html`<${Icon} name=${icon} />`}
-      ${children || label || text}
-    </button>
-  `;
-}
-/*
 function Button ({ children, icon, label, text, ...rest }) {
   return html`
-    <button ...${rest}>
+    <btn-push aria-current=${current} ...${rest}>
       ${icon && html`<${Icon} name=${icon} />`}
       ${children || label || text}
-    </button>
+    </btn-push>
   `;
 }
-*/
 
 export       { Button };
 export default Button;
