@@ -2,10 +2,16 @@
 
 // :::::: IMPORT
 
-import { computed, signal, typedSignal } from '@aufbau/signals';
-import { useEffect, useState }     from 'preact/hooks';
+// the frame is aufbau's: an <app-root> with the views in its main area, the
+// folder tree in a menu area docked at the start (a sidebar when there is room,
+// a drawer when there is not) and the settings in a config area at the end
 
-import FolderLibrary from '/.shared/js/modules/folders.js';
+import { gestalt }                     from '@aufbau/api';
+import { computed, effect, typedSignal } from '@aufbau/signals';
+import { useEffect, useRef, useState } from 'preact/hooks';
+
+import FolderLibrary  from '/.shared/js/modules/folders.js';
+import { sharedSpec } from '/.shared/js/components/Settings.js';
 
 const // shared components
 Brand       = await zugriff.component('Brand'),
@@ -26,20 +32,30 @@ TOC         = await zugriff.component('TOC');
 
 const app = zugriff.app;
 app.lib = new FolderLibrary({ accept: 'md, markdown, mdown, mkd, mdwn, mdtxt' });
-const { fs } = zugriff;
 
 // ::: state
 
 app.state.$extend({
-  filter    : { type: 'scalar', value: '' },
-  isNavOpen : { type: 'scalar', value: false },
+  filter : { type: 'scalar', value: '' },
 });
 
 // durable state — hydrates from + persists to localStorage
 const open = typedSignal({ type: 'scalar', value: null, key: 'notes:open', storage: 'local' });   // { sourceId, path } | null
 
-const closeSidebar = () => app.state.isNavOpen = false;
-const  openSidebar = () => app.state.isNavOpen = true;
+// :::::: FRAME
+
+const rootRef = { current: null };
+const show    = name => rootRef.current?.show(name);
+const area    = name => rootRef.current?.area(name);
+
+// a drawer closes once something in it was picked, a sidebar stays
+const closeMenu = () => { if (area('menu')?.isOverlay) area('menu').hide(); };
+
+function openNote (sourceId, path) {
+  open.value = { sourceId, path };
+  show('note');
+  closeMenu();
+}
 
 // :::::: ACTIONS
 
@@ -48,7 +64,7 @@ async function addFolder () {
   try {
     const record = await app.lib.addFolder();
     if (record) app.toast({ success: `Opened ${record.name}` });
-  } 
+  }
   catch (e) { app.toast(e); }
 }
 
@@ -57,38 +73,75 @@ async function addFolder () {
 // derive a note's display title: the filename without its extension
 const titleOf = node => node.name.replace(/\.[^.]+$/, '');
 
-// :::::: SIDEBAR
+// :::::: MENU
 
-function Sidebar () {
+function Menu () {
   return html`
-    <aside class=${'sidebar' + (app.state.$isNavOpen ? ' open' : '')}>
+    <div class='menu'>
       <${Brand} app=${app} />
-      <${Button} icon='close' aria-label='close' onClick=${closeSidebar} />
       <${SearchPanel} placeholder='filter notes ...' appStateId='filter' />
 
       <${FolderTree}
         lib=${app.lib}
         filter=${app.state.$filter}
         selected=${open.value}
-        onOpen=${(sourceId, path) => { open.value = { sourceId, path }; closeSidebar(); }}
-        onRemoveSource=${id => { if (open.value?.sourceId === id) open.value = null; }}
+        onOpen=${openNote}
+        onRemoveSource=${id => { if (open.value?.sourceId === id) { open.value = null; show('start'); } }}
         labelOf=${titleOf}
         fileIcon='notes'
         emptyText='No markdown files here'
         expandedKey='notes:expanded'
       />
 
-      <div class="side-foot">
+      <div class='side-foot'>
         <${InstallTip} />
         <${Button} icon='folder-add' label='Open a folder' onClick=${addFolder} />
       </div>
-    </aside>
+    </div>
   `;
 }
 
-// :::::: READER
+// :::::: CONFIG
 
-// resolve the note the router points at, against the freshest scan
+// the shared fields (palette, skin, …), written into app.state
+function Config () {
+  const host = useRef(null);
+
+  useEffect(() => {
+    const element = host.current;
+    if (!element) return;
+    let closed = false;
+
+    gestalt.palettes().then(palettes => {
+      if (closed) return;
+      const spec = sharedSpec(app.config, palettes);
+      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
+      element.spec   = spec;
+    });
+
+    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
+    element.addEventListener('config', onConfig);
+
+    // the form follows the state while it is open, a change from elsewhere included
+    const keys   = Object.keys(sharedSpec(app.config, []));
+    const follow = effect(() => {
+      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
+      if (element.spec && Object.keys(element.spec).length) element.values = values;
+    });
+
+    return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
+  }, []);
+
+  return html`
+    <app-panel heading='Settings'>
+      <app-config ref=${host}></app-config>
+    </app-panel>
+  `;
+}
+
+// :::::: VIEWS
+
+// resolve the open note against the freshest scan
 const currentNote = computed(() => {
   const o = open.value;
   if (!o) return null;
@@ -96,10 +149,34 @@ const currentNote = computed(() => {
   return node ? { sourceId: o.sourceId, node } : null;
 });
 
+function Header ({ segments = [] }) {
+  return html`
+    <header>
+      <${IconButton} icon='menu' title='notes' onClick=${() => area('menu')?.toggle()} />
+      <${Breadcrumbs} segments=${segments} />
+      <${IconButton} icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
+    </header>
+  `;
+}
+
+// no note open: open a folder, or pick a note from the tree
+function Start () {
+  const hasSources = app.lib.sources.value.length > 0;
+  const action     = hasSources ? '' : html`<${Button} label='Open a folder' icon='folder-add' onClick=${addFolder} />`;
+  const hint       = hasSources ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.';
+
+  return html`
+    <div class='reader'>
+      <${Header} />
+      <${Empty} icon='notes' title='No note open' hint=${hint} action=${action} />
+    </div>
+  `;
+}
+
 // the open note: read its text off disk and hand it to the shared <${Reader}>,
-// which owns the markdown pipeline (via <aufbau-reader>); <${TOC}> builds the
-// "on this page" list off the rendered headings.
-function NoteView ({ note }) {
+// which owns the markdown pipeline; <${TOC}> builds the "on this page" list
+// off the rendered headings
+function NoteText ({ note }) {
   const [text, setText] = useState(null);
 
   useEffect(() => {
@@ -111,65 +188,64 @@ function NoteView ({ note }) {
     return () => { alive = false; };
   }, [note.sourceId, note.node.path, note.node.handle]);
 
-  return (text == null) 
-  ? html`<div>…</div>`
+  return (text == null)
+  ? html`<div class='booting'><${Icon} name='loading' /></div>`
   : html`<>
     <${Reader} id='notes-reader' format='markdown' text=${text} />
     <${TOC} target='#notes-reader' selector='h1, h2, h3' />
   </>`;
 }
 
-
-
-// :::::: APP
-
-function EmptyReader () {
-  let action, hint;
-  const hasSources = app.lib.sources.value.length ? true : false;
-
-  if (hasSources) {
-    action = '';
-    hint   = 'Choose a note to start reading.';
-  } else {
-    action = html`<${Button} label='Open a folder' icon='folder-add' onClick=${addFolder} />`;    
-    hint   = 'Open a folder of Markdown files to get started.';
-  }
-  
-  return html`<${Empty} icon='notes' title='No note open' hint=${hint} action=${action} />`;
-}
-
-function NotesReader () {
+function Note () {
   const note = currentNote.value;
-  const segments = note ? note.node.path.split('/') : [];
-  
+  if (!note) return html`<${Start} />`;
+
   return html`
     <div class='reader'>
-      <header>
-        <${IconButton} icon='menu' aria-label="Open notes" onClick=${openSidebar} />
-        <${Breadcrumbs} segments=${segments} />
-      </header>
-  
-      ${note ? html`<${NoteView} note=${note} />` : html`<${EmptyReader}/>`}
+      <${Header} segments=${note.node.path.split('/')} />
+      <${NoteText} note=${note} />
     </div>
   `;
 }
 
+// :::::: ROOT
+
+const current = { value: open.value ? 'note' : 'start' };
+
 const dockItems = [
-  { icon: 'menu', label: 'menu', onClick: () => app.state.isNavOpen = !app.state.$isNavOpen },
+  { icon: 'menu',     label: 'notes',    onClick: () => area('menu')?.toggle()   },
+  { icon: 'settings', label: 'settings', onClick: () => area('config')?.toggle() },
 ];
 
 function App () {
+  const root = useRef(null);
+
   useEffect(() => { app.lib.load().catch(app.toast); }, []);
 
-  return (!app.lib.ready.value)
-  ? html`<div class="booting"><${Icon} name='loading' /></div>`
-  : html`<>
-    <${Sidebar} />
-    <main id='app-main'>
-      <${NotesReader}/>
-    </main>
-    <${Dock} items=${dockItems} />
-  </>`;
+  // the tree is the way through the notes: a sidebar from the start where there is
+  // room. the elements are defined by the autoloader, so this waits for them
+  useEffect(() => {
+    rootRef.current = root.current;
+    if (!root.current) return;
+    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
+      const menu = area('menu');
+      if (menu && !menu.isOverlay) menu.show();
+    });
+  }, [app.lib.ready.value]);
+
+  if (!app.lib.ready.value) return html`<div class='booting'><${Icon} name='loading' /></div>`;
+
+  return html`
+    <app-root ref=${root} routing='hash'>
+      <app-area name='main'>
+        <app-view name='start' route='/' active=${current.value === 'start' || undefined}><${Start} /></app-view>
+        <app-view name='note' route='/note' transition-on='glide' active=${current.value === 'note' || undefined}><${Note} /></app-view>
+        <${Dock} items=${dockItems} />
+      </app-area>
+      <app-area name='menu' dock='start'><${Menu} /></app-area>
+      <app-area name='config' dock='end'><${Config} /></app-area>
+    </app-root>
+  `;
 }
 
 // :::::: BOOT
