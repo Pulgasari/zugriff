@@ -7,7 +7,7 @@
 // area at the bottom and the settings in a config area at the end
 
 import { computed }          from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect }         from 'preact/hooks';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
@@ -310,32 +310,30 @@ function onNavigate (event) {
   current.value = event.detail.to;
 }
 
-function App () {
-  const root = useRef(null);
+app.root.addEventListener('navigate', onNavigate);
 
+// the areas of #app, the root
+function App () {
   // the lists are the way through the tasks: a sidebar from the start where there
   // is room. the elements are defined by the autoloader, so this waits for them
   useEffect(() => {
-    frame.rootRef.current = root.current;
     Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
       const menu = area('menu');
       if (menu && !menu.isOverlay) menu.show();
-      current.value = root.current?.querySelector('app-area[name="main"] > app-view[active]')?.getAttribute('name') ?? 'today';
+      current.value = app.root.view?.getAttribute('name') ?? 'today';
     });
   }, []);
 
   return html`
-    <app-root ref=${root} routing='hash' onnavigate=${onNavigate}>
-      <app-area name='main'>
-        ${VIEWS.map(({ name, route }) => html`
-          <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'today' || undefined}><${TaskView} name=${name} /></app-view>
-        `)}
-        <${Dock} items=${dockItems} current=${current.value} />
-      </app-area>
-      <app-area name='menu' dock='start'><${Menu} /></app-area>
-      <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Editor} /></app-area>
-      <app-area name='config' dock='end'><${Config} /></app-area>
-    </app-root>
+    <app-area name='main'>
+      ${VIEWS.map(({ name, route }) => html`
+        <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'today' || undefined}><${TaskView} name=${name} /></app-view>
+      `)}
+      <${Dock} items=${dockItems} current=${current.value} />
+    </app-area>
+    <app-area name='menu' dock='start'><${Menu} /></app-area>
+    <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Editor} /></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
   `;
 }
 

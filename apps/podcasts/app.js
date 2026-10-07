@@ -98,9 +98,8 @@ app.effect(() => {
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
-const rootRef = { current: null };
-const show    = name => rootRef.current?.show(name);
-const area    = name => rootRef.current?.area(name);
+const show = app.show;
+const area = app.area;
 
 // the view on screen, and the id each detail view was last opened with. a detail
 // view keeps its id while it is hidden, so it still shows its podcast on the way out
@@ -203,23 +202,20 @@ function onNavigate (event) {
   app.state.route = { name: event.detail.to, id: ids.value[event.detail.to] ?? null };
 }
 
+app.root.addEventListener('navigate', onNavigate);
+
+// the areas of #app, the root
 function App () {
-  const root = useRef(null);
-
-  useEffect(() => { rootRef.current = root.current; }, []);
-
   return html`
-    <app-root ref=${root} routing='hash' onnavigate=${onNavigate}>
-      <app-area name='main'>
-        ${VIEWS.map(({ name, route }) => html`
-          <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'latest' || undefined}><${View} name=${name} /></app-view>
-        `)}
-        <${PlayerPanel} />
-        <${Dock} items=${dockItems} current=${current.value} />
-        <${Slot} map=${app.dialogs} name=${app.state.$dialog} load='dialog' />
-      </app-area>
-      <app-area name='config' dock='end'><${Config} /></app-area>
-    </app-root>
+    <app-area name='main'>
+      ${VIEWS.map(({ name, route }) => html`
+        <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'latest' || undefined}><${View} name=${name} /></app-view>
+      `)}
+      <${PlayerPanel} />
+      <${Dock} items=${dockItems} current=${current.value} />
+      <${Slot} map=${app.dialogs} name=${app.state.$dialog} load='dialog' />
+    </app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
   `;
 }
 

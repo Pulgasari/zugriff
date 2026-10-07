@@ -1,13 +1,13 @@
 // todo :: modules/frame.js
-// the handles of the <app-root> and what the views share: the task open in the
+// the handles of #app, the <app-root>, and what the views share: the task open in the
 // editor, the list and tag a view shows, the view on screen.
 
 import { signal, typedSignal } from '@aufbau/signals';
 
-export const rootRef = { current: null };
+const app = zugriff.app;
 
-export const show = name => rootRef.current?.show(name);
-export const area = name => rootRef.current?.area(name);
+export const show = app.show;
+export const area = app.area;
 
 // a drawer closes once something in it was picked, a sidebar stays
 export const closeMenu = () => { if (area('menu')?.isOverlay) area('menu').hide(); };

@@ -7,7 +7,7 @@
 // the settings in a config area at the end
 
 import { computed }          from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect }         from 'preact/hooks';
 
 import { Config }            from './components/Config.js';
 import { Detail }            from './components/Detail.js';
@@ -179,28 +179,26 @@ function onNavigate (event) {
   current.value = event.detail.to;
 }
 
-function App () {
-  const root = useRef(null);
+app.root.addEventListener('navigate', onNavigate);
 
+// the areas of #app, the root
+function App () {
   useEffect(() => {
-    frame.rootRef.current = root.current;
     Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
-      current.value = root.current?.querySelector('app-area[name="main"] > app-view[active]')?.getAttribute('name') ?? 'queue';
+      current.value = app.root.view?.getAttribute('name') ?? 'queue';
       fromShare();
     });
   }, []);
 
   return html`
-    <app-root ref=${root} routing='hash' onnavigate=${onNavigate}>
-      <app-area name='main'>
-        <app-view name='queue'   route='/'        active><${Queue} /></app-view>
-        <app-view name='grab'    route='/grab'    transition-on='glide'><${Grab} /></app-view>
-        <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
-        <${Dock} items=${dockItems} current=${current.value} />
-      </app-area>
-      <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Detail} /></app-area>
-      <app-area name='config' dock='end'><${Config} /></app-area>
-    </app-root>
+    <app-area name='main'>
+      <app-view name='queue'   route='/'        active><${Queue} /></app-view>
+      <app-view name='grab'    route='/grab'    transition-on='glide'><${Grab} /></app-view>
+      <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
+      <${Dock} items=${dockItems} current=${current.value} />
+    </app-area>
+    <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Detail} /></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
   `;
 }
 

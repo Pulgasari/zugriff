@@ -3,11 +3,13 @@
 html, body { height: 100%; }
 body { overflow: hidden; overscroll-behavior: none; }
 
+/* #app is the <app-root>. with areas it is their grid (app-root's own css),
+   an app without areas gets a column */
 #app {
-  display   : flex;
-  flex-flow : column;
-  height    : 100dvh;
-  overflow  : hidden;
+  height   : 100dvh;
+  overflow : hidden;
+
+  &:not(:has(> app-area)) { display: flex; flex-flow: column; }
 }
 
 /* ── tokens ─────────────────────────────────────────────────────── */

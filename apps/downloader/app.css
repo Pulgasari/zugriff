@@ -1,8 +1,6 @@
-/* the frame is <app-root> > <app-area name="main"> (queue, grabber, library and
+/* the frame is #app, the <app-root>, with <app-area name="main"> (queue, grabber, library and
    the dock), <app-area name="context"> (the selected download, a sheet) and
    <app-area name="config"> (a sidebar where there is room, a drawer where not) */
-
-app-root { flex: 1 1 auto; min-block-size: 0; }
 
 /* ── the dock ────────────────────────────────────────────────────────────── */
 

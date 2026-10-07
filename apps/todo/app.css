@@ -1,9 +1,7 @@
-/* the frame is <app-root> > <app-area name="main"> (the views and the dock),
+/* the frame is #app, the <app-root>, with <app-area name="main"> (the views and the dock),
    <app-area name="menu"> (lists and tags), <app-area name="context"> (the task
    being edited) and <app-area name="config">. menu and config are sidebars where
    there is room and drawers where there is not, the context a sheet */
-
-app-root { flex: 1 1 auto; min-block-size: 0; }
 
 /* ── menu ────────────────────────────────────────────────────────────────── */
 
