@@ -40,7 +40,7 @@ function Receiver ({ IconButton }) {
     return html`
       <li class=${selected ? 'row selected' : 'row'} key=${host + ':' + device.port}>
         <button class='entry' type='button' aria-pressed=${String(Boolean(selected))} onClick=${() => choose(device)}>
-          <span class='thumb'><svg-icon icon=${icon}></svg-icon></span>
+          <span class='thumb'><svg-icon icon=${icon} /></span>
           <span class='text'>
             <span class='name'>${device.alias ?? host}</span>
             <small>${host}:${device.port ?? 53317} · ${device.protocol ?? 'https'}</small>
@@ -89,7 +89,7 @@ function Outbox ({ Action, Actions, IconButton }) {
             ${files.map(file => html`
               <li class='row' key=${file.uri}>
                 <span class='entry'>
-                  <span class='thumb'><svg-icon icon='lucide:file'></svg-icon></span>
+                  <span class='thumb'><svg-icon icon='lucide:file' /></span>
                   <span class='text'><span class='name'>${file.name}</span><small>${file.size >= 0 ? fmt.bytes(file.size) : ''}</small></span>
                 </span>
                 <${IconButton} icon='lucide:x' label=${`remove ${file.name}`} onClick=${() => sync.remove(file.uri)} />
@@ -101,7 +101,7 @@ function Outbox ({ Action, Actions, IconButton }) {
         <${Action} icon='lucide:file-plus' label='pick files' onClick=${() => sync.pickFiles().catch(err => app.toast.error(err))} />
         <button class='action primary' type='button' disabled=${!files.length || !target()}
                 onClick=${() => sync.send(target(), files, pin.value).catch(err => app.toast.error(err))}>
-          <svg-icon icon='lucide:send'></svg-icon> send${files.length ? ` ${files.length} · ${fmt.bytes(size)}` : ''}
+          <svg-icon icon='lucide:send' /> send${files.length ? ` ${files.length} · ${fmt.bytes(size)}` : ''}
         </button>
       </${Actions}>
     </section>
@@ -143,7 +143,7 @@ export default function SyncView (props) {
     <${Bar} title='Send' />
     <div class='scroll'>
       <div-y class='hero'>
-        <svg-icon icon='lucide:send'></svg-icon>
+        <svg-icon icon='lucide:send' />
         <h2>Only in the android app</h2>
         <p>Sending to devices on your network needs the app: a web page may not search the network or talk to a device by its address.</p>
       </div-y>

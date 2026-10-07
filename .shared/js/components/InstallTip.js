@@ -11,7 +11,7 @@ function InstallTip ({ message = DEFAULT_MESSAGE }) {
 
   return html`
     <div class='install-tip'>
-      <svg-icon icon='info'></svg-icon>
+      <svg-icon icon='info' />
       <span class='text'>${message}</span>
       ${zugriff.app.canInstall
         ? html`<btn-push onClick=${zugriff.app.promptInstall} icon='download' label='Install app' />`      

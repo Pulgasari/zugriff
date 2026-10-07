@@ -18,11 +18,11 @@ function EditRoute () {
   return html`
     <div class="vid-edit">
       <div class="vid-edit-hint">
-        <svg-icon icon="mdi:movie-edit-outline"></svg-icon>
+        <svg-icon icon="mdi:movie-edit-outline" />
         <h2>Quick edits</h2>
         <p>${src.value ? 'Editing tools are on the way.' : 'Open a clip in the player first.'}</p>
         <ul class="vid-edit-planned">
-          ${PLANNED.map(t => html`<li key=${t.label}><svg-icon icon=${t.icon}></svg-icon> ${t.label}</li>`)}
+          ${PLANNED.map(t => html`<li key=${t.label}><svg-icon icon=${t.icon} /> ${t.label}</li>`)}
         </ul>
       </div>
     </div>`;

@@ -8,7 +8,7 @@ import { html } from './../vendors.js';
 function Loading ({ text, children, class: klass }) {
   return html`
     <div class=${klass ? 'loading ' + klass : 'loading'}>
-      <svg-icon icon='loading'></svg-icon>
+      <svg-icon icon='loading' />
       ${children ?? (text && html`<span>${text}</span>`)}
     </div>
   `;

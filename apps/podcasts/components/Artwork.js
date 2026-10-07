@@ -39,7 +39,7 @@ function Artwork ({ src, size = 48, className = '', onClick }) {
 
   const pic = showImg
     ? html`<img loading='lazy' src=${url} onError=${onError} />`
-    : html`<svg-icon icon='mdi:podcast'></svg-icon>`;
+    : html`<svg-icon icon='mdi:podcast' />`;
 
   return onClick
     ? html`<button class=${classes} onClick=${onClick}>${pic}</button>`

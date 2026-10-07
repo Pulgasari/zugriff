@@ -217,7 +217,7 @@ function TaskPane ({ task, index, total, children }) {
     <div class='pane task'>
       <header>
         <span class='title'>
-          <svg-icon icon=${icon}></svg-icon> ${label}
+          <svg-icon icon=${icon} /> ${label}
         </span>
         <menu class='actions'>
           <btn-icon icon='mdi:chevron-up'   label='up'     onClick=${moveUp}   disabled=${index === 0}         />
@@ -271,11 +271,11 @@ function      FlipTaskPane (props) {
     <${TaskPane} ...${props}>
       <button class=${'chip' + (p.axis === 'h' ? ' active' : '')}
         onClick=${() => updateTask(id, { axis: 'h' })}>
-        <svg-icon icon="mdi:flip-horizontal"></svg-icon> Horizontal
+        <svg-icon icon="mdi:flip-horizontal" /> Horizontal
       </button>
       <button class=${'chip' + (p.axis === 'v' ? ' active' : '')}
         onClick=${() => updateTask(id, { axis: 'v' })}>
-        <svg-icon icon="mdi:flip-vertical"></svg-icon> Vertical
+        <svg-icon icon="mdi:flip-vertical" /> Vertical
       </button>
     </${TaskPane}>`;
 }
@@ -374,7 +374,7 @@ function TaskAdder() {
       <div class="adder-chips">
         ${Object.entries(TASK_TYPES).map(([type, def]) => html`
           <button class="chip" onClick=${() => addTask(type)}>
-            <svg-icon icon=${def.icon}></svg-icon> ${def.label}
+            <svg-icon icon=${def.icon} /> ${def.label}
           </button>`)}
       </div>
     </div>`;
@@ -390,13 +390,13 @@ function FileItem({ entry: e }) {
   }[e.status];
   return html`
     <div class=${'file-item ' + e.status}>
-      <svg-icon icon=${icon} class=${e.status === 'processing' ? 'spin' : ''}></svg-icon>
+      <svg-icon icon=${icon} class=${e.status === 'processing' ? 'spin' : ''} />
       <span class="name">${e.file.name}</span>
       ${e.status === 'done' && html`
-        <a class="icon-btn" href=${e.blobUrl} download=${e.outName}><svg-icon icon="mdi:download"></svg-icon></a>`}
+        <a class="icon-btn" href=${e.blobUrl} download=${e.outName}><svg-icon icon="mdi:download" /></a>`}
       ${e.status !== 'processing' && html`
         <button class="icon-btn remove" onClick=${() => files.value = files.value.filter(f => f.id !== e.id)}>
-          <svg-icon icon="mdi:close"></svg-icon>
+          <svg-icon icon="mdi:close" />
         </button>`}
     </div>`;
 }
@@ -435,12 +435,12 @@ function App() {
       ${(list.length > 0 && taskList.length > 0) && html`
         <div id='app-actions'>
           <button class="btn primary" onClick=${runAll} disabled=${busy || pendingCnt === 0}>
-            <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:play'} class=${busy ? 'spin' : ''}></svg-icon>
+            <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:play'} class=${busy ? 'spin' : ''} />
             ${busy ? 'Processing…' : 'Run on ' + pendingCnt + ' image' + (pendingCnt > 1 ? 's' : '')}
           </button>
           ${hasDone && html`
             <button class="btn secondary" onClick=${downloadAll}>
-              <svg-icon icon="mdi:download-multiple"></svg-icon> Download all
+              <svg-icon icon="mdi:download-multiple" /> Download all
             </button>`}
         </div>`}
     </div>`;

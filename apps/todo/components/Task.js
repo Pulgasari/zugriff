@@ -76,11 +76,11 @@ function Meta ({ task }) {
   const overdue  = !task.done && task.due && dueDay(task.due) < dayOf();
 
   const parts = [
-    task.due        && html`<span class=${overdue ? 'due overdue' : 'due'}><svg-icon icon='lucide:calendar'></svg-icon>${dueLabel(task.due)}</span>`,
-    task.repeat     && html`<span title=${repeatLabel(task.repeat)}><svg-icon icon='lucide:repeat'></svg-icon></span>`,
-    task.remind     && html`<span><svg-icon icon='lucide:bell'></svg-icon></span>`,
-    task.notes      && html`<span><svg-icon icon='lucide:sticky-note'></svg-icon></span>`,
-    subtasks.length && html`<span><svg-icon icon='lucide:list-checks'></svg-icon>${subtasks.filter(item => item.done).length}/${subtasks.length}</span>`,
+    task.due        && html`<span class=${overdue ? 'due overdue' : 'due'}><svg-icon icon='lucide:calendar' />${dueLabel(task.due)}</span>`,
+    task.repeat     && html`<span title=${repeatLabel(task.repeat)}><svg-icon icon='lucide:repeat' /></span>`,
+    task.remind     && html`<span><svg-icon icon='lucide:bell' /></span>`,
+    task.notes      && html`<span><svg-icon icon='lucide:sticky-note' /></span>`,
+    subtasks.length && html`<span><svg-icon icon='lucide:list-checks' />${subtasks.filter(item => item.done).length}/${subtasks.length}</span>`,
     listName        && html`<span class='list'>${listName}</span>`,
     ...task.tags.map(name => html`<span class='tag'>#${name}</span>`),
   ].filter(Boolean);
@@ -93,7 +93,7 @@ export function TaskRow ({ task }) {
   return html`
     <div ref=${ref} class='task' data-priority=${task.priority || null} data-done=${task.done ? '' : null} aria-current=${selected.value === task.id ? 'true' : null}>
       <button class='check' type='button' aria-pressed=${task.done ? 'true' : 'false'} aria-label=${task.done ? 'reopen' : 'tick'} onClick=${() => tickTask(task.id)}>
-        <svg-icon icon=${task.done ? 'lucide:circle-check' : 'lucide:circle'}></svg-icon>
+        <svg-icon icon=${task.done ? 'lucide:circle-check' : 'lucide:circle'} />
       </button>
       <button class='body' type='button' onClick=${() => edit(task.id)}>
         <span class='title'>${task.title}</span>
@@ -139,7 +139,7 @@ export function AddBar ({ defaults = {}, placeholder = 'add a task, e.g. call an
   return html`
     <form class='add' onSubmit=${submit}>
       <div class='add-field'>
-        <svg-icon icon='lucide:plus'></svg-icon>
+        <svg-icon icon='lucide:plus' />
         <input id='todo-add' type='text' enterkeyhint='done' autocomplete='off' placeholder=${placeholder}
                value=${text} onInput=${event => setText(event.currentTarget.value)} />
       </div>
@@ -147,7 +147,7 @@ export function AddBar ({ defaults = {}, placeholder = 'add a task, e.g. call an
         <div class='chips'>
           ${parsed.tokens.map(token => html`
             <button type='button' class='chip' data-kind=${token.kind} title='keep as text' onClick=${() => setIgnore([...ignore, token.text])}>
-              ${token.kind === 'date' && parsed.due ? dayLabel(dueDay(parsed.due)) : token.label}<svg-icon icon='lucide:x'></svg-icon>
+              ${token.kind === 'date' && parsed.due ? dayLabel(dueDay(parsed.due)) : token.label}<svg-icon icon='lucide:x' />
             </button>
           `)}
         </div>

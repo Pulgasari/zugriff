@@ -135,12 +135,12 @@ function Cover ({ blob, size = 40, radius = 6 }) {
   const style = `width:${size}px;height:${size}px;border-radius:${radius}px`;
   return u
     ? html`<img class="cover" style=${style} src=${u} alt="" loading="lazy" />`
-    : html`<span class="cover ph" style=${style}><svg-icon icon="mdi:music-note"></svg-icon></span>`;
+    : html`<span class="cover ph" style=${style}><svg-icon icon="mdi:music-note" /></span>`;
 }
 
 function PlayGlyph ({ track }) {
   const isCur = player.current.value?.key === track.key;
-  return html`<svg-icon icon=${isCur && player.playing.value ? 'mdi:volume-high' : 'mdi:play'}></svg-icon>`;
+  return html`<svg-icon icon=${isCur && player.playing.value ? 'mdi:volume-high' : 'mdi:play'} />`;
 }
 
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
@@ -149,7 +149,7 @@ function NavItem ({ name, icon, label }) {
   const active = current.value === name;
   return html`
     <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)}>
-      <svg-icon icon=${icon}></svg-icon> <span>${label}</span>
+      <svg-icon icon=${icon} /> <span>${label}</span>
     </button>`;
 }
 
@@ -160,11 +160,11 @@ function SourceRow ({ source }) {
   return html`
     <div class="src">
       <button class="src-open" onClick=${reconnect} title=${source.name}>
-        <svg-icon icon=${state === 'granted' ? 'mdi:folder-music-outline' : 'mdi:folder-alert-outline'}></svg-icon>
+        <svg-icon icon=${state === 'granted' ? 'mdi:folder-music-outline' : 'mdi:folder-alert-outline'} />
         <span class="src-name">${source.name}</span>
-        ${busy && html`<svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon>`}
+        ${busy && html`<svg-icon icon="svg-spinners:bars-scale-middle" />`}
       </button>
-      <button class="src-x" title="Remove folder" onClick=${() => removeFolder(source)}><svg-icon icon="mdi:close"></svg-icon></button>
+      <button class="src-x" title="Remove folder" onClick=${() => removeFolder(source)}><svg-icon icon="mdi:close" /></button>
     </div>`;
 }
 
@@ -173,7 +173,7 @@ function Sidebar () {
   return html`
     <div class="sidebar">
       <div class="brand">
-        <svg-icon icon="mdi:music-box-multiple-outline"></svg-icon> <span>Music</span>
+        <svg-icon icon="mdi:music-box-multiple-outline" /> <span>Music</span>
       </div>
 
       <nav class="nav-group">
@@ -193,7 +193,7 @@ function Sidebar () {
       <div class="side-foot">
         <${InstallTip} show=${db.sources.value.length > 0}
                        message="Install the app so your folders stay connected between visits." />
-        <button class="btn primary" onClick=${addFolder}><svg-icon icon="mdi:folder-plus-outline"></svg-icon> Add folder</button>
+        <button class="btn primary" onClick=${addFolder}><svg-icon icon="mdi:folder-plus-outline" /> Add folder</button>
       </div>
     </div>`;
 }
@@ -206,7 +206,7 @@ function SongsTable () {
   if (!rows.length) return html`<${Empty} q=${app.state.$search} />`;
   const head = (key, label, cls = '') => html`
     <button class=${'th ' + cls + (app.state.$sort.key === key ? ' on' : '')} onClick=${() => setSort(key)}>
-      ${label}${app.state.$sort.key === key ? html` <svg-icon icon=${app.state.$sort.dir > 0 ? 'mdi:menu-up' : 'mdi:menu-down'} size='14px'></svg-icon>` : ''}
+      ${label}${app.state.$sort.key === key ? html` <svg-icon icon=${app.state.$sort.dir > 0 ? 'mdi:menu-up' : 'mdi:menu-down'} size='14px' />` : ''}
     </button>`;
   return html`
     <div class="songs">
@@ -236,7 +236,7 @@ function AlbumsGrid () {
         <button class="album-card" key=${a.key} onClick=${() => app.go('album', a.key)}>
           <div class="album-art">
             <${Cover} blob=${a.cover} size=${160} radius=${10} />
-            <span class="album-play" onClick=${e => { e.stopPropagation(); player.play(a.tracks[0], a.tracks); }}><svg-icon icon="mdi:play"></svg-icon></span>
+            <span class="album-play" onClick=${e => { e.stopPropagation(); player.play(a.tracks[0], a.tracks); }}><svg-icon icon="mdi:play" /></span>
           </div>
           <div class="album-name" title=${a.album}>${a.album}</div>
           <div class="album-artist" title=${a.artist}>${a.artist}</div>
@@ -256,7 +256,7 @@ function AlbumDetail ({ id }) {
           <div class="detail-kind">Album</div>
           <h1>${a.album}</h1>
           <div class="detail-sub">${a.artist}${a.year ? ` · ${a.year}` : ''} · ${a.tracks.length} songs${total ? ` · ${fmtTotal(total)}` : ''}</div>
-          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><svg-icon icon="mdi:play"></svg-icon> Play</button>
+          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><svg-icon icon="mdi:play" /> Play</button>
         </div>
       </header>
       <${TrackList} tracks=${a.tracks} numbered />
@@ -275,7 +275,7 @@ function ArtistsList () {
             <div class="artist-name">${a.name}</div>
             <div class="artist-sub">${a.albums.size} album${a.albums.size === 1 ? '' : 's'} · ${a.tracks.length} song${a.tracks.length === 1 ? '' : 's'}</div>
           </div>
-          <svg-icon icon="mdi:chevron-right"></svg-icon>
+          <svg-icon icon="mdi:chevron-right" />
         </button>`)}
     </div>`;
 }
@@ -292,7 +292,7 @@ function ArtistDetail ({ id }) {
           <div class="detail-kind">Artist</div>
           <h1>${a.name}</h1>
           <div class="detail-sub">${a.albums.size} album${a.albums.size === 1 ? '' : 's'} · ${a.tracks.length} songs</div>
-          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><svg-icon icon="mdi:play"></svg-icon> Play all</button>
+          <button class="btn primary" onClick=${() => player.play(a.tracks[0], a.tracks)}><svg-icon icon="mdi:play" /> Play all</button>
         </div>
       </header>
       <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
@@ -329,9 +329,9 @@ function Empty ({ q }) {
   const has = db.sources.value.length > 0;
   return html`
     <div class="empty">
-      <svg-icon icon=${q ? 'mdi:magnify' : 'mdi:music-note-off-outline'}></svg-icon>
+      <svg-icon icon=${q ? 'mdi:magnify' : 'mdi:music-note-off-outline'} />
       <p>${q ? `Nothing matches “${q}”` : has ? 'No audio here yet — try Rescan or another folder.' : 'Add a folder of music to get started.'}</p>
-      ${!has && !q && html`<button class="btn primary" onClick=${addFolder}><svg-icon icon="mdi:folder-plus-outline"></svg-icon> Add folder</button>`}
+      ${!has && !q && html`<button class="btn primary" onClick=${addFolder}><svg-icon icon="mdi:folder-plus-outline" /> Add folder</button>`}
     </div>`;
 }
 
@@ -343,17 +343,17 @@ function TopBar ({ name }) {
   const back  = name === 'album' || name === 'artist';
   return html`
     <header class="topbar">
-      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}><svg-icon icon="mdi:menu"></svg-icon></button>
+      <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}><svg-icon icon="mdi:menu" /></button>
       ${back && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => app.go(name === 'album' ? 'albums' : 'artists')} />`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>
       <div class="searchbox">
-        <svg-icon icon="mdi:magnify"></svg-icon>
+        <svg-icon icon="mdi:magnify" />
         <input type="search" placeholder="Search…" value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
       </div>
-      <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><svg-icon icon="mdi:refresh"></svg-icon></button>
-      <button class="ibtn" title="Settings" onClick=${() => area('config')?.toggle()}><svg-icon icon="settings"></svg-icon></button>
+      <button class="ibtn" title="Rescan" onClick=${() => db.rescanAll()} disabled=${!db.sources.value.length}><svg-icon icon="mdi:refresh" /></button>
+      <button class="ibtn" title="Settings" onClick=${() => area('config')?.toggle()}><svg-icon icon="settings" /></button>
     </header>`;
 }
 
@@ -381,14 +381,14 @@ function PlayerBar () {
 
       <div class="controls">
         <div class="ctl-row">
-          <button class=${'ctl' + (player.shuffle.value ? ' on' : '')} title="Shuffle" onClick=${player.toggleShuffle}><svg-icon icon="mdi:shuffle-variant"></svg-icon></button>
-          <button class="ctl" title="Previous" onClick=${player.prev}><svg-icon icon="mdi:skip-previous"></svg-icon></button>
+          <button class=${'ctl' + (player.shuffle.value ? ' on' : '')} title="Shuffle" onClick=${player.toggleShuffle}><svg-icon icon="mdi:shuffle-variant" /></button>
+          <button class="ctl" title="Previous" onClick=${player.prev}><svg-icon icon="mdi:skip-previous" /></button>
           <button class="ctl play" title="Play/Pause" onClick=${player.toggle}>
-            <svg-icon icon=${player.waiting.value ? 'svg-spinners:bars-scale-middle' : player.playing.value ? 'mdi:pause' : 'mdi:play'}></svg-icon>
+            <svg-icon icon=${player.waiting.value ? 'svg-spinners:bars-scale-middle' : player.playing.value ? 'mdi:pause' : 'mdi:play'} />
           </button>
-          <button class="ctl" title="Next" onClick=${() => player.next()}><svg-icon icon="mdi:skip-next"></svg-icon></button>
+          <button class="ctl" title="Next" onClick=${() => player.next()}><svg-icon icon="mdi:skip-next" /></button>
           <button class=${'ctl' + (player.repeat.value !== 'off' ? ' on' : '')} title=${'Repeat: ' + player.repeat.value} onClick=${player.cycleRepeat}>
-            <svg-icon icon=${player.repeat.value === 'one' ? 'mdi:repeat-once' : 'mdi:repeat'}></svg-icon>
+            <svg-icon icon=${player.repeat.value === 'one' ? 'mdi:repeat-once' : 'mdi:repeat'} />
           </button>
         </div>
         <div class="seek">
@@ -400,7 +400,7 @@ function PlayerBar () {
       </div>
 
       <div class="extra">
-        <svg-icon icon="mdi:volume-high"></svg-icon>
+        <svg-icon icon="mdi:volume-high" />
         <input class="vol" type="range" min="0" max="1" step="0.01" value=${player.volume.value}
                onInput=${e => player.setVolume(+e.target.value)} />
       </div>
@@ -412,7 +412,7 @@ function PlayerBar () {
 function Unsupported () {
   return html`
     <div class="hero">
-      <svg-icon icon="mdi:folder-alert-outline"></svg-icon>
+      <svg-icon icon="mdi:folder-alert-outline" />
       <h1>Can’t open folders here</h1>
       <p>This browser doesn’t support the File System Access API. Try a recent Chromium-based browser (Chrome, Edge, Brave…).</p>
     </div>`;
@@ -421,10 +421,10 @@ function Unsupported () {
 function Welcome () {
   return html`
     <div class="hero">
-      <svg-icon icon="mdi:music-box-multiple-outline"></svg-icon>
+      <svg-icon icon="mdi:music-box-multiple-outline" />
       <h1>Your music, on your device</h1>
       <p>Add a folder of audio files — tags and cover art are read locally and never leave your machine.</p>
-      <button class="btn primary big" onClick=${addFolder}><svg-icon icon="mdi:folder-plus-outline"></svg-icon> Add a folder</button>
+      <button class="btn primary big" onClick=${addFolder}><svg-icon icon="mdi:folder-plus-outline" /> Add a folder</button>
     </div>`;
 }
 
@@ -446,7 +446,7 @@ function App () {
   }, [framed]);
 
   if (!fs.supported())          return html`<div class="centered"><${Unsupported} /></div>`;
-  if (!db.ready.value)          return html`<div class="centered"><div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon></div></div>`;
+  if (!db.ready.value)          return html`<div class="centered"><div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div></div>`;
   if (!db.sources.value.length) return html`<div class="centered"><${Welcome} /></div>`;
 
   return html`

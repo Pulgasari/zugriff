@@ -14,7 +14,7 @@ import { html } from './../vendors.js';
 function Empty ({ icon, title, hint, action, children }) {
   return html`
     <div class="empty">
-      ${icon  && html`<svg-icon icon=${icon}></svg-icon>`}
+      ${icon  && html`<svg-icon icon=${icon} />`}
       ${title && html`<p class="empty-title">${title}</p>`}
       ${hint  && html`<p class="empty-hint">${hint}</p>`}
       ${action}

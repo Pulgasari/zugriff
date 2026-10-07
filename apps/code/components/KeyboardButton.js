@@ -3,7 +3,7 @@
 import { html } from './../vendors.js';
 
 export default function KeyboardButton ({ keyValue, icon, label, className = '', active = false, disabled = false, onAction }) {
-  const content     = icon ? html`<svg-icon icon=${icon}></svg-icon>` : (label || keyValue);
+  const content     = icon ? html`<svg-icon icon=${icon} />` : (label || keyValue);
   const onMouseDown = event => { event.preventDefault(); if (!disabled) onAction(keyValue); };
 
   return html`

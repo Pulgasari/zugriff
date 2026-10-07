@@ -221,7 +221,7 @@ function SnippetPane({ snippet, index, total }) {
     <div class="snippet-pane">
       
       <div class="pane-header">
-        <svg-icon icon="mdi:music-note-outline"></svg-icon>
+        <svg-icon icon="mdi:music-note-outline" />
         <span class="pane-title">${file.name}</span>
         <span class="sel-dur">${fmtT(end - start)}</span>
         <div class="pane-controls">
@@ -242,14 +242,14 @@ function SnippetPane({ snippet, index, total }) {
       
       <div class="pane-footer">
         <button class="btn icon-only" onClick=${() => toggleSnippet(id)} title=${playing ? 'Pause' : 'Play selection'}>
-          <svg-icon icon=${playing ? 'mdi:pause' : 'mdi:play'}></svg-icon>
+          <svg-icon icon=${playing ? 'mdi:pause' : 'mdi:play'} />
         </button>
         <div class="time-row">
           <label>Start</label>
           <input type="number" class="field time-input" step="0.1" min="0" max=${(end-.1).toFixed(1)}
             value=${start.toFixed(1)}
             onInput=${e => update(id, { start: clamp(+e.target.value, 0, end-.1) })} />
-          <svg-icon icon="mdi:arrow-right"></svg-icon>
+          <svg-icon icon="mdi:arrow-right" />
           <label>End</label>
           <input type="number" class="field time-input" step="0.1" min=${(start+.1).toFixed(1)} max=${duration.toFixed(1)}
             value=${end.toFixed(1)}
@@ -283,7 +283,7 @@ function App() {
         <div class="preview-bar">
           <button class=${'btn ' + (isPrev ? 'secondary' : 'primary')}
             onClick=${isPrev ? stopPreview : () => playPreview(0)}>
-            <svg-icon icon=${isPrev ? 'mdi:stop' : 'mdi:play-circle-outline'}></svg-icon>
+            <svg-icon icon=${isPrev ? 'mdi:stop' : 'mdi:play-circle-outline'} />
             ${isPrev ? 'Stop preview' : 'Preview all'}
           </button>
           <span class="preview-info">
@@ -295,11 +295,11 @@ function App() {
           <${Picker} options=${FORMATS} value=${format.value} onChange=${f => format.value = f} />
           <div class="export-btns">
             <button class="btn primary" onClick=${() => doExport('combined')} disabled=${busy}>
-              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''}></svg-icon>
+              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''} />
               ${ffLoading.value ? 'Loading ffmpeg…' : 'Export combined'}
             </button>
             <button class="btn secondary" onClick=${() => doExport('individual')} disabled=${busy}>
-              <svg-icon icon="mdi:download-multiple"></svg-icon> Export individually
+              <svg-icon icon="mdi:download-multiple" /> Export individually
             </button>
           </div>
         </div>

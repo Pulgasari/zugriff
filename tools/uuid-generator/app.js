@@ -70,11 +70,11 @@ function App() {
           value=${count.value} onChange=${v => count.value = v} />
         <div class="actions">
           <button class="btn primary" onClick=${generate}>
-            <svg-icon icon="mdi:refresh"></svg-icon> Generate
+            <svg-icon icon="mdi:refresh" /> Generate
           </button>
           ${list.length > 0 && html`
             <button class="btn secondary" onClick=${copyAll}>
-              <svg-icon icon=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'}></svg-icon>
+              <svg-icon icon=${copied.value === '__all__' ? 'mdi:check' : 'mdi:content-copy'} />
               ${copied.value === '__all__' ? 'Copied!' : 'Copy all'}
             </button>`}
         </div>
@@ -84,7 +84,7 @@ function App() {
         ${list.map(uuid => html`
           <div class="uuid-row" onClick=${() => copyOne(uuid)} title="Click to copy">
             <code class="uuid">${uuid}</code>
-            <svg-icon icon=${copied.value === uuid ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon"></svg-icon>
+            <svg-icon icon=${copied.value === uuid ? 'mdi:check' : 'mdi:content-copy'} class="copy-icon" />
           </div>`)}
         ${list.map(uuid => html`
           <div class="uuid-row">

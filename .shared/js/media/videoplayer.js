@@ -170,7 +170,7 @@ function Ctrl ({ icon, label, onClick, active = false, big = false, disabled = f
       aria-label=${label}
       disabled=${disabled}
       onClick=${onClick}>
-      <svg-icon icon=${icon}></svg-icon>
+      <svg-icon icon=${icon} />
     </button>`;
 }
 
@@ -281,7 +281,7 @@ function Stage () {
 
       ${!src.value && html`
         <button class="empty" onClick=${pick}>
-          <svg-icon icon="mdi:movie-open-outline"></svg-icon>
+          <svg-icon icon="mdi:movie-open-outline" />
           <span>Open a video</span>
           <small>It stays on your device.</small>
         </button>`}

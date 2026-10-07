@@ -13,7 +13,7 @@ function BookItem ({ book }) {
         <div class="book-title">${book.title}</div>
         ${book.author && html`<div class="book-author">${book.author}</div>`}
       </div>
-      ${percent > 0 && html`<aufbau-progress class="book-progress" value=${Math.round(percent * 100)}></aufbau-progress>`}
+      ${percent > 0 && html`<aufbau-progress class="book-progress" value=${Math.round(percent * 100)} />`}
     </button>
   `;
 }

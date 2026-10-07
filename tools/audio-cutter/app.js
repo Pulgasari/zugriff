@@ -159,16 +159,16 @@ function App() {
       ${!file ? html`<${Dropzone} accept='audio/*' multiple=${false} what='an audio file' onFiles=${entries => loadFile(entries[0].file)} />` : html`
 
         <div class="file-bar">
-          <svg-icon icon="mdi:music-note-outline"></svg-icon>
+          <svg-icon icon="mdi:music-note-outline" />
           <span class="fname">${file.name}</span>
           <span class="dur">${fmt(dur)}</span>
           <button class="icon-btn remove" onClick=${reset} title="Remove">
-            <svg-icon icon="mdi:close"></svg-icon>
+            <svg-icon icon="mdi:close" />
           </button>
         </div>
 
         ${st === 'loading' && html`
-          <div class="info-row"><svg-icon icon="mdi:loading" class="spin"></svg-icon> Decoding…</div>`}
+          <div class="info-row"><svg-icon icon="mdi:loading" class="spin" /> Decoding…</div>`}
 
         ${peaks.value && html`
           <${WaveformWithHandles} 
@@ -188,7 +188,7 @@ function App() {
                 onInput=${e => startSig.value = Math.max(0, Math.min(+e.target.value, endSig.value-.1))} />
               <span class="time-fmt">${fmt(startSig.value)}</span>
             </div>
-            <div class="sel-dur"><svg-icon icon="mdi:scissors-cutting"></svg-icon>${fmt(endSig.value - startSig.value)}</div>
+            <div class="sel-dur"><svg-icon icon="mdi:scissors-cutting" />${fmt(endSig.value - startSig.value)}</div>
             <div class="time-field">
               <label>End</label>
               <input type="number" step="0.1" min=${(startSig.value+.1).toFixed(1)} max=${dur.toFixed(1)}
@@ -200,20 +200,20 @@ function App() {
 
           <div class="actions">
             <button class="btn icon-only" onClick=${togglePlay} title=${playing.value ? 'Pause' : 'Preview'}>
-              <svg-icon icon=${playing.value ? 'mdi:pause' : 'mdi:play'}></svg-icon>
+              <svg-icon icon=${playing.value ? 'mdi:pause' : 'mdi:play'} />
             </button>
             <button class="btn primary" onClick=${doConvert} disabled=${busy}>
-              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:content-cut'} class=${busy ? 'spin' : ''}></svg-icon>
+              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:content-cut'} class=${busy ? 'spin' : ''} />
               ${ffLoading.value ? 'Loading ffmpeg…' : st === 'converting' ? 'Cutting…' : 'Cut & export'}
             </button>
             ${st === 'done' && blobUrl.value && html`
               <a class="btn secondary" href=${blobUrl.value} download=${outName.value}>
-                <svg-icon icon="mdi:download"></svg-icon> Download
+                <svg-icon icon="mdi:download" /> Download
               </a>`}
           </div>
 
           ${st === 'error' && html`
-            <div class="err-row"><svg-icon icon="mdi:alert-circle-outline"></svg-icon> ${errMsg.value}</div>`}
+            <div class="err-row"><svg-icon icon="mdi:alert-circle-outline" /> ${errMsg.value}</div>`}
         `}
       `}
     </div>`;

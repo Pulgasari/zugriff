@@ -179,7 +179,7 @@ function Results () {
             <span>${iconName(result.size)}</span>
             <button class="icon-btn" title="Download"
                     onClick=${() => save(result.url, iconName(result.size))}>
-              <svg-icon icon="mdi:download"></svg-icon>
+              <svg-icon icon="mdi:download" />
             </button>
           </figcaption>
         </figure>`)}
@@ -195,7 +195,7 @@ function App () {
 
       ${errMsg.value && html`
         <div class="err-block">
-          <svg-icon icon="mdi:alert-circle-outline"></svg-icon> ${errMsg.value}
+          <svg-icon icon="mdi:alert-circle-outline" /> ${errMsg.value}
         </div>`}
 
       ${hasSource.value && html`

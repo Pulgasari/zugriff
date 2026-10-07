@@ -54,7 +54,7 @@ function App() {
           onKeyDown=${onKeyDown}
         />
         <button class="btn primary" onClick=${doDownload} disabled=${busy || !url.value}>
-          <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''}></svg-icon>
+          <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''} />
           ${busy ? 'Fetching…' : 'Download'}
         </button>
       </div>

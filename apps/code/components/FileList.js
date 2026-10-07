@@ -18,11 +18,11 @@ export default function FileList () {
               class=${'file-tab' + (file === activeFile ? ' active' : '')}
               onClick=${() => (app.files.active.value = file)}
             >
-              <svg-icon icon="material-symbols:description" color="#888"></svg-icon>
+              <svg-icon icon="material-symbols:description" color="#888" />
               <span class="tab-name">${file.name}</span>
               ${file.isDirty && html`<span class="tab-dirty">●</span>`}
               <button class="tab-close" onClick=${e => { e.stopPropagation(); app.files.close(file); }}>
-                <svg-icon icon="material-symbols:close"></svg-icon>
+                <svg-icon icon="material-symbols:close" />
               </button>
             </div>
           `)

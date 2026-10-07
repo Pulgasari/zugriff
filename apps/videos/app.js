@@ -48,12 +48,12 @@ function wireLaunchQueue () {
 function ModeBar () {
   return html`
     <header class="im-modebar">
-      <div class="im-brand"><svg-icon icon="mdi:movie-open-outline"></svg-icon> <span>videos</span></div>
+      <div class="im-brand"><svg-icon icon="mdi:movie-open-outline" /> <span>videos</span></div>
       <nav class="im-modes">
         ${routes.map(m => html`
           <button class=${'im-mode' + (current.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => app.setRoute(m.id)} title=${m.label}>
-            <svg-icon icon=${m.icon}></svg-icon> <span>${m.label}</span>
+            <svg-icon icon=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
       <div class="im-modebar-actions"><btn-icon icon='settings' label='Settings' onClick=${() => app.area('config')?.toggle()} /></div>

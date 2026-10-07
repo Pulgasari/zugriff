@@ -133,42 +133,42 @@ export default function FileBrowser () {
       <div class="filebrowser-header">
         <button class="btn-secondary btn-danger" onClick=${clearWorkspace}>Reset workspace</button>
         <button class="btn-primary" onClick=${openDirectory}>
-          <svg-icon icon="material-symbols:folder-open"></svg-icon>
+          <svg-icon icon="material-symbols:folder-open" />
           Grant a folder
         </button>
         ${status === 'needs-restore' && savedHandle && html`
           <button class="btn-secondary btn-accent" onClick=${restoreDirectory}>
-            <svg-icon icon="material-symbols:folder-open"></svg-icon>
+            <svg-icon icon="material-symbols:folder-open" />
             Open “${savedHandle.name}”
           </button>`}
       </div>
 
       ${errorMsg && html`
         <div class="filebrowser-error">
-          <svg-icon icon="material-symbols:error-outline"></svg-icon>
+          <svg-icon icon="material-symbols:error-outline" />
           ${errorMsg}
         </div>`}
 
       <div class="filebrowser-body">
         ${status === 'init' && html`
           <div class="none">
-            <svg-icon icon="material-symbols:hourglass-empty"></svg-icon><br/>
+            <svg-icon icon="material-symbols:hourglass-empty" /><br/>
             Loading saved session…
           </div>`}
         ${status === 'needs-restore' && html`
           <div class="none">
-            <svg-icon icon="material-symbols:lock-outline"></svg-icon><br/>
+            <svg-icon icon="material-symbols:lock-outline" /><br/>
             Reconnect <strong>${savedHandle?.name}</strong> to continue.
           </div>`}
         ${status === 'ready' && html`
           <div class="tree-rootbar">
-            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><svg-icon icon="material-symbols:note-add-outline"></svg-icon></button>
-            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><svg-icon icon="material-symbols:create-new-folder-outline"></svg-icon></button>
-            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><svg-icon icon="paste"></svg-icon></button>`}
+            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><svg-icon icon="material-symbols:note-add-outline" /></button>
+            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><svg-icon icon="material-symbols:create-new-folder-outline" /></button>
+            ${clipboard.value?.source === 'local' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><svg-icon icon="paste" /></button>`}
           </div>`}
         ${(status === 'ready' || status === 'idle') && html`
           ${files.length === 0
-            ? html`<div class="none"><svg-icon icon="material-symbols:info"></svg-icon><br/>No folder loaded.</div>`
+            ? html`<div class="none"><svg-icon icon="material-symbols:info" /><br/>No folder loaded.</div>`
             : html`<ul class="tree-root">
                 ${files.map(entry => html`<${TreeNode} key=${entry.name} entry=${entry} parent=${app.workspaces.dir} depth=${0} />`)}
               </ul>`}

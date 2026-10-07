@@ -36,7 +36,7 @@ function Subtasks ({ task }) {
       ${subtasks.map(item => html`<${TaskRow} key=${item.id} task=${item} />`)}
       <form class='add' onSubmit=${add}>
         <div class='add-field'>
-          <svg-icon icon='lucide:plus'></svg-icon>
+          <svg-icon icon='lucide:plus' />
           <input type='text' placeholder='add a subtask' value=${text} onInput=${event => setText(event.currentTarget.value)} />
         </div>
       </form>

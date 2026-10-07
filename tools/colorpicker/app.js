@@ -72,7 +72,7 @@ function CopyRow({ label, value }) {
       <span class="copy-label">${label}</span>
       <code class="copy-value">${value}</code>
       <button class="ghost-btn" onClick=${doCopy}>
-        <svg-icon icon=${copied ? 'mdi:check' : 'mdi:content-copy'}></svg-icon>
+        <svg-icon icon=${copied ? 'mdi:check' : 'mdi:content-copy'} />
       </button>
     </div>`;
 }
@@ -251,7 +251,7 @@ function MixTab() {
       <div class="mix-row">
         <${ColorInput} value=${a} onChange=${setA} />
         <button class="swap-btn" onClick=${() => { setA(b); setB(a); }} title="Swap">
-          <svg-icon icon="mdi:swap-horizontal"></svg-icon>
+          <svg-icon icon="mdi:swap-horizontal" />
         </button>
         <${ColorInput} value=${b} onChange=${setB} />
       </div>
@@ -300,7 +300,7 @@ function ShadesTab() {
           <span class="copy-label">css</span>
           <textarea class="vars-textarea" readonly style=${{ '--lines': steps }}>${cssVars}</textarea>
           <button class="ghost-btn" onClick=${() => navigator.clipboard.writeText(cssVars)}>
-            <svg-icon icon="mdi:content-copy"></svg-icon>
+            <svg-icon icon="mdi:content-copy" />
           </button>
         </div>
       </div>

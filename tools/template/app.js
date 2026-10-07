@@ -18,7 +18,7 @@ const { boot, config } = defineTool('template');
 function App () {
   return html`
     <div id="app-body">
-      <svg-icon icon=${config.icon}></svg-icon>
+      <svg-icon icon=${config.icon} />
       <p>${config.description}</p>
     </div>`;
 }

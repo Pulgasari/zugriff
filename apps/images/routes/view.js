@@ -101,7 +101,7 @@ function ViewTopBar () {
   return html`
     <header class="iv-top">
       <div class="iv-title">
-        <svg-icon icon="image"></svg-icon>
+        <svg-icon icon="image" />
         <span class="iv-name" title=${s?.name}>${s?.name || 'Image Viewer'}</span>
         ${many.value && html`<span class="iv-count">${idx.value + 1} / ${shots.value.length}</span>`}
         ${s && html`<span class="iv-meta">${[s.type?.split('/')[1]?.toUpperCase(), fmtSize(s.size)].filter(Boolean).join(' · ')}</span>`}
@@ -143,17 +143,17 @@ function OpenWithTip () {
   const canHandle = 'launchQueue' in window;
   if (!canHandle) return null;
   if (pwa.isInstalled.value) {
-    return html`<p class="iv-tip"><svg-icon icon="mdi:check-circle-outline"></svg-icon>
+    return html`<p class="iv-tip"><svg-icon icon="mdi:check-circle-outline" />
       Installed — pick <b>Images</b> from your device’s <b>Open with</b> menu to send images straight here.</p>`;
   }
   return html`
     <div class="iv-tip install">
-      <svg-icon icon="mdi:cellphone-arrow-down"></svg-icon>
+      <svg-icon icon="mdi:cellphone-arrow-down" />
       <div>
         <span>Install the app to open images from your gallery or files with it.</span>
         ${pwa.canInstall.value
           ? html`<button class="iv-cta small" onClick=${() => pwa.promptInstall()}>
-              <svg-icon icon="download"></svg-icon> Install app</button>`
+              <svg-icon icon="download" /> Install app</button>`
           : html`<span class="iv-tip-hint">Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
       </div>
     </div>`;
@@ -162,13 +162,13 @@ function OpenWithTip () {
 function Welcome () {
   return html`
     <div class="iv-welcome">
-      <svg-icon icon="images"></svg-icon>
+      <svg-icon icon="images" />
       <h1>View an image</h1>
       <p>Open images from your device, or just drop them here. Nothing is
          uploaded — they stay on your machine.</p>
       <button class="iv-cta" onClick=${openPicker}>
-        <svg-icon icon="mdi:folder-open-outline"></svg-icon> Open images</button>
-      ${vError.value && html`<p class="iv-error"><svg-icon icon="mdi:alert-outline"></svg-icon> ${vError.value}</p>`}
+        <svg-icon icon="mdi:folder-open-outline" /> Open images</button>
+      ${vError.value && html`<p class="iv-error"><svg-icon icon="mdi:alert-outline" /> ${vError.value}</p>`}
       <${OpenWithTip} />
     </div>`;
 }
@@ -252,9 +252,9 @@ function ViewMode () {
 
         ${many.value && !bare.value && html`
           <button class="iv-nav prev" aria-label="Previous" onClick=${e => { e.stopPropagation(); go(-1); }}>
-            <svg-icon icon="mdi:chevron-left"></svg-icon></button>
+            <svg-icon icon="mdi:chevron-left" /></button>
           <button class="iv-nav next" aria-label="Next" onClick=${e => { e.stopPropagation(); go(1); }}>
-            <svg-icon icon="mdi:chevron-right"></svg-icon></button>`}
+            <svg-icon icon="mdi:chevron-right" /></button>`}
       </div>
 
       ${!bare.value && html`<${ThumbStrip} />`}

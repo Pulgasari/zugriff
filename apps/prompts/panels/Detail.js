@@ -36,7 +36,7 @@ export default function Detail () {
 
   if (!isEdit && !prompt) return html`
     <div class="detail-empty">
-      <svg-icon icon="mdi:text-box-outline"></svg-icon>
+      <svg-icon icon="mdi:text-box-outline" />
       <span>Select a prompt or create a new one</span>
     </div>`;
 
@@ -47,16 +47,16 @@ export default function Detail () {
         <h2 class="detail-title">${prompt.title || html`<em>Untitled</em>`}</h2>
         <div class="detail-header-actions">
           <button class="icon-btn" title="Copy" onClick=${() => copyPrompt(prompt.content)}>
-            <svg-icon icon=${copied.value ? 'mdi:check' : 'mdi:content-copy'}></svg-icon>
+            <svg-icon icon=${copied.value ? 'mdi:check' : 'mdi:content-copy'} />
           </button>
           <button class="icon-btn" title="Edit" onClick=${() => app.state.editMode = true}>
-            <svg-icon icon="mdi:pencil-outline"></svg-icon>
+            <svg-icon icon="mdi:pencil-outline" />
           </button>
           <button class="icon-btn remove" title="Delete" onClick=${() => { if (confirm('Delete this prompt?')) app.removePrompt(prompt.id); }}>
-            <svg-icon icon="mdi:trash-can-outline"></svg-icon>
+            <svg-icon icon="mdi:trash-can-outline" />
           </button>
           <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
-            <svg-icon icon="mdi:arrow-left"></svg-icon>
+            <svg-icon icon="mdi:arrow-left" />
           </button>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function Detail () {
           value=${title} onInput=${e => setTitle(e.target.value)} />
         <div class="detail-header-actions">
           <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
-            <svg-icon icon="mdi:arrow-left"></svg-icon>
+            <svg-icon icon="mdi:arrow-left" />
           </button>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function Detail () {
             class=${'tag-toggle' + (selTags.includes(t.id) ? ' active' : '')}
             style=${{ '--tag-color': t.color }}
             onClick=${() => toggleTag(t.id)}>
-            <svg-icon icon=${selTags.includes(t.id) ? 'mdi:check' : 'mdi:tag-outline'}></svg-icon>
+            <svg-icon icon=${selTags.includes(t.id) ? 'mdi:check' : 'mdi:tag-outline'} />
             ${t.name}
           </button>`)}
         ${app.lib.tags.value.length === 0 && html`<span class="empty-hint">No tags — create some in the sidebar</span>`}
@@ -120,12 +120,12 @@ export default function Detail () {
 
       <div class="edit-actions">
         <button class="btn primary" onClick=${save} disabled=${!content.trim()}>
-          <svg-icon icon="mdi:content-save-outline"></svg-icon> Save
+          <svg-icon icon="mdi:content-save-outline" /> Save
         </button>
         <button class="btn secondary" onClick=${() => app.cancelEdit()}>Cancel</button>
         ${prompt && html`
           <button class="btn danger" onClick=${() => confirm('Delete this prompt?') && app.removePrompt(prompt.id)}>
-            <svg-icon icon="mdi:trash-can-outline"></svg-icon> Delete
+            <svg-icon icon="mdi:trash-can-outline" /> Delete
           </button>`}
       </div>
 

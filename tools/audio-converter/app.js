@@ -94,7 +94,7 @@ function FileItem({ entry: e }) {
   let icon = { pending: 'mdi:music-note-outline', converting: 'mdi:loading', done: 'mdi:check-circle-outline', error: 'mdi:alert-circle-outline' }[e.status];
   return html`
     <div class=${'file-item ' + e.status}>
-      <svg-icon icon=${icon} class=${e.status === 'converting' ? 'spin' : ''}></svg-icon>
+      <svg-icon icon=${icon} class=${e.status === 'converting' ? 'spin' : ''} />
       <span class="name">${e.file.name}</span>
       <span class="label">
         ${e.status === 'pending'    ? '—'
@@ -106,11 +106,11 @@ function FileItem({ entry: e }) {
         <div class="progress-bar"><div style=${'width:' + e.progress + '%'} /></div>`}
       ${e.status === 'done' && html`
         <a class="icon-btn" href=${e.blobUrl} download=${e.outName} title="Download">
-          <svg-icon icon="mdi:download"></svg-icon>
+          <svg-icon icon="mdi:download" />
         </a>`}
       ${e.status !== 'converting' && html`
         <button class="icon-btn remove" onClick=${() => files.value = files.value.filter(f => f.id !== e.id)}>
-          <svg-icon icon="mdi:close"></svg-icon>
+          <svg-icon icon="mdi:close" />
         </button>`}
     </div>`;
 }
@@ -130,12 +130,12 @@ function App() {
           ${pendingCnt > 0 && html`
             <button class="btn primary" onClick=${convertAll} disabled=${ffLoading.value}>
               <svg-icon icon=${ffLoading.value ? 'mdi:loading' : 'mdi:cog-outline'}
-                            class=${ffLoading.value ? 'spin' : ''}></svg-icon>
+                            class=${ffLoading.value ? 'spin' : ''} />
               ${ffLoading.value ? 'Loading ffmpeg…' : 'Convert ' + pendingCnt + ' file' + (pendingCnt > 1 ? 's' : '')}
             </button>`}
           ${hasDone && html`
             <button class="btn secondary" onClick=${downloadAll}>
-              <svg-icon icon="mdi:download-multiple-outline"></svg-icon> Download all
+              <svg-icon icon="mdi:download-multiple-outline" /> Download all
             </button>`}
         </div>`}
     </div>`;

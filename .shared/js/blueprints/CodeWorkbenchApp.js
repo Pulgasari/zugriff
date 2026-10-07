@@ -139,11 +139,11 @@ function CodeWorkbenchApp ({
 
           ${!live.value && html`
             <button class="btn primary" onClick=${doExecute} disabled=${busy || !input.value}>
-              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:lightning-bolt'} class=${busy ? 'spin' : ''}></svg-icon>
+              <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:lightning-bolt'} class=${busy ? 'spin' : ''} />
               ${busy ? 'Running…' : actionLabel}
             </button>`}
 
-          <label class='toggle'><input-bool look='switch' checked=${live.value} onChange=${e => live.value = e.target.checked}></input-bool><span>Live-Mode</span></label>
+          <label class='toggle'><input-bool look='switch' checked=${live.value} onChange=${e => live.value = e.target.checked} /><span>Live-Mode</span></label>
         </div>
 
       </div>

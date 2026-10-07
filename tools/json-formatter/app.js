@@ -83,11 +83,11 @@ function App () {
 
       <div id="app-actions">
         <button class="btn primary" onClick=${doFormat} disabled=${!input.value}>
-          <svg-icon icon="mdi:auto-fix"></svg-icon> Format
+          <svg-icon icon="mdi:auto-fix" /> Format
         </button>
         <${IndentPicker} />
         <button class="btn secondary" onClick=${clear} disabled=${!input.value}>
-          <svg-icon icon="mdi:close"></svg-icon> Clear
+          <svg-icon icon="mdi:close" /> Clear
         </button>
       </div>
 

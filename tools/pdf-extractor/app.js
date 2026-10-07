@@ -147,7 +147,7 @@ function PageThumb({ page }) {
       <div class="thumb-canvas-wrap">
         <canvas ref=${canvasRef} class="thumb-canvas" />
         <div class="thumb-check">
-          <svg-icon icon=${page.selected ? 'mdi:check-circle' : 'mdi:circle-outline'}></svg-icon>
+          <svg-icon icon=${page.selected ? 'mdi:check-circle' : 'mdi:circle-outline'} />
         </div>
       </div>
       <span class="thumb-num">Page ${page.num}</span>
@@ -174,16 +174,16 @@ function App() {
       ${!hasPdf ? html`
         ${st === 'loading' ? html`
           <div class="loading-row">
-            <svg-icon icon="mdi:loading" class="spin"></svg-icon> Loading PDF…
+            <svg-icon icon="mdi:loading" class="spin" /> Loading PDF…
           </div>` : html`<${Dropzone} accept='.pdf,application/pdf' multiple=${false} what='a PDF' onFiles=${entries => loadPDF(entries[0].file)} />`}
       ` : html`
         
         <div class="file-bar">
-          <svg-icon icon="mdi:file-pdf-box"></svg-icon>
+          <svg-icon icon="mdi:file-pdf-box" />
           <span class="fname">${fileName.value}.pdf</span>
           <span class="page-count">${pageCount.value} pages</span>
           <button class="ghost-btn" onClick=${reset}>
-            <svg-icon icon="mdi:close"></svg-icon> Remove
+            <svg-icon icon="mdi:close" /> Remove
           </button>
         </div>
 
@@ -215,7 +215,7 @@ function App() {
 
           <button class="btn primary" onClick=${doExport}
             disabled=${busy || selCnt === 0}>
-            <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''}></svg-icon>
+            <svg-icon icon=${busy ? 'mdi:loading' : 'mdi:download'} class=${busy ? 'spin' : ''} />
             ${busy ? 'Exporting…'
               : fmt === 'pdf'
               ? `Extract ${selCnt} page${selCnt !== 1 ? 's' : ''} as PDF`
@@ -224,7 +224,7 @@ function App() {
 
           ${errMsg.value && html`
             <div class="err-row">
-              <svg-icon icon="mdi:alert-circle-outline"></svg-icon> ${errMsg.value}
+              <svg-icon icon="mdi:alert-circle-outline" /> ${errMsg.value}
             </div>`}
 
         </div>

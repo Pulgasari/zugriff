@@ -21,15 +21,15 @@ function SourceStatus () {
   if (!stale.length) return null;
   return html`
     <div class="reconnect-bar">
-      <svg-icon icon="mdi:folder-alert-outline"></svg-icon>
+      <svg-icon icon="mdi:folder-alert-outline" />
       <span>${stale.length} folder${stale.length === 1 ? '' : 's'} need reconnecting to read on this device.</span>
       ${stale.map(source => html`
         <div key=${source.id} class="reconnect-item">
           <span class="reconnect-name">${source.name}</span>
           <button class="btn small primary" onClick=${() => reconnect(source)}>
-            <svg-icon icon="mdi:folder-key-outline"></svg-icon> Reconnect</button>
+            <svg-icon icon="mdi:folder-key-outline" /> Reconnect</button>
           <button class="btn small ghost" title="Re-select the folder — always works" onClick=${() => repick(source)}>
-            <svg-icon icon="mdi:folder-search-outline"></svg-icon> Choose folder</button>
+            <svg-icon icon="mdi:folder-search-outline" /> Choose folder</button>
         </div>`)}
     </div>
   `;

@@ -90,7 +90,7 @@ export default function GitHub () {
   const publicSection = html`
     <div class="gh-public">
       <div class="search-row">
-        <svg-icon icon="material-symbols:public"></svg-icon>
+        <svg-icon icon="material-symbols:public" />
         <input class="gh-input" type="text" placeholder="Add a public repo — owner/name or URL"
           value=${pub} onInput=${e => setPub(e.target.value)}
           onKeyDown=${e => e.key === 'Enter' && doAddPublic()} />
@@ -101,12 +101,12 @@ export default function GitHub () {
           ${pubs.map(r => html`
             <li key=${r.full}>
               <span class="gh-reporow" onClick=${() => { github.selectRepo(r); setShowList(false); }}>
-                <svg-icon icon=${r.private ? 'material-symbols:lock-outline' : 'material-symbols:public'}></svg-icon>
+                <svg-icon icon=${r.private ? 'material-symbols:lock-outline' : 'material-symbols:public'} />
                 <span class="gh-reponame">${r.full}</span>
                 <span class="gh-ro">read-only</span>
               </span>
               <button class="rowmenu-btn" title="Remove" onClick=${() => github.removePublicRepo(r.full)}>
-                <svg-icon icon="material-symbols:close"></svg-icon>
+                <svg-icon icon="material-symbols:close" />
               </button>
             </li>`)}
         </ul>`}
@@ -118,12 +118,12 @@ export default function GitHub () {
     <${Modal} id="github" title="GitHub">
       ${user ? html`
         <div class="gh-head">
-          <span class="gh-user"><svg-icon icon="mdi:github"></svg-icon> ${user.login}</span>
+          <span class="gh-user"><svg-icon icon="mdi:github" /> ${user.login}</span>
           <button class="gh-textbtn" onClick=${() => github.disconnect()}>Disconnect</button>
         </div>
       ` : null}
 
-      ${err && html`<div class="gh-error"><svg-icon icon="material-symbols:error-outline"></svg-icon> ${err}</div>`}
+      ${err && html`<div class="gh-error"><svg-icon icon="material-symbols:error-outline" /> ${err}</div>`}
 
       ${pickingRepo ? html`
         ${!user ? html`
@@ -134,7 +134,7 @@ export default function GitHub () {
               just add a public repo below to browse it read-only.
             </p>
             <a class="gh-link" href=${TOKEN_URL} target="_blank" rel="noopener">
-              <svg-icon icon="material-symbols:open-in-new"></svg-icon> Create a token
+              <svg-icon icon="material-symbols:open-in-new" /> Create a token
             </a>
             <input class="gh-input" type="password" placeholder="github_pat_…"
               value=${pat} onInput=${e => setPat(e.target.value)}
@@ -148,7 +148,7 @@ export default function GitHub () {
         ${user ? html`
           <div class="gh-repopick">
             <div class="search-row">
-              <svg-icon icon="material-symbols:search"></svg-icon>
+              <svg-icon icon="material-symbols:search" />
               <input class="gh-input" type="search" placeholder="Filter repositories…"
                 value=${query} onInput=${e => setQuery(e.target.value)} />
             </div>
@@ -157,7 +157,7 @@ export default function GitHub () {
               ${filtered.map(r => html`
                 <li key=${r.full} onClick=${() => { github.selectRepo(r); setShowList(false); }}>
                   <span class="gh-reporow">
-                    <svg-icon icon=${r.private ? 'material-symbols:lock-outline' : 'material-symbols:public'}></svg-icon>
+                    <svg-icon icon=${r.private ? 'material-symbols:lock-outline' : 'material-symbols:public'} />
                     <span class="gh-reponame">${r.full}</span>
                   </span>
                 </li>`)}
@@ -168,7 +168,7 @@ export default function GitHub () {
       ` : html`
         <div class="gh-repobar">
           <button class="gh-repochip" onClick=${() => setShowList(true)} title="Change repository">
-            <svg-icon icon=${repo.readOnly ? 'material-symbols:public' : 'material-symbols:folder-open'}></svg-icon> ${repo.full}
+            <svg-icon icon=${repo.readOnly ? 'material-symbols:public' : 'material-symbols:folder-open'} /> ${repo.full}
             ${repo.readOnly && html`<span class="gh-ro">read-only</span>`}
           </button>
           <select class="gh-branch" value=${branch} onChange=${e => github.selectBranch(e.target.value)}>
@@ -178,14 +178,14 @@ export default function GitHub () {
 
         ${github.canWrite() && html`
           <div class="tree-rootbar">
-            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><svg-icon icon="material-symbols:note-add-outline"></svg-icon></button>
-            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><svg-icon icon="material-symbols:create-new-folder-outline"></svg-icon></button>
-            ${clipboard.value?.source === 'github' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><svg-icon icon="paste"></svg-icon></button>`}
+            <button class="rowmenu-btn" title="New file"   onClick=${rootNewFile}><svg-icon icon="material-symbols:note-add-outline" /></button>
+            <button class="rowmenu-btn" title="New folder" onClick=${rootNewFolder}><svg-icon icon="material-symbols:create-new-folder-outline" /></button>
+            ${clipboard.value?.source === 'github' && html`<button class="rowmenu-btn" title="Paste" onClick=${rootPaste}><svg-icon icon="paste" /></button>`}
           </div>`}
 
         <div class="filebrowser-body">
-          ${loadingTree && html`<div class="none"><svg-icon icon="material-symbols:hourglass-empty"></svg-icon><br/>Loading tree…</div>`}
-          ${treeErr && html`<div class="gh-error"><svg-icon icon="material-symbols:error-outline"></svg-icon> ${treeErr}</div>`}
+          ${loadingTree && html`<div class="none"><svg-icon icon="material-symbols:hourglass-empty" /><br/>Loading tree…</div>`}
+          ${treeErr && html`<div class="gh-error"><svg-icon icon="material-symbols:error-outline" /> ${treeErr}</div>`}
           ${rootTree && !loadingTree && html`
             <ul class="tree-root">
               ${rootTree.map(entry => html`<${GitHubTree} key=${entry.path} entry=${entry} prefix="" depth=${0} />`)}

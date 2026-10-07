@@ -16,7 +16,7 @@ function CopyIcon ({ content }) {
     <svg-icon
       icon=${isCopied ? 'mdi:check' : 'mdi:content-copy'}
       onClick=${() => copy(content)}
-      title='Copy to Clipboard'></svg-icon>
+      title='Copy to Clipboard' />
   `;
 }
 

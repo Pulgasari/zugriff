@@ -81,7 +81,7 @@ function CodeOutputPane ({
         `}
         ${status?.value === 'error' && html`
           <div class="err-block">
-            <svg-icon icon="mdi:alert-circle-outline"></svg-icon><pre>${errorMessage?.value}</pre>
+            <svg-icon icon="mdi:alert-circle-outline" /><pre>${errorMessage?.value}</pre>
           </div>
         `}
         ${hasOut && html`<${Highlighted} code=${signal.value} lang=${lang} innerRef=${codeRef} />`}

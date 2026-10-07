@@ -25,7 +25,7 @@ function Cover ({ book, className = '' }) {
     <div ref=${ref} class=${'cover ' + className} style=${`--hue:${hueOf(book.title)}`}>
       ${!book.cover && html`
         <div class="cover-fallback">
-          <svg-icon icon=${book.kind === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:book-open-page-variant-outline'}></svg-icon>
+          <svg-icon icon=${book.kind === 'pdf' ? 'mdi:file-pdf-box' : 'mdi:book-open-page-variant-outline'} />
           <span class="cover-title">${book.title}</span>
           ${book.author && html`<span class="cover-author">${book.author}</span>`}
         </div>`}

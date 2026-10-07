@@ -89,7 +89,7 @@ else {
     /*
     return html`
       <div class=${['search-row launcher-search', sticky && 'sticky', position].filter(Boolean).join(' ')}>
-        <svg-icon icon="search" class="search-icon"></svg-icon>
+        <svg-icon icon="search" class="search-icon" />
         <input
           ref=${ref}
           class="search-input"
@@ -124,7 +124,7 @@ else {
                   <span class="name">${app.name}</span>
                   ${app.description && html`<span class="desc">${app.description}</span>`}
                 </span>
-                <span class="logo"><svg-icon icon=${app.icon}></svg-icon></span>
+                <span class="logo"><svg-icon icon=${app.icon} /></span>
               </a>
             </li>`)}
         </ul>

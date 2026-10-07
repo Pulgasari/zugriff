@@ -9,7 +9,7 @@ function Shell ({ app = {}, actions, children }) {
   return html`
     <div id='app-head'>
       <div id='app-logo'>
-        ${app.icon && html`<svg-icon icon=${app.icon}></svg-icon>`}
+        ${app.icon && html`<svg-icon icon=${app.icon} />`}
         <span>${app.name}</span>
       </div>
       <div class='actions'>

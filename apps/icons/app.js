@@ -204,7 +204,7 @@ function HomeView () {
   return html`
     <div class="home">
       <div class="hero">
-        <svg-icon icon="mdi:emoticon-outline"></svg-icon>
+        <svg-icon icon="mdi:emoticon-outline" />
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
@@ -284,9 +284,9 @@ function FavoritesView () {
 function SizeControl () {
   return html`
     <div class="size">
-      <svg-icon icon='zoom-out'></svg-icon>
+      <svg-icon icon='zoom-out' />
       <input type="range" min="56" max="200" step="1" value=${itemSize.value} onInput=${e => itemSize.value = +e.target.value} />
-      <svg-icon icon='zoom-in'></svg-icon>
+      <svg-icon icon='zoom-in' />
     </div>
   `;
 }
@@ -300,12 +300,12 @@ function TopBar ({ name }) {
 
       ${name === 'search'
         ? html`<div class="searchbox big">
-            <svg-icon icon='search'></svg-icon>
+            <svg-icon icon='search' />
             <input type="search" placeholder="Search all of Iconify…" value=${app.state.$query} onInput=${e => onSearch(e.target.value)} />
           </div>`
         : name === 'sets'
         ? html`<div class="searchbox">
-            <svg-icon icon='search'></svg-icon>
+            <svg-icon icon='search' />
             <input type="search" placeholder="Filter sets…" value=${app.state.$setFilter} onInput=${e => app.state.setFilter = e.target.value} />
           </div>`
         : html`<h1>${name === 'favs' ? 'Favourites' : name === 'set' ? 'Sets' : 'Icons'}</h1>`}

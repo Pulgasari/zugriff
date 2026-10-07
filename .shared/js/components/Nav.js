@@ -18,7 +18,7 @@ function Nav ({ here }) {
           href=${link.href}
           aria-current=${here === link.id ? 'page' : null}
         >
-          <svg-icon icon=${link.icon}></svg-icon> ${link.label}
+          <svg-icon icon=${link.icon} /> ${link.label}
         </a>`)}
     </nav>`;
 }

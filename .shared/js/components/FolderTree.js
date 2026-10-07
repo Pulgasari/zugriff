@@ -131,7 +131,7 @@ function FolderTree ({
     return html`
       <div class='src' key=${source.id}>
         <div class='head'>
-          <svg-icon icon='folder'></svg-icon>
+          <svg-icon icon='folder' />
           <span class='name' title=${source.name}>${source.name}</span>
           <btn-icon icon='refresh' label='refresh' onClick=${refresh} disabled=${disabled} />
           <btn-icon icon='close'   label='close'   onClick=${remove} />

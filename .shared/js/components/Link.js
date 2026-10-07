@@ -7,7 +7,7 @@ function Link ({ children, className, class: klass, icon, label, text, ...rest }
   const cls = ['Link', className, klass].filter(Boolean).join(' ');
   return html`
     <a class=${cls} target="_blank" rel="noopener" ...${rest}>
-      ${icon && html`<svg-icon icon=${icon}></svg-icon>`}
+      ${icon && html`<svg-icon icon=${icon} />`}
       ${children || label || text}
     </a>
   `;

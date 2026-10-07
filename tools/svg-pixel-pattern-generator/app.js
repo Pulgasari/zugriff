@@ -216,7 +216,7 @@ function Palette() {
       <label class="pal-add" title="Add color">
         <input type="color" style="opacity:0;position:absolute;width:0;height:0"
           onInput=${e => addColor(e.target.value)} />
-        <svg-icon icon="mdi:plus"></svg-icon>
+        <svg-icon icon="mdi:plus" />
       </label>
     </div>`;
 }
@@ -227,12 +227,12 @@ function SizeInput({ label, signal, min=1, max=64, onChange }) {
     <div class="size-field">
       <span class="size-label">${label}</span>
       <button class="sz-btn" onClick=${() => { let v = Math.max(min, signal.value-1); signal.value=v; onChange?.(v); }}>
-        <svg-icon icon="mdi:minus"></svg-icon>
+        <svg-icon icon="mdi:minus" />
       </button>
       <input type="number" class="field sz-input" min=${min} max=${max} value=${signal.value}
         onInput=${e => { let v = Math.max(min, Math.min(max, +e.target.value)); signal.value=v; onChange?.(v); }} />
       <button class="sz-btn" onClick=${() => { let v = Math.min(max, signal.value+1); signal.value=v; onChange?.(v); }}>
-        <svg-icon icon="mdi:plus"></svg-icon>
+        <svg-icon icon="mdi:plus" />
       </button>
     </div>`;
 }
@@ -259,19 +259,19 @@ function App() {
           ${TOOLS.map(t => html`
             <button class=${'tool-btn' + (tool.value === t.id ? ' active' : '')}
               title=${t.label} onClick=${() => tool.value = t.id}>
-              <svg-icon icon=${t.icon}></svg-icon>
+              <svg-icon icon=${t.icon} />
             </button>`)}
         </div>
         <div class="divider" />
         <div class="tool-group">
           <button class="tool-btn" title="Clear" onClick=${clearGrid}>
-            <svg-icon icon="mdi:trash-can-outline"></svg-icon>
+            <svg-icon icon="mdi:trash-can-outline" />
           </button>
           <button class="tool-btn" title="Fill all with active color" onClick=${fillAll}>
-            <svg-icon icon="mdi:palette"></svg-icon>
+            <svg-icon icon="mdi:palette" />
           </button>
           <button class="tool-btn" title="Invert colors" onClick=${invertColors}>
-            <svg-icon icon="mdi:invert-colors"></svg-icon>
+            <svg-icon icon="mdi:invert-colors" />
           </button>
         </div>
         <div class="divider" />
@@ -280,18 +280,18 @@ function App() {
         <div class="divider" />
         <div class="tool-group">
           <button class="tool-btn" title="Zoom out" onClick=${() => cellSz.value = Math.max(8, cellSz.value - 4)}>
-            <svg-icon icon="mdi:magnify-minus-outline"></svg-icon>
+            <svg-icon icon="mdi:magnify-minus-outline" />
           </button>
           <button class="tool-btn" title="Zoom in" onClick=${() => cellSz.value = Math.min(64, cellSz.value + 4)}>
-            <svg-icon icon="mdi:magnify-plus-outline"></svg-icon>
+            <svg-icon icon="mdi:magnify-plus-outline" />
           </button>
         </div>
         <div class="divider" />
         <button class="btn primary" onClick=${downloadSVG}>
-          <svg-icon icon="mdi:download"></svg-icon> SVG
+          <svg-icon icon="mdi:download" /> SVG
         </button>
         <button class="btn secondary" onClick=${copyCSS}>
-          <svg-icon icon="mdi:content-copy"></svg-icon> CSS
+          <svg-icon icon="mdi:content-copy" /> CSS
         </button>
       </div>
       

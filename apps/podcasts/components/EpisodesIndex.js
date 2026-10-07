@@ -43,7 +43,7 @@ function Item ({ episode }) {
       
       <btn-push class='title' label=${episode.title} onClick=${() => app.go('episode', episode.id)} />
       
-      ${(state.position || state.done) && html`<aufbau-progress value=${pct}></aufbau-progress>`}
+      ${(state.position || state.done) && html`<aufbau-progress value=${pct} />`}
 
       <${ActionMenu} items=${[
         html`<${PlayToggle} episode=${episode} />`,

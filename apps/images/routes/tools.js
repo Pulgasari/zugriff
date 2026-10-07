@@ -23,7 +23,7 @@ function ImgDrop ({ onFiles, label }) {
          onDragLeave=${e => { if (e.target === e.currentTarget) setOver(false); }}
          onDrop=${onDrop}
          onClick=${() => inputRef.current?.click()}>
-      <svg-icon icon="mdi:image-plus"></svg-icon>
+      <svg-icon icon="mdi:image-plus" />
       <p>${label || 'Drop images here, or click to choose'}</p>
       <input ref=${inputRef} type="file" accept="image/*" multiple hidden
              onChange=${e => { onFiles(e.target.files); e.target.value = ''; }} />
@@ -49,13 +49,13 @@ function ToolFileItem ({ entry, onRemove }) {
   return html`
     <div class=${'im-fileitem ' + entry.status}>
       <div class="im-fi-thumb"><img src=${entry.previewUrl} alt=${entry.file.name} /></div>
-      <svg-icon icon=${icon} class=${busyRow ? 'spin' : ''}></svg-icon>
+      <svg-icon icon=${icon} class=${busyRow ? 'spin' : ''} />
       <span class="im-fi-name">${entry.file.name}</span>
       ${label && html`<span class="im-fi-label">${label}</span>`}
       ${entry.status === 'done' && html`
-        <a class="tbtn" href=${entry.blobUrl} download=${entry.outName} title="Download"><svg-icon icon="mdi:download"></svg-icon></a>`}
+        <a class="tbtn" href=${entry.blobUrl} download=${entry.outName} title="Download"><svg-icon icon="mdi:download" /></a>`}
       ${!busyRow && html`
-        <button class="tbtn" title="Remove" onClick=${() => onRemove(entry.id)}><svg-icon icon="mdi:close"></svg-icon></button>`}
+        <button class="tbtn" title="Remove" onClick=${() => onRemove(entry.id)}><svg-icon icon="mdi:close" /></button>`}
     </div>`;
 }
 export { uid, dropEntries, ImgDrop, ToolFileItem };

@@ -107,7 +107,7 @@ function App () {
     });
   }, [app.db.ready.value]);
 
-  if (!app.db.ready.value) return html`<div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon></div>`;
+  if (!app.db.ready.value) return html`<div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div>`;
 
   const key = app.state.$bookKey;
 

@@ -195,7 +195,7 @@ function NavItem ({ icon, label, count, active, onClick, children }) {
   return html`
     <div class='nav-item' aria-current=${active ? 'page' : null}>
       <button type='button' class='nav-link' onClick=${onClick}>
-        <svg-icon icon=${icon}></svg-icon><span>${label}</span>${count ? html`<span class='count'>${count}</span>` : ''}
+        <svg-icon icon=${icon} /><span>${label}</span>${count ? html`<span class='count'>${count}</span>` : ''}
       </button>
       ${children}
     </div>

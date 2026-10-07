@@ -62,7 +62,7 @@ function ModeBar () {
           <button class=${'im-mode' + (current.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => m.id === 'edit' ? editCurrent() : app.setRoute(m.id)}
                   title=${m.label}>
-            <svg-icon icon=${m.icon}></svg-icon> <span>${m.label}</span>
+            <svg-icon icon=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
       <div class="im-modebar-actions"><btn-icon icon='settings' label='Settings' onClick=${() => app.area('config')?.toggle()} /></div>

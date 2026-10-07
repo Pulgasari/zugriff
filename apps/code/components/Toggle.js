@@ -9,7 +9,7 @@ export default function Toggle ({ value = false, onChange, label, size = '32' })
 
   return html`
     <div class="toggle" style=${{ opacity }} onClick=${onClick}>
-      <svg-icon icon=${icon}></svg-icon>
+      <svg-icon icon=${icon} />
       ${label && html`<span>${label}</span>`}
     </div>
   `;

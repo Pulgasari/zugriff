@@ -299,7 +299,7 @@ function MirrorToggle() {
         title=${'Mirror: ' + cur.label + ' (hold to pick)'}
         onClick=${() => { mirror.value = MIRROR_MODES[(idx+1) % MIRROR_MODES.length].id; }}
         onMouseDown=${onDown} onMouseUp=${onUp} onMouseLeave=${onUp}>
-        <svg-icon icon=${cur.icon}></svg-icon>
+        <svg-icon icon=${cur.icon} />
       </button>
       ${open && html`
         <>
@@ -308,7 +308,7 @@ function MirrorToggle() {
             ${MIRROR_MODES.map(m => html`
               <button class=${'mirror-opt' + (mirror.value === m.id ? ' active' : '')}
                 onClick=${() => { mirror.value = m.id; setOpen(false); }}>
-                <svg-icon icon=${m.icon}></svg-icon><span>${m.label}</span>
+                <svg-icon icon=${m.icon} /><span>${m.label}</span>
               </button>
             `)}
           </div>
@@ -331,7 +331,7 @@ function Palette() {
       <label class="pal-add" title="Add color">
         <input type="color" style="opacity:0;position:absolute;width:0;height:0"
           onInput=${e => addColor(e.target.value)} />
-        <svg-icon icon="mdi:plus"></svg-icon>
+        <svg-icon icon="mdi:plus" />
       </label>
     </div>`;
 }
@@ -382,34 +382,34 @@ function Toolbar () {
       <div class="divider" />
       
       <div class="tool-group">
-        <button class="tool-btn" title="Undo (Ctrl+Z)" onClick=${undo}><svg-icon icon="mdi:undo"></svg-icon></button>
-        <button class="tool-btn" title="Redo (Ctrl+Y)" onClick=${redo}><svg-icon icon="mdi:redo"></svg-icon></button>
+        <button class="tool-btn" title="Undo (Ctrl+Z)" onClick=${undo}><svg-icon icon="mdi:undo" /></button>
+        <button class="tool-btn" title="Redo (Ctrl+Y)" onClick=${redo}><svg-icon icon="mdi:redo" /></button>
       </div>
       <div class="divider" />
       <div class="tool-group">
-        <button class="tool-btn" title="Clear"         onClick=${clearGrid}><svg-icon    icon="mdi:trash-can-outline"></svg-icon></button>
-        <button class="tool-btn" title="Fill all"      onClick=${fillAll}><svg-icon      icon="mdi:palette"></svg-icon></button>
-        <button class="tool-btn" title="Invert colors" onClick=${invertColors}><svg-icon icon="mdi:invert-colors"></svg-icon></button>
+        <button class="tool-btn" title="Clear"         onClick=${clearGrid}><svg-icon    icon="mdi:trash-can-outline" /></button>
+        <button class="tool-btn" title="Fill all"      onClick=${fillAll}><svg-icon      icon="mdi:palette" /></button>
+        <button class="tool-btn" title="Invert colors" onClick=${invertColors}><svg-icon icon="mdi:invert-colors" /></button>
       </div>
       <div class="divider" />
       
-      <button class="btn primary"   onClick=${downloadSVG}><svg-icon icon="mdi:download"></svg-icon> SVG</button>
-      <button class="btn secondary" onClick=${downloadPNG}><svg-icon icon="mdi:image"></svg-icon> PNG</button>
-      <button class="btn secondary" onClick=${downloadUPNG}><svg-icon icon="mdi:image-compress"></svg-icon> PNG opt</button>
-      <button class="btn secondary" onClick=${exportJSON}><svg-icon icon="mdi:code-json"></svg-icon> JSON</button>
+      <button class="btn primary"   onClick=${downloadSVG}><svg-icon icon="mdi:download" /> SVG</button>
+      <button class="btn secondary" onClick=${downloadPNG}><svg-icon icon="mdi:image" /> PNG</button>
+      <button class="btn secondary" onClick=${downloadUPNG}><svg-icon icon="mdi:image-compress" /> PNG opt</button>
+      <button class="btn secondary" onClick=${exportJSON}><svg-icon icon="mdi:code-json" /> JSON</button>
       
       <label class="btn secondary" title="Import JSON">
         <input type="file" accept=".json" style="display:none"
           onChange=${e => { importJSON(e.target.files[0]); e.target.value=''; }} />
-        <svg-icon icon="mdi:upload"></svg-icon> Import
+        <svg-icon icon="mdi:upload" /> Import
       </label>
       
       <div class="divider" />
       
       <div class="tool-group">
-        <button class="tool-btn" title="Toggle BG"   onClick=${toggleShowBg}><svg-icon icon="tabler:background"></svg-icon></button>
-        <button class="tool-btn" title="Toggle Gap"  onClick=${toggleShowGap}><svg-icon icon="boxicons:between-vertical-end"></svg-icon></button>
-        <button class="tool-btn" title="Toggle Grid" onClick=${toggleShowGrid}><svg-icon icon="cil:grid"></svg-icon></button>
+        <button class="tool-btn" title="Toggle BG"   onClick=${toggleShowBg}><svg-icon icon="tabler:background" /></button>
+        <button class="tool-btn" title="Toggle Gap"  onClick=${toggleShowGap}><svg-icon icon="boxicons:between-vertical-end" /></button>
+        <button class="tool-btn" title="Toggle Grid" onClick=${toggleShowGrid}><svg-icon icon="cil:grid" /></button>
       </div>
       
       <div class='group'>

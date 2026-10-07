@@ -28,17 +28,17 @@ export default function Sidebar () {
 
       <div class="sidebar-top">
         <button class="btn primary full" onClick=${() => app.newPrompt()}>
-          <svg-icon icon="mdi:plus"></svg-icon> New Prompt
+          <svg-icon icon="mdi:plus" /> New Prompt
         </button>
       </div>
 
       <div class="search-row">
-        <svg-icon icon="mdi:magnify" class="search-icon"></svg-icon>
+        <svg-icon icon="mdi:magnify" class="search-icon" />
         <input class="search-input" type="text" placeholder="Search…"
           value=${app.state.$search} onInput=${e => app.state.search = e.target.value} />
         ${app.state.$search && html`
           <button class="icon-btn" onClick=${() => app.state.search = ''}>
-            <svg-icon icon="mdi:close"></svg-icon>
+            <svg-icon icon="mdi:close" />
           </button>`}
       </div>
 
@@ -46,7 +46,7 @@ export default function Sidebar () {
         <div class="tag-filter-header">
           <span class="section-label">Tags</span>
           <button class="icon-btn" title="Manage tags" onClick=${() => setShowTags(s => !s)}>
-            <svg-icon icon="mdi:tag-edit-outline"></svg-icon>
+            <svg-icon icon="mdi:tag-edit-outline" />
           </button>
         </div>
         <${TagManager} show=${showTags} onClose=${() => setShowTags(false)} />

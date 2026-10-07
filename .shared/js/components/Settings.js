@@ -105,7 +105,7 @@ function SettingsButton () {
       onClick=${toggleSettings}
       title="Settings"
       aria-expanded=${settingsOpen.value}>
-      <svg-icon icon="settings"></svg-icon>
+      <svg-icon icon="settings" />
     </button>
   `;
 }
@@ -136,7 +136,7 @@ function SettingsPanel ({ open = settingsOpen.value, onClose = closeSettings, ..
     <div id="app-settings" class="settings-panel" role="dialog" aria-label="Settings">
       <header>
         <span class="settings-title">Settings</span>
-        <button class="ghost-btn" aria-label="Close" onClick=${onClose}><svg-icon icon="close"></svg-icon></button>
+        <button class="ghost-btn" aria-label="Close" onClick=${onClose}><svg-icon icon="close" /></button>
       </header>
       <${Settings} ...${props} />
     </div>

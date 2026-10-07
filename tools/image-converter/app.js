@@ -90,19 +90,19 @@ function FileItem ({ entry }) {
         <img src=${entry.previewUrl} alt=${entry.file.name} />
       </div>
       
-      <svg-icon icon=${icon}></svg-icon>
+      <svg-icon icon=${icon} />
       <span class="name">${entry.file.name}</span>
       <span class="label">${label}</span>
       
       ${entry.status === 'done' && html`
         <a class="icon-btn" href=${entry.blobUrl} download=${entry.outName} title="Download">
-          <svg-icon icon="mdi:download"></svg-icon>
+          <svg-icon icon="mdi:download" />
         </a>
       `}
         
       ${entry.status !== 'converting' && html`
         <button class="icon-btn remove" onClick=${() => files.value = files.value.filter(file => file.id !== entry.id)} title="Remove">
-          <svg-icon icon="close"></svg-icon>
+          <svg-icon icon="close" />
         </button>
       `}
       

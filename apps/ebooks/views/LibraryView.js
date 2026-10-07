@@ -45,7 +45,7 @@ function LibraryView () {
   const pending = app.db.pending.value;
 
   const tools = html`
-    ${pending > 0 && html`<span class="scan-note"><svg-icon icon="loading"></svg-icon> ${pending} left</span>`}
+    ${pending > 0 && html`<span class="scan-note"><svg-icon icon="loading" /> ${pending} left</span>`}
     <btn-icon icon='refresh'    label='Rescan folders' onClick=${() => app.db.rescanAll()} />
     <btn-icon icon='folder-add' label='Add folder'     onClick=${app.addFolder} />
     <btn-icon icon='settings'   label='Settings'       onClick=${app.toggleConfig} />

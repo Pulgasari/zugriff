@@ -7,7 +7,7 @@ function Brand ({ app, icon, name, ...rest }) {
   
   return html`
     <div id='app-brand' ...${rest}>
-      <svg-icon icon=${icon}></svg-icon>
+      <svg-icon icon=${icon} />
       <span>${name}</span>
     </div>
   `;

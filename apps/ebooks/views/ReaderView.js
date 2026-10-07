@@ -120,23 +120,23 @@ function ReaderView ({ bookKey }) {
             onPick=${target => { if (ui.kind === 'pdf') eng?.gotoDest(target); else eng?.gotoHref(target); readerUi.value = { ...readerUi.value, tocOpen: false }; }} />`}
 
         ${!ui.ready && !ui.error && html`
-          <div class="reader-loading"><svg-icon icon="svg-spinners:bars-scale-middle"></svg-icon></div>`}
+          <div class="reader-loading"><svg-icon icon="svg-spinners:bars-scale-middle" /></div>`}
         ${ui.error && html`
           <div class="reader-error"><${Empty} icon="mdi:book-alert-outline" title="Couldn’t open this book" hint=${ui.error} /></div>`}
 
         ${ui.kind === 'epub' && ui.ready && !ui.error && html`
-          <button class="page-edge left"  aria-label="Previous" onClick=${() => eng?.prev()}><svg-icon icon="mdi:chevron-left"></svg-icon></button>
-          <button class="page-edge right" aria-label="Next"     onClick=${() => eng?.next()}><svg-icon icon="mdi:chevron-right"></svg-icon></button>`}
+          <button class="page-edge left"  aria-label="Previous" onClick=${() => eng?.prev()}><svg-icon icon="mdi:chevron-left" /></button>
+          <button class="page-edge right" aria-label="Next"     onClick=${() => eng?.next()}><svg-icon icon="mdi:chevron-right" /></button>`}
       </div>
 
       <footer class="reader-foot">
         ${ui.kind === 'pdf' && ui.pages
           ? html`
-            <button class="ibtn" aria-label="Previous page" onClick=${() => eng?.prev()}><svg-icon icon="mdi:chevron-up"></svg-icon></button>
+            <button class="ibtn" aria-label="Previous page" onClick=${() => eng?.prev()}><svg-icon icon="mdi:chevron-up" /></button>
             <span class="foot-label">Page ${ui.page ?? 1} / ${ui.pages}</span>
-            <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><svg-icon icon="mdi:chevron-down"></svg-icon></button>`
+            <button class="ibtn" aria-label="Next page" onClick=${() => eng?.next()}><svg-icon icon="mdi:chevron-down" /></button>`
           : html`<span class="foot-label">${ui.percent != null ? Math.round((ui.percent || 0) * 100) + '%' : ''}</span>`}
-        <aufbau-progress class="foot-bar" value=${Math.round((ui.percent || 0) * 100)}></aufbau-progress>
+        <aufbau-progress class="foot-bar" value=${Math.round((ui.percent || 0) * 100)} />
       </footer>
     </div>`;
 }

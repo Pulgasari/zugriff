@@ -7,7 +7,7 @@ const app = zugriff.app;
 export default function Tap ({ cmd, icon, className }) {
   return html`
     <div class=${className || ''} onClick=${() => app.exec(cmd)}>
-      <svg-icon icon=${icon}></svg-icon>
+      <svg-icon icon=${icon} />
     </div>
   `;
 }

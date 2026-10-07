@@ -153,7 +153,7 @@ function Dropzone () {
   const onDrop = e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f?.type.startsWith('image/')) usePhoto(f); };
   return html`
     <label class="drop" onDragOver=${e => e.preventDefault()} onDrop=${onDrop}>
-      <svg-icon icon="mdi:image-plus-outline"></svg-icon>
+      <svg-icon icon="mdi:image-plus-outline" />
       <strong>Drop a photo</strong>
       <span>or tap to choose — a clear, front-facing portrait works best. Nothing leaves your device.</span>
       <input type="file" accept="image/*" hidden onChange=${onFile} />
@@ -173,7 +173,7 @@ function ColorRow () {
                   title=${s.name} style=${`background:rgb(${s.r},${s.g},${s.b})`}
                   onClick=${() => { app.state.color = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
         <label class="swatch custom" title="Custom colour">
-          <svg-icon icon="mdi:eyedropper-variant"></svg-icon>
+          <svg-icon icon="mdi:eyedropper-variant" />
           <input type="color" onInput=${onCustom} />
         </label>
       </div>
@@ -198,14 +198,14 @@ function StyleRow () {
       <div class="group-head"><span>Hairstyle</span></div>
       <div class="styles">
         <button class=${'style none' + (!app.state.$styleId ? ' on' : '')} onClick=${() => useStyle(null)}>
-          <svg-icon icon="mdi:cancel"></svg-icon><span>None</span>
+          <svg-icon icon="mdi:cancel" /><span>None</span>
         </button>
         ${HAIRSTYLES.map(s => html`
           <button class=${'style' + (app.state.$styleId === s.id ? ' on' : '')} onClick=${() => useStyle(s)}>
             <img src=${s.src} alt=${s.name} /><span>${s.name}</span>
           </button>`)}
         <label class=${'style upload' + (app.state.$styleId === 'custom' ? ' on' : '')}>
-          <svg-icon icon="mdi:tray-arrow-up"></svg-icon><span>Your PNG</span>
+          <svg-icon icon="mdi:tray-arrow-up" /><span>Your PNG</span>
           <input type="file" accept="image/png,image/*" hidden onChange=${onCustom} />
         </label>
       </div>
@@ -232,16 +232,16 @@ function App () {
 
   return html`
     <header class="topbar">
-      <svg-icon icon=${config.icon}></svg-icon>
+      <svg-icon icon=${config.icon} />
       <strong>${config.name}</strong>
       <div class="spacer"></div>
       ${app.state.$hasPhoto && html`
         <label class="ibtn" title="New photo">
-          <svg-icon icon="mdi:image-refresh-outline"></svg-icon>
+          <svg-icon icon="mdi:image-refresh-outline" />
           <input type="file" accept="image/*" hidden onChange=${onNew} />
         </label>
-        <button class="ibtn" title="Reset edits" onClick=${reset}><svg-icon icon="mdi:restore"></svg-icon></button>
-        <button class="ibtn" title="Download" onClick=${download}><svg-icon icon="mdi:tray-arrow-down"></svg-icon></button>`}
+        <button class="ibtn" title="Reset edits" onClick=${reset}><svg-icon icon="mdi:restore" /></button>
+        <button class="ibtn" title="Download" onClick=${download}><svg-icon icon="mdi:tray-arrow-down" /></button>`}
     </header>
 
     <main class="stage">

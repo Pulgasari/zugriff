@@ -71,9 +71,9 @@ function ConvertMode () {
 
         <div class="im-tool-actions">
           ${pendingCnt > 0 && html`<button class="btn primary" onClick=${cvConvertAll}>
-            <svg-icon icon="mdi:cog-outline"></svg-icon> Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}</button>`}
+            <svg-icon icon="mdi:cog-outline" /> Convert ${pendingCnt} file${pendingCnt > 1 ? 's' : ''}</button>`}
           ${hasDone && html`<button class="btn" onClick=${cvDownloadAll}>
-            <svg-icon icon="mdi:download-multiple"></svg-icon> Download all</button>`}
+            <svg-icon icon="mdi:download-multiple" /> Download all</button>`}
         </div>`}
     </div>`;
 }
