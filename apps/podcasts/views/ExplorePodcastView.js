@@ -11,10 +11,9 @@ import { useSignal } from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
 
 import Empty        from '/.shared/js/components/Empty.js';
-import GoBackButton from '/.shared/js/components/GoBackButton.js';
 import Link         from '/.shared/js/components/Link.js';
 import Loading      from '/.shared/js/components/Loading.js';
-import View         from '/.shared/js/components/View.js';
+import ViewHeader   from '/.shared/js/components/ViewHeader.js';
 
 import Artwork         from './../components/Artwork.js';
 import PreviewEpisodes from './../components/PreviewEpisodes.js';
@@ -45,19 +44,15 @@ export default function ExplorePodcastView ({ id: url }) {
     return () => { alive = false; };
   }, [url]);
 
-  const back = html`<${GoBackButton} go='explore' />`;
-
   if (error.value) return html`
-    <${View} class='explore-podcast-view'>
-      <header>${back}<h1>Explore</h1></header>
-      <${Empty} icon='alert' title='could not read that feed' hint=${error.value} />
-    </${View}>`;
+    <${ViewHeader} back='explore' title='Explore' />
+    <${Empty} icon='alert' title='could not read that feed' hint=${error.value} />
+  `;
 
   if (!data.value || !subscribedIds || !shortlist) return html`
-    <${View} class='explore-podcast-view'>
-      <header>${back}<h1>Explore</h1></header>
-      <${Loading} text='reading the feed …' />
-    </${View}>`;
+    <${ViewHeader} back='explore' title='Explore' />
+    <${Loading} text='reading the feed …' />
+  `;
 
   const { podcast, episodes } = data.value;
   const subscribed = subscribedIds.includes(podcast.id);
@@ -77,38 +72,34 @@ export default function ExplorePodcastView ({ id: url }) {
   });
 
   return html`
-    <${View} class='explore-podcast-view' id='explore-podcast'>
-      <header>
-        ${back}
-        <h1>${podcast.title}</h1>
-        <div class='actions'>
-          <btn-push
-            icon=${remembered ? 'bookmark' : 'bookmark-unfilled'}
-            title=${remembered ? 'Remove from the shortlist' : 'Keep for a closer look later'}
-            onClick=${remember}
-            />
-          <btn-push ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
-        </div>
-      </header>
-
-      <main>
-        <${Artwork} src=${podcast.image} />
-
-        <div class='info'>
-          <div class='stats'>${episodes.length} episode(s)</div>
-          ${podcast.author && html`<div class='author'>${podcast.author}</div>`}
-          ${paras.map(paragraph => html`<p class='about'>${paragraph}</p>`)}
-          ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
-          <${Link} href=${url} icon='rss' label='Feed' />
-        </div>
-
-        <div class='section'><span>Episodes</span></div>
-
-        <${PreviewEpisodes}
-          episodes=${sorted}
-          empty=${{ icon: 'mdi:playlist-remove', title: 'This feed has no playable episodes' }}
+    <${ViewHeader} back='explore' title=${podcast.title}>
+      <div class='actions'>
+        <btn-push
+          icon=${remembered ? 'bookmark' : 'bookmark-unfilled'}
+          title=${remembered ? 'Remove from the shortlist' : 'Keep for a closer look later'}
+          onClick=${remember}
           />
-      </main>
-    </${View}>
+        <btn-push ...${subscribeAction({ id: podcast.id, url }, subscribed)} />
+      </div>
+    </${ViewHeader}>
+
+    <main>
+      <${Artwork} src=${podcast.image} />
+
+      <div class='info'>
+        <div class='stats'>${episodes.length} episode(s)</div>
+        ${podcast.author && html`<div class='author'>${podcast.author}</div>`}
+        ${paras.map(paragraph => html`<p class='about'>${paragraph}</p>`)}
+        ${podcast.link && html`<${Link} href=${podcast.link} icon='mdi:web' label='Website' />`}
+        <${Link} href=${url} icon='rss' label='Feed' />
+      </div>
+
+      <div class='section'><span>Episodes</span></div>
+
+      <${PreviewEpisodes}
+        episodes=${sorted}
+        empty=${{ icon: 'mdi:playlist-remove', title: 'This feed has no playable episodes' }}
+        />
+    </main>
   `;
 }

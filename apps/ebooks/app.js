@@ -89,7 +89,7 @@ app.addFolder = async () => {
 
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
-const { LibraryView, ReaderView } = await app.views('LibraryView', 'ReaderView');
+const [LibraryView, ReaderView] = await Promise.all([app.view('LibraryView'), app.view('ReaderView')]);
 
 const // ::: shared components
 Config = await zugriff.component('Config');

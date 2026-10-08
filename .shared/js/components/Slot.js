@@ -47,5 +47,5 @@ function Slot ({ map, name, load = 'view', fallback = null, ...props }) {
   return Component ? html`<${Component} ...${props} />` : fallback;
 }
 
-export { pendingSlots };
+export { pendingSlots, useSlot };
 export default Slot;

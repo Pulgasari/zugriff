@@ -12,7 +12,7 @@ import Empty       from '/.shared/js/components/Empty.js';
 import Loading     from '/.shared/js/components/Loading.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
-import View        from '/.shared/js/components/View.js';
+import ViewHeader  from '/.shared/js/components/ViewHeader.js';
 
 // ::: local components
 import Artwork from './../components/Artwork.js';
@@ -282,24 +282,23 @@ function ExploreView () {
   const tools = html`<btn-icon icon='add' label='Add by URL' onClick=${() => app.state.dialog = 'add'} />`;
 
   return html`
-    <${View} class='explore-view' id|title='explore' tools=${tools}>
-      <main>
-        <${Picker} class='tabs' look='segments' options=${TABS} signal=${state.tab} />
+    <${ViewHeader} title='explore' tools=${tools} />
+    <main>
+      <${Picker} class='tabs' look='segments' options=${TABS} signal=${state.tab} />
 
-        <${SearchPanel} placeholder='darknet diaries — or https://example.com/feed.xml' signal=${state.query} />
+      <${SearchPanel} placeholder='darknet diaries — or https://example.com/feed.xml' signal=${state.query} />
 
-        <div class='filters'>
-          <${Picker} class|placeholder='country'   look='combobox' signal=${state.country} src=${COUNTRIES} searchable />
-          <${Picker} class|placeholder='attribute' look='combobox' signal=${state.attribute} options=${ATTRIBUTES} />
-        </div>
+      <div class='filters'>
+        <${Picker} class|placeholder='country'   look='combobox' signal=${state.country} src=${COUNTRIES} searchable />
+        <${Picker} class|placeholder='attribute' look='combobox' signal=${state.attribute} options=${ATTRIBUTES} />
+      </div>
 
-        ${isUrl      && html`<btn-push icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
-        ${note.value && html`<i class='note'>${note.value}</i>`}
-        ${busy.value && html`<${Loading} text='searching …' />`}
+      ${isUrl      && html`<btn-push icon='rss' label='Open this feed' onClick=${() => open(text)} />`}
+      ${note.value && html`<i class='note'>${note.value}</i>`}
+      ${busy.value && html`<${Loading} text='searching …' />`}
 
-        ${isReady && !isUrl && html`<${Results} ...${{ tab, entries, empty, remembered, subscribed }} />`}
-      </main>
-    </${View}>
+      ${isReady && !isUrl && html`<${Results} ...${{ tab, entries, empty, remembered, subscribed }} />`}
+    </main>
   `;
 }
 
