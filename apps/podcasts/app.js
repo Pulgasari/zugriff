@@ -209,7 +209,9 @@ function App () {
   return html`
     <app-area name='main'>
       ${VIEWS.map(({ name, route }) => html`
-        <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'latest' || undefined}><${View} name=${name} /></app-view>
+        <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'latest' || undefined}>
+          <${View} name=${name} />
+        </app-view>
       `)}
       <${PlayerPanel} />
       <${Dock} items=${dockItems} current=${current.value} />
