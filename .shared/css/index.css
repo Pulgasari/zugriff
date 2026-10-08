@@ -53,7 +53,7 @@ app-view, .view, .View {
 
 body {
   --hover   :  --alpha(fg, 90%);
-  --line    :  --alpha(fg, 85%);
+  --line    :  --alpha(fg, 50%);
   --panel   : --darker(bg, 10%);
   --panel-2 : --darker(bg, 20%);
   --zebra   : --darker(bg, 10%);
@@ -107,7 +107,7 @@ or move to: aufbau/css/surfaces.css */
 
 @container style(--palette: oled) {
   body {
-    --line: color-mix(in oklch, var(--color-fg) 15%, transparent);
+    --line: --alpha(fg, 0.25);
   }
   #app {
     .view > header { border-bottom : 1px solid var(--line); }
