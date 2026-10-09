@@ -12,11 +12,7 @@ import { computed, signal, typedSignal } from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 import createElement from '@domina/methods/createElement.js';
 
-const // ::: shared components
-Config     = await zugriff.component('Config'),
-Dock       = await zugriff.component('Dock'),
-Empty      = await zugriff.component('Empty'),
-Loading    = await zugriff.component('Loading');
+const { Config, Dock, Empty, Loading, Views } = await zugriff.components('Config', 'Dock', 'Empty', 'Loading', 'Views');
 
 // ::: the app handle
 const app = zugriff.app;
@@ -35,7 +31,6 @@ app.state.$extend({
   query     : { type: 'scalar', value: '',   persist: true },   // search box
 });
 
-const current     = signal('home');   // the view on screen, for the dock
 const collections = signal(null);   // [{ prefix, name, total, … }] | null
 const setData     = signal(null);   // { prefix, title, total, icons } for route 'set'
 const setLoading  = signal(false);
@@ -47,15 +42,6 @@ const itemSize    = typedSignal({ value: 88, key: 'icons:item-size' }); // persi
 // #app is the <app-root>: the views in the main area, the icon in the context area
 
 const area = app.area;
-const show = app.show;
-
-app.go = name => show(name);
-
-function onNavigate (event) {
-  current.value = event.detail.to;
-}
-
-app.root.addEventListener('navigate', onNavigate);
 
 function inspect (name) {
   app.state.detail = name;
@@ -87,7 +73,7 @@ async function loadSet (prefix) {
 function openSet (prefix) {
   app.state.prefix = prefix;
   loadSet(prefix);
-  show('set');
+  app.go('set');
 }
 
 let searchTimer = null;
@@ -208,8 +194,8 @@ function HomeView () {
         <h1>The whole Iconify library</h1>
         <p>${list ? `Browse ${nfmt(total)} icons across ${nfmt(sets)} sets.` : 'Loading the catalogue…'}</p>
         <div class="hero-actions">
-          <btn-push icon='images' label='browse sets' onClick=${() => show('sets')}   />
-          <btn-push icon='search' label='search'      onClick=${() => show('search')} />
+          <btn-push icon='images' label='browse sets' onClick=${() => app.go('sets')}   />
+          <btn-push icon='search' label='search'      onClick=${() => app.go('search')} />
         </div>
       </div>
       ${list && list.length > 0 && html`
@@ -249,7 +235,7 @@ function SetView () {
   if (setLoading.value || !d) return html`<${Loading}/>`;
   return html`
     <div class="setview">
-      <header>
+      <header class="setview-head">
         <div>
           <h1>${d.title}</h1>
           <div class="sub">${nfmt(d.total)} icons · <code>${d.prefix}</code></div>
@@ -296,7 +282,7 @@ function TopBar ({ name }) {
   const grid = name === 'set' || name === 'search' || name === 'favs';
   return html`
     <header class="topbar">
-      ${name === 'set' && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => show('sets')} />`}
+      ${name === 'set' && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => app.go('sets')} />`}
 
       ${name === 'search'
         ? html`<div class="searchbox big">
@@ -343,13 +329,16 @@ function Detail () {
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
-const VIEWS = [
-  { name: 'home',   route: '/',       View: HomeView      },
-  { name: 'sets',   route: '/sets',   View: SetsView      },
-  { name: 'set',    route: '/set',    View: SetView       },
-  { name: 'search', route: '/search', View: SearchView    },
-  { name: 'favs',   route: '/favs',   View: FavoritesView },
-];
+// every view is the top bar over its content
+const withBar = (name, View) => () => html`<${TopBar} name=${name} /><main><${View} /></main>`;
+
+app.views = {
+  home   : { route: '/',       view: withBar('home',   HomeView)      },
+  sets   : { route: '/sets',   view: withBar('sets',   SetsView)      },
+  set    : { route: '/set',    view: withBar('set',    SetView)       },
+  search : { route: '/search', view: withBar('search', SearchView)    },
+  favs   : { route: '/favs',   view: withBar('favs',   FavoritesView) },
+};
 
 const dockItems = [
   { icon: 'mdi:home', label: 'home',     view: 'home'                                },
@@ -364,20 +353,12 @@ function App () {
   useEffect(() => {
     app.db.loadFavs().catch(() => {});
     ensureCollections(); // warms the catalogue for home stats + sets
-    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
-      current.value = app.root.view?.getAttribute('name') ?? 'home';
-    });
   }, []);
 
   return html`
     <app-area name='main'>
-      ${VIEWS.map(({ name, route, View }) => html`
-        <app-view key=${name} name=${name} route=${route} active=${name === 'home' || undefined}>
-          <${TopBar} name=${name} />
-          <${View} />
-        </app-view>
-      `)}
-      <${Dock} items=${dockItems} current=${current.value} />
+      <${Views} />
+      <${Dock} items=${dockItems} />
     </app-area>
     <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) app.state.detail = null; }}><${Detail} /></app-area>
     <app-area name='config' dock='end'><${Config} /></app-area>
