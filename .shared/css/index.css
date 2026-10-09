@@ -1,5 +1,46 @@
 @import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
 
+/* ── TO STYLE: what every app shares ─────────────────────────────────────────
+   (n) = how many apps use it
+
+   frame
+   - #app, app-root
+   - app-area, by name: main | menu (dock=start, a drawer where narrow) |
+     config (dock=end) | context (dock=bottom, a sheet). open, :state(overlay)
+   - app-view, its glide transition
+   - app-view > header: ViewHeader (.ViewBack, h1, .ViewTools) or the app's own (12)
+   - app-view > main
+   - app-panel (5), app-config (Config, 13), app-float (1)
+
+   navigation
+   - Dock: #app-dock > btn-tap.col, .active, aria-current (6)
+   - the menu area's content: .sidebar / .menu, .nav-item, .brand (feeds, audio,
+     todo, notes, prompts, files), each its own markup for now
+   - nav-crumbs (2), nav-toc (notes)
+
+   controls
+   - btn-icon (11), btn-push (8), btn-tap
+   - native button / input / select / textarea: no font inherited (arial)
+   - input-value + input-option, the combobox and segments looks (Picker, Config)
+   - input-text, input-search, SearchPanel .search-panel (5)
+   - input-number (Slider), input-file look=dropzone (Dropzone), input-bool,
+     input-date / -time / -datetime, input-chips, input-url, input-password
+   - .chip, .chip.active (4)
+
+   content
+   - data-index + data-item, aufbau-index + aufbau-item: list and grid
+   - data-tree (Tree, FolderTree with .reconnect)
+   - output-md (Reader), write-md
+   - aufbau-progress, media-file
+   - svg-icon, its sizes in buttons, headers, lists
+
+   feedback
+   - pop-toast (toast(), every app)
+   - pop-modal / Modal .modal-backdrop, pop-prompt (prompt, confirm)
+   - .empty (Empty, 9), Loading, .booting (6, each its own spinner)
+   - .install-tip (InstallTip, 6), Brand
+*/
+
 html, body { height: 100%; }
 body { overflow: hidden; overscroll-behavior: none; }
 

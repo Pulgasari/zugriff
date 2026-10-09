@@ -201,7 +201,7 @@ class ZugriffApp {
     state.$onEffects({
       density  : value => { remember('density', value); if (value) aufbau.gestalt.set({ density: value }); },
       dir      : value => { if ($root && value) $root.setAttribute('dir', value); },
-      font     : value => { if (value) webfonts.apply(value, { role: '--font' }); },
+      font     : value => { value ? webfonts.apply(value, { role: 'body' }) : webfonts.remove(null, { role: 'body' }); },
       geometry : value => { remember('geometry', value); if (value) aufbau.gestalt.set({ geometry: value }); },
       color    : value => setMeta('theme-color', value),
       lang     : value => { if ($root && value) $root.lang = value; },
@@ -309,8 +309,9 @@ class ZugriffApp {
 
   // ::: mount. App renders into #app, the <app-root>: its areas, or anything else
   init = async ({ App, target = '#app' } = {}) => {
-    // aufbau.css comes with index.css, the palette is the app's own
-    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin } });
+    // aufbau.css comes with index.css. palette, skin and font are the app's own, the
+    // font through its state effect: aufbau's default font would override it
+    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin }, font: null });
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
