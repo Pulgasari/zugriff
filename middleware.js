@@ -1,18 +1,21 @@
 // zugriff :: middleware.js (vercel routing middleware, runs at the edge)
-//
-// the gestalt of an app (palette, density, geometry) goes into the html before
-// it leaves the edge, from the cookie .shared/js/app.js writes for the app's
-// path. boot.js sets the same from localStorage before the first paint, so this
-// decides nothing on its own: it only moves the first paint earlier, and where
-// no server sits in between (capacitor, a file) everything works as before.
-//
-// no imports, web apis only. anything unexpected passes the page on untouched.
-//
-// second job: <slug>.zugriff.dev serves the bundled build of an app, www/<slug>/
-// as the ota workflow commits it. a bundle is a site of its own, its paths start at
-// / (/.shared/, /_pkg/, /<slug>/app.js). a rewrite in vercel.json comes too late for
-// that: a file that exists, like the live /.shared/, is served before it is
-// looked at. this runs before the filesystem, so the bundle's own files win.
+
+/*
+the gestalt of an app (palette, density, geometry) goes into the html before
+it leaves the edge, from the cookie .shared/js/app.js writes for the app's
+path. boot.js sets the same from localStorage before the first paint, so this
+decides nothing on its own: it only moves the first paint earlier, and where
+no server sits in between (capacitor, a file) everything works as before.
+
+no imports, web apis only. anything unexpected passes the page on untouched.
+
+second job: 
+<slug>.zugriff.dev serves the bundled build of an app, www/<slug>/ as the ota workflow commits it. 
+a bundle is a site of its own, its paths start at / (/.shared/, /_pkg/, /<slug>/app.js). 
+a rewrite in vercel.json comes too late for that: 
+a file that exists, like the live /.shared/, is served before it is looked at. 
+this runs before the filesystem, so the bundle's own files win.
+*/
 
 const OWN      = new Set(['www']);   // subdomains of the site itself, every other one is a bundle
 const COOKIE   = 'zugriff-gestalt';
@@ -47,9 +50,9 @@ function gestaltOf (request) {
 
 // :::::: BUNDLES
 
-// podcasts.zugriff.dev/<path> -> /www/podcasts/<path>, a folder as its index.html (the
-// index.html names its app, the views route by hash). a subdomain without a bundle in
-// www/ gets a 404, there is no list to keep
+// podcasts.zugriff.dev/<path> -> /www/podcasts/<path>, 
+// a folder as its index.html (the index.html names its app, the views route by hash). 
+// a subdomain without a bundle in www/ gets a 404, there is no list to keep
 function bundleOf (url) {
   const [sub, ...domain] = url.hostname.split('.');
   if (domain.join('.') !== 'zugriff.dev' || OWN.has(sub)) return null;
