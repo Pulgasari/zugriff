@@ -1,16 +1,10 @@
 ![Logo](/logo.svg)
 
-# [zugriff](https://zugriff.dev)
+# [zugriff](https://zugriff.dev) | [CLI](https://zugriff.dev/cli/)
 
 cross-platform apps focused on browser and android.
 
 build with: **aufbau** + **capacitor** + **htx** + **preact**
-
----
-
-## cli
-
-- [cli](https://zugriff.dev/cli/)
 
 ---
 
