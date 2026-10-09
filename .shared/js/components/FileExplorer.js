@@ -15,7 +15,7 @@ FileSystemDirectoryHandle root works:
 - or a folder the user grants off their disk (what the files app app builds).
 the component itself knows nothing about *where* the tree lives.
 
-import { FileExplorer } from './../../shared/js/components/index.js';
+const { FileExplorer } = await zugriff.components('FileExplorer');
 html`<${FileExplorer} backend=${zugriff.opfs.backend} />`
 
 styles live in shared/css/explorer.css (opt-in, scoped under .fx) 
@@ -30,7 +30,6 @@ which keeps the sub-views free of prop-drilling.
 
 import { html, useEffect, useRef }  from './../vendors.js';
 import { computed, signal        }  from './../vendors.js';
-import { typedSignal }              from '@aufbau/signals';
 
 
 // tree ops over the backend's root handle come from the runtime fs layer
@@ -53,7 +52,7 @@ const menu     = signal(null);    // { x, y, entry }
 const dragging = signal(false);
 const busy     = signal(false);   // a write is in flight
 
-const view = typedSignal({ type: 'scalar', value: 'list', key: 'files:view', storage: 'local' });   // 'list' | 'grid'
+const view = zugriff.app.persisted('explorer:view', 'list');   // 'list' | 'grid'
 
 const writable = computed(() => !!backend.value?.writable);
 

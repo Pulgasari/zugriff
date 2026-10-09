@@ -36,7 +36,7 @@ const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-capacitor-res: APP_SLUG is required'); process.exit(1); }
 
 const app = registry.get(slug);
-if (!app || app.type !== 'app') { console.error(`gen-capacitor-res: no app "${slug}" in the registry`); process.exit(1); }
+if (!app) { console.error(`gen-capacitor-res: no app "${slug}" in the registry`); process.exit(1); }
 
 const color  = app.color;
 const resDir = join(process.argv[2] || '.', 'android', 'app', 'src', 'main', 'res');

@@ -1,7 +1,7 @@
 // todo :: modules/frame.js
 // what the views share: the task open in the editor, the list and tag a view shows
 
-import { signal, typedSignal } from '@aufbau/signals';
+import { signal } from '@aufbau/signals';
 
 const app  = zugriff.app;
 const area = name => app.area(name);
@@ -10,8 +10,8 @@ const area = name => app.area(name);
 export const closeMenu = () => { if (area('menu')?.isOverlay) area('menu').hide(); };
 
 export const selected = signal(null);   // the id in the editor
-export const list     = typedSignal({ type: 'scalar', value: 'inbox', key: 'todo:list', storage: 'local' });
-export const tag      = typedSignal({ type: 'scalar', value: null,    key: 'todo:tag',  storage: 'local' });
+export const list     = app.persisted('list', 'inbox');
+export const tag      = app.persisted('tag', null);
 
 export function edit (id) {
   selected.value = id;

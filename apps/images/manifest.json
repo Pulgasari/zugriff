@@ -87,22 +87,22 @@
     {
       "name": "Library",
       "short_name": "Library",
-      "url": "./?mode=library"
+      "url": "./#/library"
     },
     {
       "name": "Edit",
       "short_name": "Edit",
-      "url": "./?mode=edit"
+      "url": "./#/edit"
     },
     {
       "name": "Convert",
       "short_name": "Convert",
-      "url": "./?mode=convert"
+      "url": "./#/convert"
     },
     {
       "name": "Batch",
       "short_name": "Batch",
-      "url": "./?mode=batch"
+      "url": "./#/batch"
     }
   ]
 }

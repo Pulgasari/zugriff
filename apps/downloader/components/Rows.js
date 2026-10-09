@@ -3,7 +3,7 @@
 // removed, the bytes it had with it.
 
 import { dismissable }       from '@aufbau/gestures';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef } from '/.shared/js/vendors.js';
 
 import * as engine           from '../modules/engine.js';
 import { inspect, selected } from '../modules/frame.js';

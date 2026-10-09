@@ -4,7 +4,7 @@
 // (app.editor, app.files, app.state, …), so there is no import cycle: nothing here
 // touches the app at module-evaluation time, only when a command runs.
 
-import { openPrompt } from '/.shared/js/components/index.js';
+import { openPrompt } from '/.shared/js/components/Prompt.js';
 
 const app = zugriff.app;
 

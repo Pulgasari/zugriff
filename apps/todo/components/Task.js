@@ -5,7 +5,7 @@
 // toast. delete or backspace on a focused row deletes it as well.
 
 import { dismissable }                                    from '@aufbau/gestures';
-import { useEffect, useMemo, useRef, useState }           from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState }           from '/.shared/js/vendors.js';
 
 import { dayLabel, dayOf, dueDay, dueLabel, repeatLabel } from '../modules/dates.js';
 import { edit, selected }                                 from '../modules/frame.js';

@@ -75,7 +75,7 @@ function stampOf (date = new Date) {
 
 // the slugs built as `variant`, all of them or the one asked for
 const slugsFor = (variant, only) => registry
-  .getAll('app')
+  .getAll()
   .filter(app => variantsOf(app).includes(variant))
   .filter(app => !only || app.slug === only)
   .map(app => app.slug);

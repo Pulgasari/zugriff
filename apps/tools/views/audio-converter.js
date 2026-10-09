@@ -6,7 +6,8 @@ import { fetchFile } from '@ffmpeg/util';
 
 // ::: shared
 import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
-import { Dropzone, Picker } from '/.shared/js/components/index.js';
+
+const { Dropzone, Picker } = await zugriff.components('Dropzone', 'Picker');
 
 // ── state ─────────────────────────────────────────────────────────────────────
 let files     = signal([]);

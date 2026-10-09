@@ -5,8 +5,9 @@ import { computed, html, signal, useEffect, useRef } from '/.shared/js/vendors.j
 import { PDFDocument } from 'pdf-lib';
 import * as PDFJS from 'pdfjs';
 
+const { Dropzone, Picker, Slider } = await zugriff.components('Dropzone', 'Picker', 'Slider');
+
 // ::: shared
-import { Dropzone, Picker, Slider } from '/.shared/js/components/index.js';
 
 // ::: local
 

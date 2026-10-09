@@ -5,7 +5,7 @@
 // marks the main action, `active` a toggle that is currently on, `iconOnly`
 // drops the visible label down to a tooltip.
 
-import { isValidElement } from 'preact';
+import { isValidElement } from './../vendors.js';
 
 import Link   from './Link.js';
 

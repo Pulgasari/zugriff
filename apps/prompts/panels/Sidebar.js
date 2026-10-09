@@ -9,7 +9,7 @@ import TagManager          from './../components/TagManager.js';
 import PromptItem          from './../components/PromptItem.js';
 import { filteredPrompts } from './../modules/methods.js';
 
-import { useState } from 'preact/hooks';
+import { useState } from '/.shared/js/vendors.js';
 
 const app = zugriff.app;
 

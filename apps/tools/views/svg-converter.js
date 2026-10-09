@@ -4,8 +4,9 @@
 import { html, signal, useEffect, useRef } from '/.shared/js/vendors.js';
 import { PDFDocument } from 'pdf-lib';
 
+const { Dropzone, Slider } = await zugriff.components('Dropzone', 'Slider');
+
 // ::: shared
-import { Dropzone, Slider } from '/.shared/js/components/index.js';
 
 // ::: local
 

@@ -5,14 +5,13 @@ import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
 import { CodeInputPane, CodeOutputPane } from '/.shared/js/components/code.js';
-import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
 // ── state ──────────────────────────────────────────────────────────────────
 
-const input  = typedSignal({ value: '', key: 'json-formatter:input' });
-const indent = typedSignal({ value: 2, key: 'json-formatter:indent' });
+const input  = zugriff.app.persisted('json-formatter:input', '');
+const indent = zugriff.app.persisted('json-formatter:indent', 2);
 const output = signal('');
 const status = signal('idle');
 const errMsg = signal('');

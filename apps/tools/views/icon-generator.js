@@ -7,8 +7,8 @@
 import { html, signal, computed } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { Dropzone } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { Dropzone } = await zugriff.components('Dropzone');
 
 // ::: local
 
@@ -18,9 +18,9 @@ const SIZES = [16, 32, 64, 96, 128, 180, 192, 256, 512, 1024];
 
 const files    = signal([]);          // entries from the dropzone
 const source   = signal(null);        // { name, svg, url }
-const sizes    = typedSignal({ value: [192, 512], key: 'icon-generator:sizes' });
-const padding  = typedSignal({ value: 0, key: 'icon-generator:padding' });   // percent
-const bg       = typedSignal({ value: '', key: 'icon-generator:bg' });        // '' = transparent
+const sizes    = zugriff.app.persisted('icon-generator:sizes', [192, 512]);
+const padding  = zugriff.app.persisted('icon-generator:padding', 0);   // percent
+const bg       = zugriff.app.persisted('icon-generator:bg', '');        // '' = transparent
 const results  = signal([]);         // { size, blob, url }
 const busy     = signal(false);
 const errMsg   = signal('');

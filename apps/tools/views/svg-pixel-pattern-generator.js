@@ -4,7 +4,6 @@
 import { effect, html, signal, useState } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { typedSignal } from '@aufbau/signals';
 
 // ::: local
 
@@ -18,14 +17,14 @@ image-rendering: pixelated;
 */
 
 // ── state ─────────────────────────────────────────────────────────────────────
-let palette = typedSignal({ value: ['#e63946','#457b9d','#2a9d8f','#e9c46a','#f4a261','#264653','#ffffff','#000000'], key: appID + ':palette' });
-let active  = typedSignal({ value: '#000000', key: appID + ':active' });
-let tool    = typedSignal({ value: 'draw', key: appID + ':tool' });
-let cols    = typedSignal({ value: 9, key: appID + ':cols' });
-let rows    = typedSignal({ value: 9, key: appID + ':rows' });
-let gap     = typedSignal({ value: 0, key: appID + ':gap' });
-let cellSz  = typedSignal({ value: 32, key: appID + ':cellsz' });
-let grid    = typedSignal({ value: makeGrid(cols.value, rows.value, '#ffffff'), key: appID + ':grid' });
+let palette = zugriff.app.persisted(appID + ':palette', ['#e63946','#457b9d','#2a9d8f','#e9c46a','#f4a261','#264653','#ffffff','#000000']);
+let active  = zugriff.app.persisted(appID + ':active', '#000000');
+let tool    = zugriff.app.persisted(appID + ':tool', 'draw');
+let cols    = zugriff.app.persisted(appID + ':cols', 9);
+let rows    = zugriff.app.persisted(appID + ':rows', 9);
+let gap     = zugriff.app.persisted(appID + ':gap', 0);
+let cellSz  = zugriff.app.persisted(appID + ':cellsz', 32);
+let grid    = zugriff.app.persisted(appID + ':grid', makeGrid(cols.value, rows.value, '#ffffff'));
 //let grid    = signal(makeGrid(cols.value, rows.value, '#ffffff'));
 
 // wenn cols oder rows sich ändern → grid anpassen

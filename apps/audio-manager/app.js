@@ -5,16 +5,17 @@
 
 // ::: vendors
 import { computed }         from '@aufbau/signals';
-import { useEffect }        from 'preact/hooks';
+import { useEffect }        from '/.shared/js/vendors.js';
 
 // ::: shared
 import { Config }     from '/.shared/js/components/Config.js';
-import { InstallTip } from '/.shared/js/components/index.js';
 import { Views }      from '/.shared/js/components/Views.js';
 
 // ::: app modules
 import * as db     from './modules/db.js';
 import * as player from './modules/player.js';
+
+const { InstallTip } = await zugriff.components('InstallTip');
 const { displayTitle, displayArtist, displayAlbum } = db;
 
 // ::: the app handle

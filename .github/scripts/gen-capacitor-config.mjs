@@ -51,7 +51,7 @@ const slug = process.env.APP_SLUG;
 if (!slug) { console.error('gen-capacitor-config: APP_SLUG is required'); process.exit(1); }
 
 const app = registry.get(slug);
-if (!app || app.type !== 'app') { console.error(`gen-capacitor-config: no app "${slug}" in the registry`); process.exit(1); }
+if (!app) { console.error(`gen-capacitor-config: no app "${slug}" in the registry`); process.exit(1); }
 
 const base     = (process.env.SITE_BASE || 'https://zugriff.dev').replace(/\/+$/, '');
 const appUrl   = (process.env.APP_URL || `${base}/${slug}/`).replace(/\/*$/, '/');

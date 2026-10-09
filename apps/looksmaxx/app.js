@@ -5,7 +5,7 @@
 // landmarks) is a plain object — it never renders directly. everything stays on the device.
 
 // ::: vendors
-import { useRef, useEffect } from 'preact/hooks';
+import { useRef, useEffect } from '/.shared/js/vendors.js';
 
 // ::: shared
 
@@ -24,8 +24,8 @@ const config = app.config;
 
 const MAX_DIM = 1400;   // cap the working resolution for a smooth recolour
 
-app.state.color       = null;   // { r, g, b } | null
 app.state.$extend({
+  hairColor   : { type: 'scalar', value: null },    // { r, g, b } | null
   status      : { type: 'scalar', value: '' },      // '' | 'loading' | 'segmenting' | 'detecting' | 'error…'
   hasPhoto    : { type: 'scalar', value: false },
   strength    : { type: 'scalar', value: 0.85 },
@@ -96,8 +96,8 @@ function compose () {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(base, 0, 0);
 
-  if (app.state.$color && work.mask) {
-    recolorHair(ctx, { width: canvas.width, height: canvas.height }, work.mask, app.state.$color, app.state.$strength);
+  if (app.state.$hairColor && work.mask) {
+    recolorHair(ctx, { width: canvas.width, height: canvas.height }, work.mask, app.state.$hairColor, app.state.$strength);
   }
   if (app.state.$styleId && work.styleImg && work.face) {
     drawHairstyle(ctx, work.face, work.styleImg, {
@@ -127,7 +127,7 @@ async function useStyle (entry, customImg) {
 }
 
 function reset () {
-  app.state.color = null; app.state.strength = 0.85;
+  app.state.hairColor = null; app.state.strength = 0.85;
   app.state.styleId = null; work.styleImg = null;
   app.state.styleScale = 1; app.state.styleOffset = 0;
   compose();
@@ -161,23 +161,23 @@ function Dropzone () {
 }
 
 function ColorRow () {
-  const onCustom = e => { const c = hexToRgb(e.target.value); if (c) { app.state.color = c; compose(); } };
+  const onCustom = e => { const c = hexToRgb(e.target.value); if (c) { app.state.hairColor = c; compose(); } };
   return html`
     <div class="group">
       <div class="group-head"><span>Hair colour</span>
-        ${app.state.$color && html`<button class="link" onClick=${() => { app.state.color = null; compose(); }}>none</button>`}
+        ${app.state.$hairColor && html`<button class="link" onClick=${() => { app.state.hairColor = null; compose(); }}>none</button>`}
       </div>
       <div class="swatches">
         ${SWATCHES.map(s => html`
-          <button class=${'swatch' + (isSame(app.state.$color, s) ? ' on' : '')}
+          <button class=${'swatch' + (isSame(app.state.$hairColor, s) ? ' on' : '')}
                   title=${s.name} style=${`background:rgb(${s.r},${s.g},${s.b})`}
-                  onClick=${() => { app.state.color = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
+                  onClick=${() => { app.state.hairColor = { r: s.r, g: s.g, b: s.b }; compose(); }}></button>`)}
         <label class="swatch custom" title="Custom colour">
           <svg-icon icon="mdi:eyedropper-variant" />
           <input type="color" onInput=${onCustom} />
         </label>
       </div>
-      ${app.state.$color && html`
+      ${app.state.$hairColor && html`
         <label class="slider">
           <span>Intensity</span>
           <input type="range" min="0" max="1" step="0.01" value=${app.state.$strength}

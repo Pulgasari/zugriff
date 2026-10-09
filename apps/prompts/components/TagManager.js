@@ -2,7 +2,7 @@
 // the inline tag editor in the sidebar: list existing tags, delete them, add a new one.
 
 
-import { useState } from 'preact/hooks';
+import { useState } from '/.shared/js/vendors.js';
 
 const app = zugriff.app;
 

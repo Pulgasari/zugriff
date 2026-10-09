@@ -24,7 +24,7 @@ const builds = slugsFor(builder, only).flatMap(app => [false, ...(builder === 'c
 // an app asked for by name that is not built as BUILDER fails the run, it would
 // skip the build and pass green
 if (only && !builds.length) {
-  const app = registry.getAll('app').find(app => app.slug === only);
+  const app = registry.getAll().find(app => app.slug === only);
   console.error(app ? `"${only}" is not built as ${builder}, its build.android: ${JSON.stringify(variantsOf(app))}`
                     : `no app "${only}" in the registry`);
   process.exit(1);

@@ -5,8 +5,8 @@ import { html, signal, useState } from '/.shared/js/vendors.js';
 import { converter, formatHex, interpolate, modeHsl, modeLab, modeLch, modeLrgb, modeOklab, modeOklch, modeRgb, parse, useMode } from 'culori';
 
 // ::: shared
-import { Picker } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { Picker } = await zugriff.components('Picker');
 
 // ::: local
 
@@ -85,7 +85,7 @@ let clamp   = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 // ── global state ──────────────────────────────────────────────────────────────
 let color   = signal(toOklch(parse('#3b82f6')));  // shared across tabs
-let tab     = typedSignal({ value: 'OKLCH', key: 'colorpicker:tab' });
+let tab     = zugriff.app.persisted('colorpicker:tab', 'OKLCH');
 let TABS    = ['RGB', 'HSL', 'LCH', 'OKLCH', 'Mix', 'Shades'];
 let TAB_MAP = { RGB: RGBTab, HSL: HSLTab, LCH: LCHTab, OKLCH: OKLCHTab, Mix: MixTab, Shades: ShadesTab };
 

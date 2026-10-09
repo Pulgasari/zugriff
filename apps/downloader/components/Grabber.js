@@ -2,7 +2,7 @@
 // links in, packages out: a field to paste into, the clipboard, and what the
 // plugins found, grouped, to look through before it starts.
 
-import { useState } from 'preact/hooks';
+import { useState } from '/.shared/js/vendors.js';
 
 import * as engine  from '../modules/engine.js';
 import * as grabber from '../modules/grabber.js';

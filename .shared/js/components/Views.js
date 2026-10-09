@@ -13,7 +13,7 @@
 //     <${Views} transition-on='glide' />
 //   </app-area>
 
-import { useRef } from 'preact/hooks';
+import { useRef } from './../vendors.js';
 
 import { useSlot } from './Slot.js';
 

@@ -4,12 +4,12 @@
 import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { Dropzone } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { Dropzone } = await zugriff.components('Dropzone');
 
 // ── state ────────────────────────────────────────────────────────────
 let files = signal([]);
-let tasks = typedSignal({ value: [], key: 'ibp:tasks' });
+let tasks = zugriff.app.persisted('ibp:tasks', []);
 let _id = 0;
 
 // ── task definitions ─────────────────────────────────────────────────

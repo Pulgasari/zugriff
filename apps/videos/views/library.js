@@ -1,10 +1,13 @@
-// apps/images/routes/library.js
-// library route: browse granted folders as galleries, open an image into view.
+// apps/videos/views/library.js
+// the library mode (video-manager): browse granted folders as galleries of clips
+// and open one into the player. clips show as an icon for now — poster frames are
+// a follow-up.
 
 import { signal, computed }            from '@aufbau/signals';
-import { useEffect, useRef, useState } from 'preact/hooks';
-import { InstallTip }            from '/.shared/js/components/index.js';
-import { setFiles }                    from '../modules/state.js';
+import { useEffect, useRef, useState } from '/.shared/js/vendors.js';
+import { loadFile }                    from '/.shared/js/media/videoplayer.js';
+
+const { InstallTip } = await zugriff.components('InstallTip');
 
 const app = zugriff.app;
 
@@ -14,11 +17,11 @@ const libFolder = signal('');   // '' = all folders, else a sourceId
 
 const byName = (a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
 
-const visiblePics = computed(() => {
+const visibleClips = computed(() => {
   const q = libSearch.value.trim().toLowerCase();
-  let list = app.lib.pics.value;
-  if (libFolder.value) list = list.filter(p => p.sourceId === libFolder.value);
-  if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.path.toLowerCase().includes(q));
+  let list = app.lib.clips.value;
+  if (libFolder.value) list = list.filter(c => c.sourceId === libFolder.value);
+  if (q) list = list.filter(c => c.name.toLowerCase().includes(q) || c.path.toLowerCase().includes(q));
   return [...list].sort(byName);
 });
 
@@ -29,49 +32,43 @@ async function addFolderAction () {
   catch (err) { libMsg.value = err?.message || String(err); }
 }
 
-/** open an image record into the view mode */
-async function openInView (pic) {
+/** open a clip record into the player mode */
+async function openInPlayer (clip) {
   try {
-    const file = await app.lib.openFile(pic);
-    setFiles([file]);
-    app.go('view');
+    const file = await app.lib.openFile(clip);
+    loadFile(file);
+    app.go('player');
   } catch (err) {
     libMsg.value = err?.message || String(err);
   }
 }
 
-// a lazy thumbnail: the file is read (and an object url made) only once the cell
-// scrolls near the viewport, so a folder of thousands doesn't decode all at once
-function Thumb ({ pic }) {
+// a lazy poster: the clip is decoded (and cached) only once the cell nears the
+// viewport, so a folder of thousands doesn't decode all at once. the poster cache
+// owns the object-url (shared across mounts), so it is not revoked here.
+function Thumb ({ clip }) {
   const ref = useRef(null);
   const [url, setUrl] = useState('');
 
   useEffect(() => {
-    let alive = true, obj = null;
+    let alive = true;
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(entries => {
       if (!entries.some(e => e.isIntersecting)) return;
       io.disconnect();
-      (async () => {
-        try {
-          const file = await app.lib.openFile(pic);
-          if (!alive) return;
-          obj = URL.createObjectURL(file);
-          setUrl(obj);
-        } catch { /* leave the placeholder */ }
-      })();
+      app.lib.poster(clip).then(u => { if (alive && u) setUrl(u); }).catch(() => {});
     }, { rootMargin: '300px' });
     io.observe(el);
-    return () => { alive = false; io.disconnect(); if (obj) URL.revokeObjectURL(obj); };
-  }, [pic.key]);
+    return () => { alive = false; io.disconnect(); };
+  }, [clip.key, clip.sig]);
 
   return html`
-    <button ref=${ref} class="im-thumb" title=${pic.path} onClick=${() => openInView(pic)}>
+    <button ref=${ref} class="im-thumb vid-thumb" title=${clip.path} onClick=${() => openInPlayer(clip)}>
       ${url
-        ? html`<img src=${url} alt=${pic.name} loading="lazy" />`
-        : html`<div class="im-thumb-ph"><svg-icon icon="mdi:image-outline" /></div>`}
-      <span class="im-thumb-name">${pic.name}</span>
+        ? html`<img src=${url} alt=${clip.name} loading="lazy" />`
+        : html`<div class="im-thumb-ph"><svg-icon icon="mdi:movie-outline" /></div>`}
+      <span class="im-thumb-name">${clip.name}</span>
     </button>`;
 }
 
@@ -108,14 +105,14 @@ function FolderChips () {
     </div>`;
 }
 
-function LibraryMode () {
+function LibraryRoute () {
   useEffect(() => { app.lib.ensureLoaded(); }, []);
 
   if (!app.lib.ready.value) {
     return html`<div class="im-lib"><div class="im-booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div></div>`;
   }
 
-  const pics       = visiblePics.value;
+  const clips      = visibleClips.value;
   const hasFolders = app.lib.sources.value.length > 0;
   const scanning   = Object.values(app.lib.scanning.value).some(Boolean);
 
@@ -125,7 +122,7 @@ function LibraryMode () {
         ${scanning && html`<span class="im-scan-note"><svg-icon icon="svg-spinners:bars-scale-middle" /> scanning…</span>`}
         <div class="im-lib-search">
           <svg-icon icon="mdi:magnify" />
-          <input type="search" placeholder="Search images…" value=${libSearch.value}
+          <input type="search" placeholder="Search clips…" value=${libSearch.value}
                  onInput=${e => libSearch.value = e.target.value} />
           ${libSearch.value && html`<button class="iv-btn" aria-label="Clear" onClick=${() => libSearch.value = ''}>
             <svg-icon icon="mdi:close" /></button>`}
@@ -140,29 +137,30 @@ function LibraryMode () {
 
       <${ReconnectBar} />
       <${InstallTip} show=${app.lib.sources.value.length > 0}
-                     message="Install the app to keep your image folders connected between visits — no reconnecting." />
+                     message="Install the app to keep your video folders connected between visits — no reconnecting." />
       <${FolderChips} />
 
       ${!hasFolders
         ? html`
           <div class="im-lib-empty">
-            <svg-icon icon="mdi:folder-multiple-image" />
-            <p class="im-empty-title">Browse an image folder</p>
-            <p class="im-empty-hint">Grant a folder off your device and browse it as a gallery — open any image into the viewer or editor. Nothing is uploaded; only the folder permission is remembered.</p>
+            <svg-icon icon="mdi:folder-multiple-outline" />
+            <p class="im-empty-title">Browse a video folder</p>
+            <p class="im-empty-hint">Grant a folder off your device and browse it as a gallery — open any clip into the player. Nothing is uploaded; only the folder permission is remembered.</p>
             <button class="btn primary" onClick=${addFolderAction}>
               <svg-icon icon="mdi:folder-plus-outline" /> Add a folder</button>
           </div>`
-        : pics.length
-          ? html`<div class="im-scroll"><aufbau-index class="im-grid" viewmode="grid" item-size="140px" gap="0.6rem">
-              ${pics.map(p => html`<${Thumb} key=${p.key} pic=${p} />`)}
+        : clips.length
+          ? html`<div class="im-scroll"><aufbau-index class="im-grid" viewmode="grid" item-size="160px" gap="0.6rem">
+              ${clips.map(c => html`<${Thumb} key=${c.key} clip=${c} />`)}
             </aufbau-index></div>`
           : html`
             <div class="im-lib-empty">
-              <svg-icon icon=${libSearch.value ? 'mdi:image-search-outline' : 'mdi:image-off-outline'} />
-              <p class="im-empty-title">${libSearch.value ? 'Nothing matches your search' : 'No images here yet'}</p>
-              ${!libSearch.value && html`<p class="im-empty-hint">Scanning may still be running, or this folder has no images.</p>`}
+              <svg-icon icon=${libSearch.value ? 'mdi:magnify-close' : 'mdi:movie-off-outline'} />
+              <p class="im-empty-title">${libSearch.value ? 'Nothing matches your search' : 'No clips here yet'}</p>
+              ${!libSearch.value && html`<p class="im-empty-hint">Scanning may still be running, or this folder has no videos.</p>`}
             </div>`}
     </div>`;
 }
-export { LibraryMode };
-export default LibraryMode;
+
+export { LibraryRoute };
+export default LibraryRoute;

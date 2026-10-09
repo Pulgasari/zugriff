@@ -4,8 +4,8 @@
 import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { Dropzone, Picker, Slider } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { Dropzone, Picker, Slider } = await zugriff.components('Dropzone', 'Picker', 'Slider');
 
 // ::: local
 
@@ -13,8 +13,8 @@ const APP_ID = 'image-converter';
 
 // ── state ────────────────────────────────────────────────────────────────────
 let files   = signal([]); // { id, file, status, blobUrl, outName, error }
-let format  = typedSignal({ value: 'webp', key: APP_ID + '--format' });
-let quality = typedSignal({ value: 90, key: APP_ID + '--quality' });
+let format  = zugriff.app.persisted(APP_ID + '--format', 'webp');
+let quality = zugriff.app.persisted(APP_ID + '--quality', 90);
 let FORMATS = ['jpg', 'png', 'webp'];
 
 // ── helpers ──────────────────────────────────────────────────────────────────

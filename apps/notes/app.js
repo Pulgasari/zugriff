@@ -6,8 +6,8 @@
 // folder tree in a menu area docked at the start (a sidebar when there is room,
 // a drawer when there is not) and the settings in a config area at the end
 
-import { computed, typedSignal } from '@aufbau/signals';
-import { useEffect, useState }   from 'preact/hooks';
+import { computed }            from '@aufbau/signals';
+import { useEffect, useState }   from '/.shared/js/vendors.js';
 
 import FolderLibrary from '/.shared/js/modules/folders.js';
 
@@ -27,7 +27,7 @@ app.state.$extend({
 });
 
 // durable state — hydrates from + persists to localStorage
-const open = typedSignal({ type: 'scalar', value: null, key: 'notes:open', storage: 'local' });   // { sourceId, path } | null
+const open = app.persisted('open', null);   // { sourceId, path } | null
 
 // :::::: FRAME
 
@@ -75,7 +75,7 @@ function Menu () {
         labelOf=${titleOf}
         fileIcon='notes'
         emptyText='No markdown files here'
-        expandedKey='notes:expanded'
+        expandedKey='expanded'
       />
 
       <div class='side-foot'>

@@ -4,13 +4,13 @@
 import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { CopyIcon, Picker, Slider } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { CopyIcon, Picker, Slider } = await zugriff.components('CopyIcon', 'Picker', 'Slider');
 
 // ::: local
 
-let count   = typedSignal({ value: 5, key: 'uuidgen:count' });
-let version = typedSignal({ value: 'v4', key: 'uuidgen:version' });
+let count   = zugriff.app.persisted('uuidgen:count', 5);
+let version = zugriff.app.persisted('uuidgen:version', 'v4');
 let uuids   = signal([]);
 let copied  = signal(null);
 

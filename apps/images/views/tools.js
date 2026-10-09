@@ -1,8 +1,8 @@
-// apps/images/routes/tools.js
-// shared pieces for the file-list tool routes (convert + batch).
+// apps/images/views/tools.js
+// shared pieces for the file-list tool modes (convert + batch).
 
-import { useRef, useState } from 'preact/hooks';
-import { isImageFile } from '../modules/state.js';
+import { useRef, useState } from '/.shared/js/vendors.js';
+import { isImageFile }      from '../modules/state.js';
 
 const uid = () => (crypto.randomUUID?.() ?? (Date.now().toString(36) + Math.random().toString(36).slice(2)));
 

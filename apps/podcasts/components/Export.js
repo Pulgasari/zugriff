@@ -3,7 +3,7 @@
 // plus the listening state keyed by feed url + episode guid, so an import
 // re-fetches the feeds and re-attaches progress to them.
 
-import { useRef } from 'preact/hooks';
+import { useRef } from '/.shared/js/vendors.js';
 
 const app = zugriff.app;
 

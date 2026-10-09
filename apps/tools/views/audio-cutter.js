@@ -6,8 +6,8 @@ import { fetchFile } from '@ffmpeg/util';
 
 // ::: shared
 import { loadFFmpeg } from '/.shared/js/vendors/ffmpeg.js';
-import { Dropzone } from '/.shared/js/components/index.js';
-import { WaveformWithHandles } from '/.shared/js/components/index.js';
+
+const { Dropzone, WaveformWithHandles } = await zugriff.components('Dropzone', 'WaveformWithHandles');
 
 // ::: local
 

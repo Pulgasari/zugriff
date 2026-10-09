@@ -5,16 +5,17 @@
 
 // ::: vendors
 import { computed }         from '@aufbau/signals';
-import { useEffect }        from 'preact/hooks';
+import { useEffect }        from '/.shared/js/vendors.js';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
 // ::: shared
 import { Config } from '/.shared/js/components/Config.js';
-import { Image }  from '/.shared/js/components/index.js';
 
 // ::: app modules
 import * as db           from './modules/db.js';
+
+const { Image } = await zugriff.components('Image');
 
 // ::: the app handle
 const app = zugriff.app;

@@ -26,8 +26,8 @@ A local video app with three modes, the views of `#app` (the `<app-root>`), at
 |------|------------|
 | `app.js`             | the areas of `#app`: mode bar + a view per mode, config; launchQueue, binds `app.lib` |
 | `modules/library.js` | granted-folder data layer (clip records) |
-| `routes/index.js`    | the route table (id + nav metadata + component) |
-| `routes/*.js`        | library / player / edit routes |
+| `views/index.js`     | the modes (id, nav label and icon, view)        |
+| `views/*.js`         | library / player / edit modes  |
 
 The player state lives at module scope in the shared engine, so a page has one
 player instance; the library hands it a clip via `loadFile()` and navigates.

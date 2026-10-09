@@ -1,4 +1,4 @@
-// apps/videos/routes/edit.js
+// apps/videos/views/edit.js
 // hint only for now — the plan is quick clip edits (trim/cut, rotate, flip, crop),
 // not an NLE. rotate/flip/crop already exist on the player as live transforms; the
 // editor will bake them plus a trim into an exported clip. wired up later.

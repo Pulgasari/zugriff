@@ -6,10 +6,10 @@
 // clip into the player. the runtime binds zugriff (+ zugriff.app, html) to window before
 // this runs, so nothing here imports the runtime.
 
-import { useEffect } from 'preact/hooks';
+import { useEffect } from '/.shared/js/vendors.js';
 
 import lib          from './modules/library.js';
-import { routes }   from './routes/index.js';
+import { modes }    from './views/index.js';
 import { loadFile } from '/.shared/js/media/videoplayer.js';
 
 // ::: the app handle — the data layer hangs off it as app.lib
@@ -22,8 +22,8 @@ const { Config, Views } = await zugriff.components('Config', 'Views');
 // a mode is a view in the main area, in the dom while it is on screen only. the library
 // is at the root, the other modes at their id
 
-app.views = Object.fromEntries(routes.map(({ id, component }) =>
-  [id, { route: id === 'library' ? '/' : `/${id}`, view: component, transient: true }]));
+app.views = Object.fromEntries(modes.map(({ id, view }) =>
+  [id, { route: id === 'library' ? '/' : `/${id}`, view, transient: true }]));
 
 // a clip opened via the OS "open with" arrives here on launch — into the player
 function wireLaunchQueue () {
@@ -47,7 +47,7 @@ function ModeBar () {
     <header class="im-modebar">
       <div class="im-brand"><svg-icon icon="mdi:movie-open-outline" /> <span>videos</span></div>
       <nav class="im-modes">
-        ${routes.map(m => html`
+        ${modes.map(m => html`
           <button class=${'im-mode' + (app.current.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => app.go(m.id)} title=${m.label}>
             <svg-icon icon=${m.icon} /> <span>${m.label}</span>

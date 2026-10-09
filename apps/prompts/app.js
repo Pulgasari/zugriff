@@ -6,7 +6,7 @@
 // where there is room, a drawer where not), the prompt in the main area.
 
 // ::: app modules
-import { useEffect } from 'preact/hooks';
+import { useEffect } from '/.shared/js/vendors.js';
 
 import * as lib         from './modules/lib.js';
 import { activePrompt } from './modules/methods.js';

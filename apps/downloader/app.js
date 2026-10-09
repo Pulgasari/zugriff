@@ -7,7 +7,7 @@
 // the settings in a config area at the end
 
 import { computed }          from '@aufbau/signals';
-import { useEffect }         from 'preact/hooks';
+import { useEffect }         from '/.shared/js/vendors.js';
 
 import { ConfigSections }    from './components/Config.js';
 import { Detail }            from './components/Detail.js';

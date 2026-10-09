@@ -1,7 +1,7 @@
 // podcasts :: components/Artwork.js
 
 import { useSignal } from '@aufbau/signals';
-import { useEffect } from 'preact/hooks';
+import { useEffect } from '/.shared/js/vendors.js';
 
 const app = zugriff.app;
 
