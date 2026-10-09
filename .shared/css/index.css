@@ -30,13 +30,13 @@ app-view {
   flex-direction: column;
 }
 app-view > main {
-  align-items: center;
   justify-content: safe center;
   display: flex;
   flex: 1;
 }
 app-view .empty {
   align-items: center;
+  align-self: center;
   display: flex;
   flex-flow: column;
   --gap: normal;
