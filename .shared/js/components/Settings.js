@@ -23,7 +23,7 @@
 
 // :::::: IMPORTS
 
-import View from './View.js';
+import ViewHeader from './ViewHeader.js';
 
 import { gestalt } from '@aufbau/api';
 import gui         from '@aufbau/gui';
@@ -143,11 +143,11 @@ function SettingsPanel ({ open = settingsOpen.value, onClose = closeSettings, ..
   `;
 }
 
+// header and main go directly into the <app-view>
 function SettingsView (props) {
   return html`
-    <${View} class='settings-view' title='settings'>
-      <${Settings} ...${props} />
-    </${View}>
+    <${ViewHeader} title='settings' />
+    <main class='settings-view'><${Settings} ...${props} /></main>
   `;
 }
 
