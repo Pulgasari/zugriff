@@ -1,18 +1,14 @@
 // todo :: modules/frame.js
-// the handles of #app, the <app-root>, and what the views share: the task open in the
-// editor, the list and tag a view shows, the view on screen.
+// what the views share: the task open in the editor, the list and tag a view shows
 
 import { signal, typedSignal } from '@aufbau/signals';
 
-const app = zugriff.app;
-
-export const show = app.show;
-export const area = app.area;
+const app  = zugriff.app;
+const area = name => app.area(name);
 
 // a drawer closes once something in it was picked, a sidebar stays
 export const closeMenu = () => { if (area('menu')?.isOverlay) area('menu').hide(); };
 
-export const current  = signal('today');
 export const selected = signal(null);   // the id in the editor
 export const list     = typedSignal({ type: 'scalar', value: 'inbox', key: 'todo:list', storage: 'local' });
 export const tag      = typedSignal({ type: 'scalar', value: null,    key: 'todo:tag',  storage: 'local' });
@@ -29,17 +25,10 @@ export function closeEditor () {
 
 export function openList (id) {
   list.value = id;
-  show('list');
-  closeMenu();
+  app.go('list');
 }
 
 export function openTag (name) {
   tag.value = name;
-  show('tag');
-  closeMenu();
-}
-
-export function go (name) {
-  show(name);
-  closeMenu();
+  app.go('tag');
 }

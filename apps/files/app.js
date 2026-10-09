@@ -32,7 +32,7 @@ import SyncView, { sync } from './views/sync.js';
 const app = zugriff.app;
 const fs  = zugriff.fs;
 
-const { Config } = await zugriff.components('Config');
+const { Config, Views } = await zugriff.components('Config', 'Views');
 
 app.db   = await app.module('db');
 app.scan     = await app.module('scan');
@@ -83,10 +83,8 @@ const query    = signal('');       // the dashboard's search over the index
 const category = signal(null);     // the category the dashboard lists, or null
 const selected = signal(null);     // the entry the context area is about
 const file     = signal(null);     // the entry in the preview
-const current  = signal('dashboard');
 const sheet    = signal(null);      // what the context area shows instead: 'tasks', 'remotes'
 
-const show = app.show;
 const area = app.area;
 
 const touch      = () => globalThis.matchMedia?.('(pointer: coarse)').matches;
@@ -192,14 +190,14 @@ function indexFolder (root, folder) {
 const rescan = () => { const root = localRoot(); if (root) indexFolder(root, app.db.folder.value); };
 
 function open (entry, at = path.value) {
-  if (entry.kind === 'directory') { goTo([...at, entry.name]); return show('library'); }
+  if (entry.kind === 'directory') { goTo([...at, entry.name]); return app.go('library'); }
   file.value = { ...entry, kind: 'file', path: entry.path ?? at, source: entry.source ?? sourceOf(entry) };
-  show('preview');
+  app.go('preview');
 }
 
 function showInFolder (entry) {
   goTo(entry.path ?? [], entry.source ?? sourceOf(entry));
-  show('library');
+  app.go('library');
 }
 
 // a tap opens, or a click picks and a double click opens, see opensOnTap()
@@ -306,7 +304,7 @@ async function download (entry) {
 
 async function chooseFolder () {
   if (!fs.supported()) return;
-  try         { await app.db.grant(); setTabs([{ path: [] }], 0); show('dashboard'); }
+  try         { await app.db.grant(); setTabs([{ path: [] }], 0); app.go('dashboard'); }
   catch (err) { console.warn('[files] grant failed', err); }
 }
 
@@ -477,7 +475,7 @@ function Places () {
       <h2>Folder</h2>
       <ul class='tiles'>
         <li>
-          <button class='tile' type='button' onClick=${() => { goTo([]); show('library'); }}>
+          <button class='tile' type='button' onClick=${() => { goTo([]); app.go('library'); }}>
             <svg-icon icon='lucide:folder-open' />
             <span class='text'>
               <span class='name'>${folderName()}</span>
@@ -501,7 +499,7 @@ function Bookmarks () {
           <ul class='tiles'>
             ${list.map(bookmark => html`
               <li key=${bookmark.path.join('/')}>
-                <button class='tile' type='button' onClick=${() => { goTo(bookmark.path); show('library'); }}>
+                <button class='tile' type='button' onClick=${() => { goTo(bookmark.path); app.go('library'); }}>
                   <svg-icon icon=${app.places.typeOf(bookmark.path)?.icon ?? 'lucide:bookmark'} />
                   <span class='text'>
                     <span class='name'>${bookmark.name}</span>
@@ -527,7 +525,7 @@ const PLANNED = [
 // a remote opens in a tab of its own
 function openRemote (id) {
   openTab([], id);
-  show('library');
+  app.go('library');
 }
 
 function manageRemotes () {
@@ -769,7 +767,7 @@ function Crumbs () {
 function Library () {
   if (!rootHandle()) return html`<${Bar} title='Library' /><div class='scroll'><${Welcome} /></div>`;
 
-  const up       = () => path.value.length ? goTo(path.value.slice(0, -1)) : show('dashboard');
+  const up       = () => path.value.length ? goTo(path.value.slice(0, -1)) : app.go('dashboard');
   const list     = visible();
   const viewmode = app.state.$viewmode;
   const bars     = { search: html`<${Filter} />`, tabs: html`<${Tabs} />` };
@@ -896,7 +894,7 @@ function EntryContext ({ entry }) {
 // a file of the folder into the sync view's outbox, the view opens
 function sendEntry (entry, at) {
   sync.addEntry(localRoot(), at, entry)
-    .then(() => { area('context')?.hide(); show('sync'); })
+    .then(() => { area('context')?.hide(); app.go('sync'); })
     .catch(err => app.toast.error(err));
 }
 
@@ -978,7 +976,7 @@ function FileContext ({ entry }) {
 }
 
 function Context () {
-  const view = current.value;
+  const view = app.current.value;
 
   if (sheet.value === 'tasks')   return html`<app-panel heading='Tasks'><${TaskList} /></app-panel>`;
   if (sheet.value === 'remotes') return html`<app-panel heading='Remote'><${RemoteManager} /></app-panel>`;
@@ -1067,13 +1065,13 @@ const SOON = [
 ];
 
 function Menu () {
-  const go = name => { show(name); if (area('menu')?.isOverlay) area('menu').hide(); };
+  const go = name => { app.go(name); if (area('menu')?.isOverlay) area('menu').hide(); };
 
   return html`
     <app-panel heading='Files' controls='close'>
       <nav class='menu'>
         ${MENU.map(item => html`
-          <button type='button' key=${item.name} aria-current=${current.value === item.name ? 'page' : null} onClick=${() => go(item.name)}>
+          <button type='button' key=${item.name} aria-current=${app.current.value === item.name ? 'page' : null} onClick=${() => go(item.name)}>
             <svg-icon icon=${item.icon} /> ${item.label}
           </button>
         `)}
@@ -1131,9 +1129,15 @@ function FolderSection () {
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::::
 
+app.views = {
+  dashboard : { route: '/',        view: Dashboard },
+  library   : { route: '/library', view: Library   },
+  preview   : { route: '/preview', view: Preview   },
+  sync      : { route: '/sync',    view: () => html`<${SyncView} Bar=${Bar} IconButton=${IconButton} Action=${Action} Actions=${Actions} />` },
+};
+
 // discovery runs while the sync view is on screen, it costs battery
 function onNavigate (event) {
-  current.value  = event.detail.to;
   selected.value = null;
   if (event.detail.to === 'sync') sync.start();
   else if (event.detail.from === 'sync') sync.stop();
@@ -1151,10 +1155,7 @@ function App () {
 
   return html`
     <app-area name='main'>
-      <app-view name='dashboard' route='/' active><${Dashboard} /></app-view>
-      <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
-      <app-view name='preview' route='/preview' transition-on='glide'><${Preview} /></app-view>
-      <app-view name='sync' route='/sync' transition-on='glide'><${SyncView} Bar=${Bar} IconButton=${IconButton} Action=${Action} Actions=${Actions} /></app-view>
+      <${Views} transition-on='glide' />
     </app-area>
     <app-area name='menu' dock='start'><${Menu} /></app-area>
     <app-area name='config' dock='end'><${Config}><${FolderSection} /></${Config}></app-area>

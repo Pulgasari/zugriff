@@ -1,15 +1,10 @@
 // downloader :: modules/frame.js
-// the handles of #app, the <app-root>, and what the views share: the download shown in
-// the context area, the view on screen.
+// what the views share: the download shown in the context area of #app
 
 import { signal } from '@aufbau/signals';
 
-const app = zugriff.app;
+const area = name => zugriff.app.area(name);
 
-export const show = app.show;
-export const area = app.area;
-
-export const current  = signal('queue');
 export const selected = signal(null);   // the id in the context area
 
 export function inspect (id) {

@@ -130,9 +130,8 @@ async function loadFile (file) {
 /** open the tray's current image in the editor, switching modes */
 async function editCurrent () {
   const s = current.value;
-  if (!s) { app.setRoute('edit'); return; }
-  app.setRoute('edit');
-  if (edLoadedFrom !== s.file) await loadFile(s.file);
+  app.go('edit');
+  if (s && edLoadedFrom !== s.file) await loadFile(s.file);
 }
 
 const rotate = dir => commit(edit.rotate90(work.value, dir));
@@ -330,7 +329,7 @@ function EditToolbar ({ onOpen }) {
 
       <div class="spacer"></div>
 
-      <${ToolButton} icon="mdi:image-outline" label="Back to viewer" onClick=${() => app.setRoute('view')} />
+      <${ToolButton} icon="mdi:image-outline" label="Back to viewer" onClick=${() => app.go('view')} />
       <${ToolButton} icon="mdi:restore" label="Reset to original" onClick=${resetEdit} disabled=${!dirty.value} />
     </div>`;
 }

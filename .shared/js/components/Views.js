@@ -3,7 +3,11 @@
 // view once app.go() handed it params; the params are its props. a view's module is
 // imported on its first render. attributes given to <Views> go on every <app-view>.
 // with `lazy` a view with a route renders once it has been on screen, for an app of
-// many views (apps/tools) that should not load them all up front
+// many views (apps/tools) that should not load them all up front. a view declared
+// `transient` is in the dom only while it is on screen, leaving it unmounts it (a
+// reader that closes its book, an editor that lets go of its canvas)
+//
+//   app.views = { reader: { route: '/reader', view: 'ReaderView', transient: true } };
 //
 //   <app-area name='main'>
 //     <${Views} transition-on='glide' />
@@ -22,7 +26,9 @@ function ViewContent ({ name, entry, lazy }) {
   const seen   = useRef(false);
   if (app.current.value === name) seen.current = true;
 
-  const shown     = entry.route ? !lazy || seen.current : params !== undefined;
+  const shown     = entry.transient ? app.current.value === name
+                  : entry.route     ? !lazy || seen.current
+                  :                   params !== undefined;
   const Component = useSlot('view', shown ? entry.view : null);
   return Component ? html`<${Component} ...${params ?? {}} />` : null;
 }

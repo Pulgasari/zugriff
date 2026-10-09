@@ -6,10 +6,7 @@
 // clip into the player. the runtime binds zugriff (+ zugriff.app, html) to window before
 // this runs, so nothing here imports the runtime.
 
-import { signal }    from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
-
-import { Config }           from '/.shared/js/components/Config.js';
 
 import lib          from './modules/library.js';
 import { routes }   from './routes/index.js';
@@ -19,14 +16,14 @@ import { loadFile } from '/.shared/js/media/videoplayer.js';
 const app = zugriff.app;
 app.lib = lib;
 
+const { Config, Views } = await zugriff.components('Config', 'Views');
+
 // :::::: FRAME
-// a mode is an app-view in the main area, mounted while it is on screen only.
-// opening one stays one call: app.setRoute('player')
+// a mode is a view in the main area, in the dom while it is on screen only. the library
+// is at the root, the other modes at their id
 
-const current = signal('library');   // the mode on screen
-
-app.setRoute = id => app.show(id);
-app.root.addEventListener('navigate', event => { current.value = event.detail.to; });
+app.views = Object.fromEntries(routes.map(({ id, component }) =>
+  [id, { route: id === 'library' ? '/' : `/${id}`, view: component, transient: true }]));
 
 // a clip opened via the OS "open with" arrives here on launch — into the player
 function wireLaunchQueue () {
@@ -36,7 +33,7 @@ function wireLaunchQueue () {
     try {
       const file = await params.files[0].getFile();
       loadFile(file);
-      app.setRoute('player');
+      app.go('player');
     } catch (err) {
       console.warn('[videos] could not open the launched clip:', err);
     }
@@ -51,8 +48,8 @@ function ModeBar () {
       <div class="im-brand"><svg-icon icon="mdi:movie-open-outline" /> <span>videos</span></div>
       <nav class="im-modes">
         ${routes.map(m => html`
-          <button class=${'im-mode' + (current.value === m.id ? ' active' : '')} key=${m.id}
-                  onClick=${() => app.setRoute(m.id)} title=${m.label}>
+          <button class=${'im-mode' + (app.current.value === m.id ? ' active' : '')} key=${m.id}
+                  onClick=${() => app.go(m.id)} title=${m.label}>
             <svg-icon icon=${m.icon} /> <span>${m.label}</span>
           </button>`)}
       </nav>
@@ -60,23 +57,13 @@ function ModeBar () {
     </header>`;
 }
 
-// the library is at the root, the other modes at their id
 function App () {
-  useEffect(() => {
-    wireLaunchQueue();
-    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
-      current.value = app.root.view?.getAttribute('name') ?? 'library';
-    });
-  }, []);
+  useEffect(() => { wireLaunchQueue(); }, []);
 
   return html`
     <app-area name='main'>
       <${ModeBar} />
-      ${routes.map(({ id, component: Mode }) => html`
-        <app-view key=${id} name=${id} route=${id === 'library' ? '/' : `/${id}`} active=${id === 'library' || undefined}>
-          ${current.value === id && html`<${Mode} />`}
-        </app-view>
-      `)}
+      <${Views} />
     </app-area>
     <app-area name='config' dock='end'><${Config} /></app-area>
   `;

@@ -11,15 +11,8 @@ import { useEffect, useState }   from 'preact/hooks';
 
 import FolderLibrary from '/.shared/js/modules/folders.js';
 
-const // shared components
-Brand       = await zugriff.component('Brand'),
-Config      = await zugriff.component('Config'),
-Dock        = await zugriff.component('Dock'),
-Empty       = await zugriff.component('Empty'),
-FolderTree  = await zugriff.component('FolderTree'),
-InstallTip  = await zugriff.component('InstallTip'),
-Reader      = await zugriff.component('Reader'),
-SearchPanel = await zugriff.component('SearchPanel');
+const { Brand, Config, Dock, Empty, FolderTree, InstallTip, Reader, SearchPanel, Views } =
+  await zugriff.components('Brand', 'Config', 'Dock', 'Empty', 'FolderTree', 'InstallTip', 'Reader', 'SearchPanel', 'Views');
 
 
 // :::::: APP
@@ -38,7 +31,6 @@ const open = typedSignal({ type: 'scalar', value: null, key: 'notes:open', stora
 
 // :::::: FRAME
 
-const show = app.show;
 const area = app.area;
 
 // a drawer closes once something in it was picked, a sidebar stays
@@ -46,7 +38,7 @@ const closeMenu = () => { if (area('menu')?.isOverlay) area('menu').hide(); };
 
 function openNote (sourceId, path) {
   open.value = { sourceId, path };
-  show('note');
+  app.go('note');
   closeMenu();
 }
 
@@ -79,7 +71,7 @@ function Menu () {
         filter=${app.state.$filter}
         selected=${open.value}
         onOpen=${openNote}
-        onRemoveSource=${id => { if (open.value?.sourceId === id) { open.value = null; show('start'); } }}
+        onRemoveSource=${id => { if (open.value?.sourceId === id) { open.value = null; app.go('start'); } }}
         labelOf=${titleOf}
         fileIcon='notes'
         emptyText='No markdown files here'
@@ -121,10 +113,8 @@ function Start () {
   const hint       = hasSources ? 'Choose a note to start reading.' : 'Open a folder of Markdown files to get started.';
 
   return html`
-    <div class='reader'>
-      <${Header} />
-      <${Empty} icon='notes' title='No note open' hint=${hint} action=${action} />
-    </div>
+    <${Header} />
+    <${Empty} icon='notes' title='No note open' hint=${hint} action=${action} />
   `;
 }
 
@@ -156,16 +146,17 @@ function Note () {
   if (!note) return html`<${Start} />`;
 
   return html`
-    <div class='reader'>
-      <${Header} segments=${note.node.path.split('/')} />
-      <${NoteText} note=${note} />
-    </div>
+    <${Header} segments=${note.node.path.split('/')} />
+    <${NoteText} note=${note} />
   `;
 }
 
 // :::::: ROOT
 
-const current = { value: open.value ? 'note' : 'start' };
+app.views = {
+  start : { route: '/',     view: Start },
+  note  : { route: '/note', view: Note  },
+};
 
 const dockItems = [
   { icon: 'menu',     label: 'notes',    onClick: () => area('menu')?.toggle()   },
@@ -190,8 +181,7 @@ function App () {
 
   return html`
     <app-area name='main'>
-      <app-view name='start' route='/' active=${current.value === 'start' || undefined}><${Start} /></app-view>
-      <app-view name='note' route='/note' transition-on='glide' active=${current.value === 'note' || undefined}><${Note} /></app-view>
+      <${Views} transition-on='glide' />
       <${Dock} items=${dockItems} />
     </app-area>
     <app-area name='menu' dock='start'><${Menu} /></app-area>

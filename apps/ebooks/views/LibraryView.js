@@ -4,7 +4,7 @@ import Empty       from '/.shared/js/components/Empty.js';
 import InstallTip  from '/.shared/js/components/InstallTip.js';
 import Picker      from '/.shared/js/components/Picker.js';
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
-import View        from '/.shared/js/components/View.js';
+import ViewHeader  from '/.shared/js/components/ViewHeader.js';
 
 import BookItem     from './../components/BookItem.js';
 import SourceStatus from './../components/SourceStatus.js';
@@ -52,7 +52,9 @@ function LibraryView () {
   `;
 
   return html`
-    <${View} class='library' tools=${tools}>
+    <${ViewHeader} title='Library' tools=${tools} />
+
+    <main>
       <${SourceStatus} />
       <${InstallTip} />
 
@@ -71,7 +73,7 @@ function LibraryView () {
               : app.state.$search ? html`<${EmptySearch} />`
               : html`<${EmptyLibrary} />`}
           </section>`}
-    </${View}>
+    </main>
   `;
 }
 

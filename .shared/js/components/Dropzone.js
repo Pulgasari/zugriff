@@ -4,7 +4,7 @@
 // and hand them to a signal. the element's own file list stays empty — every
 // app renders its own.
 
-import { html, preact } from './../vendors.js';
+import { html, useEffect, useRef } from './../vendors.js';
 
 let nextId = 0;
 
@@ -28,9 +28,9 @@ function Dropzone ({
   text,
   onFiles,
 }) {
-  const ref = preact.useRef(null);
+  const ref = useRef(null);
 
-  preact.useEffect(() => {
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
 

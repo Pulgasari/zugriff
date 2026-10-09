@@ -74,8 +74,14 @@ app.hotKeys = {
 // :::::: UI
 
 const
-Sidebar = await app.panel('Sidebar'),
-Detail  = await app.panel('Detail');
+Sidebar   = await app.panel('Sidebar'),
+Detail    = await app.panel('Detail'),
+{ Views } = await zugriff.components('Views');
+
+// one view, the prompt picked in the list
+app.views = {
+  prompt : { route: '/', view: Detail },
+};
 
 // the areas of #app, the root
 function App () {
@@ -89,7 +95,7 @@ function App () {
 
   return html`
     <app-area name='main'>
-      <app-view name='prompt' route='/' active><${Detail} /></app-view>
+      <${Views} />
     </app-area>
     <app-area name='menu' dock='start'><${Sidebar} /></app-area>
   `;

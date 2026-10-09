@@ -27,8 +27,6 @@ app.state.$extend({
   folder  : { type: 'scalar', value: ''                  },   // '' = all folders, else sourceId
 });
 
-const current = signal('library');   // the view on screen
-
 app.sort = typedSignal({ key: 'ebooks:sort', value: 'recent', values: ['recent', 'title', 'author', 'added'] });
 
 // epub reading prefs, remembered across books
@@ -61,22 +59,28 @@ app.percentOf = key => app.db.progressOf(key)?.percent ?? 0;
 // :::::: FRAME :::::::::::::::::::::::::::::::::::::::::::::
 // #app is the <app-root>: library and reader in the main area, the settings in the config area
 
-const area = app.area;
-const show = app.show;
+// the reader is in the dom while it is on screen only, leaving it closes the book
+const Reader = () => {
+  const key = app.state.$bookKey;
+  return key ? html`<${ReaderView} bookKey=${key} key=${key} />` : null;
+};
 
-app.root.addEventListener('navigate', event => { current.value = event.detail.to; });
+app.views = {
+  library : { route: '/',       view: 'LibraryView' },
+  reader  : { route: '/reader', view: Reader, transient: true },
+};
 
-app.toggleConfig = () => area('config')?.toggle();
+app.toggleConfig = () => app.area('config')?.toggle();
 
 // :::::: ACTIONS :::::::::::::::::::::::::::::::::::::::::::
 
 app.openReader = key => {
   app.state.bookKey = key;
   app.db.markOpened(key);
-  show('reader');
+  app.go('reader');
 };
 
-app.closeReader = () => show('library');
+app.closeReader = () => app.go('library');
 
 app.addFolder = async () => {
   if (!app.fs.supported()) return app.toast.error('This browser can’t open folders — try Chrome, Edge or another Chromium browser.');
@@ -89,35 +93,20 @@ app.addFolder = async () => {
 
 // :::::: VIEWS :::::::::::::::::::::::::::::::::::::::::::::
 
-const [LibraryView, ReaderView] = await Promise.all([app.view('LibraryView'), app.view('ReaderView')]);
-
-const // ::: shared components
-Config = await zugriff.component('Config');
+const [ReaderView, { Config, Views }] = await Promise.all([
+  app.view('ReaderView'),
+  zugriff.components('Config', 'Views'),
+]);
 
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
-// the reader is mounted while it is on screen only, leaving it closes the book
 function App () {
   useEffect(() => { app.db.load().catch(error => app.toast.error(error)); }, []);
 
-  useEffect(() => {
-    if (!app.db.ready.value) return;
-    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
-      current.value = app.root.view?.getAttribute('name') ?? 'library';
-    });
-  }, [app.db.ready.value]);
-
   if (!app.db.ready.value) return html`<div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div>`;
 
-  const key = app.state.$bookKey;
-
   return html`
-    <app-area name='main'>
-      <app-view name='library' route='/' active><${LibraryView} /></app-view>
-      <app-view name='reader' route='/reader' transition-on='glide'>
-        ${current.value === 'reader' && key && html`<${ReaderView} bookKey=${key} key=${key} />`}
-      </app-view>
-    </app-area>
+    <app-area name='main'><${Views} transition-on='glide' /></app-area>
     <app-area name='config' dock='end'><${Config} /></app-area>
   `;
 }

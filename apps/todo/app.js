@@ -20,20 +20,20 @@ import reminders                            from './modules/reminders.js';
 import * as store                           from './modules/store.js';
 import sync                                 from './modules/sync.js';
 
-const { area, current, go, openList, openTag, show } = frame;
+const { openList, openTag } = frame;
 
-const // shared components
-Brand       = await zugriff.component('Brand'),
-Config      = await zugriff.component('Config'),
-Dock        = await zugriff.component('Dock'),
-Empty       = await zugriff.component('Empty'),
-InstallTip  = await zugriff.component('InstallTip'),
-SearchPanel = await zugriff.component('SearchPanel');
+const { Brand, Config, Dock, Empty, InstallTip, SearchPanel, Views } =
+  await zugriff.components('Brand', 'Config', 'Dock', 'Empty', 'InstallTip', 'SearchPanel', 'Views');
 
 // :::::: APP
 
-const app = zugriff.app;
+const app  = zugriff.app;
+const area = app.area;
+const go   = app.go;
 app.db = app.database;
+
+// a drawer closes once something in it was picked, a sidebar stays
+app.root.addEventListener('navigate', frame.closeMenu);
 
 app.state.$extend({
   filter : { type: 'scalar', value: '' },
@@ -153,7 +153,7 @@ async function deleteList (id) {
 }
 
 function focusAdd () {
-  requestAnimationFrame(() => document.querySelector(`app-view[name="${current.peek()}"] #todo-add, #todo-add`)?.focus());
+  requestAnimationFrame(() => document.querySelector(`app-view[name="${app.current.peek()}"] #todo-add, #todo-add`)?.focus());
 }
 
 function focusSearch () {
@@ -186,8 +186,8 @@ app.hotkeys = {
 // the search shows its own view while there is a query
 app.effect(() => {
   const query = app.state.$filter.trim();
-  if (query && current.peek() !== 'search') show('search');
-  if (!query && current.peek() === 'search') show('today');
+  if (query && app.current.peek() !== 'search') go('search');
+  if (!query && app.current.peek() === 'search') go('today');
 });
 
 // :::::: MENU
@@ -205,7 +205,7 @@ function NavItem ({ icon, label, count, active, onClick, children }) {
 
 function Menu () {
   const today   = dayOf();
-  const view    = current.value;
+  const view    = app.current.value;
   const counts  = {
     today    : open.value.filter(task => task.due && dueDay(task.due) <= today).length,
     upcoming : open.value.filter(task => task.due && dueDay(task.due) > today).length,
@@ -270,32 +270,30 @@ function TaskView ({ name }) {
   const empty    = sections.every(section => !section.tasks.length) && !sections.some(section => section.empty);
 
   return html`
-    <div class='view'>
-      <${Header} title=${titleOf(name)} />
-      ${name !== 'done' && name !== 'search' && html`<${AddBar} defaults=${defaultsOf(name)} />`}
-      <main class='groups'>
-        ${empty
-          ? html`<${Empty} icon='lucide:circle-check' title='All clear' hint=${name === 'done' ? 'nothing done yet' : 'nothing here'} />`
-          : sections.map((section, index) => html`<${Section} key=${section.title ?? index} ...${section} />`)}
-      </main>
-    </div>
+    <${Header} title=${titleOf(name)} />
+    ${name !== 'done' && name !== 'search' && html`<${AddBar} defaults=${defaultsOf(name)} />`}
+    <main class='groups'>
+      ${empty
+        ? html`<${Empty} icon='lucide:circle-check' title='All clear' hint=${name === 'done' ? 'nothing done yet' : 'nothing here'} />`
+        : sections.map((section, index) => html`<${Section} key=${section.title ?? index} ...${section} />`)}
+    </main>
   `;
 }
 
 // :::::: ROOT
 
-const VIEWS = [
-  { name: 'today',    route: '/'         },
-  { name: 'upcoming', route: '/upcoming' },
-  { name: 'someday',  route: '/someday'  },
-  { name: 'list',     route: '/list'     },
-  { name: 'tag',      route: '/tag'      },
-  { name: 'done',     route: '/done'     },
-  { name: 'search',   route: '/search'   },
-];
+// every view is the one task view over its own sections
+const taskView = name => () => html`<${TaskView} name=${name} />`;
 
-// the dock's items call app.go
-app.go = name => go(name);
+app.views = {
+  today    : { route: '/',         view: taskView('today')    },
+  upcoming : { route: '/upcoming', view: taskView('upcoming') },
+  someday  : { route: '/someday',  view: taskView('someday')  },
+  list     : { route: '/list',     view: taskView('list')     },
+  tag      : { route: '/tag',      view: taskView('tag')      },
+  done     : { route: '/done',     view: taskView('done')     },
+  search   : { route: '/search',   view: taskView('search')   },
+};
 
 const dockItems = [
   { icon: 'lucide:sun',           label: 'today',    view: 'today'                                                            },
@@ -303,12 +301,6 @@ const dockItems = [
   { icon: 'lucide:list',          label: 'lists',    onClick: () => area('menu')?.toggle(), match: ['list', 'tag', 'someday', 'done'] },
   { icon: 'settings',             label: 'settings', onClick: () => area('config')?.toggle()                                  },
 ];
-
-function onNavigate (event) {
-  current.value = event.detail.to;
-}
-
-app.root.addEventListener('navigate', onNavigate);
 
 // the areas of #app, the root
 function App () {
@@ -318,16 +310,13 @@ function App () {
     Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
       const menu = area('menu');
       if (menu && !menu.isOverlay) menu.show();
-      current.value = app.root.view?.getAttribute('name') ?? 'today';
     });
   }, []);
 
   return html`
     <app-area name='main'>
-      ${VIEWS.map(({ name, route }) => html`
-        <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'today' || undefined}><${TaskView} name=${name} /></app-view>
-      `)}
-      <${Dock} items=${dockItems} current=${current.value} />
+      <${Views} transition-on='glide' />
+      <${Dock} items=${dockItems} />
     </app-area>
     <app-area name='menu' dock='start'><${Menu} /></app-area>
     <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Editor} /></app-area>

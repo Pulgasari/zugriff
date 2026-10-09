@@ -4,26 +4,20 @@
 
 /* ── a view ──────────────────────────────────────────────────────────────── */
 
-.view {
-  block-size     : 100%;
-  display        : flex;
-  flex-direction : column;
-  min-block-size : 0;
+app-view > header {
+  align-items   : center;
+  block-size    : 3rem;
+  border-bottom : 1px solid var(--line);
+  flex          : none;
+  gap           : 0.5rem;
+  padding       : 0 0.75rem;
 
-  > header {
-    align-items   : center;
-    block-size    : 3rem;
-    border-bottom : 1px solid var(--line);
-    display       : flex;
-    flex          : none;
-    gap           : 0.5rem;
-    padding       : 0 0.75rem;
-
-    > h2 { flex: 1 1 auto; font-size: 1.1rem; margin: 0; }
-  }
+  > h1 { font-size: 1.1rem; margin: 0; }
 }
 
 .list {
+  align-items    : stretch;
+  justify-content: flex-start;
   display        : flex;
   flex           : 1 1 auto;
   flex-direction : column;

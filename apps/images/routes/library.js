@@ -34,7 +34,7 @@ async function openInView (pic) {
   try {
     const file = await app.lib.openFile(pic);
     setFiles([file]);
-    app.setRoute('view');
+    app.go('view');
   } catch (err) {
     libMsg.value = err?.message || String(err);
   }

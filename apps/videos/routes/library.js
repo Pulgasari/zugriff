@@ -36,7 +36,7 @@ async function openInPlayer (clip) {
   try {
     const file = await app.lib.openFile(clip);
     loadFile(file);
-    app.setRoute('player');
+    app.go('player');
   } catch (err) {
     libMsg.value = err?.message || String(err);
   }
