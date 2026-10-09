@@ -1,5 +1,11 @@
 # www
 
+- https://code.zugriff.dev
+- https://files.zugriff.dev
+- https://podcasts.zugriff.dev
+
+##
+
 - podcasts [web-bundle](https://podcasts.zugriff.dev/)
 
 the bundled web part of the apps built as `capacitor`, one folder per app,
