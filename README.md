@@ -1,6 +1,6 @@
 ![Logo](/logo.svg)
 
-# zugriff
+# [zugriff](https://zugriff.dev)
 
 cross-platform apps focused on browser and android.
 
@@ -8,7 +8,8 @@ build with: **aufbau** + **capacitor** + **htx** + **preact**
 
 ---
 
-- [zugriff.dev](https://zugriff.dev)
+## cli
+
 - [cli](https://zugriff.dev/cli/)
 
 ---
@@ -64,8 +65,3 @@ videos   | https://videos.zugriff.dev   | https://zugriff.dev/videos/
 [xml-minifyer](https://zugriff.dev/tools/#/xml-minifyer) •
 [yaml-converter](https://zugriff.dev/tools/#/yaml-converter) •
 [yaml-inspector](https://zugriff.dev/tools/#/yaml-inspector)
-
----
-
-### deprecated
-- [image-batch-processor](https://zugriff.dev/tools/#/image-batch-processor)
