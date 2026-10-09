@@ -1,14 +1,11 @@
 // downloader :: components/Config.js
-// the settings area: the shared fields and the queue's, the targets a finished
-// file can go to, the user's plugins and what the library takes up.
+// the sections of the config area under its fields (app.settings): the targets a
+// finished file can go to, the user's plugins and what the library takes up.
 
-import { gestalt }                     from '@aufbau/api';
-import { effect }                      from '@aufbau/signals';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 
-import PopPrompt      from '@aufbau/elements/webcomponents/pop-prompt.js';
-import { sharedSpec } from '/.shared/js/components/Settings.js';
-import * as dav       from '/.shared/js/modules/webdav/client.js';
+import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
+import * as dav  from '/.shared/js/modules/webdav/client.js';
 
 import * as engine  from '../modules/engine.js';
 import * as plugins from '../modules/plugins.js';
@@ -18,50 +15,8 @@ const fmt = zugriff.fmt;
 const fs  = zugriff.fs;
 
 
-export const FIELDS = {
-  parallel   : { type: 'number',  label: 'At once',              min: 1, max: 8,     step: 1,   default: 3 },
-  perHost    : { type: 'number',  label: 'At once per host',     min: 1, max: 4,     step: 1,   default: 2 },
-  retries    : { type: 'number',  label: 'Tries',                min: 1, max: 10,    step: 1,   default: 5 },
-  limit      : { type: 'number',  label: 'Limit, KiB/s',         min: 0, max: 20480, step: 256, default: 0 },
-  target     : { type: 'enum',    label: 'Target',               look: 'segments', values: ['library', 'folder', 'webdav', 'save'], default: 'library' },
-  subfolders : { type: 'boolean', label: 'A folder per package', default: true },
-  autostart  : { type: 'boolean', label: 'Go on at start',       default: true },
-};
 
 // :::::: SECTIONS ::::::::::::::::::::::::::::::::::::::::::::
-
-function Fields () {
-  const host = useRef(null);
-
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let closed = false;
-
-    gestalt.palettes().then(palettes => {
-      if (closed) return;
-      const spec = { ...FIELDS, ...sharedSpec(app.config, palettes) };
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
-    });
-
-    const onConfig = event => {
-      app.state[event.detail.key] = event.detail.values[event.detail.key];
-      if (event.detail.key in FIELDS) engine.pump();
-    };
-    element.addEventListener('config', onConfig);
-
-    const keys   = [...Object.keys(FIELDS), ...Object.keys(sharedSpec(app.config, []))];
-    const follow = effect(() => {
-      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
-      if (element.spec && Object.keys(element.spec).length) element.values = values;
-    });
-
-    return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
-  }, []);
-
-  return html`<app-config ref=${host}></app-config>`;
-}
 
 function Targets () {
   const [places, setPlaces] = useState({});
@@ -154,15 +109,13 @@ function Storage () {
   `;
 }
 
-export function Config () {
+// what the config area holds beyond the fields
+export function ConfigSections () {
   return html`
-    <app-panel heading='Settings'>
-      <${Fields} />
-      <${Targets} />
-      <${Plugins} />
-      <${Storage} />
-    </app-panel>
+    <${Targets} />
+    <${Plugins} />
+    <${Storage} />
   `;
 }
 
-export default Config;
+export default ConfigSections;

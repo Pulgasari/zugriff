@@ -7,12 +7,10 @@
 import * as fit   from '@xterm/addon-fit';
 import * as xterm from '@xterm/xterm';
 
-import { gestalt }           from '@aufbau/api';
 import { signal }            from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 
-import { sharedSpec } from '/.shared/js/components/Settings.js';
-import { vfs }        from '/.shared/js/modules/opfs.js';
+import { vfs } from '/.shared/js/modules/opfs.js';
 
 import { terminalOptions } from './app.config.js';
 
@@ -23,6 +21,8 @@ const { Terminal } = xterm.Terminal ? xterm : xterm.default;
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::
 
 const app = zugriff.app;
+
+const { Config } = await zugriff.components('Config');
 
 const VERSION = 'v0.2.0';
 
@@ -106,37 +106,6 @@ function TerminalView () {
   return html`<div class="terminal-container" ref=${terminalRef}></div>`;
 }
 
-// :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::
-
-// the shared fields (palette, skin, …), written into app.state
-function Config () {
-  const host = useRef(null);
-
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let closed = false;
-
-    gestalt.palettes().then(palettes => {
-      if (closed) return;
-      const spec = sharedSpec(app.config, palettes);
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
-    });
-
-    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
-    element.addEventListener('config', onConfig);
-
-    return () => { closed = true; element.removeEventListener('config', onConfig); };
-  }, []);
-
-  return html`
-    <app-panel heading='Settings'>
-      <app-config ref=${host}></app-config>
-    </app-panel>
-  `;
-}
-
 // :::::: APP :::::::::::::::::::::::::::::::::::::::::::::::
 
 function App () {
@@ -153,7 +122,7 @@ function App () {
             <span class="version">${VERSION}</span>
           </div>
           <button class="ghost-btn" title="Settings" onClick=${() => area('config')?.toggle()}>
-            <svg-icon icon="settings"></svg-icon>
+            <svg-icon icon="settings" />
           </button>
         </header>
 

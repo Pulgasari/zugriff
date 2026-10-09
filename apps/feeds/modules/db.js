@@ -65,16 +65,16 @@ export async function load () {
  * url is resolved to its channel feed first; anything else is treated as a feed
  * url directly. returns the new feed record. throws with a human message.
  */
-export async function addFeed (input, proxy) {
+export async function addFeed (input) {
   const typed = (input || '').trim();
   if (!typed) throw new Error('paste a feed URL first');
 
-  const yt  = await feed.resolveYouTube(typed, proxy);   // null when not youtube
+  const yt  = await feed.resolveYouTube(typed);   // null when not youtube
   const url = yt || (/^https?:\/\//i.test(typed) ? typed : 'https://' + typed);
 
   if (feeds.value.some(f => f.url === url)) throw new Error('you already follow that feed');
 
-  const parsed = feed.parseFeed(await feed.fetchFeed(url, proxy));
+  const parsed = feed.parseFeed(await feed.fetchFeed(url));
   const rec = {
     id      : crypto.randomUUID(),
     url,
@@ -93,12 +93,12 @@ export async function addFeed (input, proxy) {
 }
 
 /** re-fetch one feed and store any new entries. returns the count added. */
-export async function refresh (id, proxy) {
+export async function refresh (id) {
   const f = feedById(id);
   if (!f) return 0;
   refreshing.value = { ...refreshing.value, [id]: true };
   try {
-    const parsed = feed.parseFeed(await feed.fetchFeed(f.url, proxy));
+    const parsed = feed.parseFeed(await feed.fetchFeed(f.url));
     const patch = {
       ...f,
       title: parsed.title || f.title,
@@ -121,10 +121,10 @@ export async function refresh (id, proxy) {
   }
 }
 
-export async function refreshAll (proxy, onProgress) {
+export async function refreshAll (onProgress) {
   let done = 0, added = 0;
   for (const f of feeds.value) {
-    try { added += await refresh(f.id, proxy); } catch {}
+    try { added += await refresh(f.id); } catch {}
     onProgress?.(++done, feeds.value.length);
   }
   return added;

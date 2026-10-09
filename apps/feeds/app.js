@@ -1,18 +1,17 @@
 // apps/feeds/app.js
 // the feeds reader on the shared handle. the runtime binds zugriff (+ zugriff.app, html) to
 // window before this runs, so nothing here imports the runtime. the library lives in the db
-// module (app.db); ephemeral ui state on app.state; the CORS proxy is a persisted scalar.
+// module (app.db); ephemeral ui state on app.state.
 
 // ::: vendors
-import { computed, signal, typedSignal } from '@aufbau/signals';
-import { useEffect }                     from 'preact/hooks';
+import { computed, signal } from '@aufbau/signals';
+import { useEffect }        from 'preact/hooks';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
 // ::: shared
-import { Config }      from '/.shared/js/components/Config.js';
-import { Image } from '/.shared/js/components/index.js';
-import { PROXY }       from '/.shared/js/modules/http.js';
+import { Config } from '/.shared/js/components/Config.js';
+import { Image }  from '/.shared/js/components/index.js';
 
 // ::: app modules
 import * as db           from './modules/db.js';
@@ -23,7 +22,7 @@ app.db = db;
 
 // :::::: STATE
 // ephemeral ui state on app.state (no `.value`); the library itself is app.db (plain
-// signals). the CORS proxy is the one durable pref — a persisted scalar via `stored`.
+// signals).
 // the view on screen is #app's business (app-view, the hash).
 
 app.state.$extend({
@@ -31,7 +30,6 @@ app.state.$extend({
   feedId : { type: 'scalar', value: null, persist: true },   // the feed of the 'feed' view
 });
 
-const proxy   = typedSignal({ value: PROXY, key: 'feeds:proxy' });
 const current = signal('latest');   // the view on screen
 
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
@@ -100,7 +98,7 @@ async function addFeed () {
   if (!input) return;
   app.state.busy = 'Adding feed…';
   try {
-    const rec = await db.addFeed(input, proxy.value);
+    const rec = await db.addFeed(input);
     flash(`Added ${rec.title}`);
     app.go('feed', rec.id);
   } catch (err) {
@@ -112,10 +110,10 @@ async function refreshView (name = current.value) {
   app.state.busy = 'Refreshing…';
   try {
     if (name === 'feed' && app.state.$feedId) {
-      const n = await db.refresh(app.state.$feedId, proxy.value);
+      const n = await db.refresh(app.state.$feedId);
       flash(n ? `${n} new` : 'up to date');
     } else {
-      const n = await db.refreshAll(proxy.value, (d, t) => app.state.busy = `Refreshing ${d}/${t}…`);
+      const n = await db.refreshAll((d, t) => app.state.busy = `Refreshing ${d}/${t}…`);
       flash(n ? `${n} new` : 'up to date');
     }
   } catch (err) { flash(err.message || String(err), 'err'); }
@@ -294,23 +292,6 @@ function Header ({ name }) {
     </header>`;
 }
 
-// :::::: CONFIG
-
-function ProxyConfig () {
-  return html`
-    <section class="config-section">
-      <h4>CORS proxy</h4>
-      <p class="hint">Most feeds block direct browser requests. Feeds are fetched directly first,
-         then through this proxy. <code>{url}</code> is replaced with the feed URL. Clear it to
-         use direct requests only.</p>
-      <input type="text" value=${proxy.value} placeholder=${PROXY} onInput=${e => proxy.value = e.target.value} />
-      <div class="actions">
-        <button class="foot-btn" onClick=${() => proxy.value = PROXY}>Reset to default</button>
-        <button class="foot-btn" onClick=${() => proxy.value = ''}>Direct only</button>
-      </div>
-    </section>`;
-}
-
 // :::::: APP
 
 const VIEWS = [
@@ -325,7 +306,7 @@ function App () {
     db.load().then(() => {
       // refresh feeds that haven't been fetched in a while, quietly, on load
       const stale = db.feeds.value.filter(f => Date.now() - (f.lastFetched || 0) > 10 * 60 * 1000);
-      if (stale.length) db.refreshAll(proxy.value).catch(() => {});
+      if (stale.length) db.refreshAll().catch(() => {});
     }).catch(err => flash('Could not open the library: ' + err.message, 'err'));
   }, []);
 
@@ -349,7 +330,7 @@ function App () {
       `)}
     </app-area>
     <app-area name='menu' dock='start'><${Sidebar} /></app-area>
-    <app-area name='config' dock='end'><${Config}><${ProxyConfig} /></${Config}></app-area>
+    <app-area name='config' dock='end'><${Config} /></app-area>
   `;
 }
 

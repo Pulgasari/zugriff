@@ -1,7 +1,9 @@
 // components/Config.js
-// the settings of an app as the content of its config area: <app-config> with the
-// shared fields (palette, skin, geometry, density and the registry schema), bound
-// to zugriff.app.state, in an <app-panel>. an app's own sections go in as children.
+// the settings of an app as an <app-config>: the shared fields (palette, skin,
+// geometry, density and the registry schema) and the app's own (app.settings), all
+// bound to app.state. an app.settings entry for a shared key changes that field. the frame is the app's: <Config> puts them in an <app-panel>,
+// <ConfigFields> alone goes into a view or a modal. an app's own sections, which are
+// more than fields, go in as children. onChange hears every change, after app.state
 //
 //   <app-area name='config' dock='end'><${Config} /></app-area>
 //   <app-area name='config' dock='end'><${Config}><${Sync} /></${Config}></app-area>
@@ -11,8 +13,14 @@ import { gestalt } from '@aufbau/api';
 import { effect, useEffect, useRef } from './../vendors.js';
 import { sharedSpec }                from './Settings.js';
 
-// the shared fields, written into app.state, following it while open
-function SharedConfig () {
+function specOf (app, palettes) {
+  const spec = sharedSpec(app.config, palettes);
+  for (const [key, field] of Object.entries(app.settings)) spec[key] = { ...spec[key], ...field };
+  return spec;
+}
+
+// the fields, written into app.state, following it while open
+function ConfigFields ({ onChange }) {
   const app  = globalThis.zugriff?.app;
   const host = useRef(null);
 
@@ -21,20 +29,26 @@ function SharedConfig () {
     if (!app || !element) return;
     let closed = false;
 
+    const keys   = Object.keys(specOf(app, []));
+    const values = () => Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
+
+    // the palette names come from aufbau's palettes.css, loaded once
     gestalt.palettes().then(palettes => {
       if (closed) return;
-      const spec = sharedSpec(app.config, palettes);
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
+      element.values = values();
+      element.spec   = specOf(app, palettes);
     });
 
-    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
+    const onConfig = event => {
+      const { key, values } = event.detail;
+      app.state[key] = values[key];
+      onChange?.(key, values[key]);
+    };
     element.addEventListener('config', onConfig);
 
-    const keys   = Object.keys(sharedSpec(app.config, []));
     const follow = effect(() => {
-      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
-      if (element.spec && Object.keys(element.spec).length) element.values = values;
+      const next = values();
+      if (element.spec && Object.keys(element.spec).length) element.values = next;
     });
 
     return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
@@ -43,14 +57,14 @@ function SharedConfig () {
   return html`<app-config ref=${host}></app-config>`;
 }
 
-function Config ({ heading = 'Settings', children }) {
+function Config ({ heading = 'Settings', onChange, children }) {
   return html`
     <app-panel heading=${heading}>
-      <${SharedConfig} />
+      <${ConfigFields} onChange=${onChange} />
       ${children}
     </app-panel>
   `;
 }
 
-export { Config, SharedConfig };
+export { Config, ConfigFields };
 export default Config;

@@ -4,11 +4,7 @@ const app = zugriff.app;
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
-import { gestalt }           from '@aufbau/api';
-import { useEffect, useRef } from 'preact/hooks';
-
 import { createThumbCache } from '/.shared/js/thumbs.js';
-import { sharedSpec }       from '/.shared/js/components/Settings.js';
 
 // :::::: APP ::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -22,20 +18,24 @@ app.library = library;
 app.player  = player;
 app.thumbs  = createThumbCache();
 
-const [{ Dock, Slot, Views }, { PlayerPanel }, Export] = await Promise.all([
-  zugriff.components('Dock', 'Slot', 'Views'),
+const [{ Config, Dock, Slot, Views }, { PlayerPanel }, Export] = await Promise.all([
+  zugriff.components('Config', 'Dock', 'Slot', 'Views'),
   app.panels('PlayerPanel'),
   app.component('Export'),
 ]);
 
 // :::: STATE
 // dialog is declared by createState; this app's own keys go on the same store.
-// nothing added here is persisted — a leaf has to ask for that.
+// nothing added here is persisted — a leaf has to ask for that. the settings are
+// persisted leaves as well, shown in the config area after the shared ones
+app.settings = {
+  menuPosition   : { type: 'enum', label: 'Menu',   look: 'segments', values: ['top', 'bottom', 'left', 'right'], default: 'bottom' },
+  playerPosition : { type: 'enum', label: 'Player', look: 'segments', values: ['top', 'bottom'],                  default: 'bottom' },
+};
+
 app.state.$extend({
   busy           : { type: String, value: '' },   // a label while a long task runs
   search         : { type: String, value: '' },   // shared episode filter, written by SearchPanel
-  menuPosition   : { type: 'enum', values: ['top', 'bottom', 'left', 'right'], value: 'bottom' },
-  playerPosition : { type: 'enum', values: ['top', 'bottom'], value: 'bottom' },
 
   // listening progress, keyed by episode id. the one part of the library that does
   // not come out of the db per view — it is read per row and written while playing.
@@ -123,43 +123,6 @@ const dockItems = [
   { label: 'Settings', icon: 'settings',              onClick: () => area('config')?.toggle() },
 ];
 
-// :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
-
-const FIELDS = {
-  menuPosition   : { type: 'enum', label: 'Menu',   look: 'segments', values: ['top', 'bottom', 'left', 'right'], default: 'bottom' },
-  playerPosition : { type: 'enum', label: 'Player', look: 'segments', values: ['top', 'bottom'],                  default: 'bottom' },
-};
-
-// the shared fields (palette, skin, …) and the app's own, all written into app.state
-function Config () {
-  const host = useRef(null);
-
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let closed = false;
-
-    gestalt.palettes().then(palettes => {
-      if (closed) return;
-      const spec = { ...sharedSpec(app.config, palettes), ...FIELDS };
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
-    });
-
-    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
-    element.addEventListener('config', onConfig);
-
-    return () => { closed = true; element.removeEventListener('config', onConfig); };
-  }, []);
-
-  return html`
-    <app-panel heading='Settings'>
-      <app-config ref=${host}></app-config>
-      <${Export} />
-    </app-panel>
-  `;
-}
-
 // :::::: ROOT ::::::::::::::::::::::::::::::::::::::::::::::::
 
 // the areas of #app, the root
@@ -171,7 +134,7 @@ function App () {
       <${Dock} items=${dockItems} />
       <${Slot} map=${app.dialogs} name=${app.state.$dialog} load='dialog' />
     </app-area>
-    <app-area name='config' dock='end'><${Config} /></app-area>
+    <app-area name='config' dock='end'><${Config}><${Export} /></${Config}></app-area>
   `;
 }
 

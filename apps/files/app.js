@@ -16,13 +16,11 @@
 // :::::: IMPORT ::::::::::::::::::::::::::::::::::::::::::::::
 
 import { computed, effect, signal } from '@aufbau/signals';
-import { gestalt }                  from '@aufbau/api';
 import { patternStyle }             from '@aufbau/elements/webcomponents/input/types/pattern.js';
 
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import { sharedSpec }     from '/.shared/js/components/Settings.js';
-import fmt                from '/.shared/js/modules/fmt.js';
+import fmt                  from '/.shared/js/modules/fmt.js';
 import { createThumbCache } from '/.shared/js/thumbs.js';
 
 import SyncView, { sync } from './views/sync.js';
@@ -33,6 +31,8 @@ import SyncView, { sync } from './views/sync.js';
 
 const app = zugriff.app;
 const fs  = zugriff.fs;
+
+const { Config } = await zugriff.components('Config');
 
 app.db   = await app.module('db');
 app.scan     = await app.module('scan');
@@ -45,16 +45,30 @@ app.remotes.load().catch(err => console.warn('[files] remotes failed to load', e
 
 const { CATEGORIES, categoryOf } = app.scan;
 
-// the patterns are input-pattern values: 'dots 8%', '' for none
+// the settings, persisted, in the config area after the shared ones. the shared ones
+// render here with a stepper through their entries, the direction as a switch of two
+app.settings = {
+  open           : { type: 'enum', label: 'Open with',  look: 'segments', values: [['auto', 'auto'], ['single', 'a tap'], ['double', 'a double click']], default: 'auto' },
+  searchbar      : { type: 'enum', label: 'Search bar', look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+  tabbar         : { type: 'enum', label: 'Tabs',       look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
+
+  // input-pattern values: 'dots 8%', '' for none. no colors: a pattern takes the color
+  // of the text where it lies, only its opacity is chosen
+  'pattern-bg'   : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Background', default: '' },
+  'pattern-tile' : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Tiles',      default: '' },
+
+  density        : { attrs: { stepper: true } },
+  dir            : { look: 'segments' },
+  font           : { attrs: { stepper: true } },
+  geometry       : { attrs: { stepper: true } },
+  palette        : { attrs: { stepper: true } },
+  skin           : { attrs: { stepper: true } },
+};
+
 app.state.$extend({
-  'pattern-bg'   : { type: String,   value: '' },
-  'pattern-tile' : { type: String,   value: '' },
-  open           : { type: 'enum',   value: 'auto',   values: ['auto', 'double', 'single'] },
-  searchbar      : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
-  tab            : { type: Number,   value: 0 },
-  tabbar         : { type: 'enum',   value: 'bottom', values: ['bottom', 'top'] },
-  tabs           : { type: 'scalar', value: [{ path: [] }] },
-  viewmode       : { type: 'enum',   value: 'list',   values: ['grid', 'list'] },
+  tab      : { type: Number,   value: 0 },
+  tabs     : { type: 'scalar', value: [{ path: [] }] },
+  viewmode : { type: 'enum',   value: 'list', values: ['grid', 'list'] },
 });
 
 // one cache for the whole app, in opfs. the images of a folder, small
@@ -1074,27 +1088,6 @@ function Menu () {
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
 
-const FIELDS = {
-  open           : { type: 'enum', label: 'Open with',  look: 'segments', values: [['auto', 'auto'], ['single', 'a tap'], ['double', 'a double click']], default: 'auto' },
-  searchbar      : { type: 'enum', label: 'Search bar', look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
-  tabbar         : { type: 'enum', label: 'Tabs',       look: 'segments', values: ['bottom', 'top'], default: 'bottom' },
-
-  // no colors: a pattern takes the color of the text where it lies, only its opacity is chosen
-  'pattern-bg'   : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Background', default: '' },
-  'pattern-tile' : { tag: 'input-pattern', attrs: { opacity: true }, label: 'Tiles',      default: '' },
-};
-
-// how the shared fields render here: the long lists step through their
-// entries as well, the direction is a switch of two
-const CONTROLS = {
-  density  : { attrs: { stepper: true } },
-  dir      : { look: 'segments' },
-  font     : { attrs: { stepper: true } },
-  geometry : { attrs: { stepper: true } },
-  palette  : { attrs: { stepper: true } },
-  skin     : { attrs: { stepper: true } },
-};
-
 // the patterns as custom properties on the root, app.css paints them. a late
 // answer for a value that changed in the meantime is dropped
 // the setting's key names the custom properties too: --pattern-bg-image, --pattern-bg-opacity
@@ -1119,51 +1112,20 @@ function usePatterns () {
   }), []);
 }
 
-// the shared fields (palette, skin, …) and the app's own, all written into app.state
-function Config () {
-  const host = useRef(null);
-
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let closed = false;
-
-    gestalt.palettes().then(palettes => {
-      if (closed) return;
-      const spec = { ...sharedSpec(app.config, palettes), ...FIELDS };
-      element.controls = CONTROLS;
-      element.values   = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec     = spec;
-    });
-
-    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
-    element.addEventListener('config', onConfig);
-
-    // the form follows the state while it is open, a change from elsewhere included
-    const keys   = Object.keys({ ...sharedSpec(app.config, []), ...FIELDS });
-    const follow = effect(() => {
-      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
-      if (element.spec && Object.keys(element.spec).length) element.values = values;
-    });
-
-    return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
-  }, []);
-
+// the folder this app works in, under the settings
+function FolderSection () {
   const folder = app.db.folder.value;
 
   return html`
-    <app-panel heading='Settings'>
-      <app-config ref=${host}></app-config>
-      <h3>Folder</h3>
-      ${folder
-        ? html`
-          <p class='folder'><svg-icon icon='folder-open' /> ${folder.name}</p>
-          <${Actions}>
-            <${Action} icon='mdi:folder-swap-outline' label='change' onClick=${chooseFolder} />
-            <${Action} icon='close' label='close' onClick=${closeFolder} />
-          </${Actions}>`
-        : html`<${Action} icon='folder-add' label='Open a folder' onClick=${chooseFolder} />`}
-    </app-panel>
+    <h3>Folder</h3>
+    ${folder
+      ? html`
+        <p class='folder'><svg-icon icon='folder-open' /> ${folder.name}</p>
+        <${Actions}>
+          <${Action} icon='mdi:folder-swap-outline' label='change' onClick=${chooseFolder} />
+          <${Action} icon='close' label='close' onClick=${closeFolder} />
+        </${Actions}>`
+      : html`<${Action} icon='folder-add' label='Open a folder' onClick=${chooseFolder} />`}
   `;
 }
 
@@ -1195,7 +1157,7 @@ function App () {
       <app-view name='sync' route='/sync' transition-on='glide'><${SyncView} Bar=${Bar} IconButton=${IconButton} Action=${Action} Actions=${Actions} /></app-view>
     </app-area>
     <app-area name='menu' dock='start'><${Menu} /></app-area>
-    <app-area name='config' dock='end'><${Config} /></app-area>
+    <app-area name='config' dock='end'><${Config}><${FolderSection} /></${Config}></app-area>
     <app-area name='context' dock='bottom' peek ontoggle=${event => { if (!event.detail?.open) sheet.value = null; }}><${Context} /></app-area>
   `;
 }

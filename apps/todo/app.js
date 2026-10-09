@@ -11,7 +11,7 @@ import { useEffect }         from 'preact/hooks';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
-import { Config }                           from './components/Config.js';
+import { ConfigSections }                   from './components/Config.js';
 import { Editor }                           from './components/Editor.js';
 import { AddBar, Section, tickTask }        from './components/Task.js';
 import { addDays, dayLabel, dayOf, dueDay } from './modules/dates.js';
@@ -24,6 +24,7 @@ const { area, current, go, openList, openTag, show } = frame;
 
 const // shared components
 Brand       = await zugriff.component('Brand'),
+Config      = await zugriff.component('Config'),
 Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
 InstallTip  = await zugriff.component('InstallTip'),
@@ -330,7 +331,7 @@ function App () {
     </app-area>
     <app-area name='menu' dock='start'><${Menu} /></app-area>
     <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Editor} /></app-area>
-    <app-area name='config' dock='end'><${Config} /></app-area>
+    <app-area name='config' dock='end'><${Config}><${ConfigSections} /></${Config}></app-area>
   `;
 }
 
