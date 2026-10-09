@@ -51,7 +51,7 @@ the start page then adds the shell's look (boot.js, aufbau), a 404 page stays pl
     #missing p { opacity: 0.5; }
     #missing a { color: inherit; }
 
-    nav { display: flex; flex-flow: row wrap; }
+    nav { display: flex; flex-flow: row wrap; align-items: center; justify-content: center; }
     
     /*
     [data-page='missing'] #missing { display: block; }
@@ -112,8 +112,8 @@ the start page then adds the shell's look (boot.js, aufbau), a 404 page stays pl
 
       await aufbau.boot({ css: { layout: 'landing', palette: 'synthwave' } });
 
-      const bg = getStyleToken('bg') || '#000000';
-      const fg = getStyleToken('fg') || '#c8d0e0';
+      const bg = getStyleToken('color-bg') || '#000000';
+      const fg = getStyleToken('color-fg') || '#c8d0e0';
       aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: '2s' });
       aufbau.patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
     //}
