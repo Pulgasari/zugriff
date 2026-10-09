@@ -5,7 +5,6 @@
 // open image tray lives in the state module.
 
 // ::: vendors
-import { signal }    from '@aufbau/signals';
 import { useEffect } from 'preact/hooks';
 
 // ::: app modules
@@ -17,22 +16,18 @@ import { routes }       from './routes/index.js';
 import { editCurrent }  from './routes/edit.js';
 
 // ::: shared components
-const
-Brand      = await zugriff.component('Brand'),
-Config     = await zugriff.component('Config');
+const { Brand, Config, Views } = await zugriff.components('Brand', 'Config', 'Views');
 
 // ::: the app handle — the data layer hangs off it as app.lib
 const app = zugriff.app;
 app.lib = lib;
 
 // :::::: FRAME
-// a mode is an app-view in the main area, mounted while it is on screen only.
-// opening one stays one call: app.setRoute('edit')
+// a mode is a view in the main area, in the dom while it is on screen only. the view
+// mode is at the root, the others at their id
 
-const current = signal('view');   // the mode on screen
-
-app.setRoute = id => app.show(id);
-app.root.addEventListener('navigate', event => { current.value = event.detail.to; });
+app.views = Object.fromEntries(routes.map(({ id, component }) =>
+  [id, { route: id === 'view' ? '/' : `/${id}`, view: component, transient: true }]));
 
 // ::::::
 
@@ -44,7 +39,7 @@ function wireLaunchQueue () {
     try {
       const files = await Promise.all(params.files.map(h => h.getFile()));
       setFiles(files);
-      app.setRoute('view');
+      app.go('view');
     } catch (err) {
       vError.value = 'could not open the launched file — ' + (err?.message || err);
     }
@@ -59,8 +54,8 @@ function ModeBar () {
       <${Brand} app=${app} />
       <nav class="im-modes">
         ${routes.map(m => html`
-          <button class=${'im-mode' + (current.value === m.id ? ' active' : '')} key=${m.id}
-                  onClick=${() => m.id === 'edit' ? editCurrent() : app.setRoute(m.id)}
+          <button class=${'im-mode' + (app.current.value === m.id ? ' active' : '')} key=${m.id}
+                  onClick=${() => m.id === 'edit' ? editCurrent() : app.go(m.id)}
                   title=${m.label}>
             <svg-icon icon=${m.icon} /> <span>${m.label}</span>
           </button>`)}
@@ -69,24 +64,16 @@ function ModeBar () {
     </header>`;
 }
 
-// the view mode is at the root, the others at their id
 function App () {
   useEffect(() => {
     wireLaunchQueue();
-    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
-      current.value = app.root.view?.getAttribute('name') ?? 'view';
-    });
     return () => revokeAll();
   }, []);
 
   return html`
     <app-area name='main'>
       <${ModeBar} />
-      ${routes.map(({ id, component: Mode }) => html`
-        <app-view key=${id} name=${id} route=${id === 'view' ? '/' : `/${id}`} active=${id === 'view' || undefined}>
-          ${current.value === id && html`<${Mode} />`}
-        </app-view>
-      `)}
+      <${Views} />
     </app-area>
     <app-area name='config' dock='end'><${Config} /></app-area>
   `;
