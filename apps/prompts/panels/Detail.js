@@ -41,26 +41,25 @@ export default function Detail () {
     </div>`;
 
   if (!isEdit && prompt) return html`
-    <div class="detail-view">
-
-      <div class="detail-header">
-        <h2 class="detail-title">${prompt.title || html`<em>Untitled</em>`}</h2>
-        <div class="detail-header-actions">
-          <button class="icon-btn" title="Copy" onClick=${() => copyPrompt(prompt.content)}>
-            <svg-icon icon=${copied.value ? 'mdi:check' : 'mdi:content-copy'} />
-          </button>
-          <button class="icon-btn" title="Edit" onClick=${() => app.state.editMode = true}>
-            <svg-icon icon="mdi:pencil-outline" />
-          </button>
-          <button class="icon-btn remove" title="Delete" onClick=${() => { if (confirm('Delete this prompt?')) app.removePrompt(prompt.id); }}>
-            <svg-icon icon="mdi:trash-can-outline" />
-          </button>
-          <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
-            <svg-icon icon="mdi:arrow-left" />
-          </button>
-        </div>
+    <header class="detail-header">
+      <h2 class="detail-title">${prompt.title || html`<em>Untitled</em>`}</h2>
+      <div class="detail-header-actions">
+        <button class="icon-btn" title="Copy" onClick=${() => copyPrompt(prompt.content)}>
+          <svg-icon icon=${copied.value ? 'mdi:check' : 'mdi:content-copy'} />
+        </button>
+        <button class="icon-btn" title="Edit" onClick=${() => app.state.editMode = true}>
+          <svg-icon icon="mdi:pencil-outline" />
+        </button>
+        <button class="icon-btn remove" title="Delete" onClick=${() => { if (confirm('Delete this prompt?')) app.removePrompt(prompt.id); }}>
+          <svg-icon icon="mdi:trash-can-outline" />
+        </button>
+        <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
+          <svg-icon icon="mdi:arrow-left" />
+        </button>
       </div>
+    </header>
 
+    <main class="detail-view">
       ${prompt.tags?.length > 0 && html`
         <div class="detail-tags">
           ${prompt.tags.map(tid => html`<${TagBadge} tagId=${tid} />`)}
@@ -72,8 +71,7 @@ export default function Detail () {
       </div>
 
       <pre class="detail-content">${prompt.content}</pre>
-
-    </div>`;
+    </main>`;
 
   // ── edit form ──
   const save = () => {
@@ -91,18 +89,17 @@ export default function Detail () {
   const toggleTag = tid => setSelTags(s => s.includes(tid) ? s.filter(x => x !== tid) : [...s, tid]);
 
   return html`
-    <div class="detail-edit">
-
-      <div class="detail-header">
-        <input class="edit-title-input" type="text" placeholder="Prompt title…"
-          value=${title} onInput=${e => setTitle(e.target.value)} />
-        <div class="detail-header-actions">
-          <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
-            <svg-icon icon="mdi:arrow-left" />
-          </button>
-        </div>
+    <header class="detail-header">
+      <input class="edit-title-input" type="text" placeholder="Prompt title…"
+        value=${title} onInput=${e => setTitle(e.target.value)} />
+      <div class="detail-header-actions">
+        <button class="icon-btn mobile-only" onClick=${() => app.showList()}>
+          <svg-icon icon="mdi:arrow-left" />
+        </button>
       </div>
+    </header>
 
+    <main class="detail-edit">
       <div class="edit-tag-picker">
         ${app.lib.tags.value.map(t => html`
           <button
@@ -128,6 +125,5 @@ export default function Detail () {
             <svg-icon icon="mdi:trash-can-outline" /> Delete
           </button>`}
       </div>
-
-    </div>`;
+    </main>`;
 }
