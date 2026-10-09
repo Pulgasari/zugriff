@@ -26,6 +26,26 @@ app-view, .view, .View {
   header > h1   { flex: 1 1 auto; }   /* next to the back button, the tools at the end */
 }
 
+app-view {
+  display: flex;
+  flex-direction: column;
+}
+app-view > main {
+  align-items: center;
+  justify-content: safe center;
+  display: flex;
+  flex: 1;
+}
+app-view .empty {
+  align-items: center;
+  display: flex;
+  flex-flow: column;
+  --gap: normal;
+}
+
+app-view .empty   { text-align: center; }
+app-view .empty * { text-align: center; }
+
 /* ── the dock, the Dock component: a row of btn-tap, icon over label ─────── */
 
 #app-dock, .dock, .Dock {
