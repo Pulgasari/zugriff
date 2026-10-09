@@ -7,7 +7,14 @@
 // no server sits in between (capacitor, a file) everything works as before.
 //
 // no imports, web apis only. anything unexpected passes the page on untouched.
+//
+// second job: <slug>.zugriff.dev serves the bundled build of an app, www/<slug>/
+// as the ota workflow commits it. a bundle is a site of its own, its paths start at
+// / (/.shared/, /_pkg/, /<slug>/app.js). a rewrite in vercel.json comes too late for
+// that: a file that exists, like the live /.shared/, is served before it is
+// looked at. this runs before the filesystem, so the bundle's own files win.
 
+const BUNDLES  = new Set(['podcasts']);   // the apps with a bundle in www/, each on its own subdomain
 const COOKIE   = 'zugriff-gestalt';
 const TOKENS   = ['density', 'geometry', 'palette'];
 const LAUNCHER = new Set(['apps', 'tools']);
@@ -39,8 +46,27 @@ function gestaltOf (request) {
   return found.length ? Object.fromEntries(found) : null;
 }
 
+// :::::: BUNDLES
+
+// podcasts.zugriff.dev/<path> -> /www/podcasts/<path>, a folder as its index.html (the
+// shell reads the app from the path, the views route by hash)
+function bundleOf (url) {
+  const [sub, ...domain] = url.hostname.split('.');
+  if (domain.join('.') !== 'zugriff.dev' || !BUNDLES.has(sub)) return null;
+
+  const path = url.pathname.endsWith('/') ? '/index.html' : url.pathname;
+  return new URL(`/www/${sub}${path}${url.search}`, url);
+}
+
+// :::::: MAIN
+
 export default async function middleware (request) {
-  const slug = new URL(request.url).pathname.split('/')[1];
+  const url    = new URL(request.url);
+  const bundle = bundleOf(url);
+  if (bundle) return new Response(null, { headers: { 'x-middleware-rewrite': bundle.href } });
+
+  // the gestalt: the app pages only, /<slug>/, not the launcher, files or the shared folders
+  const slug = /^\/([a-z0-9-]+)\/$/.exec(url.pathname)?.[1];
   if (!slug || LAUNCHER.has(slug)) return;
 
   const gestalt = gestaltOf(request);
@@ -62,7 +88,7 @@ export default async function middleware (request) {
   return new Response(html, { headers, status: response.status, statusText: response.statusText });
 }
 
-// the app pages only: /<slug>/, not the launcher, files or the shared folders
+// every path: a bundle's subdomain needs all of them. anything else is decided above
 export const config = {
-  matcher: ['/:slug([a-z0-9-]+)/'],
+  matcher: ['/:path*'],
 };

@@ -129,12 +129,20 @@ jobs:
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "${URL}" >> "$GITHUB_STEP_SUMMARY"
 
+      # the artifact holds a folder named after the app, so the download below lands
+      # every app in build/www/<slug>/, however many there are
+      - name: Name the folder after the app
+        if: ${{ inputs.commit_www }}
+        run: |
+          mkdir -p build/out
+          cp -r "build/${APP}/www" "build/out/${APP}"
+
       - name: Keep www/ for the commit
         if: ${{ inputs.commit_www }}
         uses: actions/upload-artifact@v7
         with:
           name: www-${{ matrix.app }}
-          path: build/${{ matrix.app }}/www
+          path: build/out
           include-hidden-files: true
           retention-days: 1
 
@@ -146,16 +154,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # merged: a single artifact would otherwise land directly in build/www, without
+      # a folder of its own, and the loop below would find nothing to copy
       - uses: actions/download-artifact@v5
         with:
           pattern: www-*
           path: build/www
+          merge-multiple: true
 
       - name: Commit www/<slug>/
         run: |
-          for DIR in build/www/www-*; do
-            [ -d "$DIR" ] || continue
-            APP="${DIR##*/www-}"
+          for DIR in build/www/*/; do
+            DIR="${DIR%/}"
+            APP="${DIR##*/}"
             rm -rf "www/${APP}"
             mkdir -p www
             cp -r "$DIR" "www/${APP}"

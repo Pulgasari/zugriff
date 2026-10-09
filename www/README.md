@@ -1,6 +1,6 @@
 # www
 
-- podcasts [web-bundle](https://app.zugriff.dev/podcasts/)
+- podcasts [web-bundle](https://podcasts.zugriff.dev/)
 
 the bundled web part of the apps built as `capacitor`, one folder per app,
 written by [`.github/workflows/ota-publish.yml`](/.github/workflows/ota-publish.yml) (`commit_www`). the same files go
@@ -28,8 +28,11 @@ npx serve -s www/podcasts     # -s: unknown paths fall back to index.html
 # open http://localhost:3000/ — it moves on to /podcasts/ by itself
 ```
 
-a deploy works the same way: a project (or subdomain) with `www/<slug>` as its
-root and every path rewritten to `/index.html`.
+on the live deployment every bundle has a subdomain, `<slug>.zugriff.dev`:
+`middleware.js` rewrites each path there into `www/<slug>/`, a folder to its
+`index.html`. it runs before vercel looks at the files, so the bundle's `/.shared/`
+wins over the live one. a new bundle is added to `BUNDLES` in `middleware.js` and
+its subdomain to the vercel project.
 
 ## what to compare with the live version
 
