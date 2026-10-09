@@ -1,0 +1,44 @@
+// @aufbau/signals/EnumSignal.js
+
+// :::::: IMPORT
+
+import { BaseSignal, callable } from './BaseSignal.js';
+
+// :::::: MAIN
+
+class EnumSignal extends BaseSignal {
+
+  constructor (value, values = []) {
+    super(values.includes(value) ? value : values[0]);
+    this.values = [...values];
+  }
+
+  get value ()     { return super.value; }
+  set value (next) {
+    if (!this.values.includes(next))
+      return void console.warn(`[aufbau/signals] ignored "${next}" — not in [${this.values}]`);
+    super.value = next;
+  }
+
+  // steps to the next allowed value and wraps around — a two-value list is a toggle
+  cycle () {
+    if (!this.values.length) return this.peek();
+    const index = this.values.indexOf(this.peek());
+    super.value = this.values[(index + 1) % this.values.length];
+    return this.peek();
+  }
+
+  // hydration writes past the list: a stored value is authoritative, and it may
+  // predate a change to the list it was written under.
+  $restore (next) { super.value = next; }
+
+}
+
+const enumSignal = (...args) => new EnumSignal(...args);
+
+// :::::: EXPORT
+
+const Callable = callable(EnumSignal);
+
+export { Callable as EnumSignal, enumSignal };
+export default Callable;

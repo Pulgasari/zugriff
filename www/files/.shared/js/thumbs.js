@@ -1,0 +1,349 @@
+// .shared/js/thumbs.js
+//
+// a local, client-only thumbnail cache. hand it an image url and it returns a
+// small webp copy from the origin private file system (@bunker/opfs), one file
+// per thumbnail, generating it the first time by fetching the original and
+// downscaling it on a canvas. after the first generation the original host is
+// never touched again, the images live on the device.
+//
+// the one unavoidable constraint in a browser: to *resize* a cross-origin image
+// it has to read its pixels, which needs the bytes. a direct fetch is tried
+// first, only when the host blocks it (no CORS headers) does it fall back to a
+// proxy. inside the capacitor wrapper none of that applies: the bytes come
+// through the native http plugin, which knows no CORS, so neither the resizer
+// nor the proxy is used there. display of the original never needs any of this,
+// so a caller can always fall back to showing the source url.
+//
+// shared on purpose: any zugriff app can keep its artwork small the same way.
+//
+//   import { createThumbCache } from '/.shared/js/thumbs.js';
+//   const thumbs = createThumbCache({ proxy: () => corsProxy.value });
+//   const url = await thumbs.request(imageUrl);   // -> blob object-url or null
+//
+// a file the app already holds (a granted folder, an upload) skips the fetch:
+//
+//   const url = await thumbs.requestFile(`${path}:${file.size}:${file.lastModified}`, () => handle.getFile());
+//
+// the id is the cache key, so it should change with the file: size and
+// modification time in it make an edited image a new thumbnail.
+//
+// logging (@pulgasari/logger, scope 'thumbs'): a generated thumbnail and a
+// proxy fallback log at info, a failure at warn — both visible by default. cache
+// hits log at debug; run `setLogLevel('debug')` from @pulgasari/logger to see
+// them. a host that blocks the direct fetch is remembered so the browser's
+// unsuppressable CORS error is not logged again for it.
+
+import createOpfs from '@bunker/opfs';
+import { Logger } from '@pulgasari/logger';
+
+// inside the capacitor wrapper. its bridge is injected into the remote page, the
+// npm packages are never bundled, see modules/filesystem/platform.js
+const nativeHttp = () => globalThis.Capacitor?.isNativePlatform?.() ? globalThis.Capacitor.Plugins?.CapacitorHttp ?? null : null;
+
+// the native plugin hands binary bodies over as base64
+const fromBase64 = (data, type) => new Blob([Uint8Array.from(atob(data), char => char.charCodeAt(0))], { type });
+
+// a small stable string hash (cyrb53) — the same one the apps use for ids.
+function hash (str = '') {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+// `{url}` in a proxy template is replaced with the encoded source; a template
+// without the placeholder gets it appended.
+function viaProxy (proxy, url) {
+  const tpl = (proxy || '').trim();
+  if (!tpl) return null;
+  const enc = encodeURIComponent(url);
+  return tpl.includes('{url}') ? tpl.replaceAll('{url}', enc) : tpl + enc;
+}
+
+// a tiny concurrency gate, so a full page of artwork does not open fifty fetches
+function limiter (max) {
+  let active = 0;
+  const queue = [];
+  const pump = () => {
+    if (active >= max || !queue.length) return;
+    active++;
+    const { fn, resolve, reject } = queue.shift();
+    Promise.resolve().then(fn).then(resolve, reject).finally(() => { active--; pump(); });
+  };
+  return fn => new Promise((resolve, reject) => { queue.push({ fn, resolve, reject }); pump(); });
+}
+
+const canResize = typeof createImageBitmap === 'function' && typeof document !== 'undefined';
+
+const URL_PROXY_IMG = 'https://img.pulgasari.dev/?url={url}&w={w}';
+
+const buildResizer = (url, w) => {
+  const tpl = URL_PROXY_IMG;
+  if (!tpl || !url) return null;
+  return tpl.replaceAll('{url}', encodeURIComponent(url)).replaceAll('{w}', String(w));
+};
+
+/**
+ * create a thumbnail cache.
+ *
+ * @param {object}   [opts]
+ * @param {string}   [opts.name='zugriff/thumbs']  the opfs directory (shared across apps by default)
+ * @param {number}   [opts.width=400]              the stored thumbnail's width in px; height keeps the aspect ratio
+ * @param {()=>string} [opts.proxy]                returns the CORS proxy template for the byte-fetch fallback
+ * @param {number}   [opts.maxBytes]               soft cap on total cache size; oldest entries are dropped past it
+ * @param {number}   [opts.quality=0.82]           webp quality
+ * @param {number}   [opts.concurrency=3]          parallel generations
+ * @param {string}   [opts.scope='thumbs']         logger scope
+ * @param {(url:string,width:number)=>string|null} [opts.resizer]
+ *        a server-side resizer endpoint builder. when it returns a url, the
+ *        already-small image is fetched from there and stored as-is (no client
+ *        decode/canvas, no CORS proxy) — the preferred path when a self-hosted
+ *        resizer is available. return null/empty to fall back to client-side
+ *        canvas resizing. never used inside the capacitor wrapper.
+ */
+export function createThumbCache ({
+  name        = 'zugriff/thumbs',
+  width       = 250,
+  proxy       = () => '',
+  maxBytes    = 64 * 1024 * 1024,
+  quality     = 0.80,
+  concurrency = 3,
+  scope       = 'thumbs',
+  resizer     = buildResizer,
+} = {}) {
+  const files    = createOpfs({ directory: name, onError: ({ error, key, operation }) => log.warn('opfs', operation, key ?? '', error?.message || error) });
+  const native   = nativeHttp();
+  const mem      = new Map; // key -> object-url (this session)
+  const inflight = new Map; // key -> Promise<string|null>
+  const gate     = limiter(concurrency);
+  const log      = new Logger({ prefix: scope });
+
+  // hosts whose direct fetch we already saw blocked by CORS. remembering them
+  // means we stop re-issuing a cross-origin fetch the browser will only reject
+  // and log again — the repeated "blocked by CORS" console spam — and go
+  // straight to the proxy for that host instead.
+  const corsBlocked = new Set;
+
+  // bytes on disk, read once per session and kept up to date after that. the
+  // increments happen synchronously after the await, so parallel stores add up
+  let total = null;
+  const sizeOnDisk = async () => total ??= await files.size();
+
+  // the thumbnails used to live in indexeddb, that database is only a leftover now
+  globalThis.indexedDB?.deleteDatabase('zugriff-images');
+
+  const keyOf   = url => `${hash(url)}@${width}.webp`;
+  const hostOf  = url => { try { return new URL(url).host; } catch { return url; } };
+  const label   = url => { try { return decodeURIComponent(new URL(url).pathname.split('/').pop()) || url; } catch { return url; } };
+  const asKb    = bytes => `${Math.round(bytes / 1024)} KB`;
+
+  // ── byte fetch: direct, then proxy ─────────────────────────────────────────
+  // returns { blob, via } where via is 'direct' | 'proxy', or null on failure.
+  async function fetchBytes (url) {
+    if (native) {
+      try {
+        const res = await native.request({ method: 'GET', responseType: 'blob', url });
+        if (res.status >= 200 && res.status < 300 && typeof res.data === 'string') {
+          return { blob: fromBase64(res.data, res.headers?.['Content-Type'] ?? res.headers?.['content-type'] ?? ''), via: 'native' };
+        }
+      } catch { /* the caller falls back to the original */ }
+      return null;
+    }
+
+    const host = hostOf(url);
+
+    // skip the direct attempt for hosts already known to block it, so the
+    // browser does not log the same CORS rejection over and over
+    if (!corsBlocked.has(host)) {
+      try {
+        const res = await fetch(url, { mode: 'cors', credentials: 'omit' });
+        if (res.ok) return { blob: await res.blob(), via: 'direct' };
+      } catch {
+        corsBlocked.add(host);
+        log.debug('cors', host, '→ proxy from now on');
+      }
+    }
+
+    const proxied = viaProxy(proxy(), url);
+    if (!proxied) return null;
+    try {
+      const res = await fetch(proxied, { credentials: 'omit' });
+      if (res.ok) return { blob: await res.blob(), via: 'proxy' };
+    } catch { /* give up, the caller falls back to the original */ }
+    return null;
+  }
+
+  // ── downscale a blob into a webp ─────────────────────────────────────────
+  // returns { blob, w, h } on success, or { error } describing the failure.
+  async function downscale (source) {
+    let bitmap;
+    try   { bitmap = await createImageBitmap(source); } // decode once; bail if not an image
+    catch { return { error: 'decode' }; }
+
+    // downscale only — a small original is kept at its own size, never blown up
+    const scale = Math.min(1, width / (bitmap.width || width));
+    const w = Math.max(1, Math.round((bitmap.width  || 1) * scale));
+    const h = Math.max(1, Math.round((bitmap.height || 1) * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close?.();
+
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/webp', quality));
+    if (!blob) return { error: 'encode' };
+    return { blob, w, h };
+  }
+
+  // ── generate a downscaled webp blob from the original ──────────────────────
+  // returns { blob, via, w, h } on success, or { error } describing the failure.
+  async function generate (url) {
+    // preferred path: a self-hosted resizer already returns a small image, so
+    // just fetch and keep it — no cross-origin bytes, no canvas.
+    const endpoint = native ? null : resizer?.(url, width) || null;
+    if (endpoint) {
+      try {
+        const res = await fetch(endpoint, { credentials: 'omit' });
+        if (res.ok) return { blob: await res.blob(), via: 'resizer' };
+      } catch { /* fall through to the error below */ }
+      return { error: 'resizer' };
+    }
+
+    if (!canResize) return { error: 'unsupported' };
+
+    const got = await fetchBytes(url);
+    if (!got) return { error: 'fetch' };
+
+    const made = await downscale(got.blob);
+    return made.error ? made : { ...made, via: got.via };
+  }
+
+  // ── storage bookkeeping (soft lru by write time) ──────────────────────────
+  async function store (key, blob) {
+    if (!await files.set(key, blob)) return;
+    await sizeOnDisk();
+    total += blob.size;
+    if (total > maxBytes) await evictDown();
+  }
+
+  async function evictDown () {
+    const entries = (await files.entries()).sort((a, b) => a.lastModified - b.lastModified);   // oldest first
+    let bytes = entries.reduce((sum, entry) => sum + entry.size, 0);
+    const target = maxBytes * 0.9;
+    for (const { key, size } of entries) {
+      if (bytes <= target) break;
+      await files.delete(key);
+      const u = mem.get(key);
+      if (u) { URL.revokeObjectURL(u); mem.delete(key); }
+      bytes -= size;
+    }
+    total = Math.max(0, bytes);
+  }
+
+  async function load (key) {
+    const file = await files.get(key);
+    if (!file) return null;
+    const u = URL.createObjectURL(file);
+    mem.set(key, u);
+    return u;
+  }
+
+  // a cache hit from memory or opfs, else `make` once per key, stored on success
+  function cached (key, name, make) {
+    if (mem.has(key)) { log.debug('cache', 'mem', name); return Promise.resolve(mem.get(key)); }
+    if (inflight.has(key)) return inflight.get(key);
+
+    const job = (async () => {
+      const hit = await load(key);
+      if (hit) { log.debug('cache', 'opfs', name); return hit; }
+      try {
+        const res = await gate(make);
+        if (!res || res.error) {
+          log.warn('fail', res?.error || 'unknown', name);
+          return null;
+        }
+        await store(key, res.blob);
+        const u = URL.createObjectURL(res.blob);
+        mem.set(key, u);
+        const dims = res.w && res.h ? `${res.w}×${res.h}` : null;
+        log.info(!res.via || res.via === 'direct' ? 'made' : `made (via ${res.via})`,
+                 ...[dims, asKb(res.blob.size), name].filter(Boolean));
+        return u;
+      } catch (err) {
+        log.warn('fail', 'store', name, err?.message || err);
+        return null;
+      } finally {
+        inflight.delete(key);
+      }
+    })();
+
+    inflight.set(key, job);
+    return job;
+  }
+
+  return {
+    /** the cached object-url if it is already in memory, else null (sync) */
+    peek (url) { return url ? (mem.get(keyOf(url)) || null) : null; },
+
+    /**
+     * the thumbnail object-url for `url`, generating and storing it on a miss.
+     * resolves to null when the image can't be fetched or decoded — the caller
+     * should then fall back to the original url or a placeholder.
+     */
+    async request (url) {
+      if (!url) return null;
+      return cached(keyOf(url), label(url), () => generate(url));
+    },
+
+    /** the cached object-url for `id` if it is already in memory, else null (sync) */
+    peekFile (id) { return id ? (mem.get(keyOf(id)) || null) : null; },
+
+    /**
+     * the thumbnail of a file the app already has: `getFile` returns the blob
+     * (a File, or a promise of one) and is only called on a miss. resolves to
+     * null for anything that does not decode as an image.
+     */
+    async requestFile (id, getFile) {
+      if (!id || !canResize) return null;
+      const name = id.replace(/(:\d+)+$/, '').split('/').pop();
+      return cached(keyOf(id), name, async () => downscale(await getFile()));
+    },
+
+    /** kick off generation for a batch of urls, ignoring the results */
+    prewarm (urls = []) {
+      for (const url of urls) if (url) this.request(url).catch(() => {});
+    },
+
+    /** drop the cached thumbnails for these urls (e.g. on unsubscribe) */
+    async evict (urls = []) {
+      let freed = 0;
+      for (const url of urls) {
+        if (!url) continue;
+        const key  = keyOf(url);
+        const file = await files.file(key);
+        if (file && await files.delete(key)) freed += file.size;
+        const u = mem.get(key);
+        if (u) { URL.revokeObjectURL(u); mem.delete(key); }
+      }
+      if (freed && total !== null) total = Math.max(0, total - freed);
+    },
+
+    /** wipe the whole cache */
+    async clear () {
+      for (const u of mem.values()) URL.revokeObjectURL(u);
+      mem.clear();
+      await files.clear();
+      total = 0;
+    },
+  };
+}
+
+export default createThumbCache;
