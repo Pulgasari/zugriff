@@ -45,14 +45,16 @@ the start page then adds the shell's look (boot.js, aufbau), a 404 page stays pl
       padding        : 1rem;
     }
 
-    #welcome { aspect-ratio: 1482.97 / 278.95; fill: currentColor; width: min(80vw, 36rem); }
+    #welcome { /* aspect-ratio: 1482.97 / 278.95; */ fill: currentColor; /*width: min(80vw, 36rem);*/ }
 
     #missing   { display: none; text-align: center; }
-    #missing p { margin: 0 0 0.5rem; opacity: 0.6; }
+    #missing p { opacity: 0.5; }
     #missing a { color: inherit; }
-
+    
+    /*
     [data-page='missing'] #missing { display: block; }
     [data-page='missing'] #welcome { opacity: 0.25; width: min(60vw, 20rem); }
+    */
   </style>
 </head>
 
