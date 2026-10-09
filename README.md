@@ -33,24 +33,7 @@ videos   | https://videos.zugriff.dev   | https://zugriff.dev/videos/
 
 ---
 
-## apps
-- [audio manager](https://zugriff.dev/audio-manager/)
-- [code](https://zugriff.dev/code/)
-- [downloader](https://zugriff.dev/downloader/)
-- [ebooks](https://zugriff.dev/ebooks/)
-- [feeds](https://zugriff.dev/feeds/)
-- [files](https://zugriff.dev/files/)
-- [icons](https://zugriff.dev/icons/)
-- [images](https://zugriff.dev/images/)
-- [notes](https://zugriff.dev/notes/)
-- [podcasts](https://zugriff.dev/podcasts/)
-- [prompts](https://zugriff.dev/prompts/)
-- [tools](https://zugriff.dev/tools/)
-- [todo](https://zugriff.dev/todo/)
-- [videos](https://zugriff.dev/videos/)
-
 ## tools
-all in one app, [zugriff.dev/tools](https://zugriff.dev/tools/), every tool a view of it:
 
 [audio-converter](https://zugriff.dev/tools/#/audio-converter) •
 [audio-cutter](https://zugriff.dev/tools/#/audio-cutter) •
