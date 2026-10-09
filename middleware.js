@@ -14,7 +14,7 @@
 // that: a file that exists, like the live /.shared/, is served before it is
 // looked at. this runs before the filesystem, so the bundle's own files win.
 
-const BUNDLES  = new Set(['podcasts']);   // the apps with a bundle in www/, each on its own subdomain
+const OWN      = new Set(['app', 'tools', 'www']);   // subdomains of the site itself, every other one is a bundle
 const COOKIE   = 'zugriff-gestalt';
 const TOKENS   = ['density', 'geometry', 'palette'];
 const LAUNCHER = new Set(['apps', 'tools']);
@@ -49,10 +49,11 @@ function gestaltOf (request) {
 // :::::: BUNDLES
 
 // podcasts.zugriff.dev/<path> -> /www/podcasts/<path>, a folder as its index.html (the
-// shell reads the app from the path, the views route by hash)
+// index.html names its app, the views route by hash). a subdomain without a bundle in
+// www/ gets a 404, there is no list to keep
 function bundleOf (url) {
   const [sub, ...domain] = url.hostname.split('.');
-  if (domain.join('.') !== 'zugriff.dev' || !BUNDLES.has(sub)) return null;
+  if (domain.join('.') !== 'zugriff.dev' || OWN.has(sub)) return null;
 
   const path = url.pathname.endsWith('/') ? '/index.html' : url.pathname;
   return new URL(`/www/${sub}${path}${url.search}`, url);

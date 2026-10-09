@@ -31,8 +31,13 @@ npx serve -s www/podcasts     # -s: unknown paths fall back to index.html
 on the live deployment every bundle has a subdomain, `<slug>.zugriff.dev`:
 `middleware.js` rewrites each path there into `www/<slug>/`, a folder to its
 `index.html`. it runs before vercel looks at the files, so the bundle's `/.shared/`
-wins over the live one. a new bundle is added to `BUNDLES` in `middleware.js` and
-its subdomain to the vercel project.
+wins over the live one. every subdomain is a bundle except `app`, `tools` and `www`
+(`OWN` in `middleware.js`): a new one only needs its run of the workflow and its
+domain in the vercel project.
+
+which one is on screen: a bundle's page has `<html data-app="<slug>">` in its source
+and loads `/_pkg/…` and `/_vendor/…`, the live one loads from `code.pulgasari.dev`
+and esm.sh.
 
 ## what to compare with the live version
 
