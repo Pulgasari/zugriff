@@ -127,7 +127,7 @@ app-view[name="prompt"] { block-size: 100%; display: flex; flex-direction: colum
 }
 
 .detail-view, .detail-edit {
-  display: flex; flex-direction: column; gap: .85rem; align-items: stretch; justify-content: flex-start;
+  display: flex; flex-direction: column; gap: .85rem;
   padding: 0 1.25rem 1.25rem; overflow-y: auto;
 }
 

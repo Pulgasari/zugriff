@@ -207,7 +207,7 @@ app-view {
 
 /* ── body ────────────────────────────────────────────────────────────────── */
 
-app-view > main { display: block; flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+app-view > main { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 
 .empty {
   display        : flex;

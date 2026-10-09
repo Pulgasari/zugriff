@@ -24,7 +24,7 @@
 
 /* ── library ─────────────────────────────────────────────────────────────── */
 
-app-view[name="library"] > main { display: block; width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.25rem clamp(1rem, 3vw, 2.25rem) 3rem; }
+app-view[name="library"] > main { max-width: 1200px; margin: 0 auto; padding: 1.25rem clamp(1rem, 3vw, 2.25rem) 3rem; }
 
 .lib-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 0.5rem; font-size: 1.35rem; flex: 1 1 auto; }

@@ -25,7 +25,6 @@
 .powered a { color: var(--accent-75); text-decoration: none; }
 */
 /* ── main + topbar ───────────────────────────────────────────────────────── */
-app-view > main { display: block; flex: 1 1 auto; }
 /*
 #app-main { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 .topbar { flex: none; display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.9rem; min-height: 54px; background: var(--panel); border-bottom: 1px solid var(--line); }
