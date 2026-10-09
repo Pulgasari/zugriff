@@ -2,7 +2,7 @@
   "id": "podcasts",
   "name": "Podcasts",
   "short_name": "Podcasts",
-  "description": "Subscribe by RSS, play episodes, track progress, mark them done and keep a listen-later list.",
+  "description": "A podcasts manager and player.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

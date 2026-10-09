@@ -1,8 +1,8 @@
 {
   "id": "icons",
-  "name": "Icons",
-  "short_name": "Icons",
-  "description": "Browse and search the whole Iconify library by set, copy or download any icon, and keep favourites.",
+  "name": "icons",
+  "short_name": "icons",
+  "description": "An iconify browser.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

@@ -2,7 +2,7 @@
   "id": "todo",
   "name": "Todo",
   "short_name": "Todo",
-  "description": "Tasks for one person, offline: typed in one line, ticked with a swipe, synced through a folder or webdav.",
+  "description": "A todo/tasks manager.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

@@ -2,7 +2,7 @@
   "id": "notes",
   "name": "Notes",
   "short_name": "Notes",
-  "description": "Open a folder of Markdown files and read it as a live, foldered notebook — the folder tree is the outline.",
+  "description": "A notes manager based on markdown.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
@@ -10,8 +10,8 @@
   "display": "standalone",
   "orientation": "any",
   "categories": [
-    "files",
-    "docs"
+    "docs",
+    "files"
   ],
   "background_color": "#282a36",
   "theme_color": "#282a36",

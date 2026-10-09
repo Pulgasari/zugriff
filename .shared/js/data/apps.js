@@ -1,5 +1,8 @@
 // .shared/js/data/apps.js
 // ---------------------
+// every app in one line (name, categories, description), what one has beyond that
+// below it, the rest from the defaults. the key is the slug, the app's folder in apps/
+//
 // registry.get('ebooks')     -> the resolved entry, or null
 // registry.getAll('app')     -> every app entry (omit the arg for all)
 // registry.categories('app') -> sorted, de-duped categories for that kind
@@ -10,11 +13,10 @@ const defaults = {
   color       : '#282a36', // theme_color / background_color for the manifest + <meta theme-color>
   dir         : 'ltr',
   display     : 'standalone',
-  icon        : 'mdi:music-box-multiple-outline', // deprecated ???
   lang        : 'en',
   orientation : 'any',
   palette     : 'zombie',
-  type        : 'app', // deprecated ???
+  type        : 'app',
   viewport    : 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   aufbau      : { elements: { mode: 'auto' } },
   // settings every app carries, predefined here so the shared Settings can render
@@ -29,21 +31,22 @@ const defaults = {
 };
 
 const apps = {
-  audio      : { name: 'Audio',      categories: ['media'],            description : 'An audio files manager and player.' },
-  cli        : { name: 'CLI',        categories: ['code', 'files'],    description : 'A terminal in the browser: files in the origin private file system, wasm tools run in a worker.' },
-  code       : { name: 'Code',       categories: ['code', 'files'],    description : 'A code editor.' },
-  downloader : { name: 'Downloader', categories: ['files', 'network'], description : 'A downloads manager.' },
-  ebooks     : { name: 'eBooks',     categories: ['media'],            description : 'An eBooks manager and reader.' },
-  feeds      : { name: 'feeds',      categories: ['docs', 'media'],    description : 'A RSS/atom feeds manager and reader.' },
-  files      : { name: 'files',      categories: ['files'],            description : 'A files manager.' },
-  icons      : { name: 'icons',      categories: ['design'],           description : 'An iconify browser.' },
-  images     : { name: 'images',     categories: ['image'],            description : 'An images manager, viewer and editor.' },
-  notes      : { name: 'Notes',      categories: ['docs', 'files'],    description : 'A notes manager based on markdown.' },
-  podcasts   : { name: 'Podcasts',   categories: ['media'],            description : 'A podcasts manager and player.' },
-  prompts    : { name: 'Prompts',    categories: ['tool'],             description : 'A prompts manager.' },
-  todo       : { name: 'Todo',       categories: ['productivity'],     description : 'A todo/tasks manager.' },
-  tools      : { name: 'Tools',      categories: ['tool'],             description : 'A collection of micro-tools.' },
-  videos     : { name: 'Videos',     categories: ['media'],            description : 'A videos manager and player.' },
+  'audio-manager' : { name: 'Audio',      categories: ['media'],            description : 'An audio files manager and player.' },
+  cli             : { name: 'CLI',        categories: ['code', 'files'],    description : 'A terminal in the browser: files in the origin private file system, wasm tools run in a worker.' },
+  code            : { name: 'Code',       categories: ['code', 'files'],    description : 'A code editor.' },
+  downloader      : { name: 'Downloader', categories: ['files', 'network'], description : 'A downloads manager.' },
+  ebooks          : { name: 'eBooks',     categories: ['media'],            description : 'An eBooks manager and reader.' },
+  feeds           : { name: 'feeds',      categories: ['docs', 'media'],    description : 'A RSS/atom feeds manager and reader.' },
+  files           : { name: 'files',      categories: ['files'],            description : 'A files manager.' },
+  icons           : { name: 'icons',      categories: ['design'],           description : 'An iconify browser.' },
+  images          : { name: 'images',     categories: ['image'],            description : 'An images manager, viewer and editor.' },
+  looksmaxx       : { name: 'Looksmaxx',  categories: ['image'],            description : 'Try on hair colours and hairstyles on a photo, on your device.' },
+  notes           : { name: 'Notes',      categories: ['docs', 'files'],    description : 'A notes manager based on markdown.' },
+  podcasts        : { name: 'Podcasts',   categories: ['media'],            description : 'A podcasts manager and player.' },
+  prompts         : { name: 'Prompts',    categories: ['tool'],             description : 'A prompts manager.' },
+  todo            : { name: 'Todo',       categories: ['productivity'],     description : 'A todo/tasks manager.' },
+  tools           : { name: 'Tools',      categories: ['tool'],             description : 'A collection of micro-tools.' },
+  videos          : { name: 'Videos',     categories: ['media'],            description : 'A videos manager and player.' },
 };
 
 apps.downloader.manifest = {
@@ -51,11 +54,17 @@ apps.downloader.manifest = {
   share_target   : { action: './', method: 'GET', params: { text: 'text', title: 'title', url: 'url' } },
 };
 
+// no android build (yet)
+apps.cli.build       = null;
+apps.looksmaxx.build = null;
+apps.tools.build     = null;
+
+apps.files.build    = { ...defaults.build, plugins: ['filesync'] };
 apps.files.geometry = 'pill';
 apps.files.palette  = 'synthwave';
 apps.files.skin     = 'andromeda';
-apps.files.plugins  = ['filesync'];
-apps.files.manifest = {
+
+apps.images.manifest = {
   launch_handler : { client_mode: ['focus-existing', 'auto'] },
   file_handlers  : [{
     action : './',
@@ -81,6 +90,8 @@ apps.files.manifest = {
   ],
 };
 
+apps.looksmaxx.color = '#1e1b2e';
+
 apps.videos.manifest = {
   launch_handler : { client_mode: ['focus-existing', 'auto'] },
   file_handlers  : [{
@@ -102,31 +113,18 @@ apps.videos.manifest = {
   ],
 };
 
-const entries = [
-  { // zugriff.dev/looksmaxx/
-    type        : 'app',
-    slug        : 'looksmaxx',
-    name        : 'Looksmaxx',
-    short_name  : 'Looksmaxx',
-    icon        : 'mdi:face-woman-shimmer',
-    description : 'Load a photo and try on hair colours and hairstyles — MediaPipe hair segmentation, all on your device.',
-    categories  : ['image'],
-    color       : '#1e1b2e',
-  },
-
-];
-
 // ── normalise + index ────────────────────────────────────────────────────────
-const normalize = entry => ({
+
+const normalize = ([slug, entry]) => ({
   ...defaults,
   ...entry,
-  slug       : 'audio-manager', // slug needs to come from key in apps obj
+  slug,
   short_name : entry.short_name ?? entry.name,
-  id         : entry.id         ?? entry.slug.replace(/-/g, '_'),
+  id         : entry.id         ?? slug.replace(/-/g, '_'),
   categories : entry.categories ?? [],
 });
 
-const all  = entries.map(normalize);
+const all  = Object.entries(apps).map(normalize);
 const map  = new Map(all.map(e => [e.slug, e]));
 const list = type => (type ? all.filter(e => e.type === type) : all);
 

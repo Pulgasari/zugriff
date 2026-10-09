@@ -1,8 +1,8 @@
 {
   "id": "audio_manager",
-  "name": "Audio Manager",
-  "short_name": "Music",
-  "description": "Grant your music folders and browse the library by song, album and artist — ID3 tags and cover art read on device.",
+  "name": "Audio",
+  "short_name": "Audio",
+  "description": "An audio files manager and player.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

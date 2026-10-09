@@ -2,7 +2,7 @@
   "id": "ebooks",
   "name": "eBooks",
   "short_name": "eBooks",
-  "description": "Point it at your book folders and read your EPUB and PDF library — covers, search and remembered reading position.",
+  "description": "An eBooks manager and reader.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
@@ -10,7 +10,6 @@
   "display": "standalone",
   "orientation": "any",
   "categories": [
-    "docs",
     "media"
   ],
   "background_color": "#282a36",

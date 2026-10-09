@@ -1,8 +1,8 @@
 {
   "id": "feeds",
-  "name": "RSS Reader",
-  "short_name": "Feeds",
-  "description": "Follow RSS/Atom feeds, skim the latest across all of them, and jump to the original — YouTube channels get their own section.",
+  "name": "feeds",
+  "short_name": "feeds",
+  "description": "A RSS/atom feeds manager and reader.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
@@ -10,6 +10,7 @@
   "display": "standalone",
   "orientation": "any",
   "categories": [
+    "docs",
     "media"
   ],
   "background_color": "#282a36",
