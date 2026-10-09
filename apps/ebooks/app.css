@@ -3,7 +3,6 @@
    the frame is #app, the <app-root>, with <app-area name="main"> (library, reader) and
    <app-area name="config">. this app has two faces: a library grid and a full-bleed reader. */
 
-app-view[name="reader"] { overflow: hidden; }
 
 /* ── shared controls (kept in step with the other apps) ───────────────────── */
 
@@ -25,7 +24,7 @@ app-view[name="reader"] { overflow: hidden; }
 
 /* ── library ─────────────────────────────────────────────────────────────── */
 
-.library { max-width: 1200px; margin: 0 auto; padding: 1.25rem clamp(1rem, 3vw, 2.25rem) 3rem; }
+app-view[name="library"] > main { display: block; width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.25rem clamp(1rem, 3vw, 2.25rem) 3rem; }
 
 .lib-head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 0.5rem; font-size: 1.35rem; flex: 1 1 auto; }
@@ -116,7 +115,7 @@ app-view[name="reader"] { overflow: hidden; }
 
 /* ── reader ──────────────────────────────────────────────────────────────── */
 
-.reader { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+app-view[name="reader"] { overflow: hidden; }
 .reader-bar {
   flex: none; display: flex; align-items: center; gap: 0.6rem;
   height: 3.25rem; padding: 0 0.75rem; border-bottom: 1px solid var(--line); background: var(--panel);

@@ -4,7 +4,7 @@
 // module (app.db); ephemeral ui state on app.state.
 
 // ::: vendors
-import { computed, signal } from '@aufbau/signals';
+import { computed }         from '@aufbau/signals';
 import { useEffect }        from 'preact/hooks';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
@@ -30,8 +30,6 @@ app.state.$extend({
   feedId : { type: 'scalar', value: null, persist: true },   // the feed of the 'feed' view
 });
 
-const current = signal('latest');   // the view on screen
-
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
 // :::::: FRAME
@@ -39,23 +37,17 @@ const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : ap
 // the settings in the config area
 
 const area = app.area;
-const show = app.show;
 const menu = () => area('menu');
 
 // a drawer closes once something in it was picked, a sidebar stays
 const closeMenu = () => { if (menu()?.isOverlay) menu().hide(); };
 
-app.go = (name, id = null) => {
+// the feed view shows app.state.feedId, persisted so a reload lands on the same feed
+const open = (name, id = null) => {
   if (id) app.state.feedId = id;
-  show(name);
+  app.go(name);
   closeMenu();
 };
-
-function onNavigate (event) {
-  current.value = event.detail.to;
-}
-
-app.root.addEventListener('navigate', onNavigate);
 
 // :::::: DERIVED
 
@@ -100,13 +92,13 @@ async function addFeed () {
   try {
     const rec = await db.addFeed(input);
     flash(`Added ${rec.title}`);
-    app.go('feed', rec.id);
+    open('feed', rec.id);
   } catch (err) {
     flash(err.message || String(err), 'err');
   } finally { app.state.busy = ''; }
 }
 
-async function refreshView (name = current.value) {
+async function refreshView (name = app.current.value) {
   app.state.busy = 'Refreshing…';
   try {
     if (name === 'feed' && app.state.$feedId) {
@@ -122,7 +114,7 @@ async function refreshView (name = current.value) {
 
 async function removeFeed (f) {
   if (!await PopPrompt.confirm(`Unfollow “${f.title}”? Its stored entries are removed too.`, { confirm: 'Unfollow' })) return;
-  if (current.value === 'feed' && app.state.$feedId === f.id) app.go('latest');
+  if (app.current.value === 'feed' && app.state.$feedId === f.id) open('latest');
   await db.removeFeed(f.id);
   flash('Unfollowed');
 }
@@ -136,9 +128,9 @@ function markAllRead (name) {
 // :::::: SIDEBAR
 
 function NavItem ({ name, icon, label, count }) {
-  const active = current.value === name;
+  const active = app.current.value === name;
   return html`
-    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)} title=${label}>
+    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => open(name)} title=${label}>
       <svg-icon icon=${icon} />
       <span class="nav-label">${label}</span>
       ${count > 0 && html`<span class="nav-count">${count}</span>`}
@@ -148,11 +140,11 @@ function NavItem ({ name, icon, label, count }) {
 function FeedItem ({ feed: f }) {
   const list   = db.itemsByFeed.value[f.id] || [];
   const unread = db.unreadIn(list);
-  const active = current.value === 'feed' && app.state.$feedId === f.id;
+  const active = app.current.value === 'feed' && app.state.$feedId === f.id;
   const spin   = db.refreshing.value[f.id];
   return html`
     <div class=${'feed-row' + (active ? ' active' : '')}>
-      <button class="feed-open" onClick=${() => app.go('feed', f.id)} title=${f.title}>
+      <button class="feed-open" onClick=${() => open('feed', f.id)} title=${f.title}>
         <span class="feed-ic">
           ${spin ? html`<svg-icon icon="loading" />`
                  : f.image ? html`<img src=${f.image} alt="" loading="lazy" onError=${e => e.target.style.display = 'none'} />`
@@ -292,13 +284,21 @@ function Header ({ name }) {
     </header>`;
 }
 
+// the three views are one list with its header, each over its own items
+const listView = name => () => html`
+  <${Header} name=${name} />
+  <main><${Body} name=${name} /></main>
+`;
+
+app.views = {
+  latest  : { route: '/',        view: listView('latest')  },
+  youtube : { route: '/youtube', view: listView('youtube') },
+  feed    : { route: '/feed',    view: listView('feed')    },
+};
+
 // :::::: APP
 
-const VIEWS = [
-  { name: 'latest',  route: '/'        },
-  { name: 'youtube', route: '/youtube' },
-  { name: 'feed',    route: '/feed'    },
-];
+const { Views } = await zugriff.components('Views');
 
 // the feeds are the way through: a sidebar from the start where there is room
 function App () {
@@ -314,21 +314,13 @@ function App () {
     if (!db.ready.value) return;
     Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
       if (!menu()?.isOverlay) menu()?.show();
-      current.value = app.root.view?.getAttribute('name') ?? 'latest';
     });
   }, [db.ready.value]);
 
   if (!db.ready.value) return html`<div class="booting"><svg-icon icon="svg-spinners:bars-scale-middle" /></div>`;
 
   return html`
-    <app-area name='main'>
-      ${VIEWS.map(({ name, route }) => html`
-        <app-view key=${name} name=${name} route=${route} active=${name === 'latest' || undefined}>
-          <${Header} name=${name} />
-          <div class="body-scroll"><${Body} name=${name} /></div>
-        </app-view>
-      `)}
-    </app-area>
+    <app-area name='main'><${Views} /></app-area>
     <app-area name='menu' dock='start'><${Sidebar} /></app-area>
     <app-area name='config' dock='end'><${Config} /></app-area>
   `;

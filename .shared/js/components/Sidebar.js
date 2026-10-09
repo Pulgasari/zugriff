@@ -10,8 +10,7 @@
 // pass `onClose` to get the mobile scrim (tap-to-close); omit it for a sidebar
 // that never becomes a drawer. extra class names go through `class`.
 
-import { html, preact } from './../vendors.js';
-const { Fragment } = preact;
+import { Fragment, html } from './../vendors.js';
 
 function Sidebar ({ isOpen = false, onClose, class: klass = '', children }) {
   const asideClass = ['z-sidebar', isOpen && 'is-open', klass].filter(Boolean).join(' ');

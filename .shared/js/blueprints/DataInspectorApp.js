@@ -2,8 +2,7 @@
 // paste data -> parse -> browse it as a tree. the parse/format pair is what
 // makes it a json, yaml, toml or csv inspector.
 
-import { html, signal, preact } from './../vendors.js';
-const { useState } = preact;
+import { html, signal, useState } from './../vendors.js';
 
 import CodeInputPane from './../components/CodeInputPane.js';
 
