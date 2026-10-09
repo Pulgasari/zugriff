@@ -3,7 +3,7 @@
 // capacitor build (.github/scripts/stage-capacitor-www.mjs): the root shell,
 // .shared and the app where vercel's rewrite puts it on the live site, the
 // first-party packages as local copies, the third-party modules vendored, the
-// icons as svgs, only the fonts in use, / moved to the app, and whatever nothing
+// icons as svgs, only the fonts in use, the app named in index.html, and whatever nothing
 // reaches dropped.
 //
 //   node <aufbau>/bundler/cli.js bundler.config.js slug=notes out=build/notes/www packages=build/_pkg
@@ -75,9 +75,9 @@ export default ({ dev = false, out, packages = 'build/_pkg', slug }) => ({
     origins : ['https://zugriff.dev'],
   },
 
-  // capacitor opens https://localhost/, the shell reads its route from the path.
-  // the dev build opens with ?dev, devtools on
-  start : `/${slug}/${dev ? '?dev' : ''}`,
+  // capacitor opens https://localhost/ and the page stays there: its index.html names
+  // the app (data-app, stage-capacitor-www.mjs). the dev build opens with ?dev, devtools on
+  start : dev ? '/?dev' : null,
 
   // boot.js builds the importmap itself, the local entries reach it as
   // __BOOT_CONFIG__.imports, which it lays over its own
