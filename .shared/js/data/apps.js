@@ -30,6 +30,18 @@ const typeDefaults = {
 };
 
 // ── the entries ────────────────────────────────
+const apps = {
+  audio    : { name: 'Audio',    categories: ['media'],         description : 'An audio files manager and player.' },
+  cli      : { name: 'CLI',      categories: ['code', 'files'], description : 'A terminal in the browser: files in the origin private file system, wasm tools run in a worker.' },
+  code     : { name: 'Code',     categories: ['code', 'files'], description : 'A code editor.' },
+  ebooks   : { name: 'eBooks',   categories: ['media'],         description : 'An eBooks manager and reader.' },
+  feeds    : { name: 'feeds',    categories: ['docs', 'media'], description : 'A RSS/atom feeds manager and reader.' },
+  files    : { name: 'files',    categories: ['files'],         description : 'A files manager.' },
+  icons    : { name: 'icons',    categories: ['design'],        description : 'An iconify browser.' },
+  images   : { name: 'images',   categories: ['image'],         description : 'An images manager, viewer and editor.' },
+  notes    : { name: 'Notes',    categories: ['docs', 'files'], description : 'A notes manager based on markdown.' },
+  podcasts : { name: 'Podcasts', categories: ['media'],         description : 'A podcasts manager and player.' },
+};
 const entries = [
 
   // ── apps
