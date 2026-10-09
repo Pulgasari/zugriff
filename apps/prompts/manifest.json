@@ -1,8 +1,8 @@
 {
   "id": "prompts",
-  "name": "Prompt Manager",
+  "name": "Prompts",
   "short_name": "Prompts",
-  "description": "Keep, tag and search your prompts — stored on this device.",
+  "description": "A prompts manager.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

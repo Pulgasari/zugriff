@@ -232,7 +232,7 @@ function App () {
 
   return html`
     <header class="topbar">
-      <svg-icon icon=${config.icon} />
+      <svg-icon icon=${app.url + 'app.svg'} mode='image' />
       <strong>${config.name}</strong>
       <div class="spacer"></div>
       ${app.state.$hasPhoto && html`

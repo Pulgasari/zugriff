@@ -2,7 +2,7 @@
   "id": "tools",
   "name": "Tools",
   "short_name": "Tools",
-  "description": "Small tools in one place: convert, format, inspect, minify, generate — all in the browser.",
+  "description": "A collection of micro-tools.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

@@ -2,7 +2,7 @@
   "id": "videos",
   "name": "Videos",
   "short_name": "Videos",
-  "description": "Browse your video folders, play them, and make quick edits — trim, rotate, flip — all on your device.",
+  "description": "A videos manager and player.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

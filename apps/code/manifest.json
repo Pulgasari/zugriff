@@ -2,7 +2,7 @@
   "id": "code",
   "name": "Code",
   "short_name": "Code",
-  "description": "A mobile-first code editor — edit a local folder or your GitHub repos with Monaco, a code keyboard and a command palette.",
+  "description": "A code editor.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

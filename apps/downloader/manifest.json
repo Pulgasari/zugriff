@@ -2,7 +2,7 @@
   "id": "downloader",
   "name": "Downloader",
   "short_name": "Downloader",
-  "description": "Paste or share links, they become packages: a queue fetches them resumably and puts the files where they belong.",
+  "description": "A downloads manager.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

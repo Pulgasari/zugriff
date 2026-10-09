@@ -1,8 +1,8 @@
 {
   "id": "images",
-  "name": "Images",
-  "short_name": "Images",
-  "description": "View, edit, convert and batch-process images, and browse image folders — all on your device.",
+  "name": "images",
+  "short_name": "images",
+  "description": "An images manager, viewer and editor.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",

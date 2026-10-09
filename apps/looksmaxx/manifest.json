@@ -2,7 +2,7 @@
   "id": "looksmaxx",
   "name": "Looksmaxx",
   "short_name": "Looksmaxx",
-  "description": "Load a photo and try on hair colours and hairstyles — MediaPipe hair segmentation, all on your device.",
+  "description": "Try on hair colours and hairstyles on a photo, on your device.",
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
