@@ -14,7 +14,8 @@
 
   <script>
     (() => {
-      const route    = location.pathname.split('/')[1] || 'home';
+      // the app: named by the page itself (a bundle, <html data-app>), else by the path
+      const route    = document.documentElement.dataset.app || location.pathname.split('/')[1] || 'home';
       const launcher = route === 'home' || route === 'apps' || route === 'tools';
       const head     = document.head;
       const link     = (rel, href, props) => head.append(Object.assign(document.createElement('link'), { rel, href, ...props }));
@@ -53,7 +54,7 @@
   try { await (window.__ZUGRIFF_READY__ ?? import('/.shared/js/runtime.js')); }
   catch (error) { console.error('[shell] runtime not ready:', error); }
 
-  const route    = location.pathname.split('/')[1] || 'home';
+  const route    = document.documentElement.dataset.app || location.pathname.split('/')[1] || 'home';
   const launcher = route === 'home' || route === 'apps' || route === 'tools';
 
   if (launcher) await import('/.shared/js/launcher.js');

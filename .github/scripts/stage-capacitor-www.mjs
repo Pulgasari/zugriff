@@ -26,11 +26,11 @@
 // :::::: IMPORT
 
 // ::: NODE.JS
-import { execFileSync }                 from 'node:child_process';
-import { existsSync }                   from 'node:fs';
-import { appendFile, writeFile }        from 'node:fs/promises';
-import { dirname, join, resolve }       from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { execFileSync }                    from 'node:child_process';
+import { existsSync }                      from 'node:fs';
+import { appendFile, readFile, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve }          from 'node:path';
+import { fileURLToPath, pathToFileURL }    from 'node:url';
 
 // ::: ZUGRIFF
 import { registry } from './../../.shared/js/data/apps.js';
@@ -64,6 +64,11 @@ if (!existsSync(join(bundler, 'node_modules'))) execFileSync('npm', ['install', 
 const { bundle } = await import(pathToFileURL(join(bundler, 'index.js')));
 const dev = process.env.DEVTOOLS === '1';
 const { summary } = await bundle({ ...config({ dev, out: resolve(outDir, 'www'), packages, slug }), root: ROOT });
+
+// a bundle is one app: its index.html names it, so the shell does not need the app in
+// the path. capacitor at https://localhost/ and <slug>.zugriff.dev both open it at /
+const index = resolve(outDir, 'www', 'index.html');
+await writeFile(index, (await readFile(index, 'utf8')).replace(/<html\b/, `<html data-app="${slug}"`));
 
 const ota = { slug, version: process.env.OTA_VERSION || stampOf(), ...(process.env.OTA_MANIFEST && { manifest: process.env.OTA_MANIFEST }) };
 await writeFile(resolve(outDir, 'www', 'ota.json'), JSON.stringify(ota, null, 2) + '\n');

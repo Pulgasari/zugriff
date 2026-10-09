@@ -25,7 +25,7 @@ as `zugriff.dev/www/<slug>/`, vercel would also rewrite that to `apps/`.
 
 ```sh
 npx serve -s www/podcasts     # -s: unknown paths fall back to index.html
-# open http://localhost:3000/ — it moves on to /podcasts/ by itself
+# open http://localhost:3000/ — the index.html names its app, it opens at /
 ```
 
 on the live deployment every bundle has a subdomain, `<slug>.zugriff.dev`:
