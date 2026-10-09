@@ -194,7 +194,18 @@ class ZugriffApp {
   dialogs    = many(this.dialog);
   modules    = many(this.module);
   panels     = many(this.panel);
-  views      = many(this.view);
+
+  // ::: views of #app, rendered by <Views />. a view with a route is a place of its
+  // own, one without is a detail: it renders once go() handed it params, and a reload
+  // lands on the first view
+  //
+  //   app.views = {
+  //     latest  : { route: '/', view: 'LatestView' },
+  //     episode : 'EpisodeDetailView',
+  //   };
+  views   = {};
+  current = signal(null);   // the name of the view on screen
+  params  = signal({});     // per view, the params it was last opened with
   
   // ::: actions
   get actions ()    { return this._actions; }
@@ -206,8 +217,19 @@ class ZugriffApp {
 
   // ::: routes, each change a view transition (transitions.js). an app on #app's
   // views rewires setRoute to app.show
-  setRoute = (id = null)       => transition(() => { this.state.route = id; });
-  go       = (name, id = null) => transition(() => { this.state.route = { name, id }; });
+  setRoute = (id = null) => transition(() => { this.state.route = id; });
+
+  // a declared view: its params are kept (a bare value is { id }) and #app shows it.
+  // anything else is a route of an app without views
+  go = (name, params) => {
+    if (!(name in this.views)) return transition(() => { this.state.route = { name, id: params ?? null }; });
+
+    if (params !== undefined) {
+      const next = params !== null && typeof params === 'object' ? params : { id: params };
+      this.params.value = { ...this.params.value, [name]: next };
+    }
+    return this.show(name);
+  };
 
   // ::: the frame. #app is the page's <app-root>, its areas and views are the app's
   get root () { return document.getElementById('app'); }
@@ -231,8 +253,14 @@ class ZugriffApp {
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
 
+    // the view on screen, from #app itself. listening first, the first view is shown
+    // while App renders
+    this.root?.addEventListener('navigate', event => { this.current.value = event.detail.to; });
+
     if (App) render(html`<${App} />`, $target);
     await reveal($target);   // frame, dock and first view appear together
+
+    this.current.value ??= this.root?.view?.getAttribute('name') ?? null;
 
     // android build `capacitor`: confirm this bundle, fetch a newer one for the next start
     if (globalThis.Capacitor?.Plugins?.CapacitorUpdater) import('./modules/ota.js').then(({ ota }) => ota());

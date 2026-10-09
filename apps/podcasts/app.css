@@ -13,6 +13,36 @@ the root fills #app as in files/app.css:
   app-root { flex: 1 1 auto; min-block-size: 0; }
 */
 
+/*
+SUGGESTION — views without the .view wrapper (components/Views.js, ViewHeader.js)
+the <app-view> is the root of a view now: header + main sit directly in it, there is
+no div.view, no #episode / #podcast and no .explore-view / .podcast-view anymore.
+a view is addressed by its name. the two blocks below as they would read:
+
+app-view {
+  display   : flex;
+  flex-flow : column;
+
+  > * { padding: 1rem; }
+  > main:has(> data-index) { padding: 0; }
+
+  .search-panel { background: var(--color-bg); }
+  .search-panel { width: 100%; position: sticky; top: 0; }
+  input-search  { width: stretch; }
+}
+
+app-view:is([name='episode'], [name='podcast']) {
+  > main > .art {
+    max-width: 75%;
+    img { width: stretch; }
+  }
+}
+
+and in the explore suggestion further down:
+  .explore-view          -> app-view[name='explore']
+  .explore-podcast-view  -> app-view[name='explore-podcast']
+*/
+
 .view {
   display   : flex;
   flex-flow : column;

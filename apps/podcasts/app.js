@@ -5,7 +5,6 @@ const app = zugriff.app;
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::::
 
 import { gestalt }           from '@aufbau/api';
-import { signal }            from '@aufbau/signals';
 import { useEffect, useRef } from 'preact/hooks';
 
 import { createThumbCache } from '/.shared/js/thumbs.js';
@@ -23,17 +22,15 @@ app.library = library;
 app.player  = player;
 app.thumbs  = createThumbCache();
 
-const [{ Dock, Slot }, { PlayerPanel }, Export] = await Promise.all([
-  zugriff.components('Dock', 'Slot'),
+const [{ Dock, Slot, Views }, { PlayerPanel }, Export] = await Promise.all([
+  zugriff.components('Dock', 'Slot', 'Views'),
   app.panels('PlayerPanel'),
   app.component('Export'),
 ]);
 
 // :::: STATE
-// dialog and route are declared by createState; this app's own keys go on the same
-// store. nothing added here is persisted — a leaf has to ask for that.
-app.state.route = { name: 'latest', id: null };
-
+// dialog is declared by createState; this app's own keys go on the same store.
+// nothing added here is persisted — a leaf has to ask for that.
 app.state.$extend({
   busy           : { type: String, value: '' },   // a label while a long task runs
   search         : { type: String, value: '' },   // shared episode filter, written by SearchPanel
@@ -98,57 +95,33 @@ app.effect(() => {
 
 // :::::: FRAME ::::::::::::::::::::::::::::::::::::::::::::::
 
-const show = app.show;
 const area = app.area;
 
-// the view on screen, and the id each detail view was last opened with. a detail
-// view keeps its id while it is hidden, so it still shows its podcast on the way out
-const current = signal('latest');
-const ids     = signal({});
-
-app.go = (name, id = null) => {
-  if (id != null) ids.value = { ...ids.value, [name]: id };
-  app.state.route = { name, id };
-  show(name);
+// the lists have a route, the details do not: they render once app.go() opened them,
+// and a reload lands on the first list. explore-podcast is opened with a feed url
+// rather than an id, a podcast that is not subscribed has no record to point at
+app.views = {
+  latest            : { route: '/',         view: 'LatestView' },
+  episode           : 'EpisodeDetailView',
+  podcasts          : { route: '/podcasts', view: 'PodcastsView' },
+  podcast           : 'PodcastDetailView',
+  saved             : { route: '/saved',    view: 'SavedView' },
+  explore           : { route: '/explore',  view: 'ExploreView' },
+  'explore-podcast' : 'ExplorePodcastView',
 };
-
-// the lists have a route, the details do not: an id is no part of the address, and a
-// reload lands on the list the detail was opened from
-const VIEWS = [
-  { name: 'latest',          route: '/'         },
-  { name: 'episode'                             },
-  { name: 'podcasts',        route: '/podcasts' },
-  { name: 'podcast'                             },
-  { name: 'saved',           route: '/saved'    },
-  { name: 'explore',         route: '/explore'  },
-  { name: 'explore-podcast'                     },
-];
-
-// match: the detail views that keep their list's item active
-const dockItems = [
-  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'latest',   match: ['episode']         },
-  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts', match: ['podcast']         },
-  { label: 'Later',    icon: 'bookmarks',             view: 'saved'                                },
-  { label: 'Explore',  icon: 'mdi:compass-outline',   view: 'explore',  match: ['explore-podcast'] },
-  { label: 'Settings', icon: 'settings',              onClick: () => area('config')?.toggle()      },
-];
 
 app.dialogs = {
   add : 'AddPodcastDialog',
 };
 
-app.views = {
-  latest   : 'LatestView',
-  episode  : 'EpisodeDetailView',
-  podcasts : 'PodcastsView',
-  podcast  : 'PodcastDetailView',
-  saved    : 'SavedView',
-
-  // explore routes on the feed url rather than an id — a podcast that is not
-  // subscribed has no record to point at (views/ExplorePodcastView.js)
-  explore           : 'ExploreView',
-  'explore-podcast' : 'ExplorePodcastView',
-};
+// a detail view keeps the item of the list it was opened from
+const dockItems = [
+  { label: 'Episodes', icon: 'mdi:playlist-play',     view: 'latest'                        },
+  { label: 'Podcasts', icon: 'mdi:view-grid-outline', view: 'podcasts'                      },
+  { label: 'Later',    icon: 'bookmarks',             view: 'saved'                         },
+  { label: 'Explore',  icon: 'mdi:compass-outline',   view: 'explore'                       },
+  { label: 'Settings', icon: 'settings',              onClick: () => area('config')?.toggle() },
+];
 
 // :::::: CONFIG ::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -189,32 +162,13 @@ function Config () {
 
 // :::::: ROOT ::::::::::::::::::::::::::::::::::::::::::::::::
 
-// a detail view renders once it has been given an id
-function View ({ name }) {
-  const id     = ids.value[name] ?? null;
-  const detail = !VIEWS.find(view => view.name === name).route;
-  if (detail && id == null) return null;
-  return html`<${Slot} map=${app.views} name=${name} load='view' id=${id} />`;
-}
-
-function onNavigate (event) {
-  current.value   = event.detail.to;
-  app.state.route = { name: event.detail.to, id: ids.value[event.detail.to] ?? null };
-}
-
-app.root.addEventListener('navigate', onNavigate);
-
 // the areas of #app, the root
 function App () {
   return html`
     <app-area name='main'>
-      ${VIEWS.map(({ name, route }) => html`
-        <app-view key=${name} name=${name} route=${route} transition-on='glide' active=${name === 'latest' || undefined}>
-          <${View} name=${name} />
-        </app-view>
-      `)}
+      <${Views} transition-on='glide' />
       <${PlayerPanel} />
-      <${Dock} items=${dockItems} current=${current.value} />
+      <${Dock} items=${dockItems} />
       <${Slot} map=${app.dialogs} name=${app.state.$dialog} load='dialog' />
     </app-area>
     <app-area name='config' dock='end'><${Config} /></app-area>

@@ -1,7 +1,7 @@
 // podcasts :: views/LatestView.js
 
 import SearchPanel from '/.shared/js/components/SearchPanel.js';
-import View        from '/.shared/js/components/View.js';
+import ViewHeader  from '/.shared/js/components/ViewHeader.js';
 
 import EpisodesIndex      from './../components/EpisodesIndex.js';
 import { useTable }        from './../modules/hooks.js';
@@ -35,11 +35,10 @@ export default function LatestView () {
     };
 
   return html`
-    <${View} title='latest episodes' tools=${actions}>
-      <main>
-        ${hasSubs && html`<${SearchPanel} />`}
-        <${EpisodesIndex} episodes=${filteredEpisodes} empty=${empty} />
-      </main>
-    </${View}>
+    <${ViewHeader} title='latest episodes' tools=${actions} />
+    <main>
+      ${hasSubs && html`<${SearchPanel} />`}
+      <${EpisodesIndex} episodes=${filteredEpisodes} empty=${empty} />
+    </main>
   `;
 }

@@ -2,7 +2,7 @@
 
 import EpisodesIndex from './../components/EpisodesIndex.js';
 import SearchPanel   from '/.shared/js/components/SearchPanel.js';
-import View          from '/.shared/js/components/View.js';
+import ViewHeader    from '/.shared/js/components/ViewHeader.js';
 import { useTable }  from './../modules/hooks.js';
 
 const app = zugriff.app;
@@ -28,12 +28,11 @@ function SavedView () {
   };
 
   return html`
-    <${View} title='listen later'>
-      <main>
-        ${list && html`<${SearchPanel} />`}
-        <${EpisodesIndex} episodes=${list} empty=${empty} />
-      </main>
-    </${View}>
+    <${ViewHeader} title='listen later' />
+    <main>
+      ${list && html`<${SearchPanel} />`}
+      <${EpisodesIndex} episodes=${list} empty=${empty} />
+    </main>
   `;
 }
 

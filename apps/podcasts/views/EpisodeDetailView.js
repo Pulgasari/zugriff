@@ -2,7 +2,7 @@
 
 import ActionMenu from '/.shared/js/components/ActionMenu.js';
 import Empty      from '/.shared/js/components/Empty.js';
-import View       from '/.shared/js/components/View.js';
+import ViewHeader from '/.shared/js/components/ViewHeader.js';
 
 import Art        from './../components/Artwork.js';
 
@@ -17,9 +17,9 @@ export default function EpisodeDetailView ({ id }) {
 
   if (episode === null) return null;
   if (!episode) return html`
-    <${View} back=${{ label: 'Back', onClick: () => app.go('latest') }}>
-      <${Empty} icon='alert' title='episode not found' />
-    <//>`;
+    <${ViewHeader} back='latest' />
+    <${Empty} icon='alert' title='episode not found' />
+  `;
 
   const player   = app.player;
   const state    = app.library.stateOf(id);
@@ -59,31 +59,27 @@ export default function EpisodeDetailView ({ id }) {
   };
 
   return html`
-    <${View} class='episode-view' id='episode'>
-      <header>
-        <btn-icon icon='arrow-left' label='back' ...${back} />
-      </header>
+    <${ViewHeader} back=${back} />
 
-      <main>
-        <${Art} src=${episode.image || podcast?.image} size=${160} />
-        
-        <div class='info'>
-          ${podcast && html`<button onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
-          <h1>${episode.title}</h1>
-          <div class="meta">
-            <span>${fmtDate(episode.pubDate)}</span>
-            ${episode.duration && html`<span> ${fmtDuration(episode.duration)}</span>`}
-            ${state.done       && html`<span>· <svg-icon icon="mdi:check-circle" /> done</span>`}
-          </div>
-
-          <${ActionMenu} items=${actions} />
-          <aufbau-progress value=${percent} />
+    <main>
+      <${Art} src=${episode.image || podcast?.image} size=${160} />
+      
+      <div class='info'>
+        ${podcast && html`<button onClick=${() => app.go('podcast', podcast.id)}>${podcast.title}</button>`}
+        <h1>${episode.title}</h1>
+        <div class="meta">
+          <span>${fmtDate(episode.pubDate)}</span>
+          ${episode.duration && html`<span> ${fmtDuration(episode.duration)}</span>`}
+          ${state.done       && html`<span>· <svg-icon icon="mdi:check-circle" /> done</span>`}
         </div>
+
+        <${ActionMenu} items=${actions} />
+        <aufbau-progress value=${percent} />
+      </div>
   
-        ${paras.length
-        ? html`<div>${paras.map((p,i) => html`<p key=${i}>${p}</p>`)}</div>`
-        : html`<i>No description.</i>`}
-      </main>
-    </${View}>
+      ${paras.length
+      ? html`<div>${paras.map((p,i) => html`<p key=${i}>${p}</p>`)}</div>`
+      : html`<i>No description.</i>`}
+    </main>
   `;
 }

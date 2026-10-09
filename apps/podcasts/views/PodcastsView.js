@@ -3,7 +3,6 @@
 import { enumSignal } from '@aufbau/signals';
 
 import Picker     from '/.shared/js/components/Picker.js';
-import View       from '/.shared/js/components/View.js';
 
 import PodcastsIndex    from './../components/PodcastsIndex.js';
 import { useTable }     from './../modules/hooks.js';
@@ -20,27 +19,25 @@ function PodcastsView () {
   const sortedPodcasts = sortPodcasts(podcasts, sorting);
 
   return html`
-    <${View}>
-      <header>
-        <h1>Podcasts</h1>
-        <div class="view-tools">
-          <${Picker} signal=${sorting}  look='segments' />
-          <${Picker} signal=${viewmode} look='segments' />
-          <btn-icon icon|label='add' onClick=${() => app.state.dialog = 'add'} />    
-        </div>
-      </header>
-      
-      <main>
-        <${PodcastsIndex}
-          podcasts=${sortedPodcasts}
-          empty=${{
-            icon  : 'rss', 
-            title : 'No subscriptions yet',
-            hint  : "Paste a podcast's RSS feed URL to subscribe." 
-          }}
-        />
-      </main>
-    </${View}>
+    <header>
+      <h1>Podcasts</h1>
+      <div class="view-tools">
+        <${Picker} signal=${sorting}  look='segments' />
+        <${Picker} signal=${viewmode} look='segments' />
+        <btn-icon icon|label='add' onClick=${() => app.state.dialog = 'add'} />
+      </div>
+    </header>
+
+    <main>
+      <${PodcastsIndex}
+        podcasts=${sortedPodcasts}
+        empty=${{
+          icon  : 'rss',
+          title : 'No subscriptions yet',
+          hint  : "Paste a podcast's RSS feed URL to subscribe."
+        }}
+      />
+    </main>
   `;
 }
 
