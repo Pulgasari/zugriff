@@ -17,16 +17,12 @@ import * as engine           from './modules/engine.js';
 import * as frame            from './modules/frame.js';
 import { usePlugins }        from './modules/plugins.js';
 
-const { area, current, show } = frame;
-
-const // shared components
-Config     = await zugriff.component('Config'),
-Dock       = await zugriff.component('Dock'),
-Empty      = await zugriff.component('Empty');
+const { Config, Dock, Empty, ViewHeader, Views } = await zugriff.components('Config', 'Dock', 'Empty', 'ViewHeader', 'Views');
 
 // :::::: APP
 
-const app = zugriff.app;
+const app  = zugriff.app;
+const area = app.area;
 app.db = app.database;
 
 // the queue's settings, persisted, in the config area after the shared ones
@@ -99,10 +95,10 @@ document.addEventListener('drop', event => {
 
 app.actions = {
   'close'     : () => frame.closeDetail(),
-  'grab'      : () => show('grab'),
-  'library'   : () => show('library'),
+  'grab'      : () => app.go('grab'),
+  'library'   : () => app.go('library'),
   'pause-all' : () => engine.active.peek().forEach(row => engine.pause(row.id)),
-  'queue'     : () => show('queue'),
+  'queue'     : () => app.go('queue'),
 };
 
 app.hotkeys = {
@@ -114,14 +110,10 @@ app.hotkeys = {
 
 // :::::: VIEWS
 
+// the predefined header, the settings always last
 function Header ({ title, children }) {
-  return html`
-    <header>
-      <h2>${title}</h2>
-      ${children}
-      <btn-icon icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />
-    </header>
-  `;
+  const tools = html`${children}<btn-icon icon='settings' title='settings' onClick=${() => area('config')?.toggle()} />`;
+  return html`<${ViewHeader} title=${title} tools=${tools} />`;
 }
 
 function Queue () {
@@ -129,47 +121,44 @@ function Queue () {
   const { running, speed } = totals.value;
 
   return html`
-    <div class='view'>
-      <${Header} title='Queue'>
-        ${running > 0 && html`<span class='status'>${running} running · ${zugriff.fmt.bytes(speed)}/s</span>`}
-        ${engine.active.value.length > 0 && html`<btn-icon icon='lucide:pause' title='pause all' onClick=${app.actions['pause-all']} />`}
-      <//>
-      <main class='list'>
-        ${groups.length
-          ? groups.map(({ pack, rows }) => html`<${PackageCard} key=${pack?.id ?? 'none'} pack=${pack} rows=${rows} />`)
-          : html`<${Empty} icon='lucide:download-cloud' title='Nothing in the queue' hint='paste links anywhere, or add them in the grabber' action=${html`<btn-push icon='lucide:link' label='add links' onClick=${() => show('grab')} />`} />`}
-      </main>
-    </div>
+    <${Header} title='Queue'>
+      ${running > 0 && html`<span class='status'>${running} running · ${zugriff.fmt.bytes(speed)}/s</span>`}
+      ${engine.active.value.length > 0 && html`<btn-icon icon='lucide:pause' title='pause all' onClick=${app.actions['pause-all']} />`}
+    <//>
+    <main class='list'>
+      ${groups.length
+        ? groups.map(({ pack, rows }) => html`<${PackageCard} key=${pack?.id ?? 'none'} pack=${pack} rows=${rows} />`)
+        : html`<${Empty} icon='lucide:download-cloud' title='Nothing in the queue' hint='paste links anywhere, or add them in the grabber' action=${html`<btn-push icon='lucide:link' label='add links' onClick=${() => app.go('grab')} />`} />`}
+    </main>
   `;
 }
 
 function Grab () {
   return html`
-    <div class='view'>
-      <${Header} title='Grabber' />
-      <main class='list'><${Grabber} /></main>
-    </div>
+    <${Header} title='Grabber' />
+    <main class='list'><${Grabber} /></main>
   `;
 }
 
 function Library () {
   const groups = library.value;
   return html`
-    <div class='view'>
-      <${Header} title='Library' />
-      <main class='list'>
-        ${groups.length
-          ? groups.map(({ pack, rows }) => html`<${PackageCard} key=${pack?.id ?? 'none'} pack=${pack} rows=${rows} />`)
-          : html`<${Empty} icon='lucide:library' title='Nothing done yet' hint='finished downloads show here' />`}
-      </main>
-    </div>
+    <${Header} title='Library' />
+    <main class='list'>
+      ${groups.length
+        ? groups.map(({ pack, rows }) => html`<${PackageCard} key=${pack?.id ?? 'none'} pack=${pack} rows=${rows} />`)
+        : html`<${Empty} icon='lucide:library' title='Nothing done yet' hint='finished downloads show here' />`}
+    </main>
   `;
 }
 
 // :::::: ROOT
 
-// the dock's view items call app.go
-app.go = name => show(name);
+app.views = {
+  queue   : { route: '/',        view: Queue   },
+  grab    : { route: '/grab',    view: Grab    },
+  library : { route: '/library', view: Library },
+};
 
 const dockItems = [
   { icon: 'lucide:list-video', label: 'queue',    view: 'queue'                            },
@@ -178,27 +167,16 @@ const dockItems = [
   { icon: 'settings',          label: 'settings', onClick: () => area('config')?.toggle() },
 ];
 
-function onNavigate (event) {
-  current.value = event.detail.to;
-}
-
-app.root.addEventListener('navigate', onNavigate);
-
 // the areas of #app, the root
 function App () {
   useEffect(() => {
-    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
-      current.value = app.root.view?.getAttribute('name') ?? 'queue';
-      fromShare();
-    });
+    Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(fromShare);
   }, []);
 
   return html`
     <app-area name='main'>
-      <app-view name='queue'   route='/'        active><${Queue} /></app-view>
-      <app-view name='grab'    route='/grab'    transition-on='glide'><${Grab} /></app-view>
-      <app-view name='library' route='/library' transition-on='glide'><${Library} /></app-view>
-      <${Dock} items=${dockItems} current=${current.value} />
+      <${Views} transition-on='glide' />
+      <${Dock} items=${dockItems} />
     </app-area>
     <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Detail} /></app-area>
     <app-area name='config' dock='end'>

@@ -5,7 +5,6 @@
 import { useState } from 'preact/hooks';
 
 import * as engine  from '../modules/engine.js';
-import { show }     from '../modules/frame.js';
 import * as grabber from '../modules/grabber.js';
 
 const app = zugriff.app;
@@ -18,7 +17,7 @@ const TARGETS = [['library', 'library'], ['folder', 'folder'], ['webdav', 'webda
 export async function grabText (text) {
   const count = await grabber.grab(text);
   if (!count) app.toast({ warning: 'no links in there' });
-  else show('grab');
+  else app.go('grab');
   return count;
 }
 
@@ -32,7 +31,7 @@ async function start (group, target) {
   if (!entries.length) return;
   await engine.add({ entries, name: group.name, target });
   grabber.drop(group.id);
-  if (!grabber.found.peek().length) show('queue');
+  if (!grabber.found.peek().length) app.go('queue');
 }
 
 function Group ({ group }) {
