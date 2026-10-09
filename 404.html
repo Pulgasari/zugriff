@@ -86,19 +86,20 @@ the start page then adds the shell's look (boot.js, aufbau), a 404 page stays pl
   <!-- the start page's look: the landing layout, the glitch and the moving grid -->
   <script type="module">
     if (document.documentElement.dataset.page === 'start') {
-      const [{ default: aufbau }, { applyFilter }, { applyPattern }, { default: getStyleToken }] = await Promise.all([
+      const [
+        { default: aufbau },
+        { default: getStyleToken },
+      ] = await Promise.all([
         import('@aufbau/api'),
-        import('@aufbau/filters'),
-        import('@aufbau/patterns'),
         import('@domina/methods/getStyleToken.js'),
       ]);
 
-      await aufbau.boot({ css: { layout: 'landing', palette: 'zombie' } });
+      await aufbau.boot({ css: { layout: 'landing', palette: 'synthwave' } });
 
       const bg = getStyleToken('bg') || '#000000';
       const fg = getStyleToken('fg') || '#c8d0e0';
-      applyFilter('body', 'glitch-live', { animate: true, speed: '2s' });
-      applyPattern(document.body, 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
+      aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: '2s' });
+      aufbau.patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
     }
   </script>
 
