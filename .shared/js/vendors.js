@@ -18,12 +18,13 @@ export * from '@pulgasari/timing';
 
 //
 
-import { isArray, isObject, isString } from '@pulgasari/is';
+//import { isArray, isObject, isString } from '@pulgasari/is';
 
 
 
 // ::: preact + htm
 //import htm from 'htm';
+/*
 import * as preactCore  from 'preact';
 import * as preactHooks from 'preact/hooks';
 import { Signal, batch, computed, effect, signal, untracked } from '@aufbau/signals';
@@ -35,6 +36,7 @@ const preact = {
   ...preactHooks,
   signal, Signal, computed, effect, batch, untracked,
 };
+*/
 
 // htx
 //const html = createHtml(h, Fragment);
@@ -42,17 +44,21 @@ const preact = {
 
 
 // :::::: EXPORT
+// export { signal, Signal, computed, effect, batch, untracked };
 
-// ::: htx
-export * from '@htx/preact';
 
 // ::: preact
+/*
 export * from 'preact';
 export * from 'preact/hooks';
 export { preact };
+*/
+
+// ::: htx + preact
+export * from '@htx/preact';
 
 // ::: signals
-export { signal, Signal, computed, effect, batch, untracked };
+export * from '@aufbau/signals';
 
 // ::: pulgasari utils
 export * from '@pulgasari/is';
