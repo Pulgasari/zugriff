@@ -1,0 +1,23 @@
+// shared/js/components/InstallTip.js
+// <${InstallTip} show=${db.sources.value.length > 0} />
+// <${InstallTip} message="Install to keep your book folders connected." />
+
+import { html } from './../vendors.js';
+
+const DEFAULT_MESSAGE = 'Install the app so your folders stay connected between visits — no reconnecting.';
+
+function InstallTip ({ message = DEFAULT_MESSAGE }) {
+  if (zugriff.app.isInstalled) return null;
+
+  return html`
+    <div class='install-tip'>
+      <svg-icon icon='info' />
+      <span class='text'>${message}</span>
+      ${zugriff.app.canInstall
+        ? html`<btn-push onClick=${zugriff.app.promptInstall} icon='download' label='Install app' />`      
+        : html`<span class='hint'>Use your browser’s <b>Install</b> / <b>Add to Home screen</b> menu.</span>`}
+    </div>`;
+}
+
+export       { InstallTip };
+export default InstallTip;

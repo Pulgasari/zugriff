@@ -49,7 +49,8 @@ const getApp = slug => {
   return instances.get(slug);
 };
 
-const route      = window.location.pathname.split('/')[1] || null;
+// the app: named by the page (<html data-app>, a bundle or index.html), else by the path
+const route      = document.documentElement.dataset.app || window.location.pathname.split('/')[1] || null;
 const isAppRoute = route !== null && route !== 'apps' && route !== 'tools';
 
 // :::::: BUNDLE

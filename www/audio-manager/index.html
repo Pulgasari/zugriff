@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html data-app="audio-manager" lang="en">
+
+<head>
+  <script>window.__BOOT_CONFIG__ = { imports: {"@pulgasari/is":"/_vendor/@jsr/pulgasari__is@latest/index.js","@pulgasari/logger":"/_vendor/@jsr/pulgasari__logger@latest/index.js","@pulgasari/str":"/_vendor/@jsr/pulgasari__str@latest/index.js","acorn":"/_vendor/acorn@8/index.js","htm":"/_vendor/htm@3.1.1/index.js","htm/preact":"/_vendor/htm@3.1.1/preact.js","preact":"/_vendor/preact@10.20.1/index.js","preact/hooks":"/_vendor/preact@10.20.1/hooks.js","preact/jsx-runtime":"/_vendor/preact@10.20.1/jsx-runtime.js","@preact/signals":"/_vendor/@preact/signals@1.2.2/index.js","hljs":"/_vendor/highlight.js@11.9.0/index.js","highlight.js":"/_vendor/highlight.js@11.10.0/lib/core.js","highlight.js/languages/":"/_vendor/highlight.js@11.10.0/lib/languages/","@xterm/addon-fit":"/_vendor/@xterm/addon-fit@0.10.0/index.js","@xterm/xterm":"/_vendor/@xterm/xterm@5.5.0/index.js","smol-toml":"/_vendor/smol-toml@1.3.1/index.js","yaml":"/_vendor/yaml@2.4.5/index.js","csso":"/_vendor/csso@5.0.5/index.js","terser":"/_vendor/terser@5.31.1/index.js","pdf-lib":"/_vendor/pdf-lib@1.17.1/index.js","pdfjs":"/_vendor/pdfjs-dist@4.4.168/index.js","pdfjs-worker":"/_vendor/pdfjs-dist@4.4.168/build/pdf.worker.min.js","epubjs":"/_vendor/epubjs@0.3.93/index.js","@ffmpeg/ffmpeg":"/_vendor/@ffmpeg/ffmpeg@0.12.10/index.js","@ffmpeg/util":"/_vendor/@ffmpeg/util@0.12.1/index.js","@ffmpeg/core":"/_vendor/@ffmpeg/core@0.12.6/dist/esm/ffmpeg-core.js","upng-js":"/_vendor/upng-js@2.1.0/index.js","gifenc":"/_vendor/gifenc@1.0.3/index.js","music-metadata":"/_vendor/music-metadata@11/index.js","culori":"/_vendor/culori@3.3.0/index.js","@mediapipe/tasks-vision":"/_vendor/@mediapipe/tasks-vision@0.10.14/index.js"} };</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#282a36">
+  <meta name="msapplication-TileColor" content="#282a36">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#282a36">
+  
+  <title>zugriff</title>
+  <link rel="stylesheet" href="/.shared/css/index.css">
+
+  <script>
+    (() => {
+      // the app: named by the page itself (a bundle, <html data-app>), else by the path
+      const route    = document.documentElement.dataset.app || location.pathname.split('/')[1] || 'home';
+      const launcher = route === 'home' || route === 'apps' || route === 'tools';
+      const head     = document.head;
+      const link     = (rel, href, props) => head.append(Object.assign(document.createElement('link'), { rel, href, ...props }));
+
+      if (launcher) {
+        link('icon', '/icon.svg', { type: 'image/svg+xml' });
+        link('stylesheet', '/.shared/css/launcher.css');
+      } else {
+        const basePath = '/' + route;
+        document.documentElement.dataset.app   = route;
+        link('manifest', basePath + '/manifest.json');
+        link('icon', basePath + '/app.svg', { type: 'image/svg+xml' });
+        link('apple-touch-icon', basePath + '/app.svg');
+        link('stylesheet', '/.shared/css/explorer.css');
+        link('stylesheet', basePath + '/app.css');
+      }
+    })();
+  </script>
+
+  <script src="/.shared/js/boot.js"></script>
+
+  <style>
+    :root.is-loading #app { opacity: 0; filter: blur(3px); }
+    :root.is-ready   #app { opacity: 1; filter: none; transition: opacity 500ms ease, filter 500ms ease; }
+    /* launcher-only backdrop layers */
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.12; }
+    body > #app, #welcome, header, footer { position: relative; z-index: 1; }
+  </style>
+  <script type="module" src="/_icons/provide.js"></script>
+</head>
+
+<body class="mobilefix">
+
+<app-root id='app' routing='hash'></app-root>
+
+<script type="module">
+  try { await (window.__ZUGRIFF_READY__ ?? import('/.shared/js/runtime.js')); }
+  catch (error) { console.error('[shell] runtime not ready:', error); }
+
+  const route    = document.documentElement.dataset.app || location.pathname.split('/')[1] || 'home';
+  const launcher = route === 'home' || route === 'apps' || route === 'tools';
+
+  if (launcher) await import('/.shared/js/launcher.js');
+  else          await import('/' + route + '/app.js');
+  
+  if (route === 'icons') await import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
+</script>
+<script type="module">
+  const dev = new URLSearchParams(location.search).get('dev');
+
+  if (dev !== null && dev !== 'off' && dev !== '0') {
+    try           { await import('@aufbau/devtools/boot.js'); }
+    catch (error) { console.error('[shell] devtools not loaded:', error); }
+  }
+</script>
+
+</body>
+</html>

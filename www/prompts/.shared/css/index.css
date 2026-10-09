@@ -1,0 +1,117 @@
+@import url('/_pkg/aufbau/css/aufbau.css');
+
+html, body { height: 100%; }
+body { overflow: hidden; overscroll-behavior: none; }
+
+/* #app is the <app-root>. with areas it is their grid (app-root's own css),
+   an app without areas gets a column */
+#app {
+  height   : 100dvh;
+  overflow : hidden;
+
+  &:not(:has(> app-area)) { display: flex; flex-flow: column; }
+}
+
+app-view, .view, .View {
+  header {
+    --bg  : --darker(bg, 0.2);
+    --gap : small;
+    --pad : normal;
+    display: flex; justify-content: space-between;
+    position: sticky; top: 0;
+  }
+  
+  header        { text-transform: uppercase; }
+  header button { text-transform: uppercase; }
+}
+
+/* ── the dock, the Dock component: a row of btn-tap, icon over label ─────── */
+
+#app-dock, .dock, .Dock {
+  --bg       : --darker(bg, 0.1);
+  border-top : 1px solid var(--line);
+  display    : flex;
+  flex       : none;
+  text-transform: uppercase;
+
+  > btn-tap {
+    --bg           : --darker(bg, 0.2);
+    flex           : 1 1 0;
+    flex-direction : column;
+    font-size      : 1rem;
+    gap            : --space(small);
+    padding        : --space(small);
+    opacity        : 0.5;
+
+    &:hover       { opacity: 1; }
+    &.active      { opacity: 1; color: --color(ink); }
+    &::part(icon) { font-size: 2rem; }
+  }
+}
+
+/* ── tokens ─────────────────────────────────────────────────────── */
+
+body {
+  --hover   :  --alpha(fg, 90%);
+  --line    :  --alpha(fg, 50%);
+  --panel   : --darker(bg, 10%);
+  --panel-2 : --darker(bg, 20%);
+  --zebra   : --darker(bg, 10%);
+  /* --radius  : 0.5rem; */
+}
+
+/* ── mobile / android  ─────────────────────────────────────────────────────── */
+
+/*
+safe-area insets. non-zero where the page runs edge-to-edge:
+the capacitor wrappers (android 15+ enforces it, viewport-fit=cover opts in) and notched screens.      
+body's background covers the canvas behind the system bars, #app keeps clear
+*/
+
+body {
+  --safe-top    : env(safe-area-inset-top,    0px);
+  --safe-right  : env(safe-area-inset-right,  0px);
+  --safe-bottom : env(safe-area-inset-bottom, 0px);
+  --safe-left   : env(safe-area-inset-left,   0px);
+}
+
+:root #app {
+  background-clip : content-box;
+  padding         : var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+}
+
+
+/* CUSTOM PROPS */
+
+
+/* TYPO */
+
+/*
+:root {
+  --font      : "Manrope";
+  --font-code : "JetBrains Mono", monospace;
+  --font-size : 12px;
+}
+*          { font-family : var(--font); }
+html, body { font-size   : var(--font-size); }
+*/
+
+/* move to: aufbau/css/mobile.css */
+
+/* ::selection { background: var(--accent-25); } */
+
+/* ── oled fix (temp) ─────────────────────────────────────────────────────── */
+
+/* move to: zugriff/apps/podcasts/app.css
+or move to: aufbau/css/surfaces.css */
+
+@container style(--palette: oled) {
+  body {
+    --line: --alpha(fg, 0.25);
+  }
+  #app {
+    .view > header { border-bottom : 1px solid var(--line); }
+    #app-dock      { border-top    : 1px solid var(--line); }
+    data-item      { border-bottom : 1px solid var(--line); }
+  }
+}

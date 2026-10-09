@@ -1,0 +1,65 @@
+// @aufbau/gui/element.js
+
+// dom renderer. builds real nodes via @domina/methods; 
+// the input-* controls it emits must be registered by the consumer.
+
+import createElement  from '@domina/methods/createElement.js';
+import createFragment from '@domina/methods/createFragment.js';
+import onEvent        from '@domina/methods/onEvent.js';
+
+import { isSection, normalizeOption, sectionFields, sectionValues, toControl } from './control.js';
+import { readValues }                                                          from './read.js';
+
+// one field as dom: <label><span>label</span><input-*/></label>
+function fieldElement (key, spec, value) {
+  const { tag, attrs, options } = toControl(key, spec, value);
+
+  // attributes, not props: createElement sets a writable property where the tag
+  // has one, and a defined input-* would commit it as a change
+  const control = createElement(tag);
+  for (const [name, attr] of Object.entries(attrs)) control.setAttribute(name, attr);
+
+  if (options) for (const option of options) {
+    const [value, textContent] = normalizeOption(option);
+    const $option = createElement('input-option', { value, textContent });
+    control.append($option);
+  }
+
+  const field = createElement('label');
+  const $span = createElement('span', { textContent: spec.label ?? key });
+  
+  field.append($span, control);
+  return field;
+}
+
+// a section as dom: <fieldset name="key"><legend>key</legend>fields</fieldset>.
+// the values of its fields are looked up under its key first, then flat
+function sectionElement (key, section, values = {}) {
+  const fieldset = createElement('fieldset', { className: 'aufbau-section', name: key });
+  fieldset.append(createElement('legend', { textContent: key }), ...entryElements(sectionFields(section), sectionValues(values, key)));
+  return fieldset;
+}
+
+const entryElements = (spec, values) => Object.entries(spec)
+  .map(([key, entry]) => isSection(entry) ? sectionElement(key, entry, values) : fieldElement(key, entry, values[key]));
+
+// a whole spec as a dom container (or fragment when wrap is false). onChange
+// fires on change/input with (values, name, event), the values nested by
+// section when `nested` is set. `values` may be flat or nested either way.
+function renderElement (spec, { nested = false, values = {}, wrap = 'div', onChange } = {}) {
+  const container = wrap ? createElement(wrap) : createFragment();
+  container.append(...entryElements(spec, values));
+
+  if (onChange) {
+    // resolve the field name off the nearest named control, not the raw target:
+    // composite controls (input-value) bubble change/input from an inner
+    // element that carries no name, which would otherwise read back as null
+    // a fieldset carries the name of its section, it is no field
+    const nameOf  = event => event.target?.closest?.('[name]:not(fieldset)')?.getAttribute('name') ?? null;
+    const handler = event => onChange(readValues(container, spec, { nested }), nameOf(event), event);
+    onEvent(container, ['change', 'input'], handler);
+  }
+  return container;
+}
+
+export { fieldElement, renderElement, sectionElement };

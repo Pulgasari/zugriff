@@ -1,0 +1,4 @@
+/* apps/videos/app.css
+   placeholder — styling deferred. the routes reuse the images app's im-* class
+   names (modebar, library grid, thumbs) plus a few vid-* hooks (vid-player,
+   vid-edit); wire up the actual styles later. */
