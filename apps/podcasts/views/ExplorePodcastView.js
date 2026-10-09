@@ -8,7 +8,7 @@
 // the url is the one thing that still means something after a reload.
 
 import { useSignal } from '@aufbau/signals';
-import { useEffect } from 'preact/hooks';
+import { useEffect } from '/.shared/js/vendors.js';
 
 import Empty        from '/.shared/js/components/Empty.js';
 import Link         from '/.shared/js/components/Link.js';

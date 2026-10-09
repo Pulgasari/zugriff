@@ -9,7 +9,7 @@ map values are either 'Name' (resolved through the given loader),
 or an already imported component.
 */
 
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect } from './../vendors.js';
 
 const isFn     = sth => typeof sth === 'function';
 const isString = sth => typeof sth === 'string';

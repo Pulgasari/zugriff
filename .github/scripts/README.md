@@ -55,11 +55,11 @@ dem die App gebündelt wird. Die Config legt fest:
 - die first-party Pakete, die `code.pulgasari.dev` ausliefert (aufbau, domina,
   bunker, htx, js-packages …), als `www/_pkg/<repo>/`; fehlende werden aus
   `github.com/Pulgasari/<repo>` geklont, jedes `https://code.pulgasari.dev` zeigt
-  danach auf `/_pkg`, auch die Importmap aus `boot.js`
+  danach auf `/_pkg`, auch die Importmap aus `.shared/js/data/importmap.js`
 - die Module von Dritten (esm.sh, jsdelivr, unpkg) als `www/_vendor/…`: der Bundler
   liest jede URL als npm-Paket, installiert es aus der npm-Registry (jsr über
   npm.jsr.io) und baut mit esbuild ein Browser-Modul daraus. Die Einträge der
-  Importmap aus `boot.js` kommen als `window.__BOOT_CONFIG__.imports` in die
+  Importmap (`.shared/js/data/importmap.js`) kommen als `window.__BOOT_CONFIG__.imports` in die
   `index.html`, ausgeschriebene URLs werden direkt ersetzt
 - die Icons, die im Code vorkommen, als SVGs in `www/_icons/provide.js`, das sie
   `<aufbau-icon>` per `AufbauIcon.provide()` übergibt; die iconify-API braucht es

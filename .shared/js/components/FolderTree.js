@@ -2,7 +2,6 @@
 
 // :::::: IMPORT
 
-import { typedSignal } from '@aufbau/signals';
 
 import Loading from './Loading.js';
 import Tree    from './Tree.js';
@@ -12,7 +11,7 @@ import Tree    from './Tree.js';
 // one persisted expanded-set per key, so repeat renders reuse the same signal
 const expandedStores = new Map;
 const expandedSignal = key => {
-  if (!expandedStores.has(key)) expandedStores.set(key, typedSignal({ type: 'scalar', value: [], key, storage: 'local' }));
+  if (!expandedStores.has(key)) expandedStores.set(key, zugriff.app.persisted(key, []));
   return expandedStores.get(key);
 };
 
@@ -106,9 +105,9 @@ function FolderTree ({
         if (res.granted) return;
         const why = res.error ? (res.error.name || 'error') : `browser said “${res.state}”`;
         console.warn('[foldertree] reconnect failed', { source, ...res });
-        toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
+        zugriff.toast.error(`Reconnect failed — ${why}. Try “Choose folder”.`);
       });
-      const repick = () => lib.repick(source.id).then(ok => ok || toast({ error: 'Could not open that folder' }));
+      const repick = () => lib.repick(source.id).then(ok => ok || zugriff.toast({ error: 'Could not open that folder' }));
       body = html`
         <div class='reconnect'>
           <span>${state === 'denied' ? 'Permission was blocked.' : 'This folder needs permission again.'}</span>

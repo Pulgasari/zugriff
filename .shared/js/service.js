@@ -1,14 +1,12 @@
-// shared/js/service.js
+// .shared/js/service.js
+// the body of /sw.js, one worker for every app of the site. a bundle stamps VERSION
+// with its own (stage-capacitor-www.mjs), the live site counts it up by hand
 
 import { createCache } from 'https://code.pulgasari.dev/bunker/cache/index.js';
 
-// ::::::
+const VERSION = 'v4';
 
-const SCOPE   = self.registration.scope;
-const SLUG    = SCOPE.replace(/\/+$/, '').split('/').pop() || 'zugriff';
-const VERSION = 'v3';
-
-const CACHE_APP     = `zugriff-${SLUG}-${VERSION}`;
+const CACHE_APP     = `zugriff-app-${VERSION}`;
 const CACHE_DEV     = `zugriff-dev-${VERSION}`;
 const CACHE_ICON    = `zugriff-icon-${VERSION}`;
 const CACHE_VENDOR  = `zugriff-vendor-${VERSION}`;
@@ -22,9 +20,7 @@ const DEV_HOST    = 'https://code.pulgasari.dev/'; // stale while revalidate
 const ICON_HOST   = 'https://api.iconify.design/';
 const ICON_TTL    = 30 * 24 * 60 * 60 * 1000;
 
-const NESTED = ['./apps/'].map(path => new URL(path, SCOPE).href);
-const OWN    = ['./', './app.js', './app.css', './manifest.json'];
-const SHARED = ['./../css/index.css', './boot.js', './app.js'];
+const PRECACHE = ['/.shared/css/index.css', '/.shared/js/data/importmap.js', '/.shared/js/boot.js', '/.shared/js/runtime.js'];
 
 const onError = ({ operation, key, error }) => console.warn(`[sw] cache ${operation} failed for ${key}`, error);
 const app     = createCache ({ onError, name: CACHE_APP    }); // same-origin, stale while revalidate
@@ -35,22 +31,16 @@ const vendor  = createCache ({ onError, name: CACHE_VENDOR }); // esm cdns, immu
 const isDev        = url => url.startsWith(DEV_HOST);
 const isIcon       = url => url.startsWith(ICON_HOST) && url.endsWith('.svg');
 const isImmutable  = url => isVendor(url) && FULL_SEMVER.test(url);
-const isNested     = url => NESTED.some(root => url.startsWith(root) && !SCOPE.startsWith(root));
 const isSameOrigin = url => url.startsWith(self.location.origin + '/');
 const isVendor     = url => VENDOR_HOST.test(url);
 
 // ── install ────────────────────────────────────────────────────────────────
 
-const precacheUrls = () => [
-     ...OWN.map(path => new URL(path, SCOPE).href),
-  ...SHARED.map(path => new URL(path, import.meta.url).href),
-];
-
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_APP);
     // one missing file must not fail the whole install
-    await Promise.all(precacheUrls().map(url =>
+    await Promise.all(PRECACHE.map(url =>
       cache.add(new Request(url, { cache: 'reload' }))
            .catch(error => console.warn('[sw] precache skipped', url, error))
     ));
@@ -62,14 +52,9 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(
-      keys.filter(key => key.startsWith('zugriff-') && key !== CACHE_APP && key !== CACHE_VENDOR && key !== CACHE_DEV && key !== CACHE_ICON)
-          // another app's cache is none of our business — only drop our own older
-          // versions, and the shared vendor/dev/icon caches when their version moved on
-          .filter(key => key.startsWith(`zugriff-${SLUG}-`) || key.startsWith('zugriff-vendor-') || key.startsWith('zugriff-dev-') || key.startsWith('zugriff-icon-'))
-          .map(key => caches.delete(key))
-    );
+    const current = [CACHE_APP, CACHE_DEV, CACHE_ICON, CACHE_VENDOR];
+    const keys    = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith('zugriff-') && !current.includes(key)).map(key => caches.delete(key)));
     await self.clients.claim();
   })());
 });
@@ -93,7 +78,6 @@ self.addEventListener('fetch', event => {
 
   const { url } = request;
   if (!url.startsWith('http')) return; // extension and devtools schemes are not ours to answer
-  if (isNested(url))           return;
 
   // versioned CDN URLs: cached once (immutable)
   // icons: cached hard, a given `prefix:name` never changes

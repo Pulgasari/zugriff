@@ -11,24 +11,11 @@
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
-// the importmap boot.js injects at runtime, read by running it against a stub
-// dom that keeps the <script type="importmap"> it writes. boot.js goes on after
-// that (devtools, service worker, runtime), whatever fails there is past the map
+// the importmap every page gets, data/importmap.js sets it on the global it runs in
 function importmapOf (file) {
-  let map = null;
-  const noop    = () => {};
-  const element = () => ({ addEventListener: noop, after: node => { if (node.type === 'importmap') map = JSON.parse(node.textContent); }, append: noop, classList: { add: noop, remove: noop, toggle: noop }, dataset: {}, setAttribute: noop, style: {} });
-  const document = { addEventListener: noop, write: noop, body: null, createDocumentFragment: element, createElement: tag => ({ ...element(), tagName: tag }), currentScript: { ...element(), src: 'https://zugriff.dev/.shared/js/boot.js' }, documentElement: element(), head: element(), querySelector: () => null };
-  const console  = { debug: noop, error: noop, info: noop, log: noop, trace: noop, warn: noop };
-  const window   = { addEventListener: noop, console, document, localStorage: { getItem: () => null, setItem: noop }, location: new URL('https://zugriff.dev/'), navigator: {} };
-
-  // a dynamic import() stays pending, the runtime it would load is not needed.
-  // node's vm only takes import() with a flag, so it is renamed to a stub
-  const source = readFileSync(file, 'utf8').replace(/\bimport\s*\(/g, 'importStub(');
-  try   { vm.runInNewContext(source, { ...window, importStub: () => new Promise(noop), JSON, URL, URLSearchParams, queueMicrotask: noop, setTimeout: noop, window }); }
-  catch { /* past the importmap */ }
-  if (!map) throw new Error(`bundler.config: no importmap from ${file}`);
-  return map;
+  const context = {};
+  vm.runInNewContext(readFileSync(file, 'utf8'), { globalThis: context });
+  return { imports: context.__IMPORTMAP__ };
 }
 
 // the capacitor build makes a second, `-dev` build of every app with devtools
@@ -45,6 +32,7 @@ export default ({ dev = false, out, packages = 'build/_pkg', slug }) => ({
     { from: 'icon.svg' },
     { from: 'index.html' },
     { from: 'logo.svg' },
+    { from: 'sw.js' },
   ],
 
   packages : {
@@ -79,11 +67,10 @@ export default ({ dev = false, out, packages = 'build/_pkg', slug }) => ({
   // the app (data-app, stage-capacitor-www.mjs). the dev build opens with ?dev, devtools on
   start : dev ? '/?dev' : null,
 
-  // boot.js builds the importmap itself, the local entries reach it as
-  // __BOOT_CONFIG__.imports, which it lays over its own
+  // the local entries reach boot.js as __BOOT_CONFIG__.imports, laid over the map
   vendor : {
     exclude   : dev ? [] : [/\/eruda@/],   // the devtools console, only behind ?dev
-    importmap : importmapOf('.shared/js/boot.js'),
+    importmap : importmapOf('.shared/js/data/importmap.js'),
     inject    : imports => `<script>window.__BOOT_CONFIG__ = { imports: ${JSON.stringify(imports)} };</script>`,
     path      : '/_vendor',
   },

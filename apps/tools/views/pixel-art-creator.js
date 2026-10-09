@@ -5,8 +5,8 @@ import { effect, html, signal, useRef, useState } from '/.shared/js/vendors.js';
 import UPNG from 'upng-js';
 
 // ::: shared
-import { Picker } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { Picker } = await zugriff.components('Picker');
 
 // ::: local
 
@@ -50,19 +50,19 @@ const makeGrid = (w, h) => Array.from({ length: h }, () => Array(w).fill(null));
 
 // ------ SIGNALS ----------------------------------------------
 
-let palette  = typedSignal({ value: PALETTE, key: appID + ':palette' });
-let active   = typedSignal({ value: '#000000', key: appID + ':active' });
+let palette  = zugriff.app.persisted(appID + ':palette', PALETTE);
+let active   = zugriff.app.persisted(appID + ':active', '#000000');
 let tool     = signal('draw');
-let preset   = typedSignal({ value: { w: 16, h: 16 }, key: appID + ':preset' });
+let preset   = zugriff.app.persisted(appID + ':preset', { w: 16, h: 16 });
 if (typeof preset.value === 'number') preset.value = { w: preset.value, h: preset.value };
-let grid     = typedSignal({ value: makeGrid(preset.value.w, preset.value.h), key: appID + ':grid' });
-let scale    = typedSignal({ value: 1, key: appID + ':scale' });
-let showBg   = typedSignal({ value: true, key: appID + ':showBg' });
-let showGap  = typedSignal({ value: true, key: appID + ':showGap' });
-let showGrid = typedSignal({ value: true, key: appID + ':showGrid' });
-let mirror   = typedSignal({ value: 'none', key: appID + ':mirror' });
+let grid     = zugriff.app.persisted(appID + ':grid', makeGrid(preset.value.w, preset.value.h));
+let scale    = zugriff.app.persisted(appID + ':scale', 1);
+let showBg   = zugriff.app.persisted(appID + ':showBg', true);
+let showGap  = zugriff.app.persisted(appID + ':showGap', true);
+let showGrid = zugriff.app.persisted(appID + ':showGrid', true);
+let mirror   = zugriff.app.persisted(appID + ':mirror', 'none');
 
-let exportWidth = typedSignal({ value: 512, key: appID + ':export-width' });
+let exportWidth = zugriff.app.persisted(appID + ':export-width', 512);
 
 // ------ EFFECTS ----------------------------------------------
 

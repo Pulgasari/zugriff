@@ -74,17 +74,17 @@
     {
       "name": "Library",
       "short_name": "Library",
-      "url": "./?mode=library"
+      "url": "./#/"
     },
     {
       "name": "Player",
       "short_name": "Player",
-      "url": "./?mode=player"
+      "url": "./#/player"
     },
     {
       "name": "Edit",
       "short_name": "Edit",
-      "url": "./?mode=edit"
+      "url": "./#/edit"
     }
   ]
 }

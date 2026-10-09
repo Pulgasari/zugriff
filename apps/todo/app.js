@@ -7,7 +7,7 @@
 // area at the bottom and the settings in a config area at the end
 
 import { computed }          from '@aufbau/signals';
-import { useEffect }         from 'preact/hooks';
+import { useEffect }         from '/.shared/js/vendors.js';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 

@@ -18,7 +18,7 @@
 import { computed, effect, signal } from '@aufbau/signals';
 import { patternStyle }             from '@aufbau/elements/webcomponents/input/types/pattern.js';
 
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from '/.shared/js/vendors.js';
 
 import fmt                  from '/.shared/js/modules/fmt.js';
 import { createThumbCache } from '/.shared/js/thumbs.js';

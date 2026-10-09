@@ -8,8 +8,8 @@ const app = zugriff.app;
 
 // :::::: IMPORT :::::::::::::::::::::::::::::::::::::::::::::
 
-import { computed, signal, typedSignal } from '@aufbau/signals';
-import { useEffect }                     from 'preact/hooks';
+import { computed, signal } from '@aufbau/signals';
+import { useEffect }                     from '/.shared/js/vendors.js';
 
 // :::::: HANDLE ::::::::::::::::::::::::::::::::::::::::::::
 // before the views are imported: a component captured at module scope sees whatever
@@ -27,11 +27,11 @@ app.state.$extend({
   folder  : { type: 'scalar', value: ''                  },   // '' = all folders, else sourceId
 });
 
-app.sort = typedSignal({ key: 'ebooks:sort', value: 'recent', values: ['recent', 'title', 'author', 'added'] });
+app.sort = app.persisted('sort', 'recent', { values: ['recent', 'title', 'author', 'added'] });
 
 // epub reading prefs, remembered across books
-app.readerFlow = typedSignal({ key: 'ebooks:flow', value: 'paginated' });
-app.readerFont = typedSignal({ key: 'ebooks:font', value: 100 });
+app.readerFlow = app.persisted('readerFlow', 'paginated');
+app.readerFont = app.persisted('readerFont', 100);
 app.readerUi   = signal({ ready: false });
 
 // :::::: LIBRARY :::::::::::::::::::::::::::::::::::::::::::

@@ -1,9 +1,9 @@
-// apps/images/routes/view.js
-// view route (ex image-viewer): browse the shared tray, zoom/pan, live css effect.
+// apps/images/views/view.js
+// view mode (ex image-viewer): browse the shared tray, zoom/pan, live css effect.
 
-import { signal, effect }   from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
-import { useGesture } from '@aufbau/gestures/preact';
+import { signal, effect }    from '@aufbau/signals';
+import { useEffect, useRef } from '/.shared/js/vendors.js';
+import { useGesture }        from '@aufbau/gestures/preact';
 import * as fx  from '../modules/filters.js';
 import { shots, idx, current, many, fmtSize, setFiles, vError } from '../modules/state.js';
 import { editCurrent } from './edit.js';

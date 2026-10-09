@@ -1,6 +1,6 @@
 // ebooks :: views/ReaderView.js
 
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef } from '/.shared/js/vendors.js';
 
 import Empty      from '/.shared/js/components/Empty.js';
 

@@ -3,11 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#282a36">
-  <meta name="msapplication-TileColor" content="#282a36">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="#282a36">
   
   <title>zugriff</title>
   <link rel="stylesheet" href="/.shared/css/index.css">
@@ -30,12 +26,8 @@
     })();
   </script>
 
+  <script src="/.shared/js/data/importmap.js"></script>
   <script src="/.shared/js/boot.js"></script>
-
-  <style>
-    :root.is-loading #app { opacity: 0; filter: blur(3px); }
-    :root.is-ready   #app { opacity: 1; filter: none; transition: opacity 500ms ease, filter 500ms ease; }
-  </style>
 </head>
 
 <body class="mobilefix">
@@ -51,16 +43,6 @@
 
   if (!route || !globalThis.zugriff?.registry?.has(route)) location.replace('/404.html');
   else await import('/' + route + '/app.js');
-  
-  if (route === 'icons') await import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
-</script>
-<script type="module">
-  const dev = new URLSearchParams(location.search).get('dev');
-
-  if (dev !== null && dev !== 'off' && dev !== '0') {
-    try           { await import('@aufbau/devtools/boot.js'); }
-    catch (error) { console.error('[shell] devtools not loaded:', error); }
-  }
 </script>
 
 </body>

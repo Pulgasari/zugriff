@@ -1,14 +1,13 @@
 // apps/code/components/Commands.js
 // the command palette — search every command, star favourites, run one.
 
-import { useState } from 'preact/hooks';
-import { typedSignal } from '@aufbau/signals';
+import { useState } from '/.shared/js/vendors.js';
 
 import Modal from './Modal.js';
 
 const app = zugriff.app;
 
-export const favoritesSignal = typedSignal({ value: [], key: 'code:favs' });
+export const favoritesSignal = app.persisted('favs', []);
 
 export default function Commands () {
   const [search, setSearch] = useState('');

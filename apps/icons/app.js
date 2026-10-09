@@ -8,9 +8,12 @@
 // favourites from @bunker/db (modules/db.js).
 
 // ::: vendors
-import { computed, signal, typedSignal } from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
+import { computed, signal }  from '@aufbau/signals';
+import { useEffect, useRef } from '/.shared/js/vendors.js';
 import createElement from '@domina/methods/createElement.js';
+
+// the <iconify-icon> element, not awaited: the app runs without it, the grid fills in once it is there
+import('https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js').catch(() => {});
 
 const { Config, Dock, Empty, Loading, Views } = await zugriff.components('Config', 'Dock', 'Empty', 'Loading', 'Views');
 
@@ -36,7 +39,7 @@ const setData     = signal(null);   // { prefix, title, total, icons } for route
 const setLoading  = signal(false);
 const results     = signal([]);
 const searching   = signal(false);
-const itemSize    = typedSignal({ value: 88, key: 'icons:item-size' }); // persisted grid zoom
+const itemSize    = app.persisted('itemSize', 88); // persisted grid zoom
 
 // :::::: FRAME :::::::::::::::::::::::::::::::::::::::::::::
 // #app is the <app-root>: the views in the main area, the icon in the context area

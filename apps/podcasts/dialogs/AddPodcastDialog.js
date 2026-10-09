@@ -1,7 +1,7 @@
 // podcasts :: dialogs/AddPodcastDialog.js
 
 import { useSignal } from '@aufbau/signals';
-import { useEffect } from 'preact/hooks';
+import { useEffect } from '/.shared/js/vendors.js';
 
 import Artwork from './../components/Artwork.js';
 import Loading from '/.shared/js/components/Loading.js';

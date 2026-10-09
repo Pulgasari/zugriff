@@ -4,7 +4,7 @@
 
 import TagBadge  from './../components/TagBadge.js';
 import { signal }  from '@aufbau/signals';
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect } from '/.shared/js/vendors.js';
 import { activePrompt } from './../modules/methods.js';
 
 const app = zugriff.app;

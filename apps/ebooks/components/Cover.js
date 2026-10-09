@@ -1,6 +1,6 @@
 // ebooks :: components/Cover.js
 
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef } from '/.shared/js/vendors.js';
 
 // a stable pastel from a title, for the placeholder cover
 function hueOf (text = '') {

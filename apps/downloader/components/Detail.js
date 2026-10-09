@@ -2,7 +2,7 @@
 // the download in the context area: where it comes from, how far it is, what
 // went wrong, and a finished file in the library shown by <media-file>.
 
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState } from '/.shared/js/vendors.js';
 
 import * as engine               from '../modules/engine.js';
 import { closeDetail, selected } from '../modules/frame.js';

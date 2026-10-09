@@ -3,12 +3,11 @@
 // every app in one line (name, categories, description), what one has beyond that
 // below it, the rest from the defaults. the key is the slug, the app's folder in apps/
 //
-// registry.get('ebooks')     -> the resolved entry, or null
-// registry.getAll('app')     -> every app entry (omit the arg for all)
-// registry.categories('app') -> sorted, de-duped categories for that kind
+// registry.get('ebooks') -> the resolved entry, or null
+// registry.getAll()      -> every entry
+// registry.categories()  -> sorted, de-duped categories
 
 const defaults = {
-  base        : 'apps',
   build       : { android: ['capacitor', 'capacitor-live'] },
   color       : '#282a36', // theme_color / background_color for the manifest + <meta theme-color>
   dir         : 'ltr',
@@ -16,7 +15,6 @@ const defaults = {
   lang        : 'en',
   orientation : 'any',
   palette     : 'zombie',
-  type        : 'app',
   viewport    : 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   aufbau      : { elements: { mode: 'auto' } },
   // settings every app carries, predefined here so the shared Settings can render
@@ -83,10 +81,10 @@ apps.images.manifest = {
     },
   }],
   shortcuts : [
-    { name: 'Library', short_name: 'Library', url: './?mode=library' },
-    { name: 'Edit',    short_name: 'Edit',    url: './?mode=edit'    },
-    { name: 'Convert', short_name: 'Convert', url: './?mode=convert' },
-    { name: 'Batch',   short_name: 'Batch',   url: './?mode=batch'   },
+    { name: 'Library', short_name: 'Library', url: './#/library' },
+    { name: 'Edit',    short_name: 'Edit',    url: './#/edit'    },
+    { name: 'Convert', short_name: 'Convert', url: './#/convert' },
+    { name: 'Batch',   short_name: 'Batch',   url: './#/batch'   },
   ],
 };
 
@@ -107,9 +105,9 @@ apps.videos.manifest = {
     },
   }],
   shortcuts : [
-    { name: 'Library', short_name: 'Library', url: './?mode=library' },
-    { name: 'Player',  short_name: 'Player',  url: './?mode=player'  },
-    { name: 'Edit',    short_name: 'Edit',    url: './?mode=edit'    },
+    { name: 'Library', short_name: 'Library', url: './#/'        },
+    { name: 'Player',  short_name: 'Player',  url: './#/player'  },
+    { name: 'Edit',    short_name: 'Edit',    url: './#/edit'    },
   ],
 };
 
@@ -124,15 +122,14 @@ const normalize = ([slug, entry]) => ({
   categories : entry.categories ?? [],
 });
 
-const all  = Object.entries(apps).map(normalize);
-const map  = new Map(all.map(e => [e.slug, e]));
-const list = type => (type ? all.filter(e => e.type === type) : all);
+const all = Object.entries(apps).map(normalize);
+const map = new Map(all.map(e => [e.slug, e]));
 
 const registry = {
   has        : slug => map.has(slug),
   get        : slug => map.get(slug) ?? null,
-  getAll     : type => list(type),
-  categories : type => [...new Set(list(type).flatMap(e => e.categories))].sort(),
+  getAll     : () => all,
+  categories : () => [...new Set(all.flatMap(e => e.categories))].sort(),
 };
 
 export { defaults, registry };

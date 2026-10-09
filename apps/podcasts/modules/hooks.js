@@ -8,7 +8,7 @@
 
 // :::::: IMPORTS
 
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState } from '/.shared/js/vendors.js';
 
 // :::::: CACHE
 // the last rows read under a key, so navigating back renders immediately and the

@@ -1,6 +1,6 @@
 // Dock.js
 
-import { useRef } from 'preact/hooks';
+import { useRef } from './../vendors.js';
 
 
 // an item is active while the current view is its own or one of `match`, e.g. a

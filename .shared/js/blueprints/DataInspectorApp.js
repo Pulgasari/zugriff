@@ -6,7 +6,6 @@ import { html, signal, useState } from './../vendors.js';
 
 import CodeInputPane from './../components/CodeInputPane.js';
 
-import { typedSignal } from '@aufbau/signals';
 
 // ── shared type helpers ───────────────────────────────────────────────────────
 let typeOf    = v => v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v;
@@ -109,7 +108,7 @@ function DataInspectorApp ({
   emptyIcon   = 'mdi:code-json',
   emptyLabel  = 'Paste data and click Inspect',
 }) {
-  let input  = typedSignal({ value: '', key: appID + ':input' });
+  let input  = zugriff.app.persisted(appID + ':input', '');
   let parsed = signal(null);
   let errMsg = signal('');
   let search = signal('');

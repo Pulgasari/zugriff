@@ -73,6 +73,10 @@ await writeFile(index, (await readFile(index, 'utf8')).replace(/<html\b/, `<html
 const ota = { slug, version: process.env.OTA_VERSION || stampOf(), ...(process.env.OTA_MANIFEST && { manifest: process.env.OTA_MANIFEST }) };
 await writeFile(resolve(outDir, 'www', 'ota.json'), JSON.stringify(ota, null, 2) + '\n');
 
+// the service worker's caches carry the bundle's version, a new bundle starts on fresh ones
+const service = resolve(outDir, 'www', '.shared', 'js', 'service.js');
+if (existsSync(service)) await writeFile(service, (await readFile(service, 'utf8')).replace(/^const VERSION = '[^']*';$/m, `const VERSION = '${ota.version}';`));
+
 const text = `### www: ${slug}${dev ? '-dev' : ''}\n\n${summary}\n`;
 console.log('\n' + text);
 if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, text);

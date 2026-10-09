@@ -8,7 +8,7 @@ import * as fit   from '@xterm/addon-fit';
 import * as xterm from '@xterm/xterm';
 
 import { signal }            from '@aufbau/signals';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef } from '/.shared/js/vendors.js';
 
 import { vfs } from '/.shared/js/modules/opfs.js';
 

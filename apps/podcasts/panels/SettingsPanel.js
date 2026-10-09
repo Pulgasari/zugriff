@@ -3,7 +3,7 @@
 // import/export of the subscription library.
 
 import { useSignal }     from '@aufbau/signals';
-import { useRef }        from 'preact/hooks';
+import { useRef }        from '/.shared/js/vendors.js';
 import Modal  from '/.shared/js/components/Modal.js';
 import Picker from '/.shared/js/components/Picker.js';
 import { PROXY }         from '/.shared/js/modules/http.js';

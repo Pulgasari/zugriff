@@ -5,15 +5,15 @@
 // open image tray lives in the state module.
 
 // ::: vendors
-import { useEffect } from 'preact/hooks';
+import { useEffect } from '/.shared/js/vendors.js';
 
 // ::: app modules
 import lib                              from './modules/library.js';
 import { setFiles, revokeAll, vError }  from './modules/state.js';
 
-// ::: routes + router
-import { routes }       from './routes/index.js';
-import { editCurrent }  from './routes/edit.js';
+// ::: modes
+import { modes }        from './views/index.js';
+import { editCurrent }  from './views/edit.js';
 
 // ::: shared components
 const { Brand, Config, Views } = await zugriff.components('Brand', 'Config', 'Views');
@@ -26,8 +26,8 @@ app.lib = lib;
 // a mode is a view in the main area, in the dom while it is on screen only. the view
 // mode is at the root, the others at their id
 
-app.views = Object.fromEntries(routes.map(({ id, component }) =>
-  [id, { route: id === 'view' ? '/' : `/${id}`, view: component, transient: true }]));
+app.views = Object.fromEntries(modes.map(({ id, view }) =>
+  [id, { route: id === 'view' ? '/' : `/${id}`, view, transient: true }]));
 
 // ::::::
 
@@ -53,7 +53,7 @@ function ModeBar () {
     <header class="im-modebar">
       <${Brand} app=${app} />
       <nav class="im-modes">
-        ${routes.map(m => html`
+        ${modes.map(m => html`
           <button class=${'im-mode' + (app.current.value === m.id ? ' active' : '')} key=${m.id}
                   onClick=${() => m.id === 'edit' ? editCurrent() : app.go(m.id)}
                   title=${m.label}>

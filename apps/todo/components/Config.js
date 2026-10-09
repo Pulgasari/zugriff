@@ -2,7 +2,7 @@
 // the sections of the config area under its fields: where the tasks are synced,
 // the reminders, and export and import as json or todo.txt.
 
-import { useRef, useState } from 'preact/hooks';
+import { useRef, useState } from '/.shared/js/vendors.js';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 

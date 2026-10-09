@@ -4,8 +4,8 @@
 import { html, signal } from '/.shared/js/vendors.js';
 
 // ::: shared
-import { Picker, Slider } from '/.shared/js/components/index.js';
-import { typedSignal } from '@aufbau/signals';
+
+const { Picker, Slider } = await zugriff.components('Picker', 'Slider');
 
 // ::: local
 
@@ -21,17 +21,17 @@ let CHARS = {
 let WORDLIST_URL = 'https://raw.githubusercontent.com/EFF/BIP39-English/master/wordlist.txt';
 
 // ── state ─────────────────────────────────────────────────────────────────────
-let mode      = typedSignal({ value: 'random', key: 'pwgen:mode' });   // random | passphrase | pin
-let length    = typedSignal({ value: 16, key: 'pwgen:length' });
-let useUpper  = typedSignal({ value: true, key: 'pwgen:upper' });
-let useLower  = typedSignal({ value: true, key: 'pwgen:lower' });
-let useDigits = typedSignal({ value: true, key: 'pwgen:digits' });
-let useSymbols= typedSignal({ value: false, key: 'pwgen:symbols' });
-let noSimilar = typedSignal({ value: false, key: 'pwgen:nosimilar' });
-let wordCount = typedSignal({ value: 4, key: 'pwgen:words' });
-let separator = typedSignal({ value: '-', key: 'pwgen:sep' });
-let pinLength = typedSignal({ value: 6, key: 'pwgen:pinlen' });
-let count     = typedSignal({ value: 5, key: 'pwgen:count' });
+let mode      = zugriff.app.persisted('pwgen:mode', 'random');   // random | passphrase | pin
+let length    = zugriff.app.persisted('pwgen:length', 16);
+let useUpper  = zugriff.app.persisted('pwgen:upper', true);
+let useLower  = zugriff.app.persisted('pwgen:lower', true);
+let useDigits = zugriff.app.persisted('pwgen:digits', true);
+let useSymbols= zugriff.app.persisted('pwgen:symbols', false);
+let noSimilar = zugriff.app.persisted('pwgen:nosimilar', false);
+let wordCount = zugriff.app.persisted('pwgen:words', 4);
+let separator = zugriff.app.persisted('pwgen:sep', '-');
+let pinLength = zugriff.app.persisted('pwgen:pinlen', 6);
+let count     = zugriff.app.persisted('pwgen:count', 5);
 let passwords = signal([]);
 let copied    = signal(null);
 let   wordlist  = null;

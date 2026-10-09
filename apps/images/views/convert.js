@@ -1,12 +1,12 @@
-// apps/images/routes/convert.js
-// convert route (ex image-converter): re-encode a batch of images.
+// apps/images/views/convert.js
+// convert mode (ex image-converter): re-encode a batch of images.
 
-import { signal, typedSignal } from '@aufbau/signals';
+import { signal }                             from '@aufbau/signals';
 import { dropEntries, ImgDrop, ToolFileItem } from './tools.js';
 
 const cvFiles   = signal([]);
-const cvFormat  = typedSignal({ value: 'webp', key: 'images:convert:format' });
-const cvQuality = typedSignal({ value: 90, key: 'images:convert:quality' });
+const cvFormat  = zugriff.app.persisted('convert:format', 'webp');
+const cvQuality = zugriff.app.persisted('convert:quality', 90);
 const CV_FORMATS = ['jpg', 'png', 'webp'];
 
 const cvUpdate    = (id, patch) => cvFiles.value = cvFiles.value.map(f => f.id === id ? { ...f, ...patch } : f);

@@ -12,7 +12,7 @@ import { createActions }      from './modules/actions.js';
 import { createHotkeys }      from './modules/hotkeys.js';
 import { toast }              from './modules/toast.js';
 import { syncBars }           from './modules/bars.js';
-import { reveal, transition } from './transitions.js';
+import { transition }         from './transitions.js';
 import { html, render }       from './vendors.js';
 
 // :::::: HELPERS
@@ -45,6 +45,16 @@ const valueOf = entry => Array.isArray(entry) ? entry[0] : entry;
 
 const leafOf = ({ type, default: value, values, min, max, step }) =>
   ({ type: LEAF_TYPES[type] ?? 'scalar', value, values: values?.map(valueOf), min, max, step, persist: true });
+
+// the leaf type a value stands for, as typedSignal infers it
+const typeOf = value =>
+    typeof value === 'boolean'   ? Boolean
+  : typeof value === 'number'    ? Number
+  : typeof value === 'string'    ? String
+  : value instanceof Map         ? Map
+  : value instanceof Set         ? Set
+  : value?.constructor === Object ? 'record'
+  :                                'scalar';
 
 // :::::: PWA
 
@@ -99,6 +109,13 @@ async function promptInstall () {
 const $doc  = typeof document !== 'undefined' ? document : null;
 const $root = $doc?.documentElement ?? null;
 
+// a <meta name> of the page, created when the page has none
+const setMeta = (name, content) => {
+  if (!$doc || !content) return;
+  const meta = $doc.head.querySelector(`meta[name="${name}"]`) ?? $doc.head.appendChild(Object.assign($doc.createElement('meta'), { name }));
+  meta.content = content;
+};
+
 const bodyReady = () => $doc.body ? Promise.resolve() : new Promise(resolve => $doc.addEventListener('DOMContentLoaded', resolve, { once: true }));
 
 // a preset of aufbau/gestalt/palettes.css or any css color. gestalt sets --palette,
@@ -109,8 +126,7 @@ const applyPalette = async palette => {
   await bodyReady();
 
   const { bg } = aufbau.gestalt.colors();
-  const meta   = $doc.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = bg;
+  setMeta('theme-color', bg);
   syncBars(bg); // the native bars, inside the capacitor wrapper only
 };
 
@@ -135,7 +151,6 @@ class ZugriffApp {
   constructor (slug) {
     this.baseURL  = new URL(`/${slug}/`, location.origin);
     this.config   = (slug && registry.get(slug)) || {};
-    this.database = createDB('zugriff:' + slug);
     this.slug     = slug;
     this.state    = this.#createState();
     this.url      = this.baseURL.href;
@@ -147,6 +162,10 @@ class ZugriffApp {
     this._actions = createActions ();
     this._hotkeys = createHotkeys (this._actions);
   }
+
+  // ::: the app's own db, opened on first use
+  #database = null;
+  get database () { return this.#database ??= createDB('zugriff:' + this.slug); }
 
   // ::: state
   #createState () {
@@ -184,10 +203,12 @@ class ZugriffApp {
       dir      : value => { if ($root && value) $root.setAttribute('dir', value); },
       font     : value => { if (value) webfonts.apply(value, { role: '--font' }); },
       geometry : value => { remember('geometry', value); if (value) aufbau.gestalt.set({ geometry: value }); },
+      color    : value => setMeta('theme-color', value),
       lang     : value => { if ($root && value) $root.lang = value; },
       palette  : value => { remember('palette', value); applyPalette(value); },
       skin     : value => { if (value) aufbau.gestalt.set({ skin: value }); },
       title    : value => { if ($doc && value) $doc.title = value; },
+      viewport : value => setMeta('viewport', value),
     });
 
     return state;
@@ -210,6 +231,18 @@ class ZugriffApp {
     const added = Object.entries(spec).filter(([key]) => !(key in this.state));
     this.state.$extend(Object.fromEntries(added.map(([key, field]) => [key, leafOf(field)])));
   }
+
+  // a persisted leaf of app.state under `key`, created on first use. `options` are the
+  // leaf's spec beyond its value: { values } makes an enum, { type } overrides the inferred one
+  //
+  //   const sort = app.persisted('sort', 'recent', { values: ['recent', 'title'] });
+  persisted = (key, value, options = {}) => {
+    if (!(key in this.state)) {
+      const type = options.values ? 'enum' : typeOf(value);
+      this.state.$extend({ [key]: { type, value, ...options, persist: true } });
+    }
+    return this.state[key];
+  };
 
   // ::: loaders (app-relative)
   import    = path => import(new URL(path, this.baseURL)).then(pick);
@@ -287,7 +320,6 @@ class ZugriffApp {
     this.root?.addEventListener('navigate', event => { this.current.value = event.detail.to; });
 
     if (App) render(html`<${App} />`, $target);
-    await reveal($target);   // frame, dock and first view appear together
 
     this.current.value ??= this.root?.view?.getAttribute('name') ?? null;
 

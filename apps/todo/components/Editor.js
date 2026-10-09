@@ -2,7 +2,7 @@
 // the task in the context area: every field writes on change, an undo takes
 // the last change back. subtasks as a list below, with their own add field.
 
-import { useState } from 'preact/hooks';
+import { useState } from '/.shared/js/vendors.js';
 
 import { dueDay, dueTime, repeatLabel } from '../modules/dates.js';
 import { closeEditor, selected }        from '../modules/frame.js';

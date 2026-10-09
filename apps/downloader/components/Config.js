@@ -2,7 +2,7 @@
 // the sections of the config area under its fields (app.settings): the targets a
 // finished file can go to, the user's plugins and what the library takes up.
 
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState } from '/.shared/js/vendors.js';
 
 import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 import * as dav  from '/.shared/js/modules/webdav/client.js';
