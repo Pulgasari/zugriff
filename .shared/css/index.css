@@ -23,6 +23,7 @@ app-view, .view, .View {
   
   header        { text-transform: uppercase; }
   header button { text-transform: uppercase; }
+  header > h1   { flex: 1 1 auto; }   /* next to the back button, the tools at the end */
 }
 
 /* ── the dock, the Dock component: a row of btn-tap, icon over label ─────── */

@@ -5,8 +5,7 @@ import { html } from './../vendors.js';
 function Nav ({ here }) {
   const links = [
     { id: 'cli',   label: 'cli',   icon: 'mdi:console',         href: 'https://zugriff.dev/cli/'   },
-    { id: 'apps',  label: 'apps',  icon: 'mdi:widgets-outline', href: 'https://zugriff.dev/apps'   },
-    { id: 'tools', label: 'tools', icon: 'mdi:apps',            href: 'https://zugriff.dev/tools/' },    
+    { id: 'tools', label: 'tools', icon: 'mdi:apps',            href: 'https://zugriff.dev/tools/' },
   ];
 
   return html`

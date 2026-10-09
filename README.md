@@ -10,7 +10,6 @@ build with: **aufbau** + **capacitor** + **htx** + **preact**
 
 - [zugriff.dev](https://zugriff.dev)
 - [cli](https://zugriff.dev/cli/)
-- [apps](https://zugriff.dev/apps/)
 - [tools](https://zugriff.dev/tools/)
 
 ## apps
@@ -30,21 +29,39 @@ build with: **aufbau** + **capacitor** + **htx** + **preact**
 - [videos](https://zugriff.dev/videos/)
 
 ## tools
-[audio-converter](https://zugriff.dev/tools/audio-converter/) •
-[audio-cutter](https://zugriff.dev/tools/audio-cutter/) •
-[audio-snippets](https://zugriff.dev/tools/audio-snippets/) •
-[base64-decoder](https://zugriff.dev/tools/base64-decoder/) •
-[base64-encoder](https://zugriff.dev/tools/base64-encoder/) •
-[colorpicker](https://zugriff.dev/tools/colorpicker/) •
-[css-minifyer](https://zugriff.dev/tools/css-minifyer/) •
-[csv-converter](https://zugriff.dev/tools/csv-converter/) •
-[csv-inspector](https://zugriff.dev/tools/csv-inspector/) •
-[downloader](https://zugriff.dev/tools/downloader/) •
-[html-minifyer](https://zugriff.dev/tools/html-minifyer/) •
-[icon-generator](https://zugriff.dev/tools/icon-generator/) •
-[](https://zugriff.dev/tools//) •
+all in one app, [zugriff.dev/tools](https://zugriff.dev/tools/), every tool a view of it:
+
+[audio-converter](https://zugriff.dev/tools/#/audio-converter) •
+[audio-cutter](https://zugriff.dev/tools/#/audio-cutter) •
+[audio-snippets-generator](https://zugriff.dev/tools/#/audio-snippets-generator) •
+[base64-decoder](https://zugriff.dev/tools/#/base64-decoder) •
+[base64-encoder](https://zugriff.dev/tools/#/base64-encoder) •
+[colorpicker](https://zugriff.dev/tools/#/colorpicker) •
+[css-minifyer](https://zugriff.dev/tools/#/css-minifyer) •
+[csv-converter](https://zugriff.dev/tools/#/csv-converter) •
+[csv-inspector](https://zugriff.dev/tools/#/csv-inspector) •
+[html-minifyer](https://zugriff.dev/tools/#/html-minifyer) •
+[icon-generator](https://zugriff.dev/tools/#/icon-generator) •
+[image-batch-processor](https://zugriff.dev/tools/#/image-batch-processor) •
+[image-converter](https://zugriff.dev/tools/#/image-converter) •
+[js-minifyer](https://zugriff.dev/tools/#/js-minifyer) •
+[json-converter](https://zugriff.dev/tools/#/json-converter) •
+[json-formatter](https://zugriff.dev/tools/#/json-formatter) •
+[json-inspector](https://zugriff.dev/tools/#/json-inspector) •
+[json-minifyer](https://zugriff.dev/tools/#/json-minifyer) •
+[password-generator](https://zugriff.dev/tools/#/password-generator) •
+[pdf-extractor](https://zugriff.dev/tools/#/pdf-extractor) •
+[pixel-art-creator](https://zugriff.dev/tools/#/pixel-art-creator) •
+[svg-converter](https://zugriff.dev/tools/#/svg-converter) •
+[svg-pixel-pattern-generator](https://zugriff.dev/tools/#/svg-pixel-pattern-generator) •
+[toml-converter](https://zugriff.dev/tools/#/toml-converter) •
+[toml-inspector](https://zugriff.dev/tools/#/toml-inspector) •
+[uuid-generator](https://zugriff.dev/tools/#/uuid-generator) •
+[xml-minifyer](https://zugriff.dev/tools/#/xml-minifyer) •
+[yaml-converter](https://zugriff.dev/tools/#/yaml-converter) •
+[yaml-inspector](https://zugriff.dev/tools/#/yaml-inspector)
 
 ---
 
 ### deprecated
-- [image-batch-processor](https://zugriff.dev/tools/image-batch-processor/)
+- [image-batch-processor](https://zugriff.dev/tools/#/image-batch-processor)

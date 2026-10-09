@@ -22,7 +22,7 @@ const DEV_HOST    = 'https://code.pulgasari.dev/'; // stale while revalidate
 const ICON_HOST   = 'https://api.iconify.design/';
 const ICON_TTL    = 30 * 24 * 60 * 60 * 1000;
 
-const NESTED = ['./tools/', './apps/'].map(path => new URL(path, SCOPE).href);
+const NESTED = ['./apps/'].map(path => new URL(path, SCOPE).href);
 const OWN    = ['./', './app.js', './app.css', './manifest.json'];
 const SHARED = ['./../css/index.css', './boot.js', './app.js'];
 

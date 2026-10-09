@@ -1,0 +1,99 @@
+/* apps/tools/app.css
+   tools.css holds what the tools share (panes, code input, the data tree), every
+   tool's own rules sit in views/<slug>.css, scoped to its app-view. the shelf below */
+
+@import url('./tools.css');
+@import url('./views/audio-converter.css');
+@import url('./views/audio-cutter.css');
+@import url('./views/audio-snippets-generator.css');
+@import url('./views/colorpicker.css');
+@import url('./views/icon-generator.css');
+@import url('./views/image-batch-processor.css');
+@import url('./views/image-converter.css');
+@import url('./views/json-formatter.css');
+@import url('./views/password-generator.css');
+@import url('./views/pdf-extractor.css');
+@import url('./views/pixel-art-creator.css');
+@import url('./views/svg-converter.css');
+@import url('./views/svg-pixel-pattern-generator.css');
+@import url('./views/uuid-generator.css');
+
+/* ── a tool ──────────────────────────────────────────────────────────────── */
+
+app-view > main.tool {
+  display        : flex;
+  flex-direction : column;
+  gap            : 0.75rem;
+  padding        : 0.75rem;
+}
+
+/* ── the shelf ───────────────────────────────────────────────────────────── */
+
+app-view[name='shelf'] > main {
+  display        : flex;
+  flex-direction : column;
+  gap            : 0.75rem;
+  margin-inline  : auto;
+  max-width      : 640px;
+  padding        : 0.75rem;
+  width          : 100%;
+
+  .categories {
+    display   : flex;
+    flex-wrap : wrap;
+    gap       : 0.25rem;
+  }
+
+  .shelf {
+    font-size   : 1rem;
+    line-height : 1.25;
+    list-style  : none;
+
+    li {
+      border-radius : 0.25rem;
+      &:nth-child(2n+1) { background: var(--zebra); }
+    }
+
+    a {
+      align-items     : center;
+      border-radius   : 0.25rem;
+      color           : var(--color-fg);
+      display         : flex;
+      gap             : 0.75rem;
+      justify-content : space-between;
+      padding         : 0.75rem;
+      text-decoration : none;
+
+      &:hover { background: var(--accent-10); }
+    }
+
+    .title {
+      display        : flex;
+      flex           : 1 1 auto;
+      flex-direction : column;
+      gap            : 0.25rem;
+      min-width      : 0;
+    }
+    .name { font-size: 1rem; }
+    .desc { font-size: 0.75rem; opacity: 0.5; }
+
+    .logo {
+      --icon-size : 1.5rem;
+      color       : var(--color-fg);
+      flex        : none;
+      opacity     : 0.25;
+    }
+    a:hover .logo { color: var(--color-ink); opacity: 1; }
+  }
+
+  .empty { font-style: italic; opacity: 0.4; }
+
+  .search.sticky {
+    backdrop-filter : blur(6px);
+    background      : color-mix(in oklch, var(--color-bg) 88%, black);
+    bottom          : 0.75rem;
+    box-shadow      : var(--shadow);
+    position        : sticky;
+    z-index         : 3;
+  }
+}
