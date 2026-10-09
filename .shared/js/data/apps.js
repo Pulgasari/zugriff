@@ -117,14 +117,10 @@ const entries = [
 ];
 
 // ── normalise + index ────────────────────────────────────────────────────────
-
-    slug        : 'audio-manager',
-    short_name  : 'Music',
-    
 const normalize = entry => ({
   ...defaults,
-  ...typeDefaults[entry.type],
   ...entry,
+  slug       : 'audio-manager', // slug needs to come from key in apps obj
   short_name : entry.short_name ?? entry.name,
   id         : entry.id         ?? entry.slug.replace(/-/g, '_'),
   categories : entry.categories ?? [],
