@@ -86,7 +86,7 @@ app-view {
 .searchbox input { border: 0; outline: 0; background: transparent; color: var(--color-fg); font: inherit; width: 9rem; min-width: 0; }
 .searchbox input::placeholder { color: var(--fg-50); }
 
-.content { flex: 1 1 auto; overflow-y: auto; min-height: 0; }
+app-view > main { display: block; flex: 1 1 auto; overflow-y: auto; min-height: 0; }
 
 /* ── cover ───────────────────────────────────────────────────────────────── */
 

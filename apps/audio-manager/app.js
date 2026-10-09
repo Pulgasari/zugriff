@@ -4,12 +4,13 @@
 // engine live in modules (app.db / app.player); ephemeral ui state on app.state.
 
 // ::: vendors
-import { computed, signal } from '@aufbau/signals';
+import { computed }         from '@aufbau/signals';
 import { useEffect }        from 'preact/hooks';
 
 // ::: shared
-import { Config }                       from '/.shared/js/components/Config.js';
+import { Config }     from '/.shared/js/components/Config.js';
 import { InstallTip } from '/.shared/js/components/index.js';
+import { Views }      from '/.shared/js/components/Views.js';
 
 // ::: app modules
 import * as db     from './modules/db.js';
@@ -35,8 +36,6 @@ app.state.$extend({
   sort   : { type: 'scalar', value: { key: 'artist', dir: 1 } },
 });
 
-const current = signal('songs');   // the view on screen
-
 const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : app.toast.success(text);
 
 // :::::: FRAME :::::::::::::::::::::::::::::::::::::::::::::
@@ -44,20 +43,18 @@ const flash = (text, kind = 'ok') => kind === 'err' ? app.toast.error(text) : ap
 // navigation in the menu area, the settings in the config area
 
 const area = app.area;
-const show = app.show;
 const menu = () => area('menu');
 
 // a drawer closes once something in it was picked, a sidebar stays
 const closeMenu = () => { if (menu()?.isOverlay) menu().hide(); };
 
-// album and artist take the album's key or the artist's name as id
-app.go = (name, id = null) => {
+// album and artist take the album's key or the artist's name as id, persisted so a
+// reload lands on the same one
+const open = (name, id = null) => {
   if (id != null && (name === 'album' || name === 'artist')) app.state[name] = id;
-  show(name);
+  app.go(name);
   closeMenu();
 };
-
-app.root.addEventListener('navigate', event => { current.value = event.detail.to; });
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::
 
@@ -146,9 +143,9 @@ function PlayGlyph ({ track }) {
 // :::::: SIDEBAR :::::::::::::::::::::::::::::::::::::::::::
 
 function NavItem ({ name, icon, label }) {
-  const active = current.value === name;
+  const active = app.current.value === name;
   return html`
-    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => app.go(name)}>
+    <button class=${'nav-item' + (active ? ' active' : '')} onClick=${() => open(name)}>
       <svg-icon icon=${icon} /> <span>${label}</span>
     </button>`;
 }
@@ -233,7 +230,7 @@ function AlbumsGrid () {
   return html`
     <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
       ${rows.map(a => html`
-        <button class="album-card" key=${a.key} onClick=${() => app.go('album', a.key)}>
+        <button class="album-card" key=${a.key} onClick=${() => open('album', a.key)}>
           <div class="album-art">
             <${Cover} blob=${a.cover} size=${160} radius=${10} />
             <span class="album-play" onClick=${e => { e.stopPropagation(); player.play(a.tracks[0], a.tracks); }}><svg-icon icon="mdi:play" /></span>
@@ -269,7 +266,7 @@ function ArtistsList () {
   return html`
     <div class="artists">
       ${rows.map(a => html`
-        <button class="artist-row" key=${a.name} onClick=${() => app.go('artist', a.name)}>
+        <button class="artist-row" key=${a.name} onClick=${() => open('artist', a.name)}>
           <${Cover} blob=${a.cover} size=${48} radius=${999} />
           <div class="artist-meta">
             <div class="artist-name">${a.name}</div>
@@ -297,7 +294,7 @@ function ArtistDetail ({ id }) {
       </header>
       <aufbau-index class="albums" viewmode="grid" item-size="160px" gap="1.1rem">
         ${albums.map(al => html`
-          <button class="album-card" key=${al.key} onClick=${() => app.go('album', al.key)}>
+          <button class="album-card" key=${al.key} onClick=${() => open('album', al.key)}>
             <div class="album-art"><${Cover} blob=${al.cover} size=${160} radius=${10} /></div>
             <div class="album-name" title=${al.album}>${al.album}</div>
             <div class="album-artist">${al.year || ''}</div>
@@ -344,7 +341,7 @@ function TopBar ({ name }) {
   return html`
     <header class="topbar">
       <button class="ibtn nav-toggle" aria-label="Menu" onClick=${() => menu()?.toggle()}><svg-icon icon="mdi:menu" /></button>
-      ${back && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => app.go(name === 'album' ? 'albums' : 'artists')} />`}
+      ${back && html`<btn-icon icon="arrow-left" label="Back" onClick=${() => open(name === 'album' ? 'albums' : 'artists')} />`}
       <h1 class="topbar-title">${title}</h1>
       <span class="topbar-count">${db.tracks.value.length} songs${db.pending.value ? ` · reading ${db.pending.value}…` : ''}</span>
       <span class="spacer"></span>
@@ -357,13 +354,16 @@ function TopBar ({ name }) {
     </header>`;
 }
 
-const VIEWS = [
-  { name: 'songs',   route: '/',        Content: () => html`<${SongsTable} />`                         },
-  { name: 'albums',  route: '/albums',  Content: () => html`<${AlbumsGrid} />`                         },
-  { name: 'artists', route: '/artists', Content: () => html`<${ArtistsList} />`                        },
-  { name: 'album',   route: '/album',   Content: () => html`<${AlbumDetail}  id=${app.state.$album} />`  },
-  { name: 'artist',  route: '/artist',  Content: () => html`<${ArtistDetail} id=${app.state.$artist} />` },
-];
+// every view is the top bar over its content
+const withBar = (name, Content) => () => html`<${TopBar} name=${name} /><main><${Content} /></main>`;
+
+app.views = {
+  songs   : { route: '/',        view: withBar('songs',   SongsTable)  },
+  albums  : { route: '/albums',  view: withBar('albums',  AlbumsGrid)  },
+  artists : { route: '/artists', view: withBar('artists', ArtistsList) },
+  album   : { route: '/album',   view: withBar('album',   () => html`<${AlbumDetail}  id=${app.state.$album} />`)  },
+  artist  : { route: '/artist',  view: withBar('artist',  () => html`<${ArtistDetail} id=${app.state.$artist} />`) },
+};
 
 function PlayerBar () {
   const t = player.current.value;
@@ -375,7 +375,7 @@ function PlayerBar () {
         <${Cover} blob=${t.cover} size=${48} radius=${6} />
         <div class="np-meta">
           <div class="np-title" title=${displayTitle(t)}>${displayTitle(t)}</div>
-          <button class="np-artist" onClick=${() => app.go('artist', displayArtist(t))}>${displayArtist(t)}</button>
+          <button class="np-artist" onClick=${() => open('artist', displayArtist(t))}>${displayArtist(t)}</button>
         </div>
       </div>
 
@@ -441,7 +441,6 @@ function App () {
     if (!framed) return;
     Promise.all(['app-root', 'app-area'].map(tag => customElements.whenDefined(tag))).then(() => {
       if (!menu()?.isOverlay) menu()?.show();
-      current.value = app.root.view?.getAttribute('name') ?? 'songs';
     });
   }, [framed]);
 
@@ -451,12 +450,7 @@ function App () {
 
   return html`
     <app-area name='main'>
-      ${VIEWS.map(({ name, route, Content }) => html`
-        <app-view key=${name} name=${name} route=${route} active=${name === 'songs' || undefined}>
-          <${TopBar} name=${name} />
-          <div class="content"><${Content} /></div>
-        </app-view>
-      `)}
+      <${Views} />
       <${PlayerBar} />
     </app-area>
     <app-area name='menu' dock='start'><${Sidebar} /></app-area>
