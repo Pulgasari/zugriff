@@ -14,10 +14,9 @@
 // that: a file that exists, like the live /.shared/, is served before it is
 // looked at. this runs before the filesystem, so the bundle's own files win.
 
-const OWN      = new Set(['app', 'tools', 'www']);   // subdomains of the site itself, every other one is a bundle
+const OWN      = new Set(['www']);   // subdomains of the site itself, every other one is a bundle
 const COOKIE   = 'zugriff-gestalt';
 const TOKENS   = ['density', 'geometry', 'palette'];
-const LAUNCHER = new Set(['apps', 'tools']);
 
 // a preset name or a css color, nothing that could leave the attribute or the declaration
 const SAFE = /^[\w#%.,()\s-]{1,64}$/;
@@ -61,14 +60,19 @@ function bundleOf (url) {
 
 // :::::: MAIN
 
+const rewrite = url => new Response(null, { headers: { 'x-middleware-rewrite': url.href } });
+
 export default async function middleware (request) {
   const url    = new URL(request.url);
   const bundle = bundleOf(url);
-  if (bundle) return new Response(null, { headers: { 'x-middleware-rewrite': bundle.href } });
+  if (bundle) return rewrite(bundle);
 
-  // the gestalt: the app pages only, /<slug>/, not the launcher, files or the shared folders
+  // the start page is 404.html as well (a switch inside), / would otherwise be the shell
+  if (url.pathname === '/') return rewrite(new URL('/404.html', url));
+
+  // the gestalt: the app pages only, /<slug>/, not files or the shared folders
   const slug = /^\/([a-z0-9-]+)\/$/.exec(url.pathname)?.[1];
-  if (!slug || LAUNCHER.has(slug)) return;
+  if (!slug) return;
 
   const gestalt = gestaltOf(request);
   if (!gestalt) return;   // nothing known, the page goes out as it is

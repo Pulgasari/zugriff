@@ -11,7 +11,6 @@ export * from './Nav.js';
 export * from './Picker.js';
 export * from './Prompt.js';
 export * from './Settings.js';
-export * from './Shell.js';
 export * from './Sidebar.js';
 export * from './Slider.js';
 export * from './../modules/toast.js';

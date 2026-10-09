@@ -1,6 +1,8 @@
 # concept: tools
 
-an idea, not a plan. nothing here is built yet.
+an idea, not a plan. built so far: the tools as one app, one view each, as
+they were (app.js, tools.js, views/). the families, chains, the shared input
+and output and the lab below are not.
 
 the 30 single tools under `tools/` as one app: a shelf of small tools with one
 shell around them, and a lab to try out features before an app gets them.
@@ -57,8 +59,7 @@ the shell gives every tool:
 - **options**: an `app-config` from the spec, remembered per tool
 - **history**: the last runs with their input, to redo one
 
-the tool list comes from `.shared/js/data/apps.js` (the entries of type
-`tool`), so nothing is listed twice.
+the tool list is `tools.js` in this app, so nothing is listed twice.
 
 ## chains
 
