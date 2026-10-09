@@ -2,12 +2,16 @@
 
 app      | bundle                       | live
 ---------|------------------------------|--------------------------
+cli      | https://cli.zugriff.dev      | https://zugriff.dev/cli/
 code     | https://code.zugriff.dev     | https://zugriff.dev/code/
 ebooks   | https://ebooks.zugriff.dev   | https://zugriff.dev/ebooks/
 feeds    | https://feeds.zugriff.dev    | https://zugriff.dev/feeds/
 files    | https://files.zugriff.dev    | https://zugriff.dev/files/
+icons    | https://icons.zugriff.dev    | https://zugriff.dev/icons/
+images   | https://images.zugriff.dev   | https://zugriff.dev/images/
 notes    | https://notes.zugriff.dev    | https://zugriff.dev/notes/
 podcasts | https://podcasts.zugriff.dev | https://zugriff.dev/podcasts/
+prompts  | https://prompts.zugriff.dev  | https://zugriff.dev/prompts/
 todo     | https://todo.zugriff.dev     | https://zugriff.dev/todo/
 tools    | https://tools.zugriff.dev    | https://zugriff.dev/tools/
 videos   | https://videos.zugriff.dev   | https://zugriff.dev/videos/
