@@ -3,21 +3,20 @@
 // fetching and parsing feeds in the browser — the article-flavoured cousin of
 // apps/podcasts/feed.js. same CORS reality: almost no feed sends CORS headers.
 // modules/http.js goes around it: natively inside capacitor, in a browser direct
-// first and then through the proxy the user controls in settings (`{url}` is
-// replaced with the encoded feed url).
+// first and then through its proxy.
 //
 // on top of plain RSS/Atom it understands YouTube: a channel's feed is Atom
 // with yt:/media: extensions (a video id, a thumbnail, a description), and a
 // channel *page* url can be turned into its feed url — see resolveYouTube.
 
-import { getText, PROXY } from '/.shared/js/modules/http.js';
+import { getText } from '/.shared/js/modules/http.js';
 
-/** fetch text. `accept` sets the Accept header, an empty `proxy` leaves the direct route only */
-export const fetchText = (url, proxy = PROXY, accept) => getText(url, { accept, proxy });
+/** fetch text. `accept` sets the Accept header */
+export const fetchText = (url, accept) => getText(url, { accept });
 
 /** fetch a feed's xml */
-export const fetchFeed = (url, proxy) =>
-  fetchText(url, proxy, 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*');
+export const fetchFeed = url =>
+  fetchText(url, 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*');
 
 // ── small dom helpers (namespace-agnostic, by localName) ─────────────────────
 
@@ -137,7 +136,7 @@ const PLAYLIST_FEED = id => `https://www.youtube.com/feeds/videos.xml?playlist_i
  *  - @handle · /user/… · /c/… · a video   → the page is fetched (via proxy) and
  *                                           its channelId scraped out
  */
-export async function resolveYouTube (input, proxy = PROXY) {
+export async function resolveYouTube (input) {
   const raw = (input || '').trim();
   if (!raw) return null;
 
@@ -152,7 +151,7 @@ export async function resolveYouTube (input, proxy = PROXY) {
   if (list) return PLAYLIST_FEED(list[1]);
 
   // @handle, /user/, /c/, or a watch url — the channelId is only on the page
-  const html = await fetchText(raw, proxy, 'text/html, */*');
+  const html = await fetchText(raw, 'text/html, */*');
   const id = html.match(/"channelId":"(UC[\w-]+)"/)?.[1]
           || html.match(/\/channel\/(UC[\w-]+)/)?.[1]
           || html.match(/"externalId":"(UC[\w-]+)"/)?.[1];

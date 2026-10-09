@@ -35,6 +35,17 @@ const _many = load => (...names) => Promise.all(names.map(load)).then(
 );
 */
 
+// :::::: SETTINGS
+
+// a settings field (a @aufbau/gui spec) as the state leaf behind it: the field's type,
+// its default as the value, persisted. an enum's [value, label] pairs give their values
+const LEAF_TYPES = { boolean: Boolean, enum: 'enum', number: Number, string: String, text: String, url: String };
+
+const valueOf = entry => Array.isArray(entry) ? entry[0] : entry;
+
+const leafOf = ({ type, default: value, values, min, max, step }) =>
+  ({ type: LEAF_TYPES[type] ?? 'scalar', value, values: values?.map(valueOf), min, max, step, persist: true });
+
 // :::::: PWA
 
 const standalone = () =>
@@ -180,6 +191,24 @@ class ZugriffApp {
     });
 
     return state;
+  }
+
+  // ::: settings. the shared ones are the registry's (apps.js, see sharedSpec), an app
+  // adds its own as gui fields. a new key becomes a persisted leaf of app.state and
+  // <Config> shows it after the shared ones, a shared key only changes how its field
+  // renders (a stepper, segments)
+  //
+  //   app.settings = {
+  //     menu    : { type: 'enum', values: ['top', 'bottom'], default: 'bottom', label: 'Menu' },
+  //     palette : { attrs: { stepper: true } },
+  //   };
+  #settings = {};
+
+  get settings ()     { return this.#settings; }
+  set settings (spec) {
+    this.#settings = { ...this.#settings, ...spec };
+    const added = Object.entries(spec).filter(([key]) => !(key in this.state));
+    this.state.$extend(Object.fromEntries(added.map(([key, field]) => [key, leafOf(field)])));
   }
 
   // ::: loaders (app-relative)

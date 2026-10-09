@@ -1,19 +1,16 @@
 // todo :: components/Config.js
-// the settings area: the shared fields, where the tasks are synced, the
-// reminders, and export and import as json or todo.txt.
+// the sections of the config area under its fields: where the tasks are synced,
+// the reminders, and export and import as json or todo.txt.
 
-import { gestalt }                     from '@aufbau/api';
-import { effect }                      from '@aufbau/signals';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 
-import PopPrompt      from '@aufbau/elements/webcomponents/pop-prompt.js';
-import { sharedSpec } from '/.shared/js/components/Settings.js';
+import PopPrompt from '@aufbau/elements/webcomponents/pop-prompt.js';
 
 import reminders  from '../modules/reminders.js';
 import * as store from '../modules/store.js';
 import sync       from '../modules/sync.js';
 
-const app    = zugriff.app;
+const app = zugriff.app;
 
 // :::::: FILES :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -37,36 +34,6 @@ async function importFile (file) {
 }
 
 // :::::: SECTIONS ::::::::::::::::::::::::::::::::::::::::::::
-
-function Shared () {
-  const host = useRef(null);
-
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let closed = false;
-
-    gestalt.palettes().then(palettes => {
-      if (closed) return;
-      const spec = sharedSpec(app.config, palettes);
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
-    });
-
-    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
-    element.addEventListener('config', onConfig);
-
-    const keys   = Object.keys(sharedSpec(app.config, []));
-    const follow = effect(() => {
-      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
-      if (element.spec && Object.keys(element.spec).length) element.values = values;
-    });
-
-    return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
-  }, []);
-
-  return html`<app-config ref=${host}></app-config>`;
-}
 
 function Sync () {
   const place = sync.place.value;
@@ -142,15 +109,13 @@ function Exchange () {
   `;
 }
 
-export function Config () {
+// what the config area holds beyond the fields
+export function ConfigSections () {
   return html`
-    <app-panel heading='Settings'>
-      <${Shared} />
-      <${Sync} />
-      <${Reminders} />
-      <${Exchange} />
-    </app-panel>
+    <${Sync} />
+    <${Reminders} />
+    <${Exchange} />
   `;
 }
 
-export default Config;
+export default ConfigSections;

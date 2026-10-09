@@ -9,7 +9,7 @@
 import { computed }          from '@aufbau/signals';
 import { useEffect }         from 'preact/hooks';
 
-import { Config }            from './components/Config.js';
+import { ConfigSections }    from './components/Config.js';
 import { Detail }            from './components/Detail.js';
 import { grabText, Grabber } from './components/Grabber.js';
 import { PackageCard }       from './components/Rows.js';
@@ -20,6 +20,7 @@ import { usePlugins }        from './modules/plugins.js';
 const { area, current, show } = frame;
 
 const // shared components
+Config     = await zugriff.component('Config'),
 Dock       = await zugriff.component('Dock'),
 Empty      = await zugriff.component('Empty');
 
@@ -28,15 +29,19 @@ Empty      = await zugriff.component('Empty');
 const app = zugriff.app;
 app.db = app.database;
 
+// the queue's settings, persisted, in the config area after the shared ones
+app.settings = {
+  parallel   : { type: 'number',  label: 'At once',              min: 1, max: 8,     step: 1,   default: 3 },
+  perHost    : { type: 'number',  label: 'At once per host',     min: 1, max: 4,     step: 1,   default: 2 },
+  retries    : { type: 'number',  label: 'Tries',                min: 1, max: 10,    step: 1,   default: 5 },
+  limit      : { type: 'number',  label: 'Limit, KiB/s',         min: 0, max: 20480, step: 256, default: 0 },
+  target     : { type: 'enum',    label: 'Target',               look: 'segments', values: ['library', 'folder', 'webdav', 'save'], default: 'library' },
+  subfolders : { type: 'boolean', label: 'A folder per package', default: true },
+  autostart  : { type: 'boolean', label: 'Go on at start',       default: true },
+};
+
 app.state.$extend({
-  autostart  : { type: 'scalar', value: true,      persist: true },
-  limit      : { type: 'scalar', value: 0,         persist: true },
-  parallel   : { type: 'scalar', value: 3,         persist: true },
-  perHost    : { type: 'scalar', value: 2,         persist: true },
-  plugins    : { type: 'scalar', value: [],        persist: true },
-  retries    : { type: 'scalar', value: 5,         persist: true },
-  subfolders : { type: 'scalar', value: true,      persist: true },
-  target     : { type: 'scalar', value: 'library', persist: true },
+  plugins : { type: 'scalar', value: [], persist: true },
 });
 
 await engine.load().catch(app.toast);
@@ -196,7 +201,9 @@ function App () {
       <${Dock} items=${dockItems} current=${current.value} />
     </app-area>
     <app-area name='context' dock='bottom' ontoggle=${event => { if (!event.detail?.open) frame.selected.value = null; }}><${Detail} /></app-area>
-    <app-area name='config' dock='end'><${Config} /></app-area>
+    <app-area name='config' dock='end'>
+      <${Config} onChange=${key => key in app.settings && engine.pump()}><${ConfigSections} /></${Config}>
+    </app-area>
   `;
 }
 

@@ -6,15 +6,14 @@
 // folder tree in a menu area docked at the start (a sidebar when there is room,
 // a drawer when there is not) and the settings in a config area at the end
 
-import { gestalt }                     from '@aufbau/api';
-import { computed, effect, typedSignal } from '@aufbau/signals';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { computed, typedSignal } from '@aufbau/signals';
+import { useEffect, useState }   from 'preact/hooks';
 
-import FolderLibrary  from '/.shared/js/modules/folders.js';
-import { sharedSpec } from '/.shared/js/components/Settings.js';
+import FolderLibrary from '/.shared/js/modules/folders.js';
 
 const // shared components
 Brand       = await zugriff.component('Brand'),
+Config      = await zugriff.component('Config'),
 Dock        = await zugriff.component('Dock'),
 Empty       = await zugriff.component('Empty'),
 FolderTree  = await zugriff.component('FolderTree'),
@@ -92,44 +91,6 @@ function Menu () {
         <btn-push icon='folder-add' label='Open a folder' onClick=${addFolder} />
       </div>
     </div>
-  `;
-}
-
-// :::::: CONFIG
-
-// the shared fields (palette, skin, …), written into app.state
-function Config () {
-  const host = useRef(null);
-
-  useEffect(() => {
-    const element = host.current;
-    if (!element) return;
-    let closed = false;
-
-    gestalt.palettes().then(palettes => {
-      if (closed) return;
-      const spec = sharedSpec(app.config, palettes);
-      element.values = Object.fromEntries(Object.keys(spec).map(key => [key, app.state['$' + key]]));
-      element.spec   = spec;
-    });
-
-    const onConfig = event => { app.state[event.detail.key] = event.detail.values[event.detail.key]; };
-    element.addEventListener('config', onConfig);
-
-    // the form follows the state while it is open, a change from elsewhere included
-    const keys   = Object.keys(sharedSpec(app.config, []));
-    const follow = effect(() => {
-      const values = Object.fromEntries(keys.map(key => [key, app.state['$' + key]]));
-      if (element.spec && Object.keys(element.spec).length) element.values = values;
-    });
-
-    return () => { closed = true; follow(); element.removeEventListener('config', onConfig); };
-  }, []);
-
-  return html`
-    <app-panel heading='Settings'>
-      <app-config ref=${host}></app-config>
-    </app-panel>
   `;
 }
 

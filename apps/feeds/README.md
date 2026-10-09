@@ -35,8 +35,9 @@ This is an *app*, not a *tool*: own chrome, own css (`app.css` over
 
 Almost no feed sends CORS headers, so a direct browser `fetch` is usually
 blocked. Like [`apps/podcasts`](./../podcasts/), each feed is fetched **directly
-first** and, on failure, retried through a **CORS proxy** whose URL you set in
-Settings (`{url}` is the placeholder). Clear it to use direct requests only.
+first** and, on failure, retried through the **CORS proxy** of
+`.shared/js/modules/http.js`. Inside the android app there is no proxy, requests
+go out natively.
 
 ### YouTube resolution
 
