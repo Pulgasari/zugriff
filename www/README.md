@@ -1,8 +1,18 @@
-# www
+# live vs. bundle
 
-- https://code.zugriff.dev
-- https://files.zugriff.dev
-- https://podcasts.zugriff.dev
+app      | bundle                       | live
+---------|------------------------------|--------------------------
+code     | https://code.zugriff.dev     | https://zugriff.dev/code/
+ebooks   | https://ebooks.zugriff.dev   | https://zugriff.dev/ebooks/
+feeds    | https://feeds.zugriff.dev    | https://zugriff.dev/feeds/
+files    | https://files.zugriff.dev    | https://zugriff.dev/files/
+notes    | https://notes.zugriff.dev    | https://zugriff.dev/notes/
+podcasts | https://podcasts.zugriff.dev | https://zugriff.dev/podcasts/
+todo     | https://todo.zugriff.dev     | https://zugriff.dev/todo/
+tools    | https://tools.zugriff.dev    | https://zugriff.dev/tools/
+videos   | https://videos.zugriff.dev   | https://zugriff.dev/videos/
+
+# www
 
 ##
 
