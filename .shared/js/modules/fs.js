@@ -10,7 +10,7 @@
 // no storage, no signals, no ui. the stateful layer on top of this is
 // FolderLibrary — it USES zugriff.fs and is therefore not part of it; import it
 // directly from '/.shared/js/modules/folders.js'. the private origin storage is
-// its own zugriff.opfs, for the same reason (see opfs.js).
+// @bunker/opfs.
 
 export * from './filesystem/handles.js';
 export * from './filesystem/platform.js';

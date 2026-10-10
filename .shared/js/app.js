@@ -3,6 +3,7 @@
 // :::::: IMPORTS
 
 import aufbau                          from '@aufbau/api';
+import { notify as toast }             from '@aufbau/elements/webcomponents/pop-toast.js';
 import { effect, signal, signalStore } from '@aufbau/signals';
 import webfonts                        from '@aufbau/webfonts';
 import { createDB }                    from '@bunker/db';
@@ -10,7 +11,6 @@ import { createDB }                    from '@bunker/db';
 import { registry }           from './data/apps.js';
 import { createActions }      from './modules/actions.js';
 import { createHotkeys }      from './modules/hotkeys.js';
-import { toast }              from './modules/toast.js';
 import { syncBars }           from './modules/bars.js';
 import { transition }         from './transitions.js';
 import { html, render }       from './vendors.js';

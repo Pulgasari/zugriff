@@ -87,7 +87,7 @@ components/    small reusable pieces — Artwork, PodcastsIndex, EpisodesIndex, 
   writes are ignored), `proxy` / `imgResizer` are text. Persisted as one blob under
   `zugriff:podcasts:settings`. Its own store rather than an `app.state` subtree because
   `typedSignal` persistence is whole-store and `app.state` must stay ephemeral.
-- `app.go(name, id)` — navigate: the `<app-view>` of that name in the `<app-root>` of app.js. the lists have a hash route, the detail views keep their id outside the address. For toasts call `app.toast(…)` directly (see `.shared/js/modules/toast.js`).
+- `app.go(name, id)` — navigate: the `<app-view>` of that name in the `<app-root>` of app.js. the lists have a hash route, the detail views keep their id outside the address. For toasts call `app.toast(…)` directly (`notify` of `@aufbau/elements/webcomponents/pop-toast.js`).
 - `app.actions` — named behaviours (`refresh-all`, `add-podcast`, `toggle-play`, `skip-back/forward`, …); `app.hotKeys` is the declarative combo→spec map that binds keys to them (`space` = play/pause, `arrow-left`/`arrow-right` = skip, `escape` = close). See `.shared/js/modules/{actions,hotkeys}.js`.
 
 Views/panels/components reach all of this through `const app = zugriff.app` (+

@@ -10,9 +10,12 @@ import * as xterm from '@xterm/xterm';
 import { signal }            from '@aufbau/signals';
 import { useEffect, useRef } from '/.shared/js/vendors.js';
 
-import { vfs } from '/.shared/js/modules/opfs.js';
+import createOPFS from '@bunker/opfs';
 
 import { terminalOptions } from './app.config.js';
+
+// the files of the terminal, a folder of their own in the origin private file system
+const storage = createOPFS({ directory: 'cli' });
 
 // esm.sh hands these umd builds out with named exports, a vendored copy as one default object
 const { FitAddon } = fit.FitAddon   ? fit   : fit.default;
@@ -166,11 +169,11 @@ async function handleCommand(rawInput, term, worker, finishCallback) {
 
     case 'ls':
       try {
-        const files = await vfs.listFiles();
+        const files = await storage.entries();
         if (files.length === 0) {
           term.writeln('VFS is empty.');
         } else {
-          files.forEach(f => term.writeln(`${f.name.padEnd(25)}${f.size} bytes`));
+          files.forEach(f => term.writeln(`${f.key.padEnd(25)}${f.size} bytes`));
         }
       } catch (err) {
         term.writeln(`\x1b[31mError accessing VFS: ${err.message}\x1b[0m`);
@@ -198,12 +201,8 @@ async function handleCommand(rawInput, term, worker, finishCallback) {
         finishCallback();
         break;
       }
-      try {
-        await vfs.removeFile(args[0]);
-        term.writeln(`Removed file: ${args[0]}`);
-      } catch (err) {
-        term.writeln(`\x1b[31mError removing file: ${err.message}\x1b[0m`);
-      }
+      if (await storage.delete(args[0])) term.writeln(`Removed file: ${args[0]}`);
+      else                                term.writeln(`\x1b[31mNo file named ${args[0]}\x1b[0m`);
       finishCallback();
       break;
 
@@ -241,9 +240,8 @@ function triggerFileUpload(term, callback) {
     const file = e.target.files[0];
     if (file) {
       term.writeln(`Uploading ${file.name} to VFS...`);
-      const buffer = await file.arrayBuffer();
-      await vfs.writeFile(file.name, buffer);
-      term.writeln(`\x1b[32mSuccessfully saved ${file.name} to OPFS.\x1b[0m`);
+      if (await storage.set(file.name, file)) term.writeln(`\x1b[32mSuccessfully saved ${file.name} to OPFS.\x1b[0m`);
+      else                                    term.writeln(`\x1b[31mCould not save ${file.name}.\x1b[0m`);
     } else {
       term.writeln('Upload canceled.');
     }
@@ -263,8 +261,8 @@ function triggerFileUpload(term, callback) {
 // Helper: Download file from OPFS
 async function triggerFileDownload(filename, term) {
   try {
-    const buffer = await vfs.readFile(filename);
-    const blob = new Blob([buffer]);
+    const blob = await storage.get(filename);
+    if (!blob) throw new Error(`no file named ${filename}`);
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

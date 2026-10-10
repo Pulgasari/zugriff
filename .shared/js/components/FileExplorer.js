@@ -11,12 +11,12 @@ an app drops in `<${FileExplorer} backend=${backend} />` and gets:
 
 it is deliberately backend-agnostic. anything that can hand back a
 FileSystemDirectoryHandle root works:
-- the private OPFS (zugriff.opfs.backend)
+- the private OPFS (opfsBackend, below)
 - or a folder the user grants off their disk (what the files app app builds).
 the component itself knows nothing about *where* the tree lives.
 
-const { FileExplorer } = await zugriff.components('FileExplorer');
-html`<${FileExplorer} backend=${zugriff.opfs.backend} />`
+import { FileExplorer, opfsBackend } from '/.shared/js/components/FileExplorer.js';
+html`<${FileExplorer} backend=${opfsBackend} />`
 
 styles live in shared/css/explorer.css (opt-in, scoped under .fx) 
 — a host links it the way it opts into panes.css or inspector.css.
@@ -532,10 +532,26 @@ function StatusBar () {
 
 // :::::: THE COMPONENT ::::::::::::::::::::::::::::::::::::
 
+// :::::: BACKENDS :::::::::::::::::::::::::::::::::::::::
+
+// a backend hands the explorer a root and says what it can do:
+// { id, label, writable, supported(), getRoot(), usage?() }
+
+const opfsBackend = {
+  id        : 'opfs',
+  label     : 'private storage',
+  writable  : true,
+  supported : () => typeof navigator.storage?.getDirectory === 'function',
+  getRoot   : () => navigator.storage.getDirectory(),
+  usage     : async () => {
+    const { usage = 0, quota = 0 } = await navigator.storage?.estimate?.() ?? {};
+    return { usage, quota };
+  },
+};
+
 /**
  * <${FileExplorer} backend=${backend} />
- *   backend — the OPFS descriptor (zugriff.opfs.backend), or one an app builds
- *             around a granted on-disk folder. see opfs.js for the shape.
+ *   backend — opfsBackend, or one an app builds around a granted on-disk folder
  */
 
 function FileExplorer ({ backend: be }) {
@@ -622,5 +638,5 @@ function Unsupported ({ backend: be }) {
   `;
 }
 
-export       { FileExplorer };
+export       { FileExplorer, opfsBackend };
 export default FileExplorer;

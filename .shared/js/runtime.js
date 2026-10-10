@@ -1,13 +1,17 @@
 // .shared/js/runtime.js
 // binds zugriff and html to window before any app module runs
 
-import registry          from './data/apps.js';
+import { setConfig }       from '@aufbau/element';
+import { notify as toast } from '@aufbau/elements/webcomponents/pop-toast.js';
+
+import registry             from './data/apps.js';
 import { ZugriffApp, many } from './app.js';
-import fmt               from './modules/fmt.js';
-import * as fs           from './modules/fs.js';
-import { opfs }          from './modules/opfs.js';
-import { toast }         from './modules/toast.js';
-import { html }          from './vendors.js';
+import fmt                  from './modules/fmt.js';
+import * as fs              from './modules/fs.js';
+import { html }             from './vendors.js';
+
+// every toast without a duration of its own
+setConfig({ 'pop-toast': { duration: 3000 } });
 
 const loadModule = async (spec, member) => {
   const imported = await import(spec);
@@ -22,7 +26,6 @@ const slug = document.documentElement.dataset.app;
 const zugriff = {
   fmt,
   fs,
-  opfs,
   registry,
   toast,
 
