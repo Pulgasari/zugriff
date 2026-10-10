@@ -72,17 +72,18 @@ export class DavDirectoryHandle extends DavHandle {
   async * entries () {
     for (const entry of await dav.list(this.connection, this.path)) {
       yield [entry.name, entry.isDir
-        ? new DavDirectoryHandle(this.connection, entry.path, entry.name)
-        : new DavFileHandle(this.connection, entry.path, entry.name, entry)];
+        ? new DavDirectoryHandle (this.connection, entry.path, entry.name)
+        : new DavFileHandle      (this.connection, entry.path, entry.name, entry)
+      ];
     }
   }
 
-  async * keys   () { for await (const [name] of this.entries()) yield name; }
+  async * keys   () { for await (const     [name] of this.entries()) yield   name; }
   async * values () { for await (const [, handle] of this.entries()) yield handle; }
   [Symbol.asyncIterator] () { return this.entries(); }
 
   async getDirectoryHandle (name, { create = false } = {}) {
-    const path  = dav.join(this.path, name);
+    const path  =       dav.join(this.path, name);
     const found = await dav.stat(this.connection, path);
     if (found && !found.isDir) throw mismatch(name);
     if (!found) {
@@ -93,7 +94,7 @@ export class DavDirectoryHandle extends DavHandle {
   }
 
   async getFileHandle (name, { create = false } = {}) {
-    const path  = dav.join(this.path, name);
+    const path  =       dav.join(this.path, name);
     const found = await dav.stat(this.connection, path);
     if (found?.isDir) throw mismatch(name);
     if (!found) {
@@ -104,7 +105,7 @@ export class DavDirectoryHandle extends DavHandle {
   }
 
   async removeEntry (name) {
-    const path  = dav.join(this.path, name);
+    const path  =       dav.join(this.path, name);
     const found = await dav.stat(this.connection, path);
     if (!found) throw notFound(name);
     await dav.remove(this.connection, path, found.isDir);   // a collection goes with all it holds

@@ -213,7 +213,8 @@ export function createThumbCache ({
       try {
         const res = await fetch(endpoint, { credentials: 'omit' });
         if (res.ok) return { blob: await res.blob(), via: 'resizer' };
-      } catch { /* fall through to the error below */ }
+      } 
+      catch {} /* fall through to the error below */
       return { error: 'resizer' };
     }
 

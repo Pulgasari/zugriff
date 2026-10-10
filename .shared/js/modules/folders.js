@@ -333,7 +333,7 @@ async function syncSource ({ db, store, sourceId, files, rows, keyOf, makeRecord
 
   // rows for files that vanished from this source
   const gone = rows.filter(r => r.sourceId === sourceId && !seen.has(r.key)).map(r => r.key);
-  if    (gone.length) await db.task(store, 'readwrite', s => { for (const k of gone) s.delete(k); });
+  if    (gone.length) await db.task(store, 'readwrite', s => { for (const k of gone)    s.delete(k); });
   if (toWrite.length) await db.task(store, 'readwrite', s => { for (const r of toWrite) s.put(r, r.key); });
 
   return next;
@@ -347,7 +347,7 @@ class MetaQueue {
   }
 
   enqueue (items, worker) {
-    for (const it of items) {
+    for (const it of items) {z
       if (this.queued.has(it.key)) continue;
       this.queued.add(it.key);
       this.gate(() => worker(it)).finally(() => {
