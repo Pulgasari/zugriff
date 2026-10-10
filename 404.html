@@ -27,6 +27,10 @@
     body { display: grid; place-items: center; }
     body { font-family : system-ui, sans-serif; }
 
+    /* Hide custom element until its JS definition is loaded */
+    svg-file:not(:defined) { opacity: 0; }
+
+
     /* Hide app container until async setup completes to avoid FOUC */
     #app { 
       display: flex; 
@@ -34,14 +38,12 @@
       align-items: center; 
       gap: 2rem; 
       padding: 1rem; 
-      opacity: 0; 
+      opacity: 1; 
       transition: opacity 0.15s ease-in; 
     }
 
     /* Class added after setup to trigger fade-in */
-    #app.is-ready { 
-      opacity: 1; 
-    }
+    #app.is-ready { opacity: 1; }
     
     #missing { display: none; opacity: 0.5; text-align: center; }
 
@@ -119,7 +121,7 @@
     aufbau.patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });      
 
     // Reveal UI once initialization finishes
-    document.getElementById('app').classList.add('is-ready');
+    //document.getElementById('app').classList.add('is-ready');
   </script>
 
 </body>
