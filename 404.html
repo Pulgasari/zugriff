@@ -27,20 +27,11 @@
     body { display: grid; place-items: center; }
     body { font-family : system-ui, sans-serif; }
 
-    /* Hide custom element until its JS definition is loaded */
     svg-file:not(:defined) { opacity: 0; }
 
-
-    /* Hide app container until async setup completes to avoid FOUC */
-    #app { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 2rem; 
-      padding: 1rem; 
-      opacity: 1; 
-      transition: opacity 0.15s ease-in; 
-    }
+    #app { display: flex; flex-direction: column; align-items: center; }
+    #app { gap: 2rem; padding: 1rem; }
+    #app { opacity: 1; transition: opacity 0.15s ease-in; }
     #app.is-ready { opacity: 1; }
     
     #missing { display: none; opacity: 0.5; text-align: center; }
