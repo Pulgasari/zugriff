@@ -41,25 +41,12 @@
       opacity: 1; 
       transition: opacity 0.15s ease-in; 
     }
-
-    /* Class added after setup to trigger fade-in */
     #app.is-ready { opacity: 1; }
     
     #missing { display: none; opacity: 0.5; text-align: center; }
 
-    /* Critical CSS to preserve nav layout before external stylesheet loads */
-    nav { 
-      display: flex; 
-      flex-flow: row wrap; 
-      align-items: center; 
-      justify-content: center; 
-      gap: 0.5rem 1rem; 
-    }
-
-    nav a {
-      color: inherit;
-      text-decoration: none;
-    }
+    nav   { display: flex; flex-flow: row wrap; align-items: center; justify-content: center; }
+    nav a { color: inherit; text-decoration: none; }
   </style>
 </head>
 
