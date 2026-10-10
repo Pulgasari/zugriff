@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!--
-the start page of zugriff.dev and the page for whatever is not found, one file.
-vercel serves it for every 404, middleware.js rewrites zugriff.dev/ to it. a
-subdomain without a bundle gets it as well, and there every path is rewritten into
-www/<subdomain>/: so the page needs nothing from outside, logo and css are inline.
-the start page then adds the shell's look (boot.js, aufbau), a 404 page stays plain
--->
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -16,7 +8,8 @@ the start page then adds the shell's look (boot.js, aufbau), a 404 page stays pl
   <title>zugriff</title>
   <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css" />
   <script>
-    // the start page is zugriff.dev/ (or www.), anything else that ends up here was not found
+    // the start page is zugriff.dev/ (or www.), 
+    // anything else that ends up here was not found
     const host  = location.hostname;
     const apex  = !host.endsWith('.zugriff.dev') || host === 'www.zugriff.dev';
     const start = apex && location.pathname === '/';
