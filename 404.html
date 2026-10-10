@@ -27,11 +27,37 @@
     body { display: grid; place-items: center; }
     body { font-family : system-ui, sans-serif; }
 
-    #app { display: flex; flex-direction: column; align-items: center; }
-    #app { gap: 2rem; padding: 1rem; }
+    /* Hide app container until async setup completes to avoid FOUC */
+    #app { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 2rem; 
+      padding: 1rem; 
+      opacity: 0; 
+      transition: opacity 0.15s ease-in; 
+    }
+
+    /* Class added after setup to trigger fade-in */
+    #app.is-ready { 
+      opacity: 1; 
+    }
     
     #missing { display: none; opacity: 0.5; text-align: center; }
-    nav { display: flex; flex-flow: row wrap; align-items: center; justify-content: center; }
+
+    /* Critical CSS to preserve nav layout before external stylesheet loads */
+    nav { 
+      display: flex; 
+      flex-flow: row wrap; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 0.5rem 1rem; 
+    }
+
+    nav a {
+      color: inherit;
+      text-decoration: none;
+    }
   </style>
 </head>
 
@@ -91,6 +117,9 @@
     const fg = getStyleToken('color-fg') || '#c8d0e0';
     aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: '2s' });
     aufbau.patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });      
+
+    // Reveal UI once initialization finishes
+    document.getElementById('app').classList.add('is-ready');
   </script>
 
 </body>
