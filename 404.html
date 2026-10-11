@@ -8,6 +8,7 @@
   <title>zugriff</title>
   <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css" />
   <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/gestalt/gestalt.css" />
+  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/gestalt/layouts/landing.css" />
   <script>
     // the start page is zugriff.dev/ (or www.), 
     // anything else that ends up here was not found
@@ -95,7 +96,7 @@
       import('@domina/methods/getStyleToken.js'),
     ]);
 
-    await aufbau.boot({ css: { /*layout: 'landing',*/ palette: 'synthwave' } });
+    await aufbau.boot({ css: { layout: 'landing', palette: 'synthwave' } });
 
     const bg = getStyleToken('color-bg', 'body') || '#000000';
     const fg = getStyleToken('color-fg', 'body') || '#c8d0e0';
