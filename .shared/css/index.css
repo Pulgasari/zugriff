@@ -55,7 +55,10 @@ body { overflow: hidden; overscroll-behavior: none; }
   &:not(:has(> app-area)) { display: flex; flex-flow: column; }
 }
 
-/* the head of a view, ViewHeader's or the view's own */
+app-view {
+  display: flex;
+  flex-direction: column;
+}
 app-view > header {
   --bg  : --darker(bg, 0.2);
   --gap : small;
@@ -66,11 +69,6 @@ app-view > header {
 
   button { text-transform: uppercase; }
   > h1   { flex: 1 1 auto; }   /* next to the back button, the tools at the end */
-}
-
-app-view {
-  display: flex;
-  flex-direction: column;
 }
 app-view > main {
   justify-content: safe center;
