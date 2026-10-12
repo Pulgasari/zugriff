@@ -87,6 +87,12 @@ return {
   "@pulgasari/timing"           : `${pkg}/js-packages/timing/index.js`,
   "@pulgasari/url"              : `${pkg}/js-packages/url/index.js`,
 
+  "@rat/syntax"            : `${pkg}/rat/packages/syntax/spec.js`,
+  "@rat/syntax/"           : `${pkg}/rat/packages/syntax/`,
+  "@rat/syntax/codemirror" : `${pkg}/rat/packages/syntax/targets/codemirror.js`,
+  "@rat/syntax/hljs"       : `${pkg}/rat/packages/syntax/targets/hljs.js`,
+  "@rat/syntax/monaco"     : `${pkg}/rat/packages/syntax/targets/monaco.js`,
+
   // preact once: whatever depends on it pins PREACT, so esm.sh ships no second copy
   "acorn"           : "https://esm.sh/acorn@8",
   "htm"             : "https://esm.sh/htm@3.1.1",

@@ -31,8 +31,11 @@ export function loadMonaco () {
       // the AMD loader defines a global `require`; point it at the CDN and pull
       // in the editor (which also injects Monaco's stylesheet)
       window.require.config({ paths: { vs: VS } });
-      window.require(['vs/editor/editor.main'], () => {
+      window.require(['vs/editor/editor.main'], async () => {
         self.monaco = window.monaco;   // editor.js reads the namespace off self.monaco
+        // rat (.rat, .rat.js) from @rat/syntax. a failure costs the highlighting, never the editor
+        try     { (await import('@rat/syntax/monaco')).register(window.monaco); }
+        catch (error) { console.warn('[code] rat syntax unavailable:', error); }
         resolve(window.monaco);
       }, reject);
     };
