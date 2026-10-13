@@ -12,8 +12,9 @@ import { signal } from '@aufbau/signals';
 const open   = signal([]);     // the open tabs
 const active = signal(null);   // the active tab, or null
 
-// language guessed from the file extension — Monaco's built-in modes only
+// language guessed from the file extension — Monaco's built-in modes plus rat (@rat/syntax)
 const LANG_BY_EXT = {
+  rat: 'rat',
   js: 'javascript', mjs: 'javascript', cjs: 'javascript', jsx: 'javascript',
   ts: 'typescript', tsx: 'typescript',
   json: 'json', css: 'css', scss: 'scss', less: 'less',
@@ -24,7 +25,7 @@ const LANG_BY_EXT = {
   cs: 'csharp', sh: 'shell', bash: 'shell', yml: 'yaml', yaml: 'yaml',
   sql: 'sql', toml: 'ini', ini: 'ini',
 };
-const languageOf = name => LANG_BY_EXT[name.split('.').pop().toLowerCase()] ?? 'plaintext';
+const languageOf = name => /\.rat\.js$/i.test(name) ? 'ratjs' : LANG_BY_EXT[name.split('.').pop().toLowerCase()] ?? 'plaintext';
 
 const openById  = id => open.value.find(f => f.id === id);
 const activate  = fileObj => {
