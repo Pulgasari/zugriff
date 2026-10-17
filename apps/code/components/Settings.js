@@ -3,7 +3,7 @@
 // section (Monaco theme + construction options).
 
 import { html } from './../vendors.js';
-import { gestalt } from '@aufbau/gestalt';
+import { gestalt } from '@gestalt/core';
 import Modal from './Modal.js';
 import Picker from './Picker.js';
 import Toggle from './Toggle.js';

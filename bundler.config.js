@@ -78,7 +78,7 @@ export default ({ dev = false, out, packages = 'build/_pkg', slug }) => ({
   // the fonts the shared css and the app state name (manrope, jetbrains mono),
   // the settings offer those. more go into keep
   webfonts : {
-    catalog : '_pkg/aufbau/webfonts/data.js',
+    catalog : '_pkg/gestalt/packages/webfonts/data.js',
     keep    : [],
     scan    : true,
   },

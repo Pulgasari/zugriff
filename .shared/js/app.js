@@ -3,7 +3,7 @@
 // :::::: IMPORTS
 
 import { effect, signal, signalStore } from '@aufbau/signals';
-import webfonts                        from '@aufbau/webfonts';
+import webfonts                        from '@gestalt/webfonts';
 import { createDB }                    from '@bunker/db';
 
 import { registry }           from './data/apps.js';
@@ -24,7 +24,7 @@ const segmentsOf = (str) => splitBy('/');
 const popOf      = (arr) => arr.pop();
 
 // the plural of a loader: loads all names at once, resolves to { name: export }.
-// a path keeps its last segment as the key: 'folder/Name' -> Name, '@aufbau/filters' -> filters
+// a path keeps its last segment as the key: 'folder/Name' -> Name, '@gestalt/filters' -> filters
 const many = load => (...names) => Promise.all(names.map(name => load(name)))
   .then(loaded => Object.fromEntries(names.map((name, index) => [name.split('/').pop(), loaded[index]])));
 /*
@@ -118,7 +118,7 @@ const setMeta = (name, content) => {
 
 const bodyReady = () => $doc.body ? Promise.resolve() : new Promise(resolve => $doc.addEventListener('DOMContentLoaded', resolve, { once: true }));
 
-// a preset of aufbau/gestalt/palettes.css or any css color. gestalt sets --palette,
+// a preset of gestalt/packages/css/palettes.css or any css color. gestalt sets --palette,
 // the css derives the rest, and the resolved bg feeds what css cannot reach
 const applyPalette = async palette => {
   if (!$root || !palette) return;

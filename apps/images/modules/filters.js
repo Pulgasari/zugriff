@@ -1,6 +1,6 @@
 // apps/images/filters.js
 //
-// the images app's filter layer — a thin, reusable wrapper over @aufbau/filters,
+// the images app's filter layer — a thin, reusable wrapper over @gestalt/filters,
 // shared by the edit mode (live preview + bake on export) and the batch mode (a
 // pipeline task). one curated catalogue, two entry points:
 //
@@ -14,7 +14,7 @@
 // `preview` only works for the css/svg-backed ones — a canvas-only effect (pixelate,
 // dither) has no cheap live form, so it previews as a no-op and shows on export.
 
-import { applyFilter, removeFilter, filterCanvas, filterCss, list } from '@aufbau/filters';
+import { applyFilter, removeFilter, filterCanvas, filterCss, list } from '@gestalt/filters';
 
 export const NONE = 'none';
 

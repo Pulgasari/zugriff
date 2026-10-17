@@ -13,8 +13,8 @@ what an app sets up from aufbau before it renders, the part of the former
 */
 
 import { autoloader, load as loadElement, registerAll } from '@aufbau/elements';
-import { CSS_PATH, gestalt }                            from '@aufbau/gestalt';
-import webfonts                                         from '@aufbau/webfonts';
+import { CSS_PATH, gestalt }                            from '@gestalt/core';
+import webfonts                                         from '@gestalt/webfonts';
 import { setConfig }                                    from '@domina/element';
 
 const DEFAULTS = {

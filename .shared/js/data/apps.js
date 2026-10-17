@@ -19,7 +19,7 @@ const defaults = {
   aufbau      : { elements: { mode: 'auto' } },
   // settings every app carries, predefined here so the shared Settings can render
   // them for any app without the app spelling them out. `font` is an enum whose
-  // values are filled from @aufbau/webfonts at runtime — this module stays
+  // values are filled from @gestalt/webfonts at runtime — this module stays
   // import-free so the node asset generator can read it, so the catalog is folded
   // in on the browser side (components/Settings.js, `source: 'webfonts'`), not here.
   settings    : {

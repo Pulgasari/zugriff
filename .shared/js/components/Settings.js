@@ -25,9 +25,9 @@
 
 import ViewHeader from './ViewHeader.js';
 
-import { gestalt } from '@aufbau/gestalt';
+import { gestalt } from '@gestalt/core';
 import gui         from '@aufbau/gui';
-import webfonts    from '@aufbau/webfonts';
+import webfonts    from '@gestalt/webfonts';
 
 import { signal, useEffect, useRef } from './../vendors.js';
 

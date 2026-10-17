@@ -1,4 +1,4 @@
-/* move to: aufbau/css/mobile.css */
+/* move to: gestalt/packages/css/mobile.css */
 
 /*
 safe-area insets. non-zero where the page runs edge-to-edge:
@@ -19,7 +19,7 @@ body {
 }
 
 /* move to: zugriff/apps/podcasts/app.css
-or move to: aufbau/css/surfaces.css */
+or move to: gestalt/packages/css/surfaces.css */
 
 @container style(--palette: oled) {
   body {
