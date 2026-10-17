@@ -91,19 +91,23 @@
 
   <script type="module">
     const [
-      { default: aufbau },
+      { boot },
+      filters,
+      patterns,
       { default: getStyleToken },
     ] = await Promise.all([
-      import('@aufbau/api'),
+      import('/.shared/js/modules/aufbau.js'),
+      import('@aufbau/filters'),
+      import('@aufbau/patterns'),
       import('@domina/methods/getStyleToken.js'),
     ]);
 
-    await aufbau.boot({ css: { layout: 'landing', palette: 'synthwave' } });
+    await boot({ css: { layout: 'landing', palette: 'synthwave' } });
 
     const bg = getStyleToken('color-bg', 'body') || '#000000';
     const fg = getStyleToken('color-fg', 'body') || '#c8d0e0';
-    aufbau.filters.apply('body', 'glitch-live', { animate: true, speed: '2s' });
-    aufbau.patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });      
+    filters.apply('body', 'glitch-live', { animate: true, speed: '2s' });
+    patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
 
     // Reveal UI once initialization finishes
     //document.getElementById('app').classList.add('is-ready');

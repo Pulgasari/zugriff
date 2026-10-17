@@ -8,7 +8,7 @@
 //   <app-area name='config' dock='end'><${Config} /></app-area>
 //   <app-area name='config' dock='end'><${Config}><${Sync} /></${Config}></app-area>
 
-import { gestalt } from '@aufbau/api';
+import { gestalt } from '@aufbau/gestalt';
 
 import { effect, useEffect, useRef } from './../vendors.js';
 import { sharedSpec }                from './Settings.js';

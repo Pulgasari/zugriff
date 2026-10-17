@@ -25,7 +25,7 @@
 
 import ViewHeader from './ViewHeader.js';
 
-import { gestalt } from '@aufbau/api';
+import { gestalt } from '@aufbau/gestalt';
 import gui         from '@aufbau/gui';
 import webfonts    from '@aufbau/webfonts';
 

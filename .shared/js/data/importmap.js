@@ -10,15 +10,12 @@ const HLJS   = '11.10.0';
 const PREACT = '10.20.1';
 
 return {
-  "@aufbau/api"             : `${pkg}/aufbau/api/index.js`,
   "@aufbau/ass"             : `${pkg}/aufbau/ass/index.js`,
   "@aufbau/ass/"            : `${pkg}/aufbau/ass/`,
   "@aufbau/builders/docs"   : `${pkg}/aufbau/builders/docs/index.js`,
   "@aufbau/builders/docs/"  : `${pkg}/aufbau/builders/docs/`,
   "@aufbau/devtools"        : `${pkg}/aufbau/devtools/index.js`,
   "@aufbau/devtools/"       : `${pkg}/aufbau/devtools/`,
-  "@aufbau/element"         : `${pkg}/aufbau/element/index.js`,
-  "@aufbau/element/"        : `${pkg}/aufbau/element/`,
   "@aufbau/elements"        : `${pkg}/aufbau/elements/index.js`,
   "@aufbau/elements/htx"    : `${pkg}/aufbau/elements/adapters/htx.js`,
   "@aufbau/elements/"       : `${pkg}/aufbau/elements/`,
@@ -28,7 +25,6 @@ return {
   "@aufbau/gestures"        : `${pkg}/aufbau/gestures/index.js`,
   "@aufbau/gestures/preact" : `${pkg}/aufbau/gestures/adapters/preact.js`,
   "@aufbau/gui"             : `${pkg}/aufbau/gui/index.js`,
-  "@aufbau/import"          : `${pkg}/aufbau/import/index.js`,
   "@aufbau/patterns"        : `${pkg}/aufbau/patterns/index.js`,
   "@aufbau/signals"         : `${pkg}/aufbau/signals/index.js`,
   "@aufbau/signals/"        : `${pkg}/aufbau/signals/`,
@@ -52,7 +48,7 @@ return {
   "@domina/core"         : `${pkg}/domina/core/index.js`,
   "@domina/core/"        : `${pkg}/domina/core/`,
   "@domina/element"      : `${pkg}/domina/packages/element/index.js`,
-  "@domina/element/lazy" : `${pkg}/domina/packages/element/lazy.js`,
+  "@domina/element/"     : `${pkg}/domina/packages/element/`,
   "@domina/fonts"        : `${pkg}/domina/packages/fonts/index.js`,
   "@domina/forms"        : `${pkg}/domina/packages/forms/index.js`,
   "@domina/meta"         : `${pkg}/domina/packages/meta/index.js`,

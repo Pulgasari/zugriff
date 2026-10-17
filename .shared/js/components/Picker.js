@@ -28,7 +28,7 @@ function Option ({ icon, label, title, value }) {
 }
 
 // `src` is a file of options the element loads for itself (json/csv/yaml
-// — see @aufbau/import); `options` and `src` can be used together, the loaded ones come last.
+// — see @rat/import); `options` and `src` can be used together, the loaded ones come last.
 // a `signal` holds the value, an enumSignal brings its allowed values as the
 // options too, given `options` win over them
 function Picker ({ options, signal, onChange, searchable, value, ...rest }) {
