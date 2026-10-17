@@ -1,5 +1,5 @@
-@import url('https://code.pulgasari.dev/aufbau/css/aufbau.css');
-@import url('https://code.pulgasari.dev/aufbau/gestalt/gestalt.css');
+@import url('https://code.pulgasari.dev/gestalt/packages/css/aufbau.css');
+@import url('https://code.pulgasari.dev/gestalt/packages/css/gestalt.css');
 
 
 /* ── TO STYLE: what every app shares ─────────────────────────────────────────
@@ -157,14 +157,14 @@ body {
 html, body { font-size   : var(--font-size); }
 */
 
-/* move to: aufbau/css/mobile.css */
+/* move to: gestalt/packages/css/mobile.css */
 
 /* ::selection { background: var(--accent-25); } */
 
 /* ── oled fix (temp) ─────────────────────────────────────────────────────── */
 
 /* move to: zugriff/apps/podcasts/app.css
-or move to: aufbau/css/surfaces.css */
+or move to: gestalt/packages/css/surfaces.css */
 
 @container style(--palette: oled) {
   body {

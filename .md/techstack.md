@@ -7,9 +7,9 @@ Als Framework benutzen wir **preact** in Kombination mit **htx** (eigener Fork v
 ## @aufbau
 
 - `@aufbau/elements` — custom html-elements (webcomponents)
-- `@aufbau/filters` — visual effects/shaders via svg-filter
+- `@gestalt/filters` — visual effects/shaders via svg-filter
 - `@aufbau/import`
-- `@aufbau/patterns` — svg-patterns
+- `@gestalt/patterns` — svg-patterns
 
 ## @bunker
 

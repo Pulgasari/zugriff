@@ -32,7 +32,7 @@ const exportFmt = app.persisted('edit:format', 'image/png');
 const quality   = app.persisted('edit:quality', 92);
 const panelTab  = app.persisted('edit:tab', 'adjust'); // 'adjust' | 'effects' | 'resize' | 'export'
 
-const effect    = app.persisted('edit:effect', 'none'); // an @aufbau/filters id, or 'none'
+const effect    = app.persisted('edit:effect', 'none'); // an @gestalt/filters id, or 'none'
 const effectAmt = signal(1);                             // the effect's `amount`, when it has one
 
 function selectEffect (id) {

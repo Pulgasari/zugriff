@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b0b0b">
   <title>zugriff</title>
-  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/css/aufbau.css" />
-  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/gestalt/gestalt.css" />
+  <link rel="stylesheet" href="https://code.pulgasari.dev/gestalt/packages/css/aufbau.css" />
+  <link rel="stylesheet" href="https://code.pulgasari.dev/gestalt/packages/css/gestalt.css" />
   <!--
-  <link rel="stylesheet" href="https://code.pulgasari.dev/aufbau/gestalt/layouts/landing.css" />
+  <link rel="stylesheet" href="https://code.pulgasari.dev/gestalt/packages/css/layouts/landing.css" />
   -->
   <script>
     // the start page is zugriff.dev/ (or www.), 
@@ -97,8 +97,8 @@
       { default: getStyleToken },
     ] = await Promise.all([
       import('/.shared/js/modules/aufbau.js'),
-      import('@aufbau/filters'),
-      import('@aufbau/patterns'),
+      import('@gestalt/filters'),
+      import('@gestalt/patterns'),
       import('@domina/methods/getStyleToken.js'),
     ]);
 
