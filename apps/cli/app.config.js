@@ -1,6 +1,6 @@
 // cli/app.config.js
 
-import { gestalt } from '@aufbau/api';
+import { gestalt } from '@aufbau/gestalt';
 
 // xterm needs concrete colours, so they are read back from the resolved theme
 // once the app has booted, instead of being written down a second time

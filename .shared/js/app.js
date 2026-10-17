@@ -2,12 +2,12 @@
 
 // :::::: IMPORTS
 
-import aufbau                          from '@aufbau/api';
 import { effect, signal, signalStore } from '@aufbau/signals';
 import webfonts                        from '@aufbau/webfonts';
 import { createDB }                    from '@bunker/db';
 
 import { registry }           from './data/apps.js';
+import { boot, gestalt }      from './modules/aufbau.js';
 import { createActions }      from './modules/actions.js';
 import { createHotkeys }      from './modules/hotkeys.js';
 import { toast }              from './modules/toast.js';
@@ -122,10 +122,10 @@ const bodyReady = () => $doc.body ? Promise.resolve() : new Promise(resolve => $
 // the css derives the rest, and the resolved bg feeds what css cannot reach
 const applyPalette = async palette => {
   if (!$root || !palette) return;
-  await aufbau.gestalt.set({ palette });
+  await gestalt.set({ palette });
   await bodyReady();
 
-  const { bg } = aufbau.gestalt.colors();
+  const { bg } = gestalt.colors();
   setMeta('theme-color', bg);
   syncBars(bg); // the native bars, inside the capacitor wrapper only
 };
@@ -199,14 +199,14 @@ class ZugriffApp {
     const remember = (token, value) => { gestalt[token] = value; writeGestaltCookie(this.slug, gestalt); };
 
     state.$onEffects({
-      density  : value => { remember('density', value); if (value) aufbau.gestalt.set({ density: value }); },
+      density  : value => { remember('density', value); if (value) gestalt.set({ density: value }); },
       dir      : value => { if ($root && value) $root.setAttribute('dir', value); },
       font     : value => { value ? webfonts.apply(value, { role: 'body' }) : webfonts.remove(null, { role: 'body' }); },
-      geometry : value => { remember('geometry', value); if (value) aufbau.gestalt.set({ geometry: value }); },
+      geometry : value => { remember('geometry', value); if (value) gestalt.set({ geometry: value }); },
       color    : value => setMeta('theme-color', value),
       lang     : value => { if ($root && value) $root.lang = value; },
       palette  : value => { remember('palette', value); applyPalette(value); },
-      skin     : value => { if (value) aufbau.gestalt.set({ skin: value }); },
+      skin     : value => { if (value) gestalt.set({ skin: value }); },
       title    : value => { if ($doc && value) $doc.title = value; },
       viewport : value => setMeta('viewport', value),
     });
@@ -311,7 +311,7 @@ class ZugriffApp {
   init = async ({ App, target = '#app' } = {}) => {
     // aufbau.css comes with index.css. palette, skin and font are the app's own, the
     // font through its state effect: aufbau's default font would override it
-    await aufbau.boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin }, font: null });
+    await boot({ ...this.config.aufbau, css: { palette: this.state.$palette, reset: false, skin: this.state.$skin }, font: null });
 
     const $target = typeof target === 'string' ? document.querySelector(target) : target;
     if (!$target) throw new Error(`[zugriff] mount target "${target}" not found`);
