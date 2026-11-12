@@ -1,6 +1,6 @@
 // todo :: modules/store.js
-// the tasks and lists, in @bunker/db and as signals. every write goes to both,
-// a write from another tab reloads the signals.
+// the tasks and lists, in the tables of RAT.app.database and as signals. every
+// write goes to both.
 //
 //   await store.load();
 //   const task = await store.add(parse('call anna tomorrow #family'));
@@ -9,11 +9,11 @@
 //
 // a deleted task stays as a tombstone ({ deleted }) so a sync knows it is gone.
 
-import { computed, signal } from '@aufbau/signals';
+import { computed, signal } from '@rat/signals';
 
 import { dayOf, nextDue } from './dates.js';
 
-const app = zugriff.app;
+const db = () => RAT.app.database;
 
 export const INBOX = 'inbox';
 
@@ -36,7 +36,7 @@ const uid = () => crypto.randomUUID?.() ?? `${now().toString(36)}-${Math.random(
 // :::::: LOAD ::::::::::::::::::::::::::::::::::::::::::::::::
 
 async function reload () {
-  const [rows, listRows] = await Promise.all([app.db.tasks.toValues(), app.db.lists.toValues()]);
+  const [rows, listRows] = await Promise.all([db().tasks.values(), db().lists.values()]);
   all.value   = rows;
   lists.value = withInbox(listRows.filter(list => !list.deleted)).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 }
@@ -44,14 +44,7 @@ async function reload () {
 const withInbox = rows => rows.some(list => list.id === INBOX) ? rows : [{ id: INBOX, name: 'Inbox', order: -1, changed: 0 }, ...rows];
 
 export async function load () {
-  await app.db.setup({ lists: {}, meta: {}, tasks: { indexes: ['list', 'parent'] } });
   await reload();
-
-  // another tab wrote: read again. own writes are in the signals already
-  const skip = change => change.origin === app.db.origin;
-  app.db.tasks.onChange(change => { if (!skip(change)) reload(); });
-  app.db.lists.onChange(change => { if (!skip(change)) reload(); });
-
   ready.value = true;
 }
 
@@ -61,7 +54,7 @@ async function put (task) {
   all.value = all.peek().some(item => item.id === task.id)
     ? all.peek().map(item => item.id === task.id ? task : item)
     : [...all.peek(), task];
-  await app.db.tasks.set(task.id, task);
+  await db().tasks.set(task.id, task);
   changed.value++;
   return task;
 }
@@ -69,7 +62,7 @@ async function put (task) {
 async function putMany (rows) {
   const ids = new Map(rows.map(row => [row.id, row]));
   all.value = [...all.peek().map(item => ids.get(item.id) ?? item), ...rows.filter(row => !all.peek().some(item => item.id === row.id))];
-  await app.db.tasks.setMany(rows.map(row => [row.id, row]));
+  for (const row of rows) await db().tasks.set(row.id, row);
   changed.value++;
 }
 
@@ -170,7 +163,7 @@ export async function reorder (ids) {
 
 async function putList (list) {
   lists.value = withInbox([...lists.peek().filter(item => item.id !== list.id), list]).sort((a, b) => a.order - b.order);
-  await app.db.lists.set(list.id, list);
+  await db().lists.set(list.id, list);
   changed.value++;
   return list;
 }
@@ -210,12 +203,12 @@ export async function merge ({ lists: theirLists = [], tasks: theirTasks = [] } 
   const mine     = new Map(all.peek().map(task => [task.id, task]));
   const incoming = theirTasks.filter(task => task?.id && (!mine.has(task.id) || (task.changed ?? 0) > (mine.get(task.id).changed ?? 0)));
   if (incoming.length) {
-    await app.db.tasks.setMany(incoming.map(task => [task.id, task]));
+    for (const task of incoming) await db().tasks.set(task.id, task);
   }
 
   const myLists = new Map(lists.peek().map(list => [list.id, list]));
   const newer   = theirLists.filter(list => list?.id && (!myLists.has(list.id) || (list.changed ?? 0) > (myLists.get(list.id).changed ?? 0)));
-  if (newer.length) await app.db.lists.setMany(newer.map(list => [list.id, list]));
+  for (const list of newer) await db().lists.set(list.id, list);
 
   await reload();
   return incoming.length + newer.length;

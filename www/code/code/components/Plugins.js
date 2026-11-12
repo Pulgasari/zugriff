@@ -1,8 +1,0 @@
-// apps/code/components/Plugins.js — placeholder plugins modal (not yet built out).
-
-import { html } from './../vendors.js';
-import Modal from './Modal.js';
-
-export default function Plugins () {
-  return html`<${Modal} id="plugins" title="Plugins">Plugins</${Modal}>`;
-}

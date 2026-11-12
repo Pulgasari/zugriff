@@ -1,4 +1,4 @@
-# build tooling only — the static site ships no node deps
 node_modules/
-package-lock.json
+.capacitor/
+.apks/
 npm-debug.log*

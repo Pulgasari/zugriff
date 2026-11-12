@@ -1,4 +1,4 @@
-// apps/looksmaxx/vision.js
+// looksmaxx :: modules/vision.js
 //
 // the on-device vision layer: MediaPipe Tasks Vision, running entirely in the
 // browser (WASM + WebGL), no server. two models, both in IMAGE mode since the app
@@ -10,15 +10,15 @@
 //                                       forehead to place a 2D hairstyle overlay.
 //
 // both are lazy singletons — the first call pays the model download, later calls
-// reuse it. the JS comes through the import map; its wasm + the model files are
-// fetched here from the same pinned version, so nothing is vendored into the repo.
+// reuse it. the JS, its wasm and the model files come from a pinned cdn version,
+// so nothing is vendored into the repo.
 
-import { ImageSegmenter, FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
+import { FaceLandmarker, FilesetResolver, ImageSegmenter } from 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs';
 
 const VER   = '0.10.14';
 const WASM  = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VER}/wasm`;
 const HAIR  = 'https://storage.googleapis.com/mediapipe-models/image_segmenter/hair_segmenter/float32/latest/hair_segmenter.tflite';
-const FACE  = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float32/1/face_landmarker.task';
+const FACE  = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
 
 let _fileset;
 const fileset = () => (_fileset ??= FilesetResolver.forVisionTasks(WASM));

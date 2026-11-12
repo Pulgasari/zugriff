@@ -11,7 +11,7 @@
 // ctx.text, ctx.json and ctx.fetch reach hosts without cors headers through
 // .shared/js/modules/http.js: natively in the app, through the proxy in a browser.
 
-import { getJson, getText, request } from '/.shared/js/modules/http.js';
+import { getJson, getText, request } from '../../.shared/http.js';
 
 // :::::: HELPERS :::::::::::::::::::::::::::::::::::::::::::::
 

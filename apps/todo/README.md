@@ -1,6 +1,6 @@
 # todo
 
-web: <https://zugriff.dev/todo/>
+ported from `zugriff/apps/todo`.
 
 Tasks for one person, offline. A task is typed in one line and read while it
 is typed: `call anna tomorrow 9:00 #family !2 every week +home` becomes the
@@ -29,21 +29,20 @@ the language of the page.
 
 ## files
 
-| file                    | what it is |
-|-------------------------|------------|
-| `app.js`                | the frame, the views and their groups, actions and keys |
-| `components/Task.js`    | a row, a group of rows, the add field with its chips |
-| `components/Editor.js`  | the task in the context area |
-| `components/Config.js`  | settings: shared fields, sync, reminders, export and import |
-| `modules/parse.js`      | one line of text to a task |
-| `modules/dates.js`      | days as local strings, the next due of a repeat, labels |
-| `modules/store.js`      | tasks and lists in `@bunker/db` and as signals, undo, todo.txt |
-| `modules/sync.js`       | the json file in a folder or on webdav |
-| `modules/reminders.js`  | notifications, browser and android |
-| `modules/frame.js`      | the handles of the `app-root`, what the views share |
+| file | what it is |
+|---|---|
+| `app.rat.html` | the menu, the views, the dock, the editor in the context area, the settings |
+| `state.rat.js` | the views' groups, the task in the editor, the list and tag shown (kept), the actions and commands |
+| `settings.rat.js` | the sync place, kept |
+| `views/TaskView.rat.html` | every view: its header, the add field, its groups |
+| `components/` | `TaskRow`, `TaskSection`, `AddBar`, `Editor`, `Menu`, `Preferences` |
+| `modules/parse.js` | one line of text to a task |
+| `modules/dates.js` | days as local strings, the next due of a repeat, labels |
+| `modules/store.js` | tasks and lists in the tables of `RAT.app.database` and as signals, undo, todo.txt |
+| `modules/sync.js` | the json file in a folder (`RAT.app.folders`) or on webdav |
+| `modules/reminders.js` | notifications, browser and android |
 
 ## open
 
-- sorting a list by hand (`sortable`): the dom order it changes fights with
-  preact's, needs a keyed bridge first
+- sorting a list by hand (`sortable`)
 - the markdown bridge to `apps/notes`, a calendar view, several lists per task

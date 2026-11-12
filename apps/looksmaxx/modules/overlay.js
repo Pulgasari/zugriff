@@ -1,4 +1,4 @@
-// apps/looksmaxx/overlay.js
+// looksmaxx :: modules/overlay.js
 //
 // place a 2D hairstyle "sticker" (a transparent PNG) over the head in a photo —
 // the fast, fully client-side approach (Ansatz A). the FaceLandmarker gives us

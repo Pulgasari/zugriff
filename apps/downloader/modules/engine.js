@@ -16,16 +16,19 @@
 // hls playlists: the segments of the best variant, joined into one file.
 //
 // targets: `library` keeps the file in the opfs, `folder` writes it into the
-// granted folder, `webdav` to the webdav place, `save` hands it to the
-// browser's own download. off the library the opfs copy goes once it is there.
+// granted folder (RAT.app.folders), `webdav` to the webdav place, `save` hands it
+// to the browser's own download. off the library the opfs copy goes once it is
+// there. the rows and packages are tables of RAT.app.database, the settings
+// come from settings.rat.js.
 
-import { computed, signal } from '@aufbau/signals';
+import { computed, signal } from '@rat/signals';
 
-import * as dav    from '/.shared/js/modules/webdav/client.js';
-import { request } from '/.shared/js/modules/http.js';
+import * as dav    from '../../.shared/webdav/client.js';
+import { request } from '../../.shared/http.js';
 
-const app = zugriff.app;
-const fs  = zugriff.fs;
+import { $settings, $webdav } from '../settings.rat.js';
+
+const db = () => RAT.app.database;
 
 // :::::: STATE :::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -36,10 +39,10 @@ export const live      = signal({});   // id -> { speed, eta }, not kept
 export const active = computed(() => downloads.value.filter(item => item.state === 'running' || item.state === 'queued'));
 
 export const settings = {
-  limit    : () => (Number(app.state.$limit) || 0) * 1024,   // kib/s, 0 for none
-  parallel : () => Number(app.state.$parallel) || 3,
-  perHost  : () => Number(app.state.$perHost)  || 2,
-  retries  : () => Number(app.state.$retries ?? 5),
+  limit    : () => $settings.limit * 1024,   // kib/s, 0 for none
+  parallel : () => $settings.parallel,
+  perHost  : () => $settings.perHost,
+  retries  : () => $settings.retries,
 };
 
 const ENDED       = new Set(['cancelled', 'done', 'failed']);
@@ -61,7 +64,7 @@ async function put (row) {
   downloads.value = downloads.peek().some(item => item.id === row.id)
     ? downloads.peek().map(item => item.id === row.id ? row : item)
     : [...downloads.peek(), row];
-  await app.db.downloads.set(row.id, row);
+  await db().downloads.set(row.id, row);
   return row;
 }
 
@@ -333,13 +336,13 @@ async function deliver (download) {
     return { place: 'library' };   // kept, the browser's copy is not reachable from here
   }
 
-  const places = await app.db.meta.get('targets') ?? {};
-
   if (target === 'folder') {
-    if (!places.folder) throw new Error('no folder granted, choose one in the settings');
-    const root = fs.hydrate(places.folder);
-    if (!await fs.ensurePermission(root, 'readwrite')) throw new Error('no access to the folder, choose it again');
-    const dir  = download.package && app.state.$subfolders ? await root.getDirectoryHandle(packageName(download.package), { create: true }) : root;
+    const { folders } = RAT.app;
+    const source = folders.sources.value[0];
+    if (!source) throw new Error('no folder granted, choose one in the settings');
+    const root = folders.handleOf(source.id);
+    if (!root || await root.requestPermission?.({ mode: 'readwrite' }) === 'denied') throw new Error('no access to the folder, reconnect it in the settings');
+    const dir  = download.package && $settings.subfolders ? await root.getDirectoryHandle(packageName(download.package), { create: true }) : root;
     const name = await freeName(async candidate => { try { await dir.getFileHandle(candidate); return true; } catch { return false; } }, download.name);
     const writable = await (await dir.getFileHandle(name, { create: true })).createWritable();
     await writable.write(file);
@@ -349,11 +352,12 @@ async function deliver (download) {
   }
 
   if (target === 'webdav') {
-    if (!places.webdav) throw new Error('no webdav place, add one in the settings');
-    const folder = dav.join(places.webdav.path ?? '', download.package && app.state.$subfolders ? packageName(download.package) : '');
-    if (folder && !await dav.stat(places.webdav, folder)) await dav.mkcol(places.webdav, folder);
-    const name = await freeName(async candidate => Boolean(await dav.stat(places.webdav, dav.join(folder, candidate))), download.name);
-    await dav.write(places.webdav, dav.join(folder, name), file);
+    const place = $webdav.value;
+    if (!place) throw new Error('no webdav place, add one in the settings');
+    const folder = dav.join(place.path ?? '', download.package && $settings.subfolders ? packageName(download.package) : '');
+    if (folder && !await dav.stat(place, folder)) await dav.mkcol(place, folder);
+    const name = await freeName(async candidate => Boolean(await dav.stat(place, dav.join(folder, candidate))), download.name);
+    await dav.write(place, dav.join(folder, name), file);
     await dropData(download.id);
     return { name, place: `webdav ${dav.join(folder, name)}` };
   }
@@ -430,23 +434,22 @@ export function pump () {
 // :::::: API :::::::::::::::::::::::::::::::::::::::::::::::::
 
 export async function load () {
-  await app.db.setup({ downloads: { indexes: ['package', 'state'] }, meta: {}, packages: {} });
-  const [rows, packageRows] = await Promise.all([app.db.downloads.toValues(), app.db.packages.toValues()]);
+  const [rows, packageRows] = await Promise.all([db().downloads.values(), db().packages.values()]);
 
   // what was running when the app went away goes on
   const again = rows.filter(row => row.state === 'running').map(row => ({ ...row, state: 'queued' }));
-  if (again.length) await app.db.downloads.setMany(again.map(row => [row.id, row]));
+  for (const row of again) await db().downloads.set(row.id, row);
 
   downloads.value = rows.map(row => again.find(item => item.id === row.id) ?? row);
   packages.value  = packageRows.sort((a, b) => b.created - a.created);
-  if (app.state.$autostart !== false) pump();
+  if ($settings.autostart) pump();
 }
 
 // a package and its downloads, queued
-export async function add ({ entries, name, target = app.state.$target ?? 'library' }) {
+export async function add ({ entries, name, target = $settings.target }) {
   const pack = { created: now(), id: uid(), name: name || 'downloads', target };
   packages.value = [pack, ...packages.peek()];
-  await app.db.packages.set(pack.id, pack);
+  await db().packages.set(pack.id, pack);
 
   const transport = native() ? 'native' : 'fetch';
   const rows = entries.map((entry, index) => ({
@@ -468,7 +471,7 @@ export async function add ({ entries, name, target = app.state.$target ?? 'libra
     url       : entry.url,
   }));
   downloads.value = [...downloads.peek(), ...rows];
-  await app.db.downloads.setMany(rows.map(row => [row.id, row]));
+  for (const row of rows) await db().downloads.set(row.id, row);
   pump();
   return pack;
 }
@@ -522,7 +525,7 @@ export async function remove (id) {
   stop(id);
   await dropData(id);
   downloads.value = downloads.peek().filter(item => item.id !== id);
-  await app.db.downloads.delete(id);
+  await db().downloads.delete(id);
   if (pack) await prunePackage(pack);
   pump();
 }
@@ -530,7 +533,7 @@ export async function remove (id) {
 async function prunePackage (id) {
   if (downloads.peek().some(item => item.package === id)) return;
   packages.value = packages.peek().filter(item => item.id !== id);
-  await app.db.packages.delete(id);
+  await db().packages.delete(id);
 }
 
 const ofPackage = id => downloads.peek().filter(item => item.package === id);
@@ -542,7 +545,7 @@ export async function removePackage (id) {
   for (const item of ofPackage(id)) {
     stop(item.id);
     await dropData(item.id);
-    await app.db.downloads.delete(item.id);
+    await db().downloads.delete(item.id);
   }
   downloads.value = downloads.peek().filter(item => item.package !== id);
   await prunePackage(id);

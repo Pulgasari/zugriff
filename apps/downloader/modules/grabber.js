@@ -6,7 +6,7 @@
 //   const found = await grab('https://a.org/x.part1.rar https://a.org/x.part2.rar');
 //   -> [{ id, name: 'x', entries: [{ id, url, name, size, kind, hash, selected }] }]
 
-import { signal } from '@aufbau/signals';
+import { signal } from '@rat/signals';
 
 import { basename, resolve, urlsIn } from './plugins.js';
 

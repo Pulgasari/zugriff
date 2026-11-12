@@ -9,7 +9,9 @@
 //
 // a reminder is told once, the told ones are kept in localStorage.
 
-import { effect } from '@aufbau/signals';
+import { effect } from '@rat/signals';
+
+import { toast } from '../../.shared/toast.js';
 
 import { dueStamp } from './dates.js';
 import * as store   from './store.js';
@@ -49,7 +51,7 @@ async function show (task) {
     if (registration) return registration.showNotification(task.title, options);
     return new Notification(task.title, options);
   }
-  zugriff.app.toast({ heading: 'Reminder', message: task.title, duration: 8000 });
+  toast({ duration: 8000, heading: 'Reminder', message: task.title });
 }
 
 // what is due by now and was not told yet

@@ -1,47 +1,38 @@
-// apps/code/monaco.js
-//
-// load Monaco from a versioned CDN via its own AMD loader, not through the
-// import map. the reason: esm.sh's `monaco-editor@x/…?worker` builds are broken
-// (`QE is not a function` in ts.worker) and the shared service worker chokes on
-// streaming/opaque esm.sh responses ("body is locked"). the AMD `min/vs` layout
-// ships plain, un-transpiled worker scripts and its files cache cleanly, so this
-// is the reliable way to run Monaco on a static, no-bundler site.
-//
-// workers can't be cross-origin, so getWorkerUrl hands Monaco a same-origin blob
-// that importScripts the real worker from the CDN — the standard CDN pattern.
+// code :: modules/monaco.js
 
-const VER  = '0.50.0';
-const VS   = `https://cdn.jsdelivr.net/npm/monaco-editor@${VER}/min/vs`;
-const BASE = `https://cdn.jsdelivr.net/npm/monaco-editor@${VER}/min/`;
+/*
+monaco from a versioned cdn through its own amd loader, not through the import map: esm.sh's
+monaco-editor ?worker builds break in ts.worker, the min/vs layout ships plain worker scripts that
+cache cleanly. a worker can not be cross-origin, so getWorkerUrl hands monaco a same-origin blob that
+importScripts the real one. rat (.rat, .rat.js) comes from @rat/syntax, a failure there costs the
+highlighting, never the editor.
+*/
 
-let promise;
+const VERSION = '0.50.0';
+const BASE    = `https://cdn.jsdelivr.net/npm/monaco-editor@${VERSION}/min/`;
+const VS      = `${BASE}vs`;
+
+let loading = null;
 
 export function loadMonaco () {
-  return (promise ??= new Promise((resolve, reject) => {
-    const workerBlob = URL.createObjectURL(new Blob(
-      [ `self.MonacoEnvironment = { baseUrl: '${BASE}' };\n`,
-        `importScripts('${VS}/base/worker/workerMain.js');` ],
-      { type: 'text/javascript' },
-    ));
-    self.MonacoEnvironment = { getWorkerUrl: () => workerBlob };
+  return loading ??= new Promise((resolve, reject) => {
+    const worker = URL.createObjectURL(new Blob([
+      `self.MonacoEnvironment = { baseUrl: '${BASE}' };\n`,
+      `importScripts('${VS}/base/worker/workerMain.js');`,
+    ], { type: 'text/javascript' }));
+    self.MonacoEnvironment = { getWorkerUrl: () => worker };
 
-    const script = document.createElement('script');
-    script.src   = `${VS}/loader.js`;
-    script.onload = () => {
-      // the AMD loader defines a global `require`; point it at the CDN and pull
-      // in the editor (which also injects Monaco's stylesheet)
-      window.require.config({ paths: { vs: VS } });
-      window.require(['vs/editor/editor.main'], async () => {
-        self.monaco = window.monaco;   // editor.js reads the namespace off self.monaco
-        // rat (.rat, .rat.js) from @rat/syntax. a failure costs the highlighting, never the editor
-        try     { (await import('@rat/syntax/monaco')).register(window.monaco); }
-        catch (error) { console.warn('[code] rat syntax unavailable:', error); }
-        resolve(window.monaco);
+    const script = Object.assign(document.createElement('script'), { src: `${VS}/loader.js` });
+    script.onerror = () => reject(new Error('[code] the monaco loader did not load'));
+    script.onload  = () => {
+      globalThis.require.config({ paths: { vs: VS } });
+      globalThis.require(['vs/editor/editor.main'], async () => {
+        const { monaco } = globalThis;
+        try   { (await import('@rat/syntax/targets/monaco.js')).register(monaco); }
+        catch (error) { console.warn('[code] rat syntax unavailable', error); }
+        resolve(monaco);
       }, reject);
     };
-    script.onerror = () => reject(new Error('[code] failed to load Monaco loader'));
-    document.head.appendChild(script);
-  }));
+    document.head.append(script);
+  });
 }
-
-export default loadMonaco;
