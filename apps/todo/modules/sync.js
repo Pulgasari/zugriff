@@ -7,16 +7,26 @@
 //   await sync.connect({ kind: 'webdav', url, username, password, path: 'todo.json' });
 //   await sync.pull();
 //
-// the place is kept in the db's meta table, a folder as its handle.
+// the place is kept (settings.rat.js), a folder's handle by RAT.app.folders.
 
-import { effect, signal } from '@aufbau/signals';
+import { effect, signal } from '@rat/signals';
 
-import * as dav   from '/.shared/js/modules/webdav/client.js';
+import * as dav   from '../../.shared/webdav/client.js';
 import * as store from './store.js';
 
-const app  = zugriff.app;
-const fs   = zugriff.fs;
+import { $sync } from '../settings.rat.js';
+
 const FILE = 'todo.json';
+
+const folders = () => RAT.app.folders;
+
+// the granted folder's handle, write access asked for (a click that synced asks the user)
+async function folderHandle () {
+  const source = folders().sources.value[0];
+  const handle = source && folders().handleOf(source.id);
+  if (!handle || await handle.requestPermission?.({ mode: 'readwrite' }) === 'denied') throw new Error('No access to the folder, open it again.');
+  return handle;
+}
 
 export const place  = signal(null);   // { kind, name, … } without secrets for the ui
 export const status = signal('');     // '', 'syncing', 'synced', an error message
@@ -26,13 +36,13 @@ let timer  = null;
 
 // :::::: PLACES ::::::::::::::::::::::::::::::::::::::::::::::
 
-const describe = target => target && ({ kind: target.kind, name: target.kind === 'folder' ? target.handle?.name : `${target.url} ${target.path ?? FILE}` });
+const describe = target => target && ({ kind: target.kind, name: target.kind === 'folder' ? folders().sources.value[0]?.name ?? 'a folder' : `${target.url} ${target.path ?? FILE}` });
 
 async function read () {
   if (target.kind === 'folder') {
-    if (!await fs.ensurePermission(target.handle, 'readwrite')) throw new Error('No access to the folder, open it again.');
-    if (!await fs.exists(target.handle, [], FILE)) return null;
-    return (await fs.readFile(target.handle, [], FILE)).text();
+    const handle = await folderHandle();
+    try   { return await (await (await handle.getFileHandle(FILE)).getFile()).text(); }
+    catch { return null; }
   }
   const path = target.path || FILE;
   if (!await dav.stat(target, path)) return null;
@@ -40,31 +50,36 @@ async function read () {
 }
 
 async function write (text) {
-  if (target.kind === 'folder') return fs.writeFile(target.handle, [], FILE, text);
+  if (target.kind === 'folder') {
+    const writable = await (await (await folderHandle()).getFileHandle(FILE, { create: true })).createWritable();
+    await writable.write(text);
+    return writable.close();
+  }
   return dav.write(target, target.path || FILE, text);
 }
 
 // :::::: API :::::::::::::::::::::::::::::::::::::::::::::::::
 
 export async function restore () {
-  const saved = await app.db.meta.get('sync');
+  const saved = $sync.value;
   if (!saved) return;
-  target      = saved.kind === 'folder' ? { ...saved, handle: fs.hydrate(saved.handle) } : saved;
+  target      = saved;
   place.value = describe(target);
 }
 
+// a folder through the picker of RAT.app.folders, the one there before goes
 export async function connect (options) {
   if (options.kind === 'folder') {
-    const handle = await fs.pickDirectory({ id: 'todo', mode: 'readwrite' });
-    if (!handle) return false;
-    target = { kind: 'folder', handle };
-    await app.db.meta.set('sync', { kind: 'folder', handle: fs.dehydrate(handle) });
+    const before = folders().sources.value.map(source => source.id);
+    if (!await folders().add()) return false;
+    for (const id of before) await folders().remove(id);
+    target = { kind: 'folder' };
   }
   else {
     target = { kind: 'webdav', password: options.password ?? '', path: options.path || FILE, url: options.url, username: options.username ?? '' };
     await dav.test(target);
-    await app.db.meta.set('sync', target);
   }
+  $sync.value = target;
   place.value = describe(target);
   await pull();
   return true;
@@ -74,7 +89,7 @@ export async function disconnect () {
   target       = null;
   place.value  = null;
   status.value = '';
-  await app.db.meta.delete('sync');
+  $sync.value  = null;
 }
 
 // read the file, merge, write back what this side knows more

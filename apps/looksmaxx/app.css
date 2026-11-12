@@ -1,14 +1,19 @@
-/* apps/looksmaxx/app.css — the app's own look.
-   reset + theme tokens + the #app frame come from /.shared/css/base.css. */
+/* looksmaxx :: app.css. a bar on top, the photo in the middle, the controls below it */
+
+body {
+  --fg-50  : color-mix(in oklch, var(--color-fg) 50%, transparent);
+  --fg-75  : color-mix(in oklch, var(--color-fg) 75%, transparent);
+  --radius : 0.5rem;
+}
 
 /* ── top bar ─────────────────────────────────────────────────────────────── */
 .topbar {
-  display      : flex;
+  display    : flex;
   align-items  : center;
-  gap          : 0.5rem;
-  padding      : 0 0.75rem;
-  height       : 3rem;
-  flex         : none;
+  gap      : 0.5rem;
+  padding    : 0 0.75rem;
+  height     : 3rem;
+  flex     : none;
   border-bottom: 1px solid var(--line);
   background   : var(--panel);
 }
@@ -17,46 +22,50 @@
 
 /* icon buttons (reset the base button chrome) */
 .ibtn {
-  display      : inline-flex;
+  display    : inline-flex;
   align-items  : center;
   justify-content: center;
-  width        : 2rem;
-  height       : 2rem;
-  padding      : 0;
-  border       : 1px solid transparent;
+  width    : 2rem;
+  height     : 2rem;
+  padding    : 0;
+  border     : 1px solid transparent;
   border-radius: var(--radius);
   background   : transparent;
-  color        : var(--color-fg);
-  cursor       : pointer;
+  color    : var(--color-fg);
+  cursor     : pointer;
 }
-.ibtn:hover:not(:disabled) { background: var(--hover); border-color: var(--line); }
+.ibtn:hover:not(:disabled) { border-color: var(--line); }
+.topbar svg-icon[mode='image'] { font-size: 1.5rem; }
 
 /* ── stage ───────────────────────────────────────────────────────────────── */
 .stage {
-  flex    : 1 1 auto;
-  display : grid;
-  place-items: center;
-  padding : 1rem;
-  overflow: auto;
-  min-height: 0;
+  display       : grid;
+  flex          : 1 1 auto;
+  grid-template : minmax(0, 1fr) / minmax(0, 1fr);
+  min-height    : 0;
+  overflow      : hidden;
+  padding       : 1rem;
+  place-items   : center;
 }
 
-.canvas-wrap { position: relative; display: inline-block; max-width: 100%; }
+/* the photo fits the room left by the controls, its own ratio kept */
+.canvas-wrap { display: grid; max-block-size: 100%; max-inline-size: 100%; min-block-size: 0; position: relative; }
 .canvas-wrap canvas {
-  max-width : 100%;
-  max-height: 100%;
-  border-radius: var(--radius);
-  box-shadow: 0 8px 30px rgb(0 0 0 / 0.35);
-  display   : block;
+  border-radius   : var(--radius);
+  box-shadow      : 0 8px 30px rgb(0 0 0 / 0.35);
+  display         : block;
+  max-block-size  : 100%;
+  max-inline-size : 100%;
+  min-block-size  : 0;
 }
 
 .overlay-status {
   position   : absolute;
-  inset      : 0;
-  display    : flex;
+  inset    : 0;
+  display  : flex;
   align-items: center;
   justify-content: center;
-  gap        : 0.6rem;
+  gap    : 0.6rem;
   border-radius: var(--radius);
   background : color-mix(in oklch, var(--color-bg) 55%, transparent);
   backdrop-filter: blur(2px);
@@ -73,32 +82,32 @@
 
 /* ── dropzone (empty state) ──────────────────────────────────────────────── */
 .drop {
-  display    : flex;
+  display  : flex;
   flex-direction: column;
   align-items: center;
-  gap        : 0.6rem;
+  gap    : 0.6rem;
   max-width  : 24rem;
-  padding    : 2.5rem 2rem;
-  border     : 2px dashed var(--line);
+  padding  : 2.5rem 2rem;
+  border   : 2px dashed var(--line);
   border-radius: calc(var(--radius) + 6px);
   background : var(--panel);
-  color      : var(--color-fg);
+  color    : var(--color-fg);
   text-align : center;
-  cursor     : pointer;
+  cursor   : pointer;
 }
-.drop:hover { border-color: var(--accent-50); }
+.drop:hover { border-color: var(--color-ink); }
 .drop strong { font-size: 1rem; }
 .drop span { font-size: 0.8rem; color: var(--fg-75); line-height: 1.5; }
 
 /* ── controls ────────────────────────────────────────────────────────────── */
 .controls {
-  flex      : none;
+  flex    : none;
   border-top: 1px solid var(--line);
   background : var(--panel);
   padding   : 0.75rem;
   display   : flex;
   flex-direction: column;
-  gap       : 0.9rem;
+  gap     : 0.9rem;
   max-height: 46dvh;
   overflow  : auto;
 }
@@ -106,13 +115,13 @@
 
 .group { display: flex; flex-direction: column; gap: 0.55rem; }
 .group-head {
-  display    : flex;
+  display  : flex;
   align-items: baseline;
-  gap        : 0.5rem;
+  gap    : 0.5rem;
   font-size  : 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color      : var(--fg-50);
+  color    : var(--fg-50);
 }
 .link {
   padding: 0; border: none; background: none; color: var(--color-ink);
@@ -145,7 +154,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap    : 0.25rem;
+  gap  : 0.25rem;
   border : 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--panel-2);

@@ -1,66 +1,24 @@
 # techstack
 
-## preact + htx + @aufbau/signals
+## rat
 
-Als Framework benutzen wir **preact** in Kombination mit **htx** (eigener Fork von **htm**) und **@aufbau/signals** (eigener Fork von **@preact/signals**).
+the apps are written in [rat](https://github.com/pulgasari/rat): `.rat.html` components, `.rat.js` modules,
+`config.rat.js` per app. signals, types, router, commands, hotkeys, persistence (`@rat/bunker`) and the
+drivers for web, capacitor and deno come from `@rat/*`.
 
 ## @aufbau
 
-- `@aufbau/elements` — custom html-elements (webcomponents)
-- `@gestalt/filters` — visual effects/shaders via svg-filter
-- `@aufbau/import`
-- `@gestalt/patterns` — svg-patterns
+- `@aufbau/elements`: custom html elements (webcomponents)
+- `@aufbau/gestures`
 
-## @bunker
+## @gestalt
 
-for caching and storage stuff we gonna use [@bunker](https://github.com/pulgasari/bunker/).
+look of the apps: palettes, density, geometry, webfonts, filters, patterns. its postcss plugin runs in a build.
 
 ## @domina
 
-for dom manipulation stuff we gonna use [@domina](https://github.com/pulgasari/domina/).
+dom helpers, where an app needs them directly (`@domina/dom`, `@domina/verbs`).
 
-- `@domina/methods`
+## android
 
-## utils
-
-- `@pulgasari/is`
-- `@pulgasari/obj`
-- `@pulgasari/str`
-- `@pulgasari/timing`
-
-## vendors
-
-everything else comes off a cdn through the import map in
-`shared/js/boot.js` — yaml, smol-toml, csso, terser,
-html-minifier-terser, culori, pdf-lib, pdfjs, highlight.js, ffmpeg, upng-js.
-nothing is vendored into this repo.
-
-the ffmpeg core wasm alone is 32 mb and is
-fetched on first use, then kept by the service worker.
-
-## caching
-
-each app — and the launcher — ships a one-line `sw.js` that pulls in
-`shared/js/sw-core.js`. it is a **module** service worker: import maps do not
-apply inside a worker, so `@bunker/cache` is imported by its full url there.
-
-`shared/js/sw-core.js` splits the traffic in two:
-
-| cache | holds | policy |
-|---|---|---|
-| `zugriff-<slug>-v2` | the app's own files + the shared css/js | stale-while-revalidate, conditional on `ETag`/`Last-Modified` — an unchanged file costs a 304 |
-| `zugriff-vendor-v2` | third party modules pinned to a version in the url (`esm.sh/preact@10.20.1`, `unpkg.com/@ffmpeg/core@0.12.6/…`) | cached for a year, never refetched — and shared by every app, so preact is stored once, not thirty times |
-
-anything else on a foreign origin — iconify, google fonts — is **not** touched.
-revalidating it would mean adding `If-None-Match`/`If-Modified-Since`, which
-turns a simple request into a preflighted one, and `api.iconify.design` does
-not allow those headers: the icons would load once and then start failing.
-
-the revalidation is handed to `event.waitUntil` via bunker's `keepAlive`, so a
-refresh started on the last request of a session is not lost when the worker is
-killed. the launcher's scope is the site root `/` (on `zugriff.dev`), which sits
-above every app — it deliberately ignores anything under `tools/` and `apps/` so
-each app's own worker owns its files.
-
-the cache name comes from the registration scope, so nothing is generated per
-app. bump `VERSION` in `sw-core.js` to invalidate everything.
+capacitor, through `rat build --target android`. native plugins live in `rat/packages/app/native/android`.

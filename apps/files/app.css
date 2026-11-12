@@ -1,4 +1,10 @@
-/* apps/files/app.css */
+/* files :: app.css */
+
+/* a hover and a pick that keep the text readable (.shared/css/zugriff.css has --hover at 90 % of the text color) */
+body {
+  --accent-25 : --alpha(ink, 25%);
+  --hover     : --alpha(fg, 10%);
+}
 
 @container(--a11y-reduced-motion: false) {}
 @container(--a11y-high-contrast: false) {}
@@ -30,31 +36,15 @@
 
   *:disabled { --bg: --mix(bg, fg, 10%); cursor: default; }
 
+rat-view         { flex-direction: column; overflow: hidden; }
+rat-view[active] { display: flex; }
 
-/*
-:::::::::::: SPACING ::::::::::::::::::::::::::::::::::::::::::::::::::
-- ich benutze ausser in sehr seltenen fällen gar kein 'margin` mehr
-  sondern mache ansonsten alles über 'gap' und 'padding'
-- aber auch hier denk ich da eher in 'layout/flow only' (ohne abstände) 
-  während das spacing sich dann automatisch aus hierarchie und kontext ergibt
-- und das setz ich dann tendenziell eher gesammelt
-- und mit dem neuen approach will ich ja sowieso nich mehr als 5 sizes verwenden
-  und sogar explizit als: tiny, small, normal, large, huge
+rat-view > .bar                                   { order: -3; }
+:root[data-tabbar="top"]    rat-view > .tabs      { order: -2; }
+:root[data-searchbar="top"] rat-view > .searchbar { order: -1; }
+.context h3      { font-size: 1rem; font-weight: 500; }
 
---- bei aufbau/css
-div { gap: --space(small); padding: --space(huge); } // robust
-div { --gap: small; --pad: huge;  } // hübscher, aber bissl magisch, robust machbar?    
-
---- bei aufbau/ass
-div ( gap: small; padding: small; } // perfekte form, aber braucht js oder build-step     
-*/
-
-app-view         { flex-direction: column; overflow: hidden; }
-app-view[active] { display: flex; }
-app-panel h3     { font-size: 1rem; font-weight: 500; }
-
-
-nav-crumbs       { flex: none; padding: 0 1rem 0.5rem; }
+nav-crumbs { flex: none; }
 
 .rows { display: flex; flex-direction: column; }
 
@@ -93,7 +83,7 @@ h2 { opacity: 0.55; text-align: center; text-transform: uppercase; }
   }
 }
 
-.icon-button {
+:is(.icon-button, btn-icon) {
   align-items     : center;
   background      : none;
   border          : 0;
@@ -144,7 +134,7 @@ h2 { opacity: 0.55; text-align: center; text-transform: uppercase; }
       white-space   : nowrap;
     }
 
-    > .icon-button { font-size: 1rem; padding: 0.25rem; }
+    > :is(.icon-button, btn-icon) { font-size: 1rem; padding: 0.25rem; }
 
     &.active { background: var(--accent-25, var(--hover)); }
   }
@@ -202,7 +192,7 @@ data-index[viewmode="grid"] {
   .entry { flex-direction: column; gap: 0.35rem; }
   .thumb { font-size: 2.5rem; }
   .text  { align-items: center; text-align: center; }
-  .row > .icon-button { inset: 0.25rem 0.25rem auto auto; position: absolute; }
+  .row > :is(.icon-button, btn-icon) { inset: 0.25rem 0.25rem auto auto; position: absolute; }
 
   .entry, .thumb, .text { inline-size: 100%; }
   .text  > *        { max-inline-size: 100%; }
@@ -266,7 +256,7 @@ data-index[viewmode="grid"] {
 
 .address { display: flex; flex-direction: column; --gap: small; }
 
-app-view[name="sync"] :is(input-text, input-password) {
+rat-view[name="sync"] :is(input-text, input-password) {
   display: flex; --gap: small;
 }
 
@@ -279,7 +269,6 @@ app-view[name="sync"] :is(input-text, input-password) {
 .remote-form {
   display        : flex;
   flex-direction : column;
-  gap            : 0.5rem;
 
   > .action { align-self: flex-start; }
 }
@@ -316,7 +305,6 @@ app-view[name="sync"] :is(input-text, input-password) {
     font-size     : 0.65rem;
     inset         : 0.15rem 0.15rem auto auto;
     line-height   : 1;
-    padding       : 0.15rem 0.3rem;
     position      : absolute;
   }
 }
@@ -330,14 +318,12 @@ app-view[name="sync"] :is(input-text, input-password) {
 .tasks {
   display        : flex;
   flex-direction : column;
-  gap            : 0.5rem;
   margin-block   : 0.5rem 1rem;
 }
 
 .task {
   align-items : center;
   display     : flex;
-  gap         : 0.75rem;
 
   > svg-icon         { flex: none; font-size: 1.25rem; opacity: 0.7; }
   > .text            { flex: 1 1 auto; }
@@ -349,7 +335,7 @@ app-view[name="sync"] :is(input-text, input-password) {
 
 /*//////////// CONTEXT ////////////*/
 
-app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
+rat-area[name="context"]::part(sheet) { margin-inline: --space(small); }
 
 /*//////////// PREVIEW ////////////*/
 
@@ -359,7 +345,6 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
   flex            : 1 1 auto;
   justify-content : center;
   min-block-size  : 0;
-  padding         : 1rem;
 
   > img      { max-block-size: 100%; max-inline-size: 100%; object-fit: contain; }
   > svg-icon { font-size: 6rem; opacity: 0.6; }
@@ -393,8 +378,7 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
 .menu {
   display        : flex;
   flex-direction : column;
-  gap            : 0.125rem;
-
+  
   > button {
     align-items   : center;
     background    : none;
@@ -403,9 +387,7 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
     color         : inherit;
     display       : flex;
     font          : inherit;
-    gap             : 1rem;
     justify-content : flex-start;
-    padding         : 0.75rem 1rem;
     text-align      : start;
 
     > small { margin-inline-start: auto; opacity: 0.6; }
@@ -420,7 +402,6 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
 
 .facts {
   display               : grid;
-  gap                   : 0.25rem 1rem;
   grid-template-columns : auto 1fr;
   margin-block-end      : 1rem;
 
@@ -428,7 +409,7 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
   > dd { overflow-wrap: anywhere; }
 }
 
-.actions { flex-wrap: wrap; gap: 0.5rem; }
+.actions { flex-wrap: wrap; }
 
 .action {
   align-items   : center;
@@ -439,8 +420,6 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
   cursor        : pointer;
   display       : inline-flex;
   font          : inherit;
-  gap           : 0.5rem;
-  padding       : 0.5rem 1rem;
 
   &:hover:not(:disabled) { background: var(--hover); }
 }
@@ -448,14 +427,89 @@ app-area[name="context"]::part(sheet) { margin-inline: --space(small); }
 
 .folder { align-items: center; display: flex; gap: 0.5rem; }
 
-.hero {
-  align-items : center;
-  gap         : 1rem;
-  padding     : 2rem 0;
-  text-align  : center;
+.hero            { align-items: center;.text-align: center; }
+.hero > svg-icon { font-size: 4rem; }
+.hero > p        { text-align: center; }
 
-  > svg-icon { font-size: 4rem; }
-  > p        { text-align: center; }
+.empty { opacity: 0.6; text-align: center; }
+
+/*//////////// RAT ////////////*/
+
+/* the floating button over the listing, where app-float put it */
+.pane > .fab { inset: auto 1rem 1rem auto; position: absolute; }
+
+.context    { display: flex; flex-flow: column; }
+.context h2 { margin: 0; }
+
+/*//////////// PATTERNS ////////////*/
+
+/* the patterns of the settings (state.js sets --pattern-bg-image and its opacity on the root) */
+/* body paints its own background (html has one too): isolated, the pattern lies between it and the app */
+:root[data-pattern-bg] body { isolation: isolate; }
+
+:root[data-pattern-bg] body::before {
+  background-image : var(--pattern-bg-image);
+  opacity          : var(--pattern-bg-opacity, 1);
+  
+  content          : '';
+  inset            : 0;
+  pointer-events   : none;
+  position         : fixed;
+  z-index          : -1;
 }
 
-.empty { opacity: 0.6; padding: 2rem 0; text-align: center; }
+:root[data-pattern-tile] :is(.tile, .card) {
+  position : relative;
+
+  &::before {
+    background-image : var(--pattern-tile-image);
+    opacity          : var(--pattern-tile-opacity, 1);
+    
+    border-radius    : inherit;
+    content          : '';
+    inset            : 0;
+    
+    pointer-events   : none;
+    position         : absolute;
+  }
+}
+
+/*//////////// SPACINGS ////////////*/
+
+.hero  { padding: 2rem 0; }
+.empty { padding: 2rem 0; }
+
+.menu > button,
+.context,
+.hero { --gap: normal; }
+
+.action,
+.actions,
+.remote-form,
+.tasks { --gap: small; }
+
+.menu { --gap: tiny; }
+
+.context,
+.facts,
+.menu > button,
+nav-crumbs,
+.stage,
+.task { --pad: normal; }
+
+.action,
+.tasks-button >.bade { --pad: small; }
+
+
+
+@spread --gap {
+  tiny   : .menu;
+  small  : .action, .actions, .remote-form, .tasks;
+  normal : .context, .hero;
+}
+
+@spread --pad {
+  small  : .action, .tasks-button > .bade;
+  normal : .context, .facts, .menu > button, nav-crumbs, .stage, .task;
+}
+

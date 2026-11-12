@@ -21,9 +21,6 @@
     if (!start) document.title = '404 | not found · zugriff';
   </script>
 
-  <script src="/.shared/js/data/importmap.js"></script>
-  <script src="/.shared/js/boot.js"></script>
-
   <style>
     html, body { height: 100%; margin: 0; }
 
@@ -31,14 +28,14 @@
     body { display: grid; place-items: center; }
     body { font-family : system-ui, sans-serif; }
 
-    svg-file:not(:defined) { opacity: 0; }
-
     #app { display: flex; flex-direction: column; align-items: center; }
     #app { gap: 2rem; padding: 1rem; }
     #app { opacity: 1; transition: opacity 0.15s ease-in; }
     #app.is-ready { opacity: 1; }
     
     #missing { display: none; opacity: 0.5; text-align: center; }
+    [data-page='missing'] #missing { display: block; }
+    nav { display: flex; flex-flow: row wrap; gap: 0.25rem 1rem; justify-content: center; }
     /*
     nav   { display: flex; flex-flow: row wrap; align-items: center; justify-content: center; }
     nav a { color: inherit; text-decoration: none; }
@@ -50,68 +47,30 @@
 
   <div id="app" data-layout="landing">
     <div>
-      <nav>
-        <a href="/cli/">CLI</a>
-        <a href="/code/">Code</a>
-        <a href="/ebooks/">eBooks</a>
-        <a href="/feeds/">Feeds</a>
-        <a href="https://files.zugriff.dev">Files</a>
-        <a href="/icons/">Icons</a>
-        <a href="/images/">Images</a>
-        <a href="/notes/">Notes</a>
-        <a href="/podcasts/">Podcasts</a>
-        <a href="/prompts/">Prompts</a>
-        <a href="/todo/">Todo</a>
-        <a href="/tools/">Tools</a>
-        <a href="/videos/">Videos</a>
-      </nav>
-    </div>
-
-    <div>
-      <svg-file src='/logo.svg'></svg-file>
+      <img src='/logo.svg' alt='zugriff' />
       <div id="missing">404 | not found.</div>
     </div>
 
     <nav>
-      <a href="/cli/">CLI</a>
-      <a href="/code/">Code</a>
-      <a href="/ebooks/">eBooks</a>
-      <a href="/feeds/">Feeds</a>
-      <a href="https://files.zugriff.dev">Files</a>
-      <a href="/icons/">Icons</a>
-      <a href="/images/">Images</a>
-      <a href="/notes/">Notes</a>
-      <a href="/podcasts/">Podcasts</a>
-      <a href="/prompts/">Prompts</a>
-      <a href="/todo/">Todo</a>
-      <a href="/tools/">Tools</a>
-      <a href="/videos/">Videos</a>
+      <a href="/cli/">cli</a>
+      <a href="/code/">code</a>
+      <a href="/downloader/">downloader</a>
+      <a href="/ebooks/">ebooks</a>
+      <a href="/feeds/">feeds</a>
+      <a href="/files/">files</a>
+      <a href="/icons/">icons</a>
+      <a href="/images/">images</a>
+      <a href="/looksmaxx/">looksmaxx</a>
+      <a href="/noisy/">noisy</a>
+      <a href="/notes/">notes</a>
+      <a href="/podcasts/">podcasts</a>
+      <a href="/prompts/">prompts</a>
+      <a href="/todo/">todo</a>
+      <a href="/tools/">tools</a>
+      <a href="/vectorizer/">vectorizer</a>
+      <a href="/videos/">videos</a>
     </nav>
   </div>
-
-  <script type="module">
-    const [
-      { boot },
-      filters,
-      patterns,
-      { default: getStyleToken },
-    ] = await Promise.all([
-      import('/.shared/js/modules/aufbau.js'),
-      import('@gestalt/filters'),
-      import('@gestalt/patterns'),
-      import('@domina/methods/getStyleToken.js'),
-    ]);
-
-    await boot({ css: { layout: 'landing', palette: 'synthwave' } });
-
-    const bg = getStyleToken('color-bg', 'body') || '#000000';
-    const fg = getStyleToken('color-fg', 'body') || '#c8d0e0';
-    filters.apply('body', 'glitch-live', { animate: true, speed: '2s' });
-    patterns.apply('body', 'grid', { bg, fg: fg + '22', motion: 'up', speed: '1s', size: 44, width: 1 });
-
-    // Reveal UI once initialization finishes
-    //document.getElementById('app').classList.add('is-ready');
-  </script>
 
 </body>
 </html>

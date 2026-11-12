@@ -1,25 +1,16 @@
-// apps/images/filters.js
+// images :: modules/filters.js
 //
-// the images app's filter layer — a thin, reusable wrapper over @gestalt/filters,
-// shared by the edit mode (live preview + bake on export) and the batch mode (a
-// pipeline task). one curated catalogue, two entry points:
+// the effects of @gestalt/filters the app offers, one curated list for the editor and the batch:
 //
-//   preview(el, id, opts)   non-destructive, live — sets a css/svg filter on a
-//                           dom element (used for the editor's on-canvas preview)
-//   bake(canvas, id, opts)  destructive — bakes the effect into a canvas in place
-//                           via aufbau's filterCanvas (used on export and in batch)
-//
-// aufbau's filterCanvas can realise every filter (its own imageData pass, the
-// ctx.filter bridge for css/svg, or webgl), so `bake` handles the whole catalogue;
-// `preview` only works for the css/svg-backed ones — a canvas-only effect (pixelate,
-// dither) has no cheap live form, so it previews as a no-op and shows on export.
+//   preview(element, id, options)   live, a css/svg filter on an element (none for a canvas-only effect)
+//   bake(canvas, id, options)       into the pixels, every effect (export, batch)
+//   cssValue(id, options)           a plain css filter value, '' if there is none (the viewer)
 
 import { applyFilter, removeFilter, filterCanvas, filterCss, list } from '@gestalt/filters';
 
 export const NONE = 'none';
 
-// a photo-oriented subset, in a deliberate order; anything not in the installed
-// catalogue is skipped so this never breaks if the catalogue changes.
+// a photo-oriented subset in a deliberate order, what the catalogue lacks is skipped
 const CURATED = [
   'grayscale', 'sepia', 'invert', 'saturate', 'hue-saturation', 'duotone', 'instacolor',
   'posterize', 'solarize', 'sharpen', 'blur', 'glow', 'grain', 'vignette', 'halftone',
@@ -46,7 +37,7 @@ export const EFFECTS = [
 
 export const effectById = id => EFFECTS.find(e => e.id === id) ?? null;
 
-/** live, non-destructive preview on a dom element (css filter or injected svg url) */
+// live, non-destructive preview on a dom element (css filter or injected svg url)
 export async function preview (el, id, opts) {
   if (!el) return;
   if (!id || id === NONE) { removeFilter(el); return; }
@@ -54,19 +45,13 @@ export async function preview (el, id, opts) {
   catch { removeFilter(el); }   // canvas-only effect — no live form; it bakes on export
 }
 
-/** destructive — bake the effect into a canvas in place (export / batch) */
+// destructive — bake the effect into a canvas in place (export / batch)
 export async function bake (canvas, id, opts) {
   if (!canvas || !id || id === NONE) return;
   try { await filterCanvas(canvas, id, opts || {}); }
   catch (err) { console.warn('[images] filter bake failed:', id, err); }
 }
 
-/**
- * a plain css `filter` value for a css-backed effect, or '' otherwise. lets a
- * caller drop the effect straight into an element's inline style alongside other
- * declarations (e.g. the viewer's transform) without touching el.style itself —
- * the safe path when the element's style is re-rendered by the framework.
- */
 export async function cssValue (id, opts) {
   if (!id || id === NONE) return '';
   try { return (await filterCss(id, opts || {})) || ''; }

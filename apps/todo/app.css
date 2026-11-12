@@ -5,7 +5,7 @@
 
 /* ── menu ────────────────────────────────────────────────────────────────── */
 
-app-area[name="menu"] { --area-size: min(85vw, 18rem); }
+rat-area[name="menu"] { --area-size: min(85vw, 18rem); }
 
 .menu {
   block-size     : 100%;
@@ -68,7 +68,7 @@ app-area[name="menu"] { --area-size: min(85vw, 18rem); }
 
 /* ── a view: header, the add field, the groups ───────────────────────────── */
 
-app-view > header {
+rat-view > header {
   align-items   : center;
   block-size    : 3rem;
   border-bottom : 1px solid var(--line);
@@ -205,7 +205,7 @@ app-view > header {
 
 /* ── the editor ──────────────────────────────────────────────────────────── */
 
-app-area[name="context"] { --area-size: min(80vh, 40rem); }
+rat-area[name="context"] { --area-size: min(80vh, 40rem); }
 
 .editor {
   display           : flex;
@@ -254,3 +254,7 @@ pop-toast .undo {
   padding         : 0;
   text-decoration : underline;
 }
+
+/* a button's text is centered by default, a row reads from the start */
+.task .body, .nav-link { justify-items: start; text-align: start; }
+.menu .search { inline-size: 100%; }

@@ -11,9 +11,9 @@
    #app is the <app-root>: the list in <app-area name="menu"> at the start, a
    sidebar where there is room, a drawer where not. the prompt in the main area */
 
-app-area[name="menu"] { --area-size: min(85vw, 280px); }
+rat-area[name="menu"] { --area-size: min(85vw, 280px); }
 
-app-view[name="prompt"] { block-size: 100%; display: flex; flex-direction: column; }
+.detail { block-size: 100%; display: flex; flex-direction: column; min-block-size: 0; }
 
 /* ── sidebar ── */
 .sidebar {
@@ -45,6 +45,7 @@ app-view[name="prompt"] { block-size: 100%; display: flex; flex-direction: colum
 
 /* ── sort (buttons are now a shared <${Picker}>) ── */
 .sort-row { display: flex; align-items: center; gap: .35rem; flex-shrink: 0; }
+.sort-row input-value { flex: 1 1 auto; font-size: .75rem; min-inline-size: 0; }
 
 /* ── section label ── */
 .section-label {
@@ -207,7 +208,7 @@ app-view[name="prompt"] { block-size: 100%; display: flex; flex-direction: colum
 /* ── narrow: the list is a drawer, the prompt has a way back to it ── */
 .mobile-only { display: none; }
 
-#app:has(> app-area[name="menu"]:state(overlay)) {
+#app:has(> rat-area[name="menu"]:state(overlay)) {
   .mobile-only               { display: flex; }
   .detail-header             { padding: .85rem .85rem .6rem; }
   .detail-view, .detail-edit { padding: 0 .85rem .85rem; }

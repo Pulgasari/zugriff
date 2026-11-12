@@ -6,12 +6,8 @@
   "trailingSlash": true,
   "rewrites": [
     {
-      "source"      : "/:appname([a-z0-9-]+)/",
-      "destination" : "/index.html"
-    },
-    {
-      "source"      :      "/:appname/:path*",
-      "destination" : "/apps/:appname/:path*"
+      "source"      : "/:appname/:path*",
+      "destination" : "/www/:appname/:path*"
     }
   ]
 }

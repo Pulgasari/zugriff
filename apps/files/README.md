@@ -1,129 +1,70 @@
 # files
 
-A file manager over a folder from your **own disk**. You grant one folder with
-the File System Access API and it becomes the root. Nothing is uploaded and
-nothing is copied, only the directory handle is kept, so a returning visit just
-asks for permission again.
+A file manager over a folder of your **own disk**, from `zugriff/apps/files`, rebuilt on rat. You grant one
+folder and it becomes the root. Nothing is uploaded and nothing is copied, only the handle is kept (table
+`root` of the database), so a returning visit just asks for permission again. On android and the desktop the
+folder comes from the shell's folders driver of `@rat/app`.
 
 ## frame
 
-An `<app-root>` with four `<app-area>`s (`@aufbau/elements`):
-
 | area      | dock   | what it holds |
 |-----------|--------|---------------|
-| `main`    |        | the views |
-| `menu`    | start  | the app's menu, the former tools come back here |
-| `config`  | end    | the settings: the shared ones and the app's own, the folder |
-| `context` | bottom | about the current thing: an entry, the open file, the folder, the scan |
-
-On a narrow screen the docked areas are drawers, `context` peeks with its
-handle. On a wide one they are sidebars and a sheet below the views.
+| main      |        | the views |
+| `menu`    | start  | the views, what is coming back |
+| `config`  | end    | the app's settings, the folder, the shared appearance |
+| `context` | bottom | the tasks, an entry, the open file, the folder on screen, the folder as a whole |
 
 ## views
 
 | view        | route        | what it is |
 |-------------|--------------|------------|
-| `dashboard` | `#/`         | recent files, categories, the folder; a search over the whole folder |
-| `library`   | `#/library`  | the folder in tabs: crumbs, filter, list or grid, a new-folder button |
+| `dashboard` | `#/`         | recent files, bookmarks, categories, the folder; a search over the whole folder |
+| `library`   | `#/library`  | the folder in tabs: crumbs, filter, list or grid, a new-folder button, the pickboard |
 | `preview`   | `#/preview`  | one file, an image inline. its details are in the context area |
-
-## settings
-
-- **Open with**: `auto` (a tap on touch screens, a double click with a mouse),
-  `a tap`, `a double click`
-- **Search bar**, **Tabs**: at the bottom (default) or the top
-
-## the index
-
-The dashboard reads the whole folder in the background (`modules/scan.js`):
-size, type and date of every file, dot folders and `node_modules` skipped. The
-last index is stored in opfs and shown at once on the next visit, a fresh walk
-replaces it when it is done.
-
-## thumbnails
-
-Images get a thumbnail once they scroll into view: decoded, downscaled to 256px
-and stored as webp in opfs by the shared thumbnail cache (`.shared/js/thumbs.js`,
-`requestFile`). The key holds path, size and modification time, so an edited
-image gets a new one. The cache is capped at 128 MB, the oldest go first.
-
-## tasks
-
-Work that takes a while runs as a task (`modules/tasks.js`), never in front of
-the user: reading the folder, every write. Tasks wait in lanes: the index and
-the writes run side by side, two writes one after another. The square beside
-the search field turns while one runs and shows the count; a tap lists what
-runs, what waits and what ran (the last 50, kept across visits). A waiting or
-running task can be cancelled.
-
-## copy and move
-
-An entry's details put it on the clipboard, to copy or to move; more entries
-of the same kind join it. In the library a bar shows what waits, and pastes it
-into the folder on screen as one task with a file count as progress
-(`modules/transfer.js`). A taken name gets a number (`a (2).txt`), a folder
-cannot go into itself. A move uses the browser's own `move()` where it has
-one, else copy and delete. Files are copied as streams.
-
-## send (lan)
-
-The `sync` view (`#/sync`, in the menu as Send) sends files to a device on the
-local network over LocalSend v2: the official LocalSend app on the other side
-is all it takes (with quick save on, nobody has to tap accept for auto sync).
-It needs the
-android app: the network part is the native FileSync plugin
-(`.github/capacitor/plugins/filesync/`, protocol in its `PROTOCOL.md`), only
-the files app carries it (`build.plugins` in the registry).
-
-- receivers are found by multicast, typed (`ip:port`, `filesync://…`) or picked
-  from those sent to before; https certificates are pinned by fingerprint where
-  it is known, a pin is asked for when the receiver wants one
-- files are picked, or sent from the library: a file's details have "send",
-  through the `content://` uri its android handle carries
-- a send is a task in the `send` lane, with bytes as progress; its history is
-  the task history
-- auto sync sends a folder in the background whenever new files show up on
-  wi-fi (optionally one ssid), subfolders included
-
-## folder types and bookmarks
-
-`modules/places.js`, per granted folder:
-
-- **types**: Audio, Documents, Images and Videos built in, more with a name and
-  an icon. A folder's details suggest one when most of its files are of a
-  kind. For now a type changes the folder's icon; a default view per type is
-  the next step.
-- **bookmarks**: a folder is bookmarked from its details and shows on the
-  dashboard.
-
-## remote
-
-WebDAV servers (Nextcloud and ownCloud included) are connected from the
-dashboard and open in a tab of their own (`modules/remotes.js`). A connection
-is a root handle like the granted folder (`.shared/js/modules/webdav/`), so
-browsing, preview, thumbnails, copy and move all work on it, and between it and
-the folder. In the android app the requests are native (`request()` of
-`.shared/js/modules/http.js`, the NativeHttp plugin), any server works; in a
-browser the server has to allow cors for this app. The credentials stay on the
-device, in opfs. Drive, (S)FTP and LAN are tiles that say what each would
-need.
-
-## writing
-
-The folder is granted read only. Renaming, deleting and a new folder ask for
-write access on the click that wants it.
 
 ## how it's built
 
-| file              | what it is |
-|-------------------|------------|
-| `app.js`          | the app: state, tabs, the views, the areas |
-| `modules/db.js`   | the one granted folder handle (`@bunker/db`) and the permission dance |
-| `modules/places.js` | bookmarks and folder types |
-| `modules/remotes.js` | the webdav connections |
-| `modules/scan.js` | the index of the whole folder |
-| `modules/sync.js` | lan sending through the FileSync plugin |
-| `modules/tasks.js` | the task lanes and their history |
-| `modules/transfer.js` | the clipboard, copying and moving |
-| `views/sync.js` | the send view |
-| `app.css`         | the views' layout and the look of rows, tiles and cards |
+| file | what it is |
+|---|---|
+| `app.rat.html` | the areas and the views |
+| `state.rat.js` | the state (tabs, listing, selection, settings) and the actions (open, write, paste, the folder) |
+| `../.shared/fs.js` | listing, reading, a new folder, rename, delete, copy over any root handle |
+| `modules/places.rat.js` | bookmarks and foldertypes |
+| `../.shared/webdav/remotes.rat.js` | the webdav servers, each a root handle (`.shared/webdav/`), kept in `RAT.app.files` |
+| `modules/root.rat.js` | the granted folder: picked and kept through `@rat/app`'s folders driver |
+| `modules/scan.rat.js` | the index of the whole folder, kept in `RAT.app.files` |
+| `modules/sync.rat.js` | sending over the lan (LocalSend v2) through the native FileSync plugin |
+| `modules/tasks.rat.js` | the task lanes and their history |
+| `modules/transfer.rat.js` | the pickboard, copying and moving |
+| `components/` | the views and their parts |
+
+state and modules are `.rat.js`: their signals are exported `$names` (`$folder`, `$index`, `$queue` …), a view
+imports them by name and reads and writes them like its own (`$category = null`), no `.value`.
+
+mods: `database` (the handle), `dialogs` (new folder, rename, delete), `files` (the index, the servers),
+`thumbnails`, `offline`.
+
+## remote
+
+WebDAV servers (Nextcloud and ownCloud included) are connected from the dashboard and open in a tab of their
+own. A connection is a root handle like the folder (`.shared/webdav/handles.js`), so browsing, preview,
+thumbnails, copy and move work on it and between it and the folder. In a browser the server has to allow cors
+for this app; in the android app the requests are native (`request()` of `.shared/http.js`, the NativeHttp
+plugin). The credentials stay on the device.
+
+## send (lan)
+
+The `#/sync` view sends files to a device on the local network over LocalSend v2. The network part is native:
+udp multicast and https to a lan address with a self-signed certificate are nothing a web page may do. In a
+browser the view says so; it works in the android app with the FileSync plugin.
+
+## android
+
+`rat build apps/files --target android` (the ci workflow `android.yml` with an sdk): the granted folder
+through the storage access framework (rat's `Saf` plugin, the grant persisted), the servers without cors
+(`NativeHttp`), sending over the lan (`FileSync`, `android.plugins` in `config.rat.js`).
+
+## settings
+
+open with (a tap, a double click, auto), the search bar and the tabs at the top or the bottom, a pattern behind
+the app and on the tiles (`input-pattern`, painted by `app.css`).

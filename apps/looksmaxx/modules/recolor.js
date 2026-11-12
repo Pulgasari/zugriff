@@ -1,4 +1,4 @@
-// apps/looksmaxx/recolor.js
+// looksmaxx :: modules/recolor.js
 //
 // recolour the hair region of a photo without flattening it. the trick (straight
 // out of the methodology) is to keep the original luminance — the light and shadow

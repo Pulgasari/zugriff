@@ -1,10 +1,7 @@
-// apps/images/edit.js
+// images :: modules/edit.js
 //
-// the pixel work — pure canvas transforms. every function takes a source
-// canvas and returns a brand new one, so the caller can keep the old one for
-// the undo stack instead of mutating in place. nothing here touches the dom or
-// the app state. (shared verbatim with the edit mode; ported from the old
-// image-editor so images/ stays self-contained.)
+// the pixel work, pure canvas transforms: each takes a canvas and returns a new one, the caller keeps
+// the old one for undo. nothing here touches the dom or the app state
 
 export function newCanvas (w, h) {
   const canvas = document.createElement('canvas');
@@ -13,14 +10,14 @@ export function newCanvas (w, h) {
   return canvas;
 }
 
-/** a straight copy of a canvas */
+// a straight copy of a canvas
 export function clone (src) {
   const out = newCanvas(src.width, src.height);
   out.getContext('2d').drawImage(src, 0, 0);
   return out;
 }
 
-/** rotate by a quarter turn — 'cw' or 'ccw'. width and height swap. */
+// rotate by a quarter turn — 'cw' or 'ccw'. width and height swap.
 export function rotate90 (src, dir = 'cw') {
   const out = newCanvas(src.height, src.width);
   const ctx = out.getContext('2d');
@@ -30,7 +27,7 @@ export function rotate90 (src, dir = 'cw') {
   return out;
 }
 
-/** mirror across an axis — 'h' (left↔right) or 'v' (top↔bottom) */
+// mirror across an axis — 'h' (left↔right) or 'v' (top↔bottom)
 export function flip (src, axis = 'h') {
   const out = newCanvas(src.width, src.height);
   const ctx = out.getContext('2d');
@@ -40,7 +37,7 @@ export function flip (src, axis = 'h') {
   return out;
 }
 
-/** cut out a rectangle (in source pixels), clamped to the canvas */
+// cut out a rectangle (in source pixels), clamped to the canvas
 export function crop (src, x, y, w, h) {
   x = Math.max(0, Math.min(src.width,  Math.round(x)));
   y = Math.max(0, Math.min(src.height, Math.round(y)));
@@ -51,7 +48,7 @@ export function crop (src, x, y, w, h) {
   return out;
 }
 
-/** scale to new dimensions */
+// scale to new dimensions
 export function resize (src, w, h) {
   const out = newCanvas(w, h);
   const ctx = out.getContext('2d');
@@ -60,19 +57,19 @@ export function resize (src, w, h) {
   return out;
 }
 
-// ── adjustments ──────────────────────────────────────────────────────────────
+// :::::: ADJUSTMENTS
 
 export const IDENTITY = { brightness: 100, contrast: 100, saturate: 100, grayscale: 0 };
 
-/** true when the sliders are all at their neutral position */
+// true when the sliders are all at their neutral position
 export const isIdentity = f =>
   f.brightness === 100 && f.contrast === 100 && f.saturate === 100 && f.grayscale === 0;
 
-/** a css/canvas filter string from the slider values */
+// a css/canvas filter string from the slider values
 export const filterString = f =>
   `brightness(${f.brightness}%) contrast(${f.contrast}%) saturate(${f.saturate}%) grayscale(${f.grayscale}%)`;
 
-/** bake the current adjustments into the pixels */
+// bake the current adjustments into the pixels
 export function applyFilter (src, f) {
   if (isIdentity(f)) return clone(src);
   const out = newCanvas(src.width, src.height);
@@ -82,9 +79,9 @@ export function applyFilter (src, f) {
   return out;
 }
 
-// ── io ───────────────────────────────────────────────────────────────────────
+// :::::: IO
 
-/** decode a File/Blob into a canvas — createImageBitmap with an <img> fallback */
+// decode a File/Blob into a canvas — createImageBitmap with an <img> fallback
 export async function loadImage (file) {
   try {
     const bitmap = await createImageBitmap(file);

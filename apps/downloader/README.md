@@ -1,6 +1,6 @@
 # downloader
 
-web: <https://zugriff.dev/downloader/>
+ported from `zugriff/apps/downloader`.
 
 Paste or share links, they become packages: a queue fetches them resumably and
 puts the files where they belong. Adding a source is one plugin file.
@@ -52,22 +52,20 @@ an entry may carry `kind: 'hls'`, `hash: { algorithm: 'SHA-256', value }` and
 
 ## files
 
-| file                        | what it is |
-|-----------------------------|------------|
-| `app.js`                    | the frame, queue and library views, links in from share, paste and drop |
-| `components/Grabber.js`     | the field, the found packages, start |
-| `components/Rows.js`        | a download row, a package card |
-| `components/Detail.js`      | the download in the context area, a preview of a finished file |
-| `components/Config.js`      | settings: queue, targets, plugins, storage |
-| `modules/engine.js`         | the queue, transports, resume, hls, check, targets |
-| `modules/grabber.js`        | urls to packages |
-| `modules/plugins.js`        | built-in plugins, the user's in workers |
-| `modules/plugin-worker.js`  | one user plugin, away from the page |
-| `modules/frame.js`          | the handles of the `app-root` |
+| file | what it is |
+|---|---|
+| `app.rat.html` | the views, the dock, the context area with the download, the settings |
+| `state.rat.js` | the queue and the library as packages, the download shown, links in from share, paste and drop |
+| `settings.rat.js` | the queue's settings, the webdav place and the user's plugins, kept |
+| `views/` | `QueueView`, `GrabView`, `LibraryView` |
+| `components/` | `PackageCard`, `DownloadRow`, `FoundPackage`, `Detail`, `Preferences` |
+| `modules/engine.js` | the queue, transports, resume, hls, check, targets. rows and packages are tables of `RAT.app.database`, the folder target is `RAT.app.folders` |
+| `modules/grabber.js` | urls to packages |
+| `modules/plugins.js` | built-in plugins, the user's in workers |
+| `modules/plugin-worker.js` | one user plugin, away from the page |
 
 ## open
 
 - segments: a file in a few ranges at once
 - background fetch in the browser, android's `DownloadManager` for long downloads
 - unzip and rename after a download, dash streams
-- `tools/downloader` is no longer listed, the folder is still there

@@ -1,4 +1,4 @@
-// apps/code/modules/keyboard.js
+// code :: modules/keyboard.js
 // native (Android) keyboard suppression. where the browser supports the
 // VirtualKeyboard API, inputs are marked manual and the OS keyboard is hidden so the
 // on-screen code keyboard is the only one. shared by the app-wide effect (app.js) and
