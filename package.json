@@ -3,7 +3,7 @@
   "private" : true,
   "type"    : "module",
   "scripts" : {
-    "build"   : "for app in apps/*/; do node ../rat/packages/cli/index.js build \"$app\"; done",
+    "apps"    : "for app in apps/*/; do node ../rat/packages/cli/index.js build \"$app\"; done",
     "android" : "node .github/scripts/android.mjs"
   }
 }

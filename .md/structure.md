@@ -30,5 +30,6 @@ rat/  aufbau/  bunker/  domina/  gestalt/  htx/  js-packages/      (wallpaperfx/
 ```
 
 - a source page loads `../../../rat/packages/app/run/run.js`, which writes the import map into the others
-- `node ../rat/packages/cli/index.js build apps/<slug>` builds one app into `www/<slug>`
+- `node ../rat/packages/cli/index.js build apps/<slug>` builds one app into `www/<slug>`, `npm run apps` all of them
+- vercel builds nothing: it serves `www/` as committed. a script named `build` would be run there, where no rat is checked out
 - `node ../rat/packages/cli/index.js dev apps/<slug>` serves one while working on it
