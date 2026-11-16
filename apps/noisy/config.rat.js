@@ -36,8 +36,12 @@ export default {
   offline    : true,
   thumbnails : { width: 160 }, // the covers, from the tags
 
-  // rat build --target android. the media session plugin: the notification, the lock screen, playing on in the background
-  android : { id: 'dev.pulgasari.noisy', npm: ['@jofr/capacitor-media-session@4'] },
+  // rat build --target android. the media session plugin:
+  // the notification, the lock screen, playing on in the background
+  android : { 
+    id  : 'dev.pulgasari.noisy', 
+    npm : ['@jofr/capacitor-media-session@4'] 
+  },
 
   build : { 
     emptyOutDir : true, 
