@@ -5,21 +5,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b0b0b">
+  
   <title>zugriff</title>
+  
   <link rel="stylesheet" href="https://code.pulgasari.dev/gestalt/packages/css/aufbau.css" />
   <link rel="stylesheet" href="https://code.pulgasari.dev/gestalt/packages/css/gestalt.css" />
-  <!--
-  <link rel="stylesheet" href="https://code.pulgasari.dev/gestalt/packages/css/layouts/landing.css" />
-  -->
-  <script>
-    // the start page is zugriff.dev/ (or www.), 
-    // anything else that ends up here was not found
-    const host  = location.hostname;
-    const apex  = !host.endsWith('.zugriff.dev') || host === 'www.zugriff.dev';
-    const start = apex && location.pathname === '/';
-    document.documentElement.dataset.page = start ? 'start' : 'missing';
-    if (!start) document.title = '404 | not found · zugriff';
-  </script>
 
   <style>
     html, body { height: 100%; margin: 0; }
@@ -41,11 +31,41 @@
     nav a { color: inherit; text-decoration: none; }
     */
   </style>
+
+  <script>
+    // the start page is zugriff.dev/ (or www.), 
+    // anything else that ends up here was not found
+    const host  = location.hostname;
+    const apex  = !host.endsWith('.zugriff.dev') || host === 'www.zugriff.dev';
+    const start = apex && location.pathname === '/';
+    document.documentElement.dataset.page = start ? 'start' : 'missing';
+    if (!start) document.title = '404 | not found · zugriff';
+  </script>
 </head>
 
 <body>
 
   <div id="app" data-layout="landing">
+    <nav>
+      <a href="/cli/">cli</a>
+      <a href="/code/">code</a>
+      <a href="/downloader/">downloader</a>
+      <a href="/ebooks/">ebooks</a>
+      <a href="/feeds/">feeds</a>
+      <a href="/files/">files</a>
+      <a href="/icons/">icons</a>
+      <a href="/images/">images</a>
+      <a href="/looksmaxx/">looksmaxx</a>
+      <a href="/noisy/">noisy</a>
+      <a href="/notes/">notes</a>
+      <a href="/podcasts/">podcasts</a>
+      <a href="/prompts/">prompts</a>
+      <a href="/todo/">todo</a>
+      <a href="/tools/">tools</a>
+      <a href="/vectorizer/">vectorizer</a>
+      <a href="/videos/">videos</a>
+    </nav>
+    
     <div>
       <img src='/logo.svg' alt='zugriff' />
       <div id="missing">404 | not found.</div>
