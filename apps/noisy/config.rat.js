@@ -44,3 +44,19 @@ export default {
     outDir      : '../../www/noisy'
   }, // rat build -> www/noisy
 };
+
+
+/*
+doctype  : 'html',
+lang     : 'en',
+charset  : 'utf8',
+manifest : 'manifest.json',
+viewport : {
+  width        : 'device-width',
+  initialScale : 1.0,
+},
+stylesheets: [
+  '../.shared/css/zugriff.css',
+  'app.css',
+],
+*/
