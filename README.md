@@ -5,12 +5,19 @@
 cross-platform apps focused on browser and android.
 
 built with:
-[rat](https://github.com/pulgasari/rat)
-[aufbau](https://github.com/pulgasari/aufbau)
-[gestalt](https://github.com/pulgasari/gestalt)
+[rat](https://github.com/pulgasari/rat) ·
+[aufbau](https://github.com/pulgasari/aufbau) ·
+[gestalt](https://github.com/pulgasari/gestalt) ·
 capacitor
 
 ---
+
+## apps
+
+app | build | live | source
+----|-------|------|-------
+cli  | [build](https://zugriff.dev/cli/)  | [live](https://cli.zugriff.dev)  | [source](apps/cli)
+code | [build](https://zugriff.dev/code/) | [live](https://code.zugriff.dev) | [source](apps/code)
 
 ## apps
 
