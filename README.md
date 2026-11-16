@@ -4,7 +4,11 @@
 
 cross-platform apps focused on browser and android.
 
-built with: **[rat](https://github.com/pulgasari/rat)** + **aufbau** + **gestalt** + **capacitor**
+built with:
+[rat](https://github.com/pulgasari/rat)
+[aufbau](https://github.com/pulgasari/aufbau)
+[gestalt](https://github.com/pulgasari/gestalt)
+capacitor
 
 ---
 
@@ -34,4 +38,6 @@ android only (the web layer of [wallpaperfx](https://github.com/Pulgasari/wallpa
 
 - structure: [`.md/structure.md`](.md/structure.md)
 - techstack: [`.md/techstack.md`](.md/techstack.md)
-- apps and their todo: [`apps/README.md`](apps/README.md), [`apps/TODO.md`](apps/TODO.md)
+- apps and their todo:
+[`apps/README.md`](apps/README.md),
+[`apps/TODO.md`](apps/TODO.md)
