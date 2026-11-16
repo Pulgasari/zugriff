@@ -69,7 +69,7 @@ export async function save ({ content, tags: chosen, title }) {
   const saved = await database.prompts.put({
     content,
     createdAt : $current?.createdAt ?? now,
-    tags      : [...chosen],   // a $List in the form, an array in the database
+    tags      : [...chosen],   // a $Array in the form, a plain one in the database
     title     : title.trim(),
     updatedAt : now,
     ...$current ? { id: $current.id } : {},
@@ -89,7 +89,7 @@ export const addTag = (name, color) => database.tags.add({ color, name: name.tri
 // the tag goes off every prompt that had it
 export async function removeTag (id) {
   await database.tags.delete(id);
-  for (const prompt of prompts.filter(prompt => prompt.tags?.includes(id)).toArray()) {
+  for (const prompt of prompts.filter(prompt => prompt.tags?.includes(id))) {
     await database.prompts.put({ ...prompt, tags: prompt.tags.filter(other => other !== id) });
   }
   if ($tag === id) $tag = null;

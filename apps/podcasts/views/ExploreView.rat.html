@@ -58,7 +58,7 @@
   const $remembered = new Set(shortlist.map(row => row.id));
 
   // with no query: podcasts fall back to the shortlist, episodes have nothing to show
-  const $entries = $text ? $results : $tab === 'podcasts' ? shortlist.toArray() : [];
+  const $entries = $text ? $results : $tab === 'podcasts' ? [...shortlist] : [];
   const $empty   = $text ? EMPTY.search : EMPTY[$tab];
 
   // search-as-you-type. the timer waits out the typing, the controller drops a request

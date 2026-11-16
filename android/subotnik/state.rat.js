@@ -14,7 +14,7 @@ look and who sits where are kept (by package name: an uninstalled app drops out 
 */
 
 import { effect } from '@rat/signals';
-import { $Record, Bool, Enum, List, Num, Str } from '@rat/types';
+import { $Array, $Record, Bool, Enum, Num, Str } from '@rat/types';
 
 import { launcher, categoryOf, glyphOf, letterOf, norm } from './modules/launcher.js';
 
@@ -25,7 +25,7 @@ import { toast } from '../.shared/toast.js';
 export const BARS = { cat: 'Kategorien', letter: 'Anfangsbuchstaben', search: 'Suchfeld' };
 
 const Look = {
-  barsOrder     : List(Enum('cat', 'letter', 'search')).default(['cat', 'letter', 'search']),   // top to bottom
+  barsOrder     : $Array(Enum('cat', 'letter', 'search')).default(['cat', 'letter', 'search']),   // top to bottom
   barsPos       : Enum('bottom', 'top'),
   borderColor   : Str.default('#ffffff'),
   borderSize    : Num.range(0, 4).default(0),
