@@ -14,7 +14,7 @@ of a server.
 
 import dom from '@domina/dom';
 import { batch, effect, untrack }    from '@rat/signals';
-import { $List, $Record, Enum, Str } from '@rat/types';
+import { $Array, $Record, Enum, Str } from '@rat/types';
 import { Path }                      from '@rat/types/Path';
 
 import { toast } from '../.shared/toast.js';
@@ -95,7 +95,7 @@ $size     = null;    // { width, height } of the image in the preview
 
 const Tab = $Record({ path: Path, source: Str.optional().default(null) });
 
-export const $tabs! = $List(Tab).create([{}]);
+export const $tabs! = $Array(Tab).create([{}]);
 
 let $tabIndex! = 0;
 
@@ -325,7 +325,7 @@ export async function paste () {
   const board = $pickboard;
   if (!board) return;
   const handle = await writable();
-  const items  = board.items.toArray();
+  const items  = [...board.items];
   const target = $path;
   const what   = items.length === 1 ? items[0].name : `${items.length} items`;
   const verb   = board.mode === 'move' ? 'move' : 'copy';   // the name of its icon as well
@@ -388,7 +388,7 @@ export function manageRemotes () {
 export async function forgetRemote (connection) {
   if (!await dialogs.confirm({ message: `Forget “${connection.name}”? The files on the server stay.`, ok: 'Forget', title: connection.name })) return;
   await remotes.remove(connection.id);
-  resetTabs($tabs.filter(tab => tab.source !== connection.id).toArray());
+  resetTabs($tabs.filter(tab => tab.source !== connection.id));
 }
 
 // :::::: SEND, a file of the folder into the outbox, the view opens

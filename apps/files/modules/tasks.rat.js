@@ -20,19 +20,19 @@ index.
 
 // :::::: IMPORT
 
-import { $List, $Record } from '@rat/types';
+import { $Array, $Record } from '@rat/types';
 
 // ::::::
 
 const HISTORY = 50;
 
 const // ::: the lists, changed in place. the ended ones kept
-$open   = new $List,
-$ended! = new $List;
+$open   = new $Array,
+$ended! = new $Array;
 
 export const // ::: what the views read: signals, as every $name another module imports
-$queue   = $open.toArray(),
-$history = $ended.toArray(),
+$queue   = [...$open],
+$history = [...$ended],
 $busy    = $open.has({ state: 'running' });
 
 const controllers = new WeakMap;   // task -> AbortController

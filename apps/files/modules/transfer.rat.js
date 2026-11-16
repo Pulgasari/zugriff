@@ -5,7 +5,7 @@ copying and moving inside the granted folder and between it and the servers. the
 was picked to copy or to move (not the system's clipboard, that is RAT.app.clipboard), transfer() puts
 it into the folder on screen.
 
-  $pickboard   null, or a $Record { items: $List of { kind, name, path (a Path), root }, mode: 'copy' | 'move', placed }
+  $pickboard   null, or a $Record { items: $Array of { kind, name, path (a Path), root }, mode: 'copy' | 'move', placed }
   pick(mode, entry, path, root)   puts an entry on it, the same mode adds to it
   placed()                        a copy was put somewhere: it stays to put again, the next pick starts anew
 
@@ -16,7 +16,7 @@ and delete. files are copied as streams.
 
 // :::::: IMPORT
 
-import { $List, $Record } from '@rat/types';
+import { $Array, $Record } from '@rat/types';
 import { copyFile, copyTree, dirAt } from '../../.shared/fs.js';
 
 // ::::::
@@ -27,7 +27,7 @@ export let $pickboard = null;
 // :::::: PICKBOARD
 
 export function pick (mode, entry, path, root) {
-  if ($pickboard?.mode !== mode || $pickboard.placed) $pickboard = new $Record({ items: new $List, mode, placed: false });
+  if ($pickboard?.mode !== mode || $pickboard.placed) $pickboard = new $Record({ items: new $Array, mode, placed: false });
   $pickboard.items.drop({ name: entry.name, path });
   $pickboard.items.push({ kind: entry.kind, name: entry.name, path, root });
 }

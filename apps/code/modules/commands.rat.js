@@ -49,7 +49,7 @@ const COMMANDS = {
   // ::: files
   'close-file' : { exec: () => { if ($current) close($current); }, title: 'Close File' },
   'save'       : { exec: () => saveDocument(),                     title: 'Save' },
-  'save-all'   : { exec: async () => { for (const document of $documents.filter(document => document.dirty).toArray()) await saveDocument(document); }, title: 'Save All' },
+  'save-all'   : { exec: async () => { for (const document of $documents.filter(document => document.dirty)) await saveDocument(document); }, title: 'Save All' },
 
   // ::: history and clipboard
   'copy'  : { exec: action('editor.action.clipboardCopyAction'),  title: 'Copy' },

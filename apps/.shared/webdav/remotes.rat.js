@@ -33,8 +33,8 @@ const $rows = $Table(Connection).create(await files.read(FILE, 'json').catch(() 
 effect(() => files.write(FILE, JSON.stringify($rows)));
 
 // what the views read: a signal, as every $name another module imports
-export const $connections = $rows.toArray();
-export const byId = id => $rows.one({ id }) ?? null;
+export const $connections = [...$rows];
+export const byId = id => $rows.first({ id }) ?? null;
 
 export async function add ({ name, password = '', url, username = '' }) {
   const trimmed = String(url ?? '').trim();

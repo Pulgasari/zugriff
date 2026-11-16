@@ -13,7 +13,7 @@ same way. a binary file opens read only and empty.
   close(document), closeUnder(id)   one, or all at or below an id (a renamed or deleted entry)
 */
 
-import { $List, $Record } from '@rat/types';
+import { $Array, $Record } from '@rat/types';
 
 // :::::: LANGUAGES, monaco's own modes plus rat (@rat/syntax)
 
@@ -32,7 +32,7 @@ const isBinary = bytes => bytes.subarray(0, 8000).includes(0);
 
 // :::::: DOCUMENTS
 
-export const $documents = new $List;
+export const $documents = new $Array;
 
 export let $current = null;
 
@@ -81,5 +81,5 @@ export function close (document) {
 }
 
 export function closeUnder (id) {
-  for (const document of $documents.filter(document => document.id === id || document.id.startsWith(`${id}/`)).toArray()) close(document);
+  for (const document of $documents.filter(document => document.id === id || document.id.startsWith(`${id}/`))) close(document);
 }

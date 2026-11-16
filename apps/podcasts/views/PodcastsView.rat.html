@@ -11,7 +11,7 @@
   let $sorting!  = 'newest';
   let $viewmode! = 'list';
 
-  const $podcasts = sortPodcasts(podcasts.toArray(), $sorting);
+  const $podcasts = sortPodcasts([...podcasts], $sorting);
 
   const empty = { hint: "Paste a podcast's RSS feed URL to subscribe.", icon: 'rss', title: 'No subscriptions yet' };
 </script>
